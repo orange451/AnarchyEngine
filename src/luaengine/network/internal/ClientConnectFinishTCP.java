@@ -24,6 +24,9 @@ public class ClientConnectFinishTCP implements ClientProcessable {
 					players.rawset("LocalPlayer", player);
 					con.disconnect();
 					
+					Game.connections().getLocalConnection().rawset("Player", player);
+					player.rawset("Connection", Game.connections().getLocalConnection());
+					
 					// Copy starter player scripts in to player
 					Instance starterScripts = Game.getService("Storage").findFirstChild("StarterPlayerScripts");
 					List<Instance> cc = starterScripts.getChildren();
