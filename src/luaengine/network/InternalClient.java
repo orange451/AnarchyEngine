@@ -5,8 +5,6 @@ import java.io.IOException;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.luaj.vm2.LuaTable;
-import org.luaj.vm2.LuaValue;
-import org.luaj.vm2.lib.ZeroArgFunction;
 
 import com.esotericsoftware.kryonet.Client;
 import com.esotericsoftware.kryonet.Connection;
@@ -17,15 +15,12 @@ import engine.InternalGameThread;
 import engine.InternalRenderThread;
 import engine.io.Load;
 import ide.ErrorWindow;
-import luaengine.LuaEngine;
 import luaengine.network.internal.ClientConnectFinishTCP;
 import luaengine.network.internal.ClientConnectTCP;
 import luaengine.network.internal.ClientLoadMapTCP;
 import luaengine.network.internal.ClientProcessable;
-import luaengine.network.internal.InstanceCreateTCP;
-import luaengine.network.internal.InstanceUpdateUDP;
-import luaengine.type.object.Instance;
-import luaengine.type.object.insts.PhysicsObject;
+import luaengine.network.internal.PingRequest;
+import luaengine.type.object.services.Connections;
 
 public class InternalClient extends Client {
 	private String worldJSON;
@@ -34,6 +29,8 @@ public class InternalClient extends Client {
 	public boolean connected;
 	
 	private static luaengine.type.object.insts.Connection connectionInstance;
+	
+	
 	
 	public InternalClient( String ip, int port, String username, LuaTable data) {
 		this.start();
@@ -68,6 +65,7 @@ public class InternalClient extends Client {
 								connectionInstance = new luaengine.type.object.insts.Connection(connection);
 								connectionInstance.forceSetName("ConnectionServer");
 								connectionInstance.forceSetParent(Game.getService("Connections"));
+								Game.connections().rawset("LocalConnection", connectionInstance);
 								
 								// Tell server we're all loaded
 								InternalGameThread.runLater(()->{
@@ -98,6 +96,21 @@ public class InternalClient extends Client {
 				if ( object instanceof ClientProcessable ) {
 					((ClientProcessable)object).clientProcess();
 				}
+				
+				// Ping request
+				if ( object instanceof PingRequest ) {
+					((PingRequest)object).process(connection);
+				}
+			}
+			
+			@Override
+			public void disconnected(Connection connection) {
+				Connections connections = ((Connections)Game.getService("Connections"));
+				luaengine.type.object.insts.Connection conInst = connections.getConnectionFromKryo(connection);
+				if ( conInst == null )
+					return;
+				
+				conInst.disconnect();
 			}
 		});
 	}

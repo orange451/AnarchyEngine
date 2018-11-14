@@ -191,6 +191,14 @@ public class Game implements Tickable {
 		return (UserInputService) Game.getService("UserInputService");
 	}
 	
+	public static Players players() {
+		return (Players) Game.getService("Players");
+	}
+	
+	public static Connections connections() {
+		return (Connections) Game.getService("Connections");
+	}
+	
 	public static Assets assets() {
 		return (Assets) Game.getService("Assets");
 	}
@@ -233,6 +241,13 @@ public class Game implements Tickable {
 			super("Game");
 			LuaEngine.globals.set("game", this);
 			
+			// On load event
+			this.rawset("OnLoad", new LuaEvent());
+			
+			// Fields
+			this.defineField("Running", LuaValue.valueOf(false), true);
+			this.defineField("IsServer", LuaValue.valueOf(false), true);
+			
 			// GetService convenience method
 			getmetatable().set("GetService", new TwoArgFunction() {
 				@Override
@@ -243,12 +258,6 @@ public class Game implements Tickable {
 					return service;
 				}
 			});
-			
-			// On load event
-			this.rawset("OnLoad", new LuaEvent());
-			
-			// Running variable. Set by engine
-			this.defineField("Running", LuaValue.valueOf(false), true);
 			
 			((LuaEvent)this.rawget("DescendantRemoved")).connectLua(new OneArgFunction() {
 				@Override
@@ -388,6 +397,7 @@ public class Game implements Tickable {
 	@Override
 	public void tick() {
 		Game.game().rawset("Running", LuaValue.valueOf(running));
+		Game.game().rawset("IsServer", LuaValue.valueOf(Game.isServer()));
 		
 		if ( !isLoaded() || !running )
 			return;

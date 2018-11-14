@@ -64,7 +64,7 @@ public class RunnerTestSimple extends RunnerClient {
 		obj.setParent(Game.workspace());
 		
 		// Camera controller
-		Game.runService().getRenderSteppedEvent().connect( new RunnableArgs() {
+		Game.runService().renderSteppedEvent().connect( new RunnableArgs() {
 			final int CAMERA_DIST = 2;
 			double t = Math.PI/2f;
 			

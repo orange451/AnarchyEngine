@@ -22,7 +22,7 @@ public class RunnerTestPBR extends RunnerClient {
 		super.loadScene(args);
 		
 		// Move camera
-		Game.runService().getRenderSteppedEvent().connect( new RunnableArgs() {
+		Game.runService().renderSteppedEvent().connect( new RunnableArgs() {
 			final int CAMERA_DIST = 256;
 			double t = Math.PI/2f;
 			

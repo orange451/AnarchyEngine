@@ -36,7 +36,7 @@ public class Debris extends Service {
 		
 		Game.runLater(() -> {
 			// Debris check
-			Game.runService().getHeartbeatEvent().connect( new RunnableArgs() {
+			Game.runService().heartbeatEvent().connect( new RunnableArgs() {
 				@Override
 				public void run(LuaValue[] args) {
 					long currentTime = System.currentTimeMillis();

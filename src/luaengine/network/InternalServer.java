@@ -13,12 +13,13 @@ import engine.io.Save;
 import luaengine.network.internal.ClientConnectFinishTCP;
 import luaengine.network.internal.ClientConnectTCP;
 import luaengine.network.internal.ClientLoadMapTCP;
-import luaengine.network.internal.ClientProcessable;
 import luaengine.network.internal.InstanceCreateTCP;
 import luaengine.network.internal.InstanceDestroyTCP;
 import luaengine.network.internal.InstanceUpdateUDP;
+import luaengine.network.internal.PingRequest;
 import luaengine.network.internal.ServerProcessable;
 import luaengine.type.object.Instance;
+import luaengine.type.object.insts.Camera;
 import luaengine.type.object.insts.Player;
 import luaengine.type.object.services.Connections;
 
@@ -81,6 +82,11 @@ public class InternalServer extends Server {
 				if ( object instanceof ServerProcessable ) {
 					((ServerProcessable)object).serverProcess();
 				}
+				
+				// Ping request
+				if ( object instanceof PingRequest ) {
+					((PingRequest)object).process(connection);
+				}
 			}
 
 			@Override
@@ -138,6 +144,11 @@ public class InternalServer extends Server {
 	}
 	
 	private void syncInstances(Instance instance) {
+		
+		// Keep cameras local
+		if ( instance instanceof Camera )
+			return;
+		
 		instance.changedEvent().connect((cargs) -> {
 			InternalGameThread.runLater(()->{
 				InstanceUpdateUDP updateObject = new InstanceUpdateUDP(instance, cargs[0]);

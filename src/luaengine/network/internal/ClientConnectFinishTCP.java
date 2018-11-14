@@ -16,7 +16,7 @@ public class ClientConnectFinishTCP implements ClientProcessable {
 		final long playerId = SID;
 		
 		Service players = Game.getService("Players");
-		con = Game.runService().getHeartbeatEvent().connect((args)-> {
+		con = Game.runService().heartbeatEvent().connect((args)-> {
 			List<Instance> children = players.getChildren();
 			for (int i = 0; i < children.size(); i++) {
 				Instance player = children.get(i);

@@ -18,7 +18,7 @@ RunService = game:GetService("RunService")
 
 RunService.RenderStepped:Connect(function(delta)
 	-- Disable if game is running
-	if ( game.Running ) then
+	if ( game.Running and not game.IsServer ) then
 		return
 	end
 	

@@ -1,10 +1,13 @@
 package luaengine.type.object.insts;
 
+import java.util.concurrent.atomic.AtomicLong;
+
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.ZeroArgFunction;
 
 import engine.Game;
 import ide.layout.windows.icons.Icons;
+import luaengine.network.internal.PingRequest;
 import luaengine.type.object.Instance;
 import luaengine.type.object.TreeViewable;
 
@@ -23,6 +26,7 @@ public class Connection extends Instance implements TreeViewable {
 		this.defineField("Address", "127.0.0.1", true);
 		this.defineField("Data", "", false);
 		this.defineField("Player", LuaValue.NIL, true);
+		this.defineField("Ping", LuaValue.valueOf(0), true);
 		
 		this.rawset("Archivable", LuaValue.valueOf(false));
 		
@@ -38,6 +42,17 @@ public class Connection extends Instance implements TreeViewable {
 		
 		this.setInstanceable(false);
 		this.setLocked(true);
+		
+		// Request ping every second
+		if (!Game.isRunning())
+			return;
+		AtomicLong lastSend = new AtomicLong(System.currentTimeMillis());
+		Game.runService().heartbeatEvent().connect((args)->{
+			if ( System.currentTimeMillis() - lastSend.get() > 100 ) {
+				lastSend.set(System.currentTimeMillis());
+				kryoConnection.sendUDP(new PingRequest(this));
+			}
+		});
 	}
 	
 	public com.esotericsoftware.kryonet.Connection getConnection() {
@@ -67,6 +82,12 @@ public class Connection extends Instance implements TreeViewable {
 			player.destroy();
 		
 		this.destroy();
+		
+		com.esotericsoftware.kryonet.Connection con = kryoConnection;
+		if ( con != null ) {
+			kryoConnection = null;
+			con.close();
+		}
 	}
 
 	public Player getPlayer() {

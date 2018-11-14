@@ -35,6 +35,8 @@ public class Connections extends Service implements TreeViewable,GameSubscriber 
 		ownedCharacters = new ArrayList<GameObject>();
 		
 		this.defineField("DefaultPort", LuaValue.valueOf(36545), false);
+		this.defineField("LocalConnection", LuaValue.NIL, true);
+		
 		this.rawset("Archivable", LuaValue.valueOf(false));
 		this.rawset("OnConnect", new LuaEvent());
 		this.rawset("OnDisconnect", new LuaEvent());
@@ -196,5 +198,10 @@ public class Connections extends Service implements TreeViewable,GameSubscriber 
 		}
 		
 		return cons;
+	}
+
+	public Connection getLocalConnection() {
+		LuaValue con = this.get("LocalConnection");
+		return !con.isnil()&&con instanceof Connection ? (Connection)con:null;
 	}
 }

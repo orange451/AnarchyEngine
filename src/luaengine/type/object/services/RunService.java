@@ -25,11 +25,11 @@ public class RunService extends Service {
 		return true;
 	}
 	
-	public LuaEvent getHeartbeatEvent() {
+	public LuaEvent heartbeatEvent() {
 		return (LuaEvent) this.get("Heartbeat");
 	}
 	
-	public LuaEvent getRenderSteppedEvent() {
+	public LuaEvent renderSteppedEvent() {
 		return (LuaEvent) this.get("RenderStepped");
 	}
 }

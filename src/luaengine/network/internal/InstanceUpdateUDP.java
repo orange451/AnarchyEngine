@@ -9,7 +9,6 @@ import org.luaj.vm2.LuaValue;
 
 import engine.Game;
 import luaengine.type.object.Instance;
-import luaengine.type.object.PhysicsBase;
 import luaengine.type.object.insts.GameObject;
 import luaengine.type.object.insts.PhysicsObject;
 import luaengine.type.object.services.Connections;

@@ -102,8 +102,12 @@ public class LuaEvent extends LuaDatatype {
 				//LuaEngine.globals.get("spawn").call(temp.getFunction());
 				//LuaEngine.spawn(temp.getFunction(), null, vargs);
 				
-				ScriptData t = ScriptData.create(temp.getFunction(), null, vargs);
-				t.run();
+				try {
+					ScriptData t = ScriptData.create(temp.getFunction(), null, vargs);
+					t.run();
+				}catch(Exception e) {
+					//
+				}
 			}
 		}
 	}

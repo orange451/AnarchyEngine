@@ -319,10 +319,10 @@ public abstract class Instance extends LuaInstancetype {
 		LuaEvent event = this.changedEvent();
 		event.fire(key, value);
 		
-		notifySubscribers(key.toString(), value);
+		notifyPropertySubscribers(key.toString(), value);
 	}
 	
-	public void notifySubscribers(String key, LuaValue value) {
+	public void notifyPropertySubscribers(String key, LuaValue value) {
 		for (int i = 0; i < propertySubscribers.size(); i++) {
 			if ( i >= propertySubscribers.size() )
 				continue;

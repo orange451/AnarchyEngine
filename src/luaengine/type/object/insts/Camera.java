@@ -17,7 +17,7 @@ public class Camera extends Instance implements TreeViewable {
 	public Camera() {
 		super("Camera");
 
-		this.defineField("Position",		Vector3.newInstance(0, 0, 0), false);
+		this.defineField("Position",	Vector3.newInstance(0, 0, 0), false);
 		this.defineField("LookAt",		Vector3.newInstance(0, 0, 0), false);
 		this.defineField("Pitch",		LuaValue.valueOf(0), false);
 		this.defineField("Yaw",			LuaValue.valueOf(0), false);

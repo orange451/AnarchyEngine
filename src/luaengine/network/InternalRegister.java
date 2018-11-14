@@ -9,6 +9,7 @@ import luaengine.network.internal.ClientLoadMapTCP;
 import luaengine.network.internal.InstanceCreateTCP;
 import luaengine.network.internal.InstanceDestroyTCP;
 import luaengine.network.internal.InstanceUpdateUDP;
+import luaengine.network.internal.PingRequest;
 import luaengine.network.internal.TestProtocol;
 
 public class InternalRegister {
@@ -25,5 +26,7 @@ public class InternalRegister {
 		kryo.register(InstanceCreateTCP.class);
 		kryo.register(InstanceDestroyTCP.class);
 		kryo.register(InstanceUpdateUDP.class);
+		
+		kryo.register(PingRequest.class);
 	}
 }

@@ -15,7 +15,7 @@ public class Player extends Instance implements TreeViewable {
 		super("Player");
 		
 		this.defineField("Character", LuaValue.NIL, false);
-		this.defineField("Connection", LuaValue.NIL, false);
+		this.defineField("Connection", LuaValue.NIL, true);
 		this.defineField("ClientOwnsPhysics", LuaValue.TRUE, false);
 
 		this.rawset("Archivable", LuaValue.valueOf(false));

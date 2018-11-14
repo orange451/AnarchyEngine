@@ -101,7 +101,7 @@ public abstract class PhysicsBase extends Instance implements GameSubscriber {
 		if ( !tv.equals(pv) ) {
 			vel.setInternal(pv);
 			this.rawset("Velocity", vel);
-			this.notifySubscribers("Velocity", vel);
+			this.notifyPropertySubscribers("Velocity", vel);
 		}
 	}
 	
