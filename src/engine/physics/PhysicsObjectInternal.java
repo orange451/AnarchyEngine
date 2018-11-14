@@ -17,6 +17,7 @@ import engine.gl.mesh.BufferedMesh;
 import engine.util.Pair;
 import engine.util.PhysicsUtils;
 import luaengine.type.data.Matrix4;
+import luaengine.type.data.Vector3;
 import luaengine.type.object.PhysicsBase;
 import luaengine.type.object.insts.Mesh;
 import luaengine.type.object.insts.Prefab;
@@ -82,11 +83,21 @@ public class PhysicsObjectInternal {
 	}
 
 	public void setVelocity( Vector3f vector ) {
+		this.setVelocity( new javax.vecmath.Vector3f( vector.x, vector.y, vector.z ) );
+	}
+
+	public void setVelocity( javax.vecmath.Vector3f vector ) {
 		if (this.destroyed)
 			return;
 		
-		this.wakeup();
-		body.setLinearVelocity( new javax.vecmath.Vector3f( vector.x, vector.y, vector.z ) );
+		javax.vecmath.Vector3f oldVel = body.getLinearVelocity(new javax.vecmath.Vector3f());
+		oldVel.sub(vector);
+		float distSqr = oldVel.lengthSquared();
+		
+		if ( distSqr > 0.1 )
+			this.wakeup();
+		
+		body.setLinearVelocity( vector );
 	}
 
 	public void applyImpulse( Vector3f impulse, Vector3f location ) {

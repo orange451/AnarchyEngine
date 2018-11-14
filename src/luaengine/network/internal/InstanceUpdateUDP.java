@@ -82,7 +82,6 @@ public class InstanceUpdateUDP implements ClientProcessable,ServerProcessable {
 	@Override
 	public void clientProcess() {
 		Instance instance = Game.getInstanceFromSID(instanceId);
-		//System.out.println("Receiving update packet -> " + instance + "("+instanceId+") / " + instanceData);
 		if ( instance == null )
 			return;
 		
@@ -103,14 +102,14 @@ public class InstanceUpdateUDP implements ClientProcessable,ServerProcessable {
 					instance.forceSetParent(value);
 				else {
 					if ( !rawOnly ) {
-						try {
-							instance.set(field, value);
-						} catch(Exception e) {
-							//
-						}
+						try { instance.set(field, value); } catch(Exception e) {}
 					} else {
-						if ( instance instanceof PhysicsObject ) {
-							((PhysicsObject)instance).updatePhysics(LuaValue.valueOf(field), value);
+						if ( Game.isServer() ) {
+							if ( instance instanceof PhysicsObject ) {
+								((PhysicsObject)instance).updatePhysics(LuaValue.valueOf(field), value);
+							}
+						} else {
+							try { instance.set(field, value); } catch(Exception e) {}
 						}
 					}
 					instance.rawset(field, value);

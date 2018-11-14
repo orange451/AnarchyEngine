@@ -234,35 +234,37 @@ public abstract class PhysicsBase extends Instance implements GameSubscriber {
 		// User updated the velocity
 		if ( key.toString().equals("Velocity") ) {
 			if ( physics != null ) {
-				physics.setVelocity(((Vector3)value).toJoml());
+				Vector3 vec = (Vector3)value;
+				javax.vecmath.Vector3f newVel = new javax.vecmath.Vector3f( vec.getX(), vec.getY(), vec.getZ() );
+				physics.setVelocity(newVel);
 			}
 		}
 		
 		// User updated the mass
 		if ( key.toString().equals("Mass") ) {
 			if ( physics != null ) {
-				physics.setMass(value.tofloat());
+				physics.setMass( Math.min( Math.max( value.tofloat(), 0 ), 1 ) );
 			}
 		}
 		
 		// User updated the bounciness
 		if ( key.toString().equals("Bounciness") ) {
 			if ( physics != null ) {
-				physics.setBounciness(value.tofloat());
+				physics.setBounciness(Math.min( value.tofloat(), 2));
 			}
 		}
 		
 		// User updated the friction
 		if ( key.toString().equals("Friction") ) {
 			if ( physics != null ) {
-				physics.setFriction(value.tofloat());
+				physics.setFriction(Math.min( value.tofloat(), 2));
 			}
 		}
 		
 		// User updated the AngularFactor
 		if ( key.toString().equals("AngularFactor") ) {
 			if ( physics != null ) {
-				physics.setAngularFactor(value.tofloat());
+				physics.setAngularFactor( Math.min( value.tofloat(), 1 ) );
 			}
 		}
 		

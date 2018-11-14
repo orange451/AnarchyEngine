@@ -4,7 +4,6 @@ import org.luaj.vm2.LuaValue;
 
 import ide.layout.windows.icons.Icons;
 import luaengine.type.object.Instance;
-import luaengine.type.object.RunScript;
 import luaengine.type.object.TreeViewable;
 
 public class PlayerScriptsStart extends Instance implements TreeViewable {
