@@ -1,12 +1,20 @@
 package luaengine.type.object.services;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.luaj.vm2.LuaTable;
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.OneArgFunction;
+import org.luaj.vm2.lib.TwoArgFunction;
+import org.luaj.vm2.lib.ZeroArgFunction;
 
 import ide.layout.windows.icons.Icons;
 import luaengine.type.LuaEvent;
+import luaengine.type.object.Instance;
 import luaengine.type.object.Service;
 import luaengine.type.object.TreeViewable;
+import luaengine.type.object.insts.GameObject;
 import luaengine.type.object.insts.Player;
 
 public class Players extends Service implements TreeViewable {
@@ -17,6 +25,35 @@ public class Players extends Service implements TreeViewable {
 		this.defineField("LocalPlayer", LuaValue.NIL, true);
 		
 		this.rawset("PlayerAdded",	new LuaEvent());
+		
+		this.getmetatable().set("GetPlayers", new ZeroArgFunction() {
+			@Override
+			public LuaValue call() {
+				List<Player> temp = getPlayers();
+				LuaTable table = new LuaTable();
+				for (int i = 0; i < temp.size(); i++) {
+					table.set(i+1, temp.get(i));
+				}
+				
+				return table;
+			}
+		});
+		
+		this.getmetatable().set("GetPlayerFromCharacter", new TwoArgFunction() {
+
+			@Override
+			public LuaValue call(LuaValue arg1, LuaValue character) {
+				if ( character.isnil() || !(character instanceof Instance) )
+					return LuaValue.NIL;
+				
+				Player player = getPlayerFromCharacter((Instance) character);
+				if ( player == null )
+					return LuaValue.NIL;
+				
+				return player;
+			}
+			
+		});
 		
 		// Fire player added when a player is added
 		LuaEvent added = (LuaEvent) this.rawget("ChildAdded");
@@ -44,5 +81,29 @@ public class Players extends Service implements TreeViewable {
 	@Override
 	public Icons getIcon() {
 		return Icons.icon_players;
+	}
+	
+	public List<Player> getPlayers() {
+		List<Player> players = new ArrayList<Player>();
+		List<Instance> children = this.getChildren();
+		for (int i = 0; i < children.size(); i++) {
+			Instance child = children.get(i);
+			if ( child instanceof Player ) {
+				players.add((Player) child);
+			}
+		}
+		
+		return players;
+	}
+
+	public Player getPlayerFromCharacter(Instance character) {
+		List<Player> players = getPlayers();
+		for (int i = 0; i < players.size(); i++) {
+			Player player = players.get(i);
+			if ( player.getCharacter().equals(character) )
+				return player;
+		}
+		
+		return null;
 	}
 }

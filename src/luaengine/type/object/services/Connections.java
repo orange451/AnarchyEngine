@@ -20,15 +20,19 @@ import luaengine.type.object.Instance;
 import luaengine.type.object.Service;
 import luaengine.type.object.TreeViewable;
 import luaengine.type.object.insts.Connection;
+import luaengine.type.object.insts.GameObject;
 
 public class Connections extends Service implements TreeViewable,GameSubscriber {
 
 	private InternalServer internalServer;
 	private InternalClient internalClient;
 	private boolean enabled;
+	public List<GameObject> ownedCharacters;
 	
 	public Connections() {
 		super("Connections");
+		
+		ownedCharacters = new ArrayList<GameObject>();
 		
 		this.defineField("DefaultPort", LuaValue.valueOf(36545), false);
 		this.rawset("Archivable", LuaValue.valueOf(false));

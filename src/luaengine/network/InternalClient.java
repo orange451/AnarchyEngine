@@ -22,12 +22,18 @@ import luaengine.network.internal.ClientConnectFinishTCP;
 import luaengine.network.internal.ClientConnectTCP;
 import luaengine.network.internal.ClientLoadMapTCP;
 import luaengine.network.internal.ClientProcessable;
+import luaengine.network.internal.InstanceCreateTCP;
+import luaengine.network.internal.InstanceUpdateUDP;
+import luaengine.type.object.Instance;
+import luaengine.type.object.insts.PhysicsObject;
 
 public class InternalClient extends Client {
 	private String worldJSON;
 	private boolean loadingWorld;
 	
 	public boolean connected;
+	
+	private static luaengine.type.object.insts.Connection connectionInstance;
 	
 	public InternalClient( String ip, int port, String username, LuaTable data) {
 		this.start();
@@ -55,18 +61,20 @@ public class InternalClient extends Client {
 							
 							InternalRenderThread.runLater(()->{
 								// Load new game data
-								Game.clearServices();
+								Game.unload();
 								Load.parseJSON(obj);
 								
 								// Create connection object
-								luaengine.type.object.insts.Connection conInst = new luaengine.type.object.insts.Connection(connection);
-								conInst.forceSetName("ConnectionServer");
-								conInst.forceSetParent(Game.getService("Connections"));
+								connectionInstance = new luaengine.type.object.insts.Connection(connection);
+								connectionInstance.forceSetName("ConnectionServer");
+								connectionInstance.forceSetParent(Game.getService("Connections"));
 								
 								// Tell server we're all loaded
 								InternalGameThread.runLater(()->{
 									connection.sendTCP(new ClientConnectFinishTCP());
 								});
+								
+								Game.setRunning(true);
 							});
 							
 						} catch (Exception e) {
@@ -92,5 +100,27 @@ public class InternalClient extends Client {
 				}
 			}
 		});
+	}
+
+	public static void sendServerTCP(Object packet) {
+		if ( connectionInstance == null )
+			return;
+		
+		if ( connectionInstance.getKryo() == null )
+			return;
+		
+		Connection con = connectionInstance.getKryo();
+		con.sendTCP(packet);
+	}
+	
+	public static void sendServerUDP(Object packet) {
+		if ( connectionInstance == null )
+			return;
+		
+		if ( connectionInstance.getKryo() == null )
+			return;
+		
+		Connection con = connectionInstance.getKryo();
+		con.sendUDP(packet);
 	}
 }

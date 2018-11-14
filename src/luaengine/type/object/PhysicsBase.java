@@ -1,5 +1,7 @@
 package luaengine.type.object;
 
+import java.util.List;
+
 import org.joml.Vector3f;
 import org.luaj.vm2.LuaValue;
 
@@ -7,18 +9,26 @@ import engine.Game;
 import engine.GameSubscriber;
 import engine.physics.PhysicsObjectInternal;
 import engine.util.Pair;
+import luaengine.network.InternalClient;
+import luaengine.network.InternalServer;
+import luaengine.network.internal.InstanceUpdateUDP;
 import luaengine.type.LuaConnection;
 import luaengine.type.data.Matrix4;
 import luaengine.type.data.Vector3;
 import luaengine.type.object.insts.GameObject;
 import luaengine.type.object.insts.Mesh;
+import luaengine.type.object.insts.Player;
 import luaengine.type.object.insts.Prefab;
+import luaengine.type.object.services.Connections;
+import luaengine.type.object.services.Players;
 
 public abstract class PhysicsBase extends Instance implements GameSubscriber {
 	protected GameObject linked;
 	protected PhysicsObjectInternal physics;
 	private LuaConnection connection;
 	private LuaConnection prefabChanged;
+	
+	public Player playerOwns;
 	
 	public PhysicsBase(String typename) {
 		super(typename);
@@ -50,14 +60,12 @@ public abstract class PhysicsBase extends Instance implements GameSubscriber {
 		this.physics.wakeup();
 	}
 	
-	private long lastSend;
-	
 	@Override
 	public void internalTick() {
 		PhysicsObjectInternal internalPhys = physics;
 		
 		if ( linked == null ) {
-			//checkAddPhysics();
+			checkAddPhysics();
 		}
 		
 		if ( linked == null )
@@ -66,11 +74,23 @@ public abstract class PhysicsBase extends Instance implements GameSubscriber {
 			return;
 		linked.rawset("WorldMatrix", this.get("WorldMatrix"));
 		
-		if ( Game.isServer() ) {
-			if ( System.currentTimeMillis()-lastSend > 1000 || ( internalPhys.getBody() != null && internalPhys.getBody().isActive() && this.getMass() > 0 ) ) {
-				//lastSend = System.currentTimeMillis();
-				//this.changedEvent().fire(LuaValue.valueOf("WorldMatrix"),this.get("WorldMatrix"));
-				//this.changedEvent().fire(LuaValue.valueOf("Velocity"),this.get("Velocity"));
+		if ( ( internalPhys.getBody() != null && internalPhys.getBody().isActive() && this.getMass() > 0 ) ) {
+			if ( Game.isServer() ) {
+				if ( playerOwns == null ) {
+					InternalServer.sendAllUDP(new InstanceUpdateUDP(this, LuaValue.valueOf("WorldMatrix")));
+					InternalServer.sendAllUDP(new InstanceUpdateUDP(this, LuaValue.valueOf("Velocity")));
+				} else {
+					InternalServer.sendAllUDPExcept(new InstanceUpdateUDP(this, LuaValue.valueOf("WorldMatrix")), playerOwns.getConnection());
+					InternalServer.sendAllUDPExcept(new InstanceUpdateUDP(this, LuaValue.valueOf("Velocity")), playerOwns.getConnection());					
+				}
+			}
+			
+			boolean isClient = !Game.isServer();
+			if ( isClient ) {
+				if (Game.getService("Players").get("LocalPlayer").equals(playerOwns)) {
+					InternalClient.sendServerUDP(new InstanceUpdateUDP(this, LuaValue.valueOf("WorldMatrix"), true));
+					InternalClient.sendServerUDP(new InstanceUpdateUDP(this, LuaValue.valueOf("Velocity"), true));
+				}
 			}
 		}
 		
@@ -114,6 +134,8 @@ public abstract class PhysicsBase extends Instance implements GameSubscriber {
 		}
 		
 		this.rawset("Linked", LuaValue.NIL);
+		
+		this.playerOwns = null;
 	}
 	
 	private void setPhysics(LuaValue value) {
@@ -123,7 +145,7 @@ public abstract class PhysicsBase extends Instance implements GameSubscriber {
 		if ( value == null || value.isnil() )
 			return;
 		
-		if ( !(value instanceof Instance) )
+		if ( !(value instanceof GameObject) )
 			return;
 		
 		if ( physics != null ) {
@@ -193,9 +215,8 @@ public abstract class PhysicsBase extends Instance implements GameSubscriber {
 			}
 		}
 	}
-
-	@Override
-	protected LuaValue onValueSet(LuaValue key, LuaValue value) {
+	
+	public LuaValue updatePhysics(LuaValue key, LuaValue value) {
 		
 		// User updated the world matrix
 		if ( key.toString().equals("WorldMatrix") ) {
@@ -283,6 +304,11 @@ public abstract class PhysicsBase extends Instance implements GameSubscriber {
 		}
 		return value;
 	}
+
+	@Override
+	protected LuaValue onValueSet(LuaValue key, LuaValue value) {
+		return updatePhysics(key, value);
+	}
 	
 	@Override
 	public void onValueUpdated(LuaValue key, LuaValue value) {
@@ -329,11 +355,42 @@ public abstract class PhysicsBase extends Instance implements GameSubscriber {
 						this.cleanupPhysics();
 						this.setPhysics(parent);
 					}
+					
+					// Ownership stuff
+					checkNetworkOwnership();
 				} else {
 					this.cleanupPhysics();
 				}
 			} else {
 				this.cleanupPhysics();
+			}
+		}
+	}
+	
+	private void checkNetworkOwnership() {
+		if ( playerOwns == null ) {
+			if ( Game.isServer() ) {
+				Connections connections = (Connections) Game.getService("Connections");
+				List<GameObject> ownedCharacters = connections.ownedCharacters;
+				for (int i = 0; i < ownedCharacters.size(); i++) {
+					GameObject character = ownedCharacters.get(i);
+					if ( this.isDescendantOf(character) ) {
+						System.out.println("DESCENDENT OF " + character);
+						Player player = ((Players)Game.getService("Players")).getPlayerFromCharacter(character);
+						playerOwns = player;
+					}
+				}
+			} else {
+				LuaValue localPlayer = Game.getService("Players").get("LocalPlayer");
+				if ( !localPlayer.isnil() && localPlayer instanceof Player ) {
+					Player player = (Player) localPlayer;
+					
+					if (player.get("ClientOwnsPhysics").toboolean()) {
+						LuaValue character = player.get("Character");
+						if ( !character.isnil() && character instanceof GameObject && this.isDescendantOf((GameObject)character) )
+							playerOwns = player;
+					}
+				}
 			}
 		}
 	}
@@ -347,7 +404,6 @@ public abstract class PhysicsBase extends Instance implements GameSubscriber {
 			return;
 		}
 		
-
 		checkAddPhysics();
 	}
 

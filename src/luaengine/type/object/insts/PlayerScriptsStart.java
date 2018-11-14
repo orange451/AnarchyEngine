@@ -7,7 +7,7 @@ import luaengine.type.object.Instance;
 import luaengine.type.object.RunScript;
 import luaengine.type.object.TreeViewable;
 
-public class PlayerScriptsStart extends Instance implements TreeViewable,RunScript {
+public class PlayerScriptsStart extends Instance implements TreeViewable {
 
 	public PlayerScriptsStart() {
 		super("StarterPlayerScripts");

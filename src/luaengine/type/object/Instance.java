@@ -286,6 +286,7 @@ public abstract class Instance extends LuaInstancetype {
 	}
 
 	public boolean isDescendantOf( LuaValue arg ) {
+
 		int tries = 0;
 		LuaValue current = this;
 		if ( current.equals(arg) ) {

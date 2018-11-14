@@ -13,9 +13,11 @@ import engine.io.Save;
 import luaengine.network.internal.ClientConnectFinishTCP;
 import luaengine.network.internal.ClientConnectTCP;
 import luaengine.network.internal.ClientLoadMapTCP;
+import luaengine.network.internal.ClientProcessable;
 import luaengine.network.internal.InstanceCreateTCP;
 import luaengine.network.internal.InstanceDestroyTCP;
 import luaengine.network.internal.InstanceUpdateUDP;
+import luaengine.network.internal.ServerProcessable;
 import luaengine.type.object.Instance;
 import luaengine.type.object.insts.Player;
 import luaengine.type.object.services.Connections;
@@ -34,7 +36,6 @@ public class InternalServer extends Server {
 		System.out.println("Server started");
 		this.addListener(new Listener() {
 			public void received (Connection connection, Object object) {
-				System.out.println("Received: " + object);
 				
 				final int CHUNK_SIZE = 256;
 
@@ -75,6 +76,10 @@ public class InternalServer extends Server {
 					ClientConnectFinishTCP fn = new ClientConnectFinishTCP();
 					fn.SID = player.getSID();
 					connection.sendTCP(fn);
+				}
+				
+				if ( object instanceof ServerProcessable ) {
+					((ServerProcessable)object).serverProcess();
 				}
 			}
 
@@ -141,7 +146,7 @@ public class InternalServer extends Server {
 		});
 	}
 	
-	private void sendAllTCP(Object packet) {
+	public static void sendAllTCP(Object packet) {
 		List<luaengine.type.object.insts.Connection> cons = ((Connections)Game.getService("Connections")).getConnections();
 		for (int i = 0; i < cons.size(); i++) {
 			luaengine.type.object.insts.Connection con = cons.get(i);
@@ -152,13 +157,20 @@ public class InternalServer extends Server {
 		}
 	}
 	
-	private void sendAllUDP(Object packet) {
+	public static void sendAllUDP(Object packet) {
+		sendAllUDPExcept( packet, null );
+	}
+	
+	public static void sendAllUDPExcept(Object packet, luaengine.type.object.insts.Connection player) {
 		List<luaengine.type.object.insts.Connection> cons = ((Connections)Game.getService("Connections")).getConnections();
 		for (int i = 0; i < cons.size(); i++) {
 			luaengine.type.object.insts.Connection con = cons.get(i);
-			Connection kryo = con.getKryo();
-			if ( kryo != null ) {
-				kryo.sendUDP(packet);
+			
+			if ( !con.equals(player) ) {
+				Connection kryo = con.getKryo();
+				if ( kryo != null ) {
+					kryo.sendUDP(packet);
+				}
 			}
 		}
 	}

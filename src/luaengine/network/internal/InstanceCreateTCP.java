@@ -39,7 +39,7 @@ public class InstanceCreateTCP implements ClientProcessable {
 	@Override
 	public void clientProcess() {
 		LuaValue toParent = LuaValue.NIL;
-		System.out.println("Attempting to create: " + instanceType);
+		//System.out.println("Attempting to create: " + instanceType);
 		Instance internalInstance = (Instance) Instance.instance(instanceType);
 		if ( internalInstance == null )
 			return;
@@ -54,12 +54,13 @@ public class InstanceCreateTCP implements ClientProcessable {
 				String field = (String) keyArray[i];
 				Object jsonValue = obj.get(field);
 				LuaValue value = PacketUtility.JSONToField(jsonValue);
-				//System.out.println(field + " / " + value + " / " + jsonValue);
+				//System.out.println(internalInstance + " :: " + field + " / " + value + " / " + jsonValue);
 				if ( value != null ) {
 					if ( field.equals("Parent") ) {
 						toParent = value;
 					} else {
 						internalInstance.rawset(field, value);
+						try{internalInstance.set(field, value);}catch(Exception e) {}
 					}
 				}
 			}

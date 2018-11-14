@@ -128,7 +128,7 @@ public class Load {
 		String[] propertyKeys = properties.keySet().toArray(new String[properties.keySet().size()]);
 		for (int j = 0; j < propertyKeys.length; j++) {
 			String key = propertyKeys[j];
-			if ( key.equals("SID") && !Game.isLoaded() )
+			if ( key.equals("SID") && !Game.isRunning() )
 				continue;
 			
 			PropertyValue<?> p = properties.get(key);

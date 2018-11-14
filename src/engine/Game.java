@@ -275,7 +275,9 @@ public class Game implements Tickable {
 							
 							long sid = inst.getSID();
 							
-							createdInstances.put(sid, inst);
+							if ( sid != -1 ) {
+								createdInstances.put(sid, inst);
+							}
 						}
 					}
 					return LuaValue.NIL;
