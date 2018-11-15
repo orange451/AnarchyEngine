@@ -6,8 +6,6 @@ import org.lwjgl.opengl.GL11;
 import engine.Game;
 import engine.InternalGameThread;
 import engine.gl.Pipeline;
-import luaengine.LuaEngine;
-import luaengine.type.LuaEvent;
 import luaengine.type.object.services.UserInputService;
 import lwjgui.LWJGUI;
 import lwjgui.geometry.Insets;

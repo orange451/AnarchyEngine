@@ -9,7 +9,7 @@ public class RunService extends Service {
 
 	public RunService() {
 		super("RunService");
-
+		
 		this.rawset("Heartbeat", new LuaEvent());
 		this.rawset("RenderStepped", new LuaEvent());
 		this.setLocked(true);

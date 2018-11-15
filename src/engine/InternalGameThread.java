@@ -20,7 +20,7 @@ public class InternalGameThread extends Observable implements Runnable {
 	public static int tps;
 	public static float delta;
 	
-	public static int desiredTPS = 30;
+	public static int desiredTPS = 60;
 	
 	private static List<Runnable> runnables = Collections.synchronizedList(new ArrayList<Runnable>());
 	

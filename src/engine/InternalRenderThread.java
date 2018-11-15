@@ -23,7 +23,7 @@ import luaengine.type.LuaEvent;
 public class InternalRenderThread {
 	public static float delta;
 	public static float fps;
-	public static int desiredFPS = 120;
+	public static int desiredFPS = 60;
 
 	private int fpscounter;
 
