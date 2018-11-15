@@ -38,6 +38,7 @@ public abstract class PhysicsBase extends Instance implements GameSubscriber {
 		this.defineField("Friction", LuaValue.valueOf(0.1f), false);
 		this.defineField("Bounciness", LuaValue.valueOf(0.5f), false);
 		this.defineField("AngularFactor", LuaValue.valueOf(1.0f), false);
+		this.defineField("LinearDamping", LuaValue.valueOf(0.0f), false);
 		this.defineField("Shape", LuaValue.valueOf("Box"), false);
 		this.defineField("Velocity", Vector3.newInstance(0, 0, 0), false);
 		this.defineField("WorldMatrix", new Matrix4(), false);
@@ -64,7 +65,7 @@ public abstract class PhysicsBase extends Instance implements GameSubscriber {
 	public void internalTick() {
 		PhysicsObjectInternal internalPhys = physics;
 		
-		if ( linked == null ) {
+		if ( linked == null || internalPhys == null || internalPhys.getBody() == null ) {
 			checkAddPhysics();
 		}
 		
@@ -74,8 +75,11 @@ public abstract class PhysicsBase extends Instance implements GameSubscriber {
 			return;
 		linked.rawset("WorldMatrix", this.get("WorldMatrix"));
 		
-		if ( ( internalPhys.getBody() != null && internalPhys.getBody().isActive() && this.getMass() > 0 ) ) {
-			if ( Game.isServer() ) {
+		// Ownership stuff
+		checkNetworkOwnership();
+		
+		if ( internalPhys.getBody() != null ) {
+			if ( Game.isServer() && internalPhys.getBody().isActive() && this.getMass() > 0 ) {
 				if ( playerOwns == null ) {
 					InternalServer.sendAllUDP(new InstanceUpdateUDP(this, LuaValue.valueOf("WorldMatrix")));
 					InternalServer.sendAllUDP(new InstanceUpdateUDP(this, LuaValue.valueOf("Velocity")));
@@ -86,8 +90,8 @@ public abstract class PhysicsBase extends Instance implements GameSubscriber {
 			}
 			
 			boolean isClient = !Game.isServer();
-			if ( isClient ) {
-				if (Game.getService("Players").get("LocalPlayer").equals(playerOwns)) {
+			if ( isClient && Game.players().getLocalPlayer() != null ) {
+				if (Game.players().getLocalPlayer().equals(playerOwns)) {
 					InternalClient.sendServerUDP(new InstanceUpdateUDP(this, LuaValue.valueOf("WorldMatrix"), true));
 					InternalClient.sendServerUDP(new InstanceUpdateUDP(this, LuaValue.valueOf("Velocity"), true));
 				}
@@ -200,6 +204,7 @@ public abstract class PhysicsBase extends Instance implements GameSubscriber {
 			if ( this.physics != null )
 				this.physics.refresh();
 		});*/
+		checkNetworkOwnership();
 	}
 	
 	private void setupPrefabChanged() {
@@ -265,6 +270,13 @@ public abstract class PhysicsBase extends Instance implements GameSubscriber {
 		if ( key.toString().equals("AngularFactor") ) {
 			if ( physics != null ) {
 				physics.setAngularFactor( Math.min( value.tofloat(), 1 ) );
+			}
+		}
+		
+		// User updated the AngularFactor
+		if ( key.toString().equals("LinearDamping") ) {
+			if ( physics != null ) {
+				physics.setLinearDamping( Math.min( value.tofloat(), 1 ) );
 			}
 		}
 		
@@ -357,9 +369,6 @@ public abstract class PhysicsBase extends Instance implements GameSubscriber {
 						this.cleanupPhysics();
 						this.setPhysics(parent);
 					}
-					
-					// Ownership stuff
-					checkNetworkOwnership();
 				} else {
 					this.cleanupPhysics();
 				}
@@ -377,7 +386,6 @@ public abstract class PhysicsBase extends Instance implements GameSubscriber {
 				for (int i = 0; i < ownedCharacters.size(); i++) {
 					GameObject character = ownedCharacters.get(i);
 					if ( this.isDescendantOf(character) ) {
-						System.out.println("DESCENDENT OF " + character);
 						Player player = ((Players)Game.getService("Players")).getPlayerFromCharacter(character);
 						playerOwns = player;
 					}
@@ -389,8 +397,11 @@ public abstract class PhysicsBase extends Instance implements GameSubscriber {
 					
 					if (player.get("ClientOwnsPhysics").toboolean()) {
 						LuaValue character = player.get("Character");
-						if ( !character.isnil() && character instanceof GameObject && this.isDescendantOf((GameObject)character) )
+						if ( !character.isnil() && character instanceof GameObject && this.isDescendantOf((GameObject)character) ) {
 							playerOwns = player;
+							
+							System.out.println("I OWN THIS!");
+						}
 					}
 				}
 			}
@@ -399,8 +410,9 @@ public abstract class PhysicsBase extends Instance implements GameSubscriber {
 
 	@Override
 	public void gameUpdateEvent(boolean important) {
-		//if ( !important )
-			//return;
+		if ( !important )
+			return;
+		
 		if ( !Game.isRunning() ) {
 			this.cleanupPhysics();
 			return;

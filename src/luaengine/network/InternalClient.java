@@ -68,8 +68,10 @@ public class InternalClient extends Client {
 								Game.connections().rawset("LocalConnection", connectionInstance);
 								
 								// Tell server we're all loaded
-								InternalGameThread.runLater(()->{
-									connection.sendTCP(new ClientConnectFinishTCP());
+								InternalRenderThread.runLater(()->{
+									InternalGameThread.runLater(()->{
+										connection.sendTCP(new ClientConnectFinishTCP());
+									});
 								});
 								
 								Game.setRunning(true);

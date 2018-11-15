@@ -23,8 +23,9 @@ public class Players extends Service implements TreeViewable {
 		super("Players");
 
 		this.defineField("LocalPlayer", LuaValue.NIL, true);
-		
-		this.rawset("PlayerAdded",	new LuaEvent());
+
+		this.rawset("PlayerAdded",		new LuaEvent());
+		this.rawset("PlayerRemoved",	new LuaEvent());
 		
 		this.getmetatable().set("GetPlayers", new ZeroArgFunction() {
 			@Override
@@ -105,5 +106,14 @@ public class Players extends Service implements TreeViewable {
 		}
 		
 		return null;
+	}
+
+	public LuaEvent playerAddedEvent() {
+		return (LuaEvent) this.get("PlayerAdded");
+	}
+	
+	public Player getLocalPlayer() {
+		LuaValue p = this.get("LocalPlayer");
+		return (!p.isnil()&&p instanceof Player)?(Player)p:null;
 	}
 }

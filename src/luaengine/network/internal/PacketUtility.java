@@ -63,7 +63,6 @@ public class PacketUtility {
 			
 			if ( j.get("Type").equals("Reference") ) {
 				long v = Long.parseLong(""+j.get("Value"));
-				System.out.println("Getting object from reference: " + v);
 				return Game.getInstanceFromSID(v);
 			}
 			

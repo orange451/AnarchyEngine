@@ -33,6 +33,7 @@ public class PhysicsObjectInternal {
 	private float desiredBounce = 0.5f;
 	private float desiredFriction = 0.5f;
 	private float desiredAngularFactor = 1.0f;
+	private float desiredLinearDamping = 0.1f;
 	private CollisionShape desiredShape;
 	private boolean refresh = false;
 	private PhysicsBase luaFrontEnd;
@@ -45,10 +46,12 @@ public class PhysicsObjectInternal {
 		float bounciness = luaFrontEnd.rawget("Bounciness").tofloat();
 		float friction = luaFrontEnd.rawget("Friction").tofloat();
 		float angular = luaFrontEnd.rawget("AngularFactor").tofloat();
+		float linearD = luaFrontEnd.rawget("LinearDamping").tofloat();
 		this.desiredBounce = bounciness;
 		this.desiredFriction = friction;
 		this.desiredMass = mass;
 		this.desiredAngularFactor = angular;
+		this.desiredLinearDamping = linearD;
 		
 		// Create body
 		this.refreshBody();
@@ -189,6 +192,11 @@ public class PhysicsObjectInternal {
 		this.desiredAngularFactor = desiredAngularFactor;
 		this.refresh = true;
 	}
+	
+	public void setLinearDamping( float desiredLinearDamping ) {
+		this.desiredLinearDamping = desiredLinearDamping;
+		this.refresh = true;
+	}
 
 	public void setBounciness(float bounciness) {
 		this.desiredBounce = bounciness;
@@ -225,6 +233,7 @@ public class PhysicsObjectInternal {
 			// Create new
 			RigidBody newBody = PhysicsUtils.getBody(newMass, desiredBounce, desiredFriction, desiredShape);
 			newBody.setAngularFactor(desiredAngularFactor);
+			newBody.setDamping(desiredLinearDamping, 0.3f);
 			
 			// Update some variables
 			PhysicsObjectInternal.this.body = newBody;

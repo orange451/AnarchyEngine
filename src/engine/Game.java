@@ -95,24 +95,23 @@ public class Game implements Tickable {
 		if ( Game.getService("ScriptService") == null )
 			new ScriptService();
 
-		if ( Game.getService("Assets") == null ) {
+		if ( Game.getService("Assets") == null )
 			new Assets();
 			
-			if ( Game.getService("Assets").findFirstChild("Prefabs") == null )
-				((Assets)Game.getService("Assets")).newPackage("Prefabs");
+		if ( Game.getService("Assets").findFirstChild("Prefabs") == null )
+			((Assets)Game.getService("Assets")).newPackage("Prefabs");
 
-			if ( Game.getService("Assets").findFirstChild("Meshes") == null )
-				((Assets)Game.getService("Assets")).newPackage("Meshes");
+		if ( Game.getService("Assets").findFirstChild("Meshes") == null )
+			((Assets)Game.getService("Assets")).newPackage("Meshes");
 
-			if ( Game.getService("Assets").findFirstChild("Materials") == null )
-				((Assets)Game.getService("Assets")).newPackage("Materials");
+		if ( Game.getService("Assets").findFirstChild("Materials") == null )
+			((Assets)Game.getService("Assets")).newPackage("Materials");
 
-			if ( Game.getService("Assets").findFirstChild("Textures") == null )
-				((Assets)Game.getService("Assets")).newPackage("Textures");
+		if ( Game.getService("Assets").findFirstChild("Textures") == null )
+			((Assets)Game.getService("Assets")).newPackage("Textures");
 
-			if ( Game.getService("Assets").findFirstChild("Audio") == null )
-				((Assets)Game.getService("Assets")).newPackage("Audio");
-		}
+		if ( Game.getService("Assets").findFirstChild("Audio") == null )
+			((Assets)Game.getService("Assets")).newPackage("Audio");
 
 		if ( Game.getService("UserInputService") == null )
 			new UserInputService();

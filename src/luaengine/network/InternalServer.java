@@ -71,12 +71,15 @@ public class InternalServer extends Server {
 					if ( conInst == null )
 						return;
 					
-					Player player = conInst.connectPlayer();
-					
-					// Tell client where his player is.
-					ClientConnectFinishTCP fn = new ClientConnectFinishTCP();
-					fn.SID = player.getSID();
-					connection.sendTCP(fn);
+					InternalGameThread.runLater(()->{
+						// Add player to players folder
+						Player player = conInst.connectPlayer();
+						
+						// Tell client where his player is.
+						ClientConnectFinishTCP fn = new ClientConnectFinishTCP();
+						fn.SID = player.getSID();
+						connection.sendTCP(fn);
+					});
 				}
 				
 				if ( object instanceof ServerProcessable ) {
