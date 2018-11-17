@@ -110,6 +110,8 @@ public abstract class ScriptBase extends Instance implements GameSubscriber {
 		if ( !important )
 			return;
 		
+		if ( !Game.isLoaded() )
+			return;
 		
 		// Check if we're in a runnable service
 		boolean inRunnableService = false;

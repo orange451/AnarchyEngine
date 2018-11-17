@@ -48,10 +48,8 @@ public class InternalServer extends Server {
 					// Check if connection is already established
 					Connections connections = ((Connections)Game.getService("Connections"));
 					luaengine.type.object.insts.Connection conInst = connections.getConnectionFromKryo(connection);
-					if ( conInst == null ) {
-						System.out.println("NO CONNECTION");
-						//return;
-					}
+					if ( conInst == null )
+						return;
 					
 					conInst.forceSetName(username);
 					
@@ -72,6 +70,8 @@ public class InternalServer extends Server {
 						return;
 					
 					InternalGameThread.runLater(()->{
+						System.out.println("Connecting player...");
+						
 						// Add player to players folder
 						Player player = conInst.connectPlayer();
 						
@@ -153,10 +153,8 @@ public class InternalServer extends Server {
 			return;
 		
 		instance.changedEvent().connect((cargs) -> {
-			InternalGameThread.runLater(()->{
-				InstanceUpdateUDP updateObject = new InstanceUpdateUDP(instance, cargs[0]);
-				sendAllUDP(updateObject);
-			});
+			InstanceUpdateUDP updateObject = new InstanceUpdateUDP(instance, cargs[0]);
+			sendAllUDP(updateObject);
 		});
 	}
 	
