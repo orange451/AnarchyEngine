@@ -38,28 +38,53 @@ public class InternalServer extends Server {
 		this.addListener(new Listener() {
 			public void received (Connection connection, Object object) {
 				
-				final int CHUNK_SIZE = 256;
+				final int CHUNK_SIZE = 512;
 
 				// Send the game file in chunks of "CHUNK_SIZE" bytes (when client connects)
 				if ( object instanceof ClientConnectTCP ) {
 					// Grab desired username
 					String username = ((ClientConnectTCP)object).username;
+					String version = ((ClientConnectTCP)object).version;
+					
+					// Make sure versions match
+					if ( !version.equals(Game.version()) ) {
+						connection.close();
+						return;
+					}
 					
 					// Check if connection is already established
 					Connections connections = ((Connections)Game.getService("Connections"));
 					luaengine.type.object.insts.Connection conInst = connections.getConnectionFromKryo(connection);
-					if ( conInst == null )
+					if ( conInst == null ) {
+						connection.close();
 						return;
+					}
 					
 					conInst.forceSetName(username);
 					
-					connection.sendTCP(new ClientLoadMapTCP());
+					// Stream game to client
 					String gameJSON = Save.getGameJSON().toJSONString();
 					String[] strings = gameJSON.split("(?<=\\G.{"+CHUNK_SIZE+"})");
-					for (int i = 0; i < strings.length; i++) {
-						connection.sendTCP(strings[i]);
-					}
-					connection.sendTCP(new ClientLoadMapTCP());
+					connection.sendTCP(new ClientLoadMapTCP()); // Mark client as "loading map" state.
+					new Thread(new Runnable() {
+
+						@Override
+						public void run() {
+							for (int i = 0; i < strings.length; i++) {
+								try {
+									connection.sendTCP(new ClientLoadMapTCP(strings[i]));
+									
+									Thread.sleep(10);
+								}catch(Exception e) {
+									conInst.disconnect();
+								}
+							}
+
+							// Tell him it's finished
+							connection.sendTCP(new ClientLoadMapTCP(true));
+						}
+						
+					}).start();
 				}
 				
 				// Client finished connecting

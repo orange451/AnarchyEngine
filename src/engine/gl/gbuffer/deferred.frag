@@ -17,6 +17,7 @@ uniform float enableIBL;
 
 uniform vec3 uAmbient;
 uniform vec3 uMaterialColor;
+uniform vec3 uMaterialEmissive;
 
 in vec2 passTexCoord;
 in vec4 passColor;
@@ -72,8 +73,8 @@ void main(void) {
 	
 	// Calculate fresnel
 	vec3 fresnel = calculateFresnel( nViewSpacePos, normal, fRoughness, fMetalness ) * uReflective;
-	vec3 emissive = vec3(0.0);
+	vec3 emissive = uMaterialEmissive+fresnel;
 
 	// Write to GBuffer
-	write( diffuseSample.rgb, normal, fMetalness, fRoughness, uReflective, emissive+fresnel );
+	write( diffuseSample.rgb, normal, fMetalness, fRoughness, uReflective, emissive );
 }

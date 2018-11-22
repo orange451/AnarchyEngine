@@ -37,6 +37,8 @@ public class PhysicsObjectInternal {
 	private boolean refresh = false;
 	private PhysicsBase luaFrontEnd;
 	
+	private javax.vecmath.Vector3f forceVelocity;
+	
 	public PhysicsObjectInternal( PhysicsBase physicsObject ) {
 		this.luaFrontEnd = physicsObject;
 		
@@ -69,11 +71,15 @@ public class PhysicsObjectInternal {
 	}
 
 	public Vector3f getVelocity() {
-		if (this.destroyed || body == null)
-			return new Vector3f();
-		
-		javax.vecmath.Vector3f vel = body.getLinearVelocity(new javax.vecmath.Vector3f());
+		javax.vecmath.Vector3f vel = getVelocityInternal();
 		return new Vector3f( vel.x, vel.y, vel.z );
+	}
+
+	public javax.vecmath.Vector3f getVelocityInternal() {
+		if (this.destroyed || body == null)
+			return new javax.vecmath.Vector3f();
+		
+		return body.getLinearVelocity(new javax.vecmath.Vector3f());
 	}
 
 	public Vector3f getLocation() {
@@ -89,8 +95,13 @@ public class PhysicsObjectInternal {
 	}
 
 	public void setVelocity( javax.vecmath.Vector3f vector ) {
-		if (this.destroyed || body == null)
+		if (this.destroyed)
 			return;
+		
+		if ( body == null ) {
+			forceVelocity = vector;
+			return;
+		}
 		
 		javax.vecmath.Vector3f oldVel = body.getLinearVelocity(new javax.vecmath.Vector3f());
 		oldVel.sub(vector);
@@ -206,7 +217,7 @@ public class PhysicsObjectInternal {
 		refresh = false;
 		
 		Matrix4f worldMat = this.getWorldMatrix();
-		Vector3f vel = this.getVelocity();
+		final javax.vecmath.Vector3f vel = this.getVelocityInternal();
 		final float newMass = anchored ? 0 : desiredMass;
 		RigidBody old = body;
 		
@@ -234,11 +245,18 @@ public class PhysicsObjectInternal {
 			newBody.setAngularFactor(desiredAngularFactor);
 			newBody.setDamping(desiredLinearDamping, 0.3f);
 			
-			// Update some variables
+			// Set the body
 			PhysicsObjectInternal.this.body = newBody;
+			
+			// Check for force setting velocity
+			if ( forceVelocity != null ) {
+				vel.set(forceVelocity);
+				forceVelocity = null;
+			}
+			
+			// Set some vars
 			setWorldMatrix(worldMat);
 			setVelocity(vel);
-			
 			newBody.setHitFraction(0);
 			newBody.setCcdMotionThreshold((float) 1e-7);
 			newBody.setCcdSweptSphereRadius((float) 1e-2);

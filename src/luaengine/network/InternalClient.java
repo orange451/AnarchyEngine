@@ -1,6 +1,7 @@
 package luaengine.network;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -24,7 +25,8 @@ import luaengine.type.object.services.Connections;
 
 public class InternalClient extends Client {
 	private String worldJSON;
-	private boolean loadingWorld;
+	private boolean blockUpdates;
+	private ArrayList<ClientProcessable> packetBackQueue = new ArrayList<ClientProcessable>();
 	
 	public boolean connected;
 	
@@ -39,7 +41,7 @@ public class InternalClient extends Client {
 			this.connect(5000, ip, port, port);
 			connected = true;
 			
-			this.sendTCP(new ClientConnectTCP(username));
+			this.sendTCP(new ClientConnectTCP(username, Game.version()));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -47,56 +49,68 @@ public class InternalClient extends Client {
 		this.addListener(new Listener() {
 			public void received (Connection connection, Object object) {
 				if ( object instanceof ClientLoadMapTCP ) {
-					loadingWorld = !loadingWorld;
-					if ( !loadingWorld && worldJSON != null ) {
-						System.out.println("Loaded world...");
-						System.out.println(worldJSON);
-						
-						try {
-							JSONParser parser = new JSONParser();
-							final JSONObject obj = (JSONObject) parser.parse(worldJSON);
+					ClientLoadMapTCP loadPacket = (ClientLoadMapTCP) object;
+					if ( loadPacket.data != null ) {
+						if ( worldJSON != null ) {
+							worldJSON = worldJSON + loadPacket.data;
+						} else {
+							worldJSON = loadPacket.data;
+						}
+					} else {
+						if ( !loadPacket.finished ) {
+							blockUpdates = true;
+						} else if ( loadPacket.finished && worldJSON != null ) {
+							System.out.println("Loaded world...");
+							System.out.println(worldJSON);
 							
-							InternalRenderThread.runLater(()->{
-								// Load new game data
-								Game.unload();
-								Load.parseJSON(obj);
+							try {
+								JSONParser parser = new JSONParser();
+								final JSONObject obj = (JSONObject) parser.parse(worldJSON);
 								
-								// Create connection object
-								connectionInstance = new luaengine.type.object.insts.Connection(connection);
-								connectionInstance.forceSetName("ConnectionServer");
-								connectionInstance.forceSetParent(Game.getService("Connections"));
-								Game.connections().rawset("LocalConnection", connectionInstance);
-								
-								// Tell server we're all loaded
 								InternalRenderThread.runLater(()->{
-									InternalGameThread.runLater(()->{
-										connection.sendTCP(new ClientConnectFinishTCP());
+									// Load new game data
+									Game.unload();
+									Load.parseJSON(obj);
+									
+									// Create connection object
+									connectionInstance = new luaengine.type.object.insts.Connection(connection);
+									connectionInstance.forceSetName("ConnectionServer");
+									connectionInstance.forceSetParent(Game.getService("Connections"));
+									Game.connections().rawset("LocalConnection", connectionInstance);
+									
+									// Tell server we're all loaded
+									InternalRenderThread.runLater(()->{
+										InternalGameThread.runLater(()->{
+											connection.sendTCP(new ClientConnectFinishTCP());
+										});
 									});
+									
+									Game.setRunning(true);
 								});
 								
-								Game.setRunning(true);
-							});
+							} catch (Exception e) {
+								e.printStackTrace();
+								new ErrorWindow("There was a problem reading this file. 001b");
+							}
 							
-						} catch (Exception e) {
-							e.printStackTrace();
-							new ErrorWindow("There was a problem reading this file. 001b");
-						}
-						
-						worldJSON = null;
-					}
-				}
-				if ( object instanceof String ) {
-					if ( loadingWorld ) {
-						if ( worldJSON != null ) {
-							worldJSON = worldJSON + object;
-						} else {
-							worldJSON = (String) object;
+							// Do all the queued updates.
+							blockUpdates = false;
+							while(packetBackQueue.size() > 0) {
+								packetBackQueue.get(0).clientProcess();
+								packetBackQueue.remove(0);
+							}
+							
+							worldJSON = null;
 						}
 					}
 				}
 				
 				if ( object instanceof ClientProcessable ) {
-					((ClientProcessable)object).clientProcess();
+					if ( blockUpdates ) {
+						packetBackQueue.add((ClientProcessable) object);
+					} else {
+						((ClientProcessable)object).clientProcess();
+					}
 				}
 				
 				// Ping request

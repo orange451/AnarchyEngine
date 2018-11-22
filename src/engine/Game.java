@@ -493,4 +493,8 @@ public class Game implements Tickable {
 	public void setServer(boolean b) {
 		this.isServer = b;
 	}
+	
+	public static String version() {
+		return "0.5a";
+	}
 }

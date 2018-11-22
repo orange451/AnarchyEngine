@@ -20,4 +20,8 @@ public class LightProcessor implements PostProcessor {
 		}
 		buffer.unbind();
 	}
+	
+	public PointLightHandler getPointLightHandler() {
+		return pointLight;
+	}
 }

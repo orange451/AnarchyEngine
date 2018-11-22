@@ -207,6 +207,13 @@ public abstract class PhysicsBase extends Instance implements GameSubscriber {
 		checkNetworkOwnership();
 	}
 	
+	protected void forceRefresh() {
+		if ( this.physics == null )
+			return;
+		
+		this.physics.refresh();
+	}
+	
 	private void setupPrefabChanged() {
 		if ( prefabChanged != null ) {
 			prefabChanged.disconnect();

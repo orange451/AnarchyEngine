@@ -20,7 +20,7 @@ public class OutlineRenderer {
 	static {
 		THICKNESS = 1/24f;
 		MESH = Resources.MESH_CUBE;
-		MATERIAL = new MaterialGL().setReflective(0).setMetalness(0).setRoughness(1).setColor(Color.AQUA);
+		MATERIAL = new MaterialGL().setReflective(0).setMetalness(0).setRoughness(1).setEmissive(Color.AQUA).setColor(Color.WHITE);
 	}
 	
 	public static void render(Instance instance) {

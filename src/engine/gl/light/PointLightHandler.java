@@ -1,6 +1,20 @@
 package engine.gl.light;
 
-import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL11.GL_BACK;
+import static org.lwjgl.opengl.GL11.GL_BLEND;
+import static org.lwjgl.opengl.GL11.GL_CULL_FACE;
+import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
+import static org.lwjgl.opengl.GL11.GL_FRONT;
+import static org.lwjgl.opengl.GL11.GL_GREATER;
+import static org.lwjgl.opengl.GL11.GL_LESS;
+import static org.lwjgl.opengl.GL11.GL_ONE;
+import static org.lwjgl.opengl.GL11.GL_SRC_ALPHA;
+import static org.lwjgl.opengl.GL11.glBlendFunc;
+import static org.lwjgl.opengl.GL11.glCullFace;
+import static org.lwjgl.opengl.GL11.glDepthFunc;
+import static org.lwjgl.opengl.GL11.glDepthMask;
+import static org.lwjgl.opengl.GL11.glDisable;
+import static org.lwjgl.opengl.GL11.glEnable;
 
 import java.net.URL;
 import java.util.ArrayList;
@@ -8,7 +22,6 @@ import java.util.Collections;
 import java.util.List;
 
 import org.joml.Matrix4f;
-import org.joml.Vector3f;
 import org.joml.Vector4f;
 
 import engine.gl.Pipeline;
@@ -22,7 +35,7 @@ public class PointLightHandler {
 	private BufferedMesh mesh = MeshUtils.sphere(1, 16);
 	
 	public PointLightHandler() {
-		int close = 8;
+		/*int close = 8;
 		int r = 48;
 		int b = 10;
 		int xx = 8;
@@ -30,7 +43,7 @@ public class PointLightHandler {
 		addLight(new PointLight(new Vector3f(xx, close, xx), r, b));
 		addLight(new PointLight(new Vector3f(-xx, close, -xx), r, b));
 		addLight(new PointLight(new Vector3f(xx, close, -xx), r, b));
-		addLight(new PointLight(new Vector3f(0, -close*2, 0), r, b/2f));
+		addLight(new PointLight(new Vector3f(0, -close*2, 0), r, b/2f));*/
 	}
 	
 	public void addLight(PointLight l) {
@@ -82,6 +95,7 @@ public class PointLightHandler {
 				lightShader.shader_set_uniform_f( lightShader.shader_get_uniform( "radius"), light.radius );
 				lightShader.shader_set_uniform_f( lightShader.shader_get_uniform( "intensity"), light.intensity );
 				lightShader.shader_set_uniform_f( lightShader.shader_get_uniform( "lightPosition"), lightEyePos.x, lightEyePos.y, lightEyePos.z );
+				lightShader.shader_set_uniform_f( lightShader.shader_get_uniform( "lightColor"), light.color.x, light.color.y, light.color.z );
 				
 				mesh.render(lightShader, worldMatrix, null);
 			}

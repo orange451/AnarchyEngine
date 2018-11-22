@@ -82,6 +82,7 @@ public class LuaEngine {
 		new LocalScript();
 		new Texture();
 		new PlayerScripts();
+		new PointLight();
 	}
 	
 	/*private static void loadDataTypes(String packageName) {

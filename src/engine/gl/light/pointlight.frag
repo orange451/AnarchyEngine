@@ -11,6 +11,7 @@ uniform mat4 inverseProjectionMatrix;
 
 uniform float radius;
 uniform float intensity;
+uniform vec3 lightColor;
 
 in vec4 passColor;
 in vec2 passTexCoord;
@@ -19,7 +20,6 @@ in vec3 passNormal;
 out vec4 out_Color;
 
 // CONSTANTS FOR NOW
-const vec3 lightColor = vec3(1.0);
 const float shadow = 1.0;
 const float PI = 3.1515926535;
 

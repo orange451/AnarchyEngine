@@ -24,12 +24,17 @@ public class PlayerPhysics extends PhysicsBase implements TreeViewable {
 		this.getField("Shape").setLocked(true);
 		
 		// Use shape
-		this.set("UseCustomMesh", LuaValue.valueOf(false));
 		this.getField("UseCustomMesh").setLocked(true);
+		this.rawset("UseCustomMesh", LuaValue.valueOf(false));
 		
 		// Force it straight up
-		this.set("AngularFactor", LuaValue.valueOf(0.0f));
 		this.getField("AngularFactor").setLocked(true);
+		this.rawset("AngularFactor", LuaValue.valueOf(0.0f));
+		
+		// If height changes, rebuild physics
+		this.changedEvent().connect((args)-> {
+			PlayerPhysics.this.forceRefresh();
+		});
 	}
 	
 	@Override

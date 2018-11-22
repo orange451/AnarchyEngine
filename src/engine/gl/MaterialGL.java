@@ -17,6 +17,7 @@ public class MaterialGL {
 	private float roughness = 0.3f;
 	private float reflective = 0.3f;
 	
+	private Vector3f emissive;
 	private Vector3f color;
 	
 	public MaterialGL() {
@@ -25,6 +26,7 @@ public class MaterialGL {
 		setMetalnessTexture(null);
 		setRoughnessTexture(null);
 		setColor(Color.LIGHT_GRAY);
+		setEmissive(Color.BLACK);
 	}
 	
 	public MaterialGL setColor(Color color) {
@@ -32,8 +34,19 @@ public class MaterialGL {
 		return this;
 	}
 	
-	public void setColor(Vector3f vector) {
+	public MaterialGL setColor(Vector3f vector) {
 		this.color.set(vector);
+		return this;
+	}	
+	
+	public MaterialGL setEmissive(Color color) {
+		this.emissive = new Vector3f(color.getRed()/255f, color.getGreen()/255f, color.getBlue()/255f);
+		return this;
+	}
+	
+	public MaterialGL setEmissive(Vector3f vector) {
+		this.emissive.set(vector);
+		return this;
 	}
 	
 	public float getReflective() {
@@ -135,6 +148,7 @@ public class MaterialGL {
 		shader.shader_set_uniform_f(shader.shader_get_uniform("uRoughness"), roughness);
 		shader.shader_set_uniform_f(shader.shader_get_uniform("uReflective"), reflective);
 		shader.shader_set_uniform_f(shader.shader_get_uniform("uMaterialColor"), color);
+		shader.shader_set_uniform_f(shader.shader_get_uniform("uMaterialEmissive"), emissive);
 		shader.shader_set_uniform_f(shader.shader_get_uniform("uAmbient"), Pipeline.pipeline_get().getGBuffer().getAmbient());
 		shader.shader_set_uniform_f(shader.shader_get_uniform("enableSkybox"), cubemap == null ? 0:1);
 		shader.shader_set_uniform_f(shader.shader_get_uniform("enableIBL"), ibl == null ? 0:1);

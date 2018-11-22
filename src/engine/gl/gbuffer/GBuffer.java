@@ -35,6 +35,7 @@ public class GBuffer {
 	private Surface accumulationBuffer;
 	
 	private MergeProcessor merge;
+	private LightProcessor lightProcessor;
 	private ArrayList<PostProcessor> processors = new ArrayList<PostProcessor>();
 	
 	private Vector3f ambient = new Vector3f( 0.03f );
@@ -53,7 +54,7 @@ public class GBuffer {
 		
 		resize(width, height);
 		
-		processors.add(new LightProcessor());
+		processors.add(lightProcessor = new LightProcessor());
 		processors.add(merge = new MergeProcessor());
 		processors.add(new ToneMapper());
 	}
@@ -234,6 +235,14 @@ public class GBuffer {
 
 	public MergeProcessor getMergeProcessor() {
 		return merge;
+	}
+	
+	/**
+	 * Returns this gbuffers light processor. Can be used to access the scenes lights.
+	 * @return
+	 */
+	public LightProcessor getLightProcessor() {
+		return lightProcessor;
 	}
 
 	/**
