@@ -125,10 +125,9 @@ public class InternalRenderThread {
 		GLFW.glfwMakeContextCurrent(window);
 
 		// Draw event
-		if ( Game.isLoaded() ) {
-			((LuaEvent)Game.getService("RunService").get("RenderStepped")).fire(LuaValue.valueOf(delta));
-			observable.notifyObservers();
-		}
+		if ( Game.isLoaded() )
+			Game.runService().renderSteppedEvent().fire(LuaValue.valueOf(delta));
+		observable.notifyObservers();
 		
 		// Run runnables
 		synchronized(runnables) {

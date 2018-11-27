@@ -7,6 +7,7 @@ import engine.util.TextureUtils;
 public class SkySphereIBL extends SkySphere {
 	private SkySphereIBL lightSphere;
 	private int buffers;
+	private float lightMultiplier = 1.0f;
 	
 	public SkySphereIBL(Image reflection, Image light) {
 		this(reflection, light, 512);
@@ -33,6 +34,15 @@ public class SkySphereIBL extends SkySphere {
 		
 		buffers++;
 		return b;
+	}
+	
+	public void setLightMultiplier(float i) {
+		this.lightMultiplier = i;
+	}
+	
+
+	public float getLightMultiplier() {
+		return lightMultiplier;
 	}
 
 	public SkySphere getLightSphere() {

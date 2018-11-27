@@ -16,7 +16,6 @@ import lwjgui.scene.Window;
 import lwjgui.scene.layout.Pane;
 
 public class IDE extends RenderableApplication {
-	public static Pipeline pipeline;
 	public static IdeLayout layout;
 	public static Window win;
 	
@@ -41,8 +40,7 @@ public class IDE extends RenderableApplication {
 		win.getScene().setRoot(background);
 		
 		// Create rendering pipeline
-		pipeline = new Pipeline();
-		this.attachRenderable(pipeline);
+		this.attachRenderable(pipeline = new Pipeline());
 		
 		// Setup mane IDE layout
 		layout = new IdeLayout(background);

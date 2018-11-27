@@ -9,9 +9,11 @@ import luaengine.RunnableArgs;
 import luaengine.type.data.Color3;
 import luaengine.type.data.Matrix4;
 import luaengine.type.data.Vector3;
+import luaengine.type.object.LightBase;
 import luaengine.type.object.insts.GameObject;
 import luaengine.type.object.insts.Material;
 import luaengine.type.object.insts.Mesh;
+import luaengine.type.object.insts.PointLight;
 import luaengine.type.object.insts.Prefab;
 import luaengine.type.object.insts.Texture;
 
@@ -21,7 +23,7 @@ public class RunnerTestPBR extends RunnerClient {
 	public void loadScene(String[] args) {
 		super.loadScene(args);
 		
-		// Move camera
+		// Move camera script
 		Game.runService().renderSteppedEvent().connect( new RunnableArgs() {
 			final int CAMERA_DIST = 256;
 			double t = Math.PI/2f;
@@ -56,7 +58,6 @@ public class RunnerTestPBR extends RunnerClient {
 		mesh.setFilePath("Resources/Testing/Sphere.mesh");
 		mesh.setParent(Game.assets().meshes());
 		
-		
 		// Textures
 		Texture texture1 = new Texture();
 		texture1.setFilePath("Resources/Testing/PBR/scratch/normal.png");
@@ -72,15 +73,52 @@ public class RunnerTestPBR extends RunnerClient {
 		
 		// Base material
 		Material mat = new Material();
+		mat.setName("BaseMaterial");
 		mat.setNormalMap(texture1);
 		mat.setRoughMap(texture2);
 		mat.setMetalMap(texture3);
+		mat.setParent(Game.assets().materials());
 		
 		// Make rows of balls
 		makeRow( mesh, mat,  1, Color3.newInstance(255, 255, 255),	Color3.newInstance(255, 255, 255),	0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f);
 		makeRow( mesh, mat,  0, Color3.newInstance(0, 128, 16),		Color3.newInstance(0, 128, 16),		0.0f, 1.0f, 0.2f, 0.2f, 0.3f, 0.0f);
 		makeRow( mesh, mat, -1, Color3.newInstance(255,220,96),		Color3.newInstance(255, 220, 96),	0.0f, 1.0f, 0.8f, 0.8f, 1.0f, 0.0f);
 		makeRow( mesh, mat, -2, Color3.red(),						Color3.red(),						0.0f, 0.0f, 0.2f, 0.2f, 0.0f, 0.4f);
+		
+		// Add lights
+		int close = 8;
+		int r = 48;
+		int b = 10;
+		int xx = 8;
+		PointLight l1 = new PointLight();
+		l1.setPosition(-xx, close, xx);
+		l1.setRadius(r);
+		l1.setIntensity(b);
+		l1.setParent(Game.workspace());
+		
+		PointLight l2 = new PointLight();
+		l2.setPosition(xx, close, xx);
+		l2.setRadius(r);
+		l2.setIntensity(b);
+		l2.setParent(Game.workspace());
+		
+		PointLight l3 = new PointLight();
+		l3.setPosition(-xx, close, -xx);
+		l3.setRadius(r);
+		l3.setIntensity(b);
+		l3.setParent(Game.workspace());
+		
+		PointLight l4 = new PointLight();
+		l4.setPosition(xx, close, -xx);
+		l4.setRadius(r);
+		l4.setIntensity(b);
+		l4.setParent(Game.workspace());
+		
+		PointLight l5 = new PointLight();
+		l5.setPosition(xx, -close*2, -xx);
+		l5.setRadius(r);
+		l5.setIntensity(b/2);
+		l5.setParent(Game.workspace());
 	}
 	
 	private void makeRow( Mesh mesh, Material mat, float y, Color3 fromColor, Color3 toColor, float fromRough, float toRough, float fromMetal, float toMetal, float fromReflective, float toReflective ) {

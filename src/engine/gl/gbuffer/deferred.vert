@@ -24,7 +24,7 @@ void main(void) {
 	vec4 viewPos = viewWorldMatrix * vec4(inPos, 1.0);
 	vec4 viewNor = viewWorldMatrix * vec4(inNormal, 0.0);
 	
-	gl_Position = projectionMatrix * viewMatrix * worldMatrix * vec4(inPos,1.0);
+	gl_Position = projectionMatrix * viewPos;
 	passNormal = normalize(normalMatrix * worldNormalMatrix * inNormal);
 	
 	passTexCoord = inTexCoord;

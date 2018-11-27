@@ -24,7 +24,7 @@ const float shadow = 1.0;
 const float PI = 3.1515926535;
 
 
-// From pbr.frag
+// PBR RELATED
 float DistributionGGX(vec3 N, vec3 H, float roughness);
 float GeometrySchlickGGX(float NdotV, float roughness);
 float GeometrySmith(vec3 N, vec3 V, vec3 L, float roughness);

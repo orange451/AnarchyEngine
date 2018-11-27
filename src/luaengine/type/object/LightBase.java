@@ -28,4 +28,16 @@ public abstract class LightBase extends Instance {
 	}
 	
 	public abstract Light getLightInternal();
+
+	public void setIntensity(float intensity) {
+		this.set("Intensity", LuaValue.valueOf(intensity));
+	}
+
+	public void setPosition(int x, int y, int z) {
+		this.set("Position", Vector3.newInstance(x, y, z));
+	}
+	
+	public void setPosition(Vector3 position) {
+		this.set("Position", position.clone());
+	}
 }

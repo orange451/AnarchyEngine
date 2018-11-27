@@ -141,6 +141,9 @@ public class MaterialGL {
 		if ( cubemap instanceof SkySphereIBL ) {
 			ibl = ((SkySphereIBL) cubemap).getLightSphere();
 			shader.texture_set_stage(shader.shader_get_uniform("texture_ibl"), ibl, 5);
+			shader.shader_set_uniform_f(shader.shader_get_uniform("uSkyBoxLightMultiplier"), ((SkySphereIBL)cubemap).getLightMultiplier());
+		} else {
+			shader.shader_set_uniform_f(shader.shader_get_uniform("uSkyBoxLightMultiplier"), 1.0f);
 		}
 
 		// Set uniforms

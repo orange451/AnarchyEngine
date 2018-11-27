@@ -15,6 +15,8 @@ uniform float normalMapEnabled;
 uniform float enableSkybox;
 uniform float enableIBL;
 
+uniform float uSkyBoxLightMultiplier;
+
 uniform vec3 uAmbient;
 uniform vec3 uMaterialColor;
 uniform vec3 uMaterialEmissive;
@@ -67,8 +69,9 @@ void main(void) {
 		diffuseSample.rgb *= cubemapSample;
 
 		// Calculate IBL
-		vec3 iblSample = (enableIBL == 0.0) ? vec3( 0.0 ) : textureLod( texture_ibl, reflectEnv( nViewSpacePos, normal ).xyz, MAX_REFLECTION_LOD * fRoughness).rgb;
-		diffuseSample.rgb += iblSample * uReflective * (1.0-fMetalness) * uAmbient;
+		//vec3 iblSample = (enableIBL == 0.0) ? vec3( 0.0 ) : textureLod( texture_ibl, reflectEnv( nViewSpacePos, normal ).xyz, MAX_REFLECTION_LOD * fRoughness).rgb;
+		//iblSample *= uSkyBoxLightMultiplier;
+		//diffuseSample.rgb += iblSample * uReflective * (1.0-fMetalness) * uAmbient;
     }
 	
 	// Calculate fresnel

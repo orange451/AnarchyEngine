@@ -5,6 +5,7 @@ import org.lwjgl.opengl.GL11;
 
 import engine.Game;
 import engine.InternalGameThread;
+import engine.InternalRenderThread;
 import engine.gl.Pipeline;
 import luaengine.type.object.services.UserInputService;
 import lwjgui.LWJGUI;
@@ -14,7 +15,6 @@ import lwjgui.scene.Window;
 import lwjgui.scene.layout.StackPane;
 
 public abstract class Runner extends RenderableApplication {
-	public static Pipeline pipeline;
 	private static StackPane rootPane;
 	
 	public StackPane getRootPane() {
@@ -62,6 +62,11 @@ public abstract class Runner extends RenderableApplication {
 		// Tell the game to run
 		InternalGameThread.runLater(()->{
 			Game.setRunning(true);
+			
+			// On first render, throw out an update.
+			InternalRenderThread.runLater(()->{
+				Game.getGame().gameUpdate(true);
+			});
 		});
 	}
 

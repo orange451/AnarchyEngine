@@ -5,6 +5,8 @@ import org.luaj.vm2.LuaValue;
 
 import engine.Game;
 import engine.GameSubscriber;
+import engine.InternalGameThread;
+import engine.application.RenderableApplication;
 import engine.gl.light.Light;
 import ide.IDE;
 import ide.layout.windows.icons.Icons;
@@ -46,6 +48,10 @@ public class PointLight extends LightBase implements TreeViewable,GameSubscriber
 			}
 		});
 	}
+	
+	public void setRadius(float radius) {
+		this.set("Radius", radius);
+	}
 
 	@Override
 	public Light getLightInternal() {
@@ -70,6 +76,10 @@ public class PointLight extends LightBase implements TreeViewable,GameSubscriber
 		if (!important)
 			return;
 		
+		if ( RenderableApplication.pipeline == null || RenderableApplication.pipeline.getGBuffer() == null || RenderableApplication.pipeline.getGBuffer().getLightProcessor() == null || RenderableApplication.pipeline.getGBuffer().getLightProcessor().getPointLightHandler() == null ) {
+			return;
+		}
+		
 		if ( this.isDescendantOf(Game.workspace()) ) {
 			if ( light == null ) {
 				// Create light
@@ -83,7 +93,7 @@ public class PointLight extends LightBase implements TreeViewable,GameSubscriber
 				light.color = new Vector3f( Math.max( color.getRed(),1 )/255f, Math.max( color.getGreen(),1 )/255f, Math.max( color.getBlue(),1 )/255f );
 				
 				// Add it to pipeline
-				IDE.pipeline.getGBuffer().getLightProcessor().getPointLightHandler().addLight(light);
+				RenderableApplication.pipeline.getGBuffer().getLightProcessor().getPointLightHandler().addLight(light);
 			}
 		} else {
 			onDestroy();

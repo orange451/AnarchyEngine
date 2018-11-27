@@ -4,6 +4,7 @@ import org.luaj.vm2.LuaValue;
 import org.lwjgl.glfw.GLFW;
 
 import engine.Game;
+import engine.io.Save;
 import ide.RunnerClient;
 import luaengine.RunnableArgs;
 import luaengine.type.data.Color3;
@@ -11,6 +12,7 @@ import luaengine.type.data.Vector3;
 import luaengine.type.object.insts.GameObject;
 import luaengine.type.object.insts.Material;
 import luaengine.type.object.insts.Mesh;
+import luaengine.type.object.insts.PointLight;
 import luaengine.type.object.insts.Prefab;
 import luaengine.type.object.insts.Texture;
 
@@ -62,6 +64,43 @@ public class RunnerTestSimple extends RunnerClient {
 		GameObject obj = new GameObject();
 		obj.setPrefab(p);
 		obj.setParent(Game.workspace());
+		
+		// Add lights
+		{
+			int close = 8;
+			int r = 48;
+			int b = 10;
+			int xx = 8;
+			PointLight l1 = new PointLight();
+			l1.setPosition(-xx, close, xx);
+			l1.setRadius(r);
+			l1.setIntensity(b);
+			l1.setParent(Game.workspace());
+			
+			PointLight l2 = new PointLight();
+			l2.setPosition(xx, close, xx);
+			l2.setRadius(r);
+			l2.setIntensity(b);
+			l2.setParent(Game.workspace());
+			
+			PointLight l3 = new PointLight();
+			l3.setPosition(-xx, close, -xx);
+			l3.setRadius(r);
+			l3.setIntensity(b);
+			l3.setParent(Game.workspace());
+			
+			PointLight l4 = new PointLight();
+			l4.setPosition(xx, close, -xx);
+			l4.setRadius(r);
+			l4.setIntensity(b);
+			l4.setParent(Game.workspace());
+			
+			PointLight l5 = new PointLight();
+			l5.setPosition(xx, -close*2, -xx);
+			l5.setRadius(r);
+			l5.setIntensity(b/2);
+			l5.setParent(Game.workspace());
+		}
 		
 		// Camera controller
 		Game.runService().renderSteppedEvent().connect( new RunnableArgs() {
