@@ -150,12 +150,13 @@ public class Pipeline implements Renderable {
 			// Draw buffers
 			boolean debug = false;
 			if ( debug ) {
-				drawTexture( gbuffer.getBuffer0(), 0,   0, 100, 100 );
-				drawTexture( gbuffer.getBuffer1(), 100, 0, 100, 100 );
-				drawTexture( gbuffer.getBuffer2(), 200, 0, 100, 100 );
-				drawTexture( gbuffer.getBuffer3(), 300, 0, 100, 100 );
-				drawTexture( gbuffer.getAccumulationBuffer(), 400, 0, 100, 100 );
-				drawTexture( gbuffer.getMergeProcessor().getBuffer(), 500, 0, 100, 100 );
+				int s = 150;
+				drawTexture( gbuffer.getBuffer0(), s*0,   0, s, s );
+				drawTexture( gbuffer.getBuffer1(), s*1, 0, s, s );
+				drawTexture( gbuffer.getBuffer2(), s*2, 0, s, s );
+				//drawTexture( gbuffer.getBuffer3(), 300, 0, 100, 100 );
+				drawTexture( gbuffer.getAccumulationBuffer(), s*3, 0, s, s );
+				//drawTexture( gbuffer.getMergeProcessor().getBuffer(), 500, 0, 100, 100 );
 			}
 		}
 		buffer.unbind();

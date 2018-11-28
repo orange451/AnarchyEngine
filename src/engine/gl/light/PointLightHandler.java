@@ -30,7 +30,7 @@ import engine.gl.shader.BaseShader;
 import engine.util.MeshUtils;
 
 public class PointLightHandler {
-	private List<PointLight> lights = Collections.synchronizedList(new ArrayList<PointLight>());
+	private List<PointLightInternal> lights = Collections.synchronizedList(new ArrayList<PointLightInternal>());
 	private BaseShader lightShader = new PointLightShader();
 	private BufferedMesh mesh = MeshUtils.sphere(1, 16);
 	
@@ -46,13 +46,13 @@ public class PointLightHandler {
 		addLight(new PointLight(new Vector3f(0, -close*2, 0), r, b/2f));*/
 	}
 	
-	public void addLight(PointLight l) {
+	public void addLight(PointLightInternal l) {
 		synchronized(lights) {
 			lights.add(l);
 		}
 	}
 	
-	public void removeLight(PointLight l) {
+	public void removeLight(PointLightInternal l) {
 		synchronized(lights) {
 			lights.remove(l);
 		}
@@ -84,7 +84,7 @@ public class PointLightHandler {
 			lightShader.texture_set_stage( lightShader.shader_get_uniform( "texture_pbr"), pipeline.getGBuffer().getBuffer2(), 3);
 				
 			for (int i = 0; i < lights.size(); i++) {
-				PointLight light = lights.get(i);
+				PointLightInternal light = lights.get(i);
 				Matrix4f worldMatrix = new Matrix4f();
 				worldMatrix.translate(light.x, light.y, light.z);
 				worldMatrix.scale(light.radius);
@@ -112,11 +112,11 @@ public class PointLightHandler {
 		public PointLightShader() {
 			super(
 				new URL[] {
-						PointLight.class.getResource("pointlight.vert")
+						PointLightInternal.class.getResource("pointlight.vert")
 				},
 				new URL[] {
-						PointLight.class.getResource("pbr.frag"),
-						PointLight.class.getResource("pointlight.frag")
+						PointLightInternal.class.getResource("pbr.frag"),
+						PointLightInternal.class.getResource("pointlight.frag")
 				}
 			);
 		}

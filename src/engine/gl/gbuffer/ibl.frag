@@ -14,8 +14,11 @@ in vec4 passColor;
 
 out vec4 outColor;
 
-const float MULTIPLIER = 1.0; // Test just to boost color to make sure I have output
+const float MULTIPLIER = 2.0;
+const float CUTOFF = 0.4;
 const float MAX_REFLECTION_LOD = 14.0;
+
+vec3 reflectEnv( vec3 viewSpacePos, vec3 surfaceNormal );
 
 void main(void) {
 	float depth = texture( texture_depth, passTexCoord ).r;
@@ -37,9 +40,15 @@ void main(void) {
 	kD *= 1.0 - metallic;
 	
 	// Calculate IBL radiance 
-	vec3 radiance = textureLod( texture_ibl, reflect( L, N ), MAX_REFLECTION_LOD * roughness ).rgb;
-	radiance *= MULTIPLIER;
+	mat3 iView = mat3(uInverseViewMatrix);
+	vec3 reflectVector = reflectEnv( L, N );
+	vec3 radiance = textureLod( texture_ibl, reflectVector, MAX_REFLECTION_LOD * roughness ).rgb;
 	
-	//outColor = vec4( (kD * radiance)+radiance, 1.0 );
-	outColor = vec4( radiance, 1.0 );
+	// Correct radiance
+	radiance = ((radiance - CUTOFF) * MULTIPLIER) + CUTOFF;
+	radiance = max( radiance, 0.0 );
+	
+	//outColor = vec4( (kD * radiance)+radiance * MULTIPLIER, 1.0 );
+	//outColor = vec4( radiance, 1.0 );
+	outColor = vec4( (kD + radiance) * kD, 1.0 );
 }

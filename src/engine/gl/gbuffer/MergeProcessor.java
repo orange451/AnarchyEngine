@@ -30,7 +30,7 @@ public class MergeProcessor implements PostProcessor {
 		TextureUtils.autoResize = false;
 		//skyBox = new SkyBox(TextureUtils.loadImage("Resources/Testing/skybox.png"));
 		skyBox = SkySphereIBL.create("Resources/Testing/IBL/apartment.hdr");
-		//skyBox = SkySphereIBL.create("Resources/Testing/IBL/caveroom.hdr");
+		//skyBox = SkySphereIBL.create("Resources/Testing/IBL/winter.hdr");
 		((SkySphereIBL)skyBox).setLightMultiplier(10);
 		TextureUtils.autoResize = true;
 		skyBoxRotation.rotateX((float) (-Math.PI/2f));

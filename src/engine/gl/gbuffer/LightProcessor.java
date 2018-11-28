@@ -8,7 +8,7 @@ import engine.gl.Resources;
 import engine.gl.SkyBox;
 import engine.gl.Surface;
 import engine.gl.ibl.SkySphereIBL;
-import engine.gl.light.PointLight;
+import engine.gl.light.PointLightInternal;
 import engine.gl.light.PointLightHandler;
 import engine.gl.shader.BaseShader;
 import lwjgui.Color;
@@ -29,7 +29,7 @@ public class LightProcessor implements PostProcessor {
 			iblHandler.handle(pipeline);
 			
 			// Draw point lights
-			//pointLight.handle(pipeline);
+			pointLight.handle(pipeline);
 		}
 		buffer.unbind();
 	}
@@ -66,6 +66,7 @@ class IBLHandler {
 						LightProcessor.class.getResource("ibl.vert")
 				},
 				new URL[] {
+						LightProcessor.class.getResource("reflect.frag"),
 						LightProcessor.class.getResource("ibl.frag")
 				}
 			);

@@ -18,7 +18,7 @@ import lwjgui.Color;
 
 public class PointLight extends LightBase implements TreeViewable,GameSubscriber {
 
-	private engine.gl.light.PointLight light;
+	private engine.gl.light.PointLightInternal light;
 
 	public PointLight() {
 		super("PointLight");
@@ -86,7 +86,7 @@ public class PointLight extends LightBase implements TreeViewable,GameSubscriber
 				Vector3f pos = ((Vector3)this.get("Position")).toJoml();
 				float radius = this.get("Radius").tofloat();
 				float intensity = this.get("Intensity").tofloat();
-				light = new engine.gl.light.PointLight(pos, radius, intensity);
+				light = new engine.gl.light.PointLightInternal(pos, radius, intensity);
 				
 				// Color it
 				Color color = ((Color3)this.get("Color")).toColor();
