@@ -27,6 +27,10 @@ void main(void) {
 	vec4 pbrSample = texture(texture_pbr, passTexCoord);
 	float rawDepth = texture(texture_depth, passTexCoord).r;
 	
+	if ( rawDepth < 1.0 ) {
+		albedoSample = vec3(0.0);
+	}
+	
 	// Combine light and diffuse
 	vec3 diffuseLight = (clamp( 1.0 - accumulationSample, 0.0, 1.0 )) * (albedoSample * uAmbient) + accumulationSample;
 	diffuseLight = max( diffuseLight, 0.0 );

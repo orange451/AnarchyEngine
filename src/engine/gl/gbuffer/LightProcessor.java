@@ -4,6 +4,7 @@ import java.net.URL;
 
 import engine.gl.Pipeline;
 import engine.gl.PostProcessor;
+import engine.gl.Resources;
 import engine.gl.SkyBox;
 import engine.gl.Surface;
 import engine.gl.ibl.SkySphereIBL;
@@ -44,13 +45,17 @@ class IBLHandler {
 	public void handle(Pipeline pipeline) {
 		SkyBox skybox = pipeline.getGBuffer().getMergeProcessor().getSkybox();
 		
-		//if ( !(skybox instanceof SkySphereIBL) )
-			//return;
+		if ( !(skybox instanceof SkySphereIBL) )
+			return;
 		
 		pipeline.shader_set(shader);
-		shader.texture_set_stage(shader.shader_get_uniform("texture_normal"), pipeline.getGBuffer().getBuffer1(), 0);
-		shader.texture_set_stage(shader.shader_get_uniform("texture_ibl"), ((SkySphereIBL)skybox).getLightSphere().getTextureID(), 1);
+		shader.texture_set_stage(shader.shader_get_uniform("texture_depth"), pipeline.getGBuffer().getBufferDepth(), 0);
+		shader.texture_set_stage(shader.shader_get_uniform("texture_diffuse"), pipeline.getGBuffer().getBuffer0(), 1);
+		shader.texture_set_stage(shader.shader_get_uniform("texture_normal"), pipeline.getGBuffer().getBuffer1(), 2);
+		shader.texture_set_stage(shader.shader_get_uniform("texture_pbr"), pipeline.getGBuffer().getBuffer2(), 3);
+		shader.texture_set_stage(shader.shader_get_uniform("texture_ibl"), ((SkySphereIBL)skybox).getLightSphere(), 4);
 		shader.shader_set_uniform_matrix(shader.shader_get_uniform("uInverseViewMatrix"), pipeline.getGBuffer().getInverseViewMatrix());
+		shader.shader_set_uniform_matrix(shader.shader_get_uniform("uInverseProjectionMatrix"), pipeline.getGBuffer().getInverseProjectionMatrix());
 		pipeline.fullscreenQuad();
 	}
 	
