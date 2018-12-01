@@ -9,7 +9,6 @@ import luaengine.RunnableArgs;
 import luaengine.type.data.Color3;
 import luaengine.type.data.Matrix4;
 import luaengine.type.data.Vector3;
-import luaengine.type.object.LightBase;
 import luaengine.type.object.insts.GameObject;
 import luaengine.type.object.insts.Material;
 import luaengine.type.object.insts.Mesh;

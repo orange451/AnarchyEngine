@@ -14,7 +14,7 @@ in vec4 passColor;
 
 out vec4 outColor;
 
-const float MULTIPLIER = 2.0;
+const float MULTIPLIER = 0.2;
 const float CUTOFF = 0.4;
 const float MAX_REFLECTION_LOD = 14.0;
 
@@ -37,18 +37,19 @@ void main(void) {
 	// Some PBR stuff
 	float metallic = PBR.x;
 	float roughness = PBR.y;
+	float reflectiveness = PBR.z;
 	kD *= 1.0 - metallic;
 	
-	// Calculate IBL radiance 
-	mat3 iView = mat3(uInverseViewMatrix);
-	vec3 reflectVector = reflectEnv( L, N );
-	vec3 radiance = textureLod( texture_ibl, reflectVector, MAX_REFLECTION_LOD * roughness ).rgb;
+	// Calculate IBL radiance
+	vec3 radiance = textureLod( texture_ibl, reflectEnv( L, N ), MAX_REFLECTION_LOD * roughness ).rgb;
 	
-	// Correct radiance
-	radiance = ((radiance - CUTOFF) * MULTIPLIER) + CUTOFF;
+	// Correct radiance (boost brightness)
+	radiance = MULTIPLIER >= 1 ? ((radiance - CUTOFF) * MULTIPLIER) + CUTOFF : radiance * MULTIPLIER;
 	radiance = max( radiance, 0.0 );
 	
-	//outColor = vec4( (kD * radiance)+radiance * MULTIPLIER, 1.0 );
-	//outColor = vec4( radiance, 1.0 );
-	outColor = vec4( (kD + radiance) * kD, 1.0 );
+	// Calculate final IBL based on reflectiveness
+	vec3 final = mix( kD + radiance, (kD * radiance) + radiance * 0.25, reflectiveness );
+
+	// Write
+	outColor = vec4( final, 1.0 );
 }
