@@ -12,7 +12,7 @@ public class Lighting extends Service implements TreeViewable {
 	public Lighting() {
 		super("Lighting");
 		
-		this.defineField("Ambient", Color3.newInstance(32, 32, 32), false);
+		this.defineField("Ambient", Color3.newInstance(128, 128, 128), false);
 		this.defineField("Exposure", LuaValue.valueOf(1.0f), false);
 		this.defineField("Saturation", LuaValue.valueOf(1.2f), false);
 		this.defineField("Gamma", LuaValue.valueOf(2.2f), false);

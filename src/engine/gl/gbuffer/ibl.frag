@@ -6,6 +6,7 @@ uniform sampler2D texture_normal;
 uniform sampler2D texture_pbr;
 uniform samplerCube texture_ibl;
 
+uniform vec3 uAmbient;
 uniform mat4 uInverseViewMatrix;
 uniform mat4 uInverseProjectionMatrix;
 
@@ -51,5 +52,5 @@ void main(void) {
 	vec3 final = mix( kD + radiance, (kD * radiance) + radiance * 0.25, reflectiveness );
 
 	// Write
-	outColor = vec4( final, 1.0 );
+	outColor = vec4( final*uAmbient, 1.0 );
 }
