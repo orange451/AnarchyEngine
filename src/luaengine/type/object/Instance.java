@@ -381,37 +381,48 @@ public abstract class Instance extends LuaInstancetype {
 				Instance newParInst = (Instance) newParent;
 				
 				// Add to children list
-				synchronized((newParInst).getChildren()) {
-					(newParInst).getChildren().add(this);
-					((LuaEvent)newParInst.rawget("ChildAdded")).fire(this);
+				List<Instance> newParentChildren = newParInst.getChildren();
+				synchronized(newParentChildren) {
+					newParentChildren.add(this);
 				}
+				
+				// Fire added event
+				((LuaEvent)newParInst.rawget("ChildAdded")).fire(this);
 	
+				// Fire descendant added event
 				descendantAdded(newParInst);
 				for (int i = 0; i < desc.size(); i++) {
 					desc.get(i).descendantAdded(newParInst);
 				}
 				
-				// Add new value
+				// Add new reference
 				LuaValue temp = newParInst.get(name);
-				if ( temp.equals(LuaValue.NIL) ) {
+				if ( temp.equals(LuaValue.NIL) && newParInst.getField(name) == null ) {
 					newParInst.rawset(name, this);
 				}
 			}
 			
-			// Delete self from old parent
-			if ( !oldParent.equals(LuaValue.NIL) && oldParent instanceof Instance ) {
-				synchronized(((Instance)oldParent).getChildren()) {
-					((Instance)oldParent).getChildren().remove(this);
-					((LuaEvent)oldParent.rawget("ChildRemoved")).fire(this);
+			// Delete self from old parent reference
+			if ( oldParent instanceof Instance ) {
+				List<Instance> oldParentChildren = ((Instance)oldParent).getChildren();
+				synchronized(oldParentChildren) {
+					oldParentChildren.remove(this);
+					
+					// Get first child remaining with this name
+					LuaValue firstWithName = LuaValue.NIL;
+					for (int i = 0; i < oldParentChildren.size(); i++) {
+						Instance temp = oldParentChildren.get(i);
+						if ( temp.getName().equalsIgnoreCase(name) ) {
+							firstWithName = temp;
+						}
+					}
+					
+					// Set the reference to that child. NIL if no child found.
+					((Instance)oldParent).updateChildPointer(name, firstWithName);
 				}
 				
-				List<Instance> children1 = ((Instance)oldParent).getChildrenWithName(name);
-				if ( children1.size() <= 1 ) {
-					((Instance)oldParent).updateChildPointer(name, LuaValue.NIL);
-				} else {
-					children1.remove(this);
-					((Instance)oldParent).updateChildPointer(name, children1.get(0));
-				}
+				// Child has finished being removed. Fire event.
+				((LuaEvent)oldParent.rawget("ChildRemoved")).fire(this);
 			}
 			Game.getGame().gameUpdate(true);
 		}
@@ -492,23 +503,6 @@ public abstract class Instance extends LuaInstancetype {
 		//this.rawset("Name", name);
 		this.setLocked(l);
 		this.getField("Name").setLocked(l2);
-	}
-
-	public String getFullName() {
-		String ret = "";
-		LuaValue p = this;
-		int i = 0;
-		while ( p != null && p instanceof Instance ) {
-			Instance inst = ((Instance)p);
-			p = inst.getParent();
-			
-			if ( i > 0 )
-				ret = "." + ret;
-			ret = inst.getName() + ret;
-			
-			i++;
-		}
-		return ret;
 	}
 
 	public void internalTick() {

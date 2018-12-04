@@ -7,6 +7,7 @@ import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.OneArgFunction;
 
 import luaengine.LuaEngine;
+import luaengine.type.object.Instance;
 
 public abstract class LuaInstancetype extends LuaDatatype {
 	protected static HashMap<String,LuaInstancetypeData> TYPES = new HashMap<String,LuaInstancetypeData>();
@@ -65,6 +66,22 @@ public abstract class LuaInstancetype extends LuaDatatype {
 		this.rawset("DescendantRemoved",	new LuaEvent());
 	}
 	
+	public String getFullName() {
+		String ret = "";
+		LuaValue p = this;
+		int i = 0;
+		while ( p != null && p instanceof Instance ) {
+			Instance inst = ((Instance)p);
+			p = inst.getParent();
+			
+			if ( i > 0 )
+				ret = "." + ret;
+			ret = inst.getName() + ret;
+			
+			i++;
+		}
+		return ret;
+	}
 
 	public Long getSID() {
 		return this.get("SID").tolong();

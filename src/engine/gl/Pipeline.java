@@ -205,23 +205,23 @@ public class Pipeline implements Renderable {
 	}
 	
 	public void ortho() {
-		projMatrix = new Matrix4f().ortho(0, size.x, 0, size.y, -3200, 3200);
-		viewMatrix = new Matrix4f(IDENTITY);
+		projMatrix.set(IDENTITY).ortho(0, size.x, 0, size.y, -3200, 3200);
+		viewMatrix.set(IDENTITY);
 	}
 	
 	private void perspective() {
 		LuaValue cam = Game.workspace().get("CurrentCamera");
-		if ( !cam.equals(LuaValue.NIL) ) {
+		if ( !cam.isnil() ) {
 			Camera camera = (Camera)cam;
 			float fov = camera.get("Fov").tofloat();
 			float aspect = (float)size.x/(float)size.y;
 			
 			// Set matrices
-			viewMatrix = camera.getViewMatrix().toJoml();
+			viewMatrix.set(camera.getViewMatrix().getInternal());
 			projMatrix.identity().perspective((float) Math.toRadians(fov), aspect, 0.1f, 512);
 		} else {
-			viewMatrix = gbuffer.getViewMatrix();
-			projMatrix = gbuffer.getProjectionMatrix();
+			viewMatrix.set(gbuffer.getViewMatrix());
+			projMatrix.set(gbuffer.getProjectionMatrix());
 		}
 	}
 

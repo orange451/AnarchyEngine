@@ -37,7 +37,7 @@ public class Matrix4 extends LuaValuetype {
 	}
 	
 	public Matrix4(Matrix4f internal) {
-		this.internal = internal;
+		this.internal = new Matrix4f(internal);
 		
 		this.defineField("P", Vector3.newInstance(0,0,0), false);
 		update();
@@ -146,11 +146,19 @@ public class Matrix4 extends LuaValuetype {
 	}
 
 	/**
-	 * Returns the internal joml-backedz   matrix.
+	 * Returns a clone of the internal joml-backed matrix.
 	 * @return
 	 */
 	public Matrix4f toJoml() {
 		return new Matrix4f(internal);
+	}
+	
+	/**
+	 * Returns the raw internal matrix.
+	 * @return
+	 */
+	public Matrix4f getInternal() {
+		return internal;
 	}
 	
 	/**
@@ -288,6 +296,6 @@ public class Matrix4 extends LuaValuetype {
 
 	@Override
 	public LuaValuetype clone() {
-		return new Matrix4(new Matrix4f(internal));
+		return new Matrix4(internal);
 	}
 }
