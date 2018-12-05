@@ -10,6 +10,7 @@ import engine.gl.Texture2D;
 import ide.layout.windows.icons.Icons;
 import luaengine.type.LuaConnection;
 import luaengine.type.data.Color3;
+import luaengine.type.data.Vector3;
 import luaengine.type.object.Asset;
 import luaengine.type.object.Instance;
 import luaengine.type.object.Service;
@@ -19,7 +20,6 @@ public class Material extends Asset implements TreeViewable {
 	private engine.gl.MaterialGL material;
 	private boolean changed = true;
 
-	private HashMap<String,LuaConnection> textureChangesConnections = new HashMap<String,LuaConnection>();
 	private HashMap<String,LuaConnection> textureLoadsConnections = new HashMap<String,LuaConnection>();
 	
 	public Material() {
@@ -35,12 +35,17 @@ public class Material extends Asset implements TreeViewable {
 		this.defineField("Roughness", LuaValue.valueOf(0.3f), false);
 		this.defineField("Reflective", LuaValue.valueOf(0.3f), false);
 		this.defineField("Color", Color3.newInstance(255, 255, 255), false);
+		this.defineField("Emissive", Vector3.newInstance(0,0,0), false);
 		
 		this.material = new engine.gl.MaterialGL();
 	}
 	
 	public void setColor(Color3 color) {
 		this.set("Color", color);
+	}
+	
+	public void setEmissive(Vector3 emissive) {
+		this.set("Emissive", emissive);
 	}
 	
 	public void setMetalness(float f) {
@@ -80,21 +85,16 @@ public class Material extends Asset implements TreeViewable {
 				|| key.toString().equals("NormalTexture")
 				|| key.toString().equals("MetallicTexture")
 				|| key.toString().equals("RoughnessTexture")) {
-			onTextureChange(key, value);
+			onTextureSet(key, value);
 		}
 		return value;
 	}
 
-	private void onTextureChange(LuaValue key, LuaValue value) {
+	private void onTextureSet(LuaValue key, LuaValue value) {
 		String k = key.toString();
-		LuaConnection t1 = textureChangesConnections.get(k);
 		LuaConnection t2 = textureLoadsConnections.get(k);
 		
 		// Garbage collect old connections
-		if ( t1 != null ) {
-			textureChangesConnections.remove(k);
-			t1.disconnect();
-		}
 		if ( t2 != null ) {
 			textureLoadsConnections.remove(k);
 			t2.disconnect();
@@ -104,18 +104,12 @@ public class Material extends Asset implements TreeViewable {
 		if ( value instanceof Texture ) {
 			Texture tex = (Texture)value;
 			
-			// If the texture has any variables changed...
-			LuaConnection c1 = tex.changedEvent().connect((args)->{
-				//changed = true;
-			});
-			
 			// If the texture has a texture get loaded
 			LuaConnection c2 = tex.textureLoadedEvent().connect((args2)->{
 				changed = true;
 			});
 			
 			// put it in the active connections
-			textureChangesConnections.put(k, c1);
 			textureLoadsConnections.put(k, c2);
 		}
 	}
@@ -169,6 +163,7 @@ public class Material extends Asset implements TreeViewable {
 			material.setRoughness((float) this.rawget("Roughness").checkdouble());
 			material.setReflective((float) this.rawget("Reflective").checkdouble());
 			material.setColor(((Color3)this.rawget("Color")).toColor());
+			material.setEmissive(((Vector3)this.rawget("Emissive")).toJoml());
 		}
 		return material;
 	}
