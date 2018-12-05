@@ -1,5 +1,6 @@
 package ide.layout.windows;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 
@@ -298,17 +299,25 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 			
 			if ( editable ) {
 				this.setMouseReleasedEvent(event -> {
-					PointerBuffer outPath = MemoryUtil.memAllocPointer(1);
-					int result = NativeFileDialog.NFD_OpenDialog(null, IDEFilePath.convertToSystem(initialValue.toString()), outPath);
-					if ( result == NativeFileDialog.NFD_OKAY ) {
-						String path = IDEFilePath.convertToIDE(outPath.getStringUTF8(0));
-						try {
-							this.instance.set(field, path);
-						}catch(Exception e) {
+					
+					try {
+						PointerBuffer outPath = MemoryUtil.memAllocPointer(1);
+						String pp = IDEFilePath.convertToSystem(initialValue.toString());
+						if ( !new File(pp).exists() )
+							pp = "";
+						int result = NativeFileDialog.NFD_OpenDialog(null, pp, outPath);
+						if ( result == NativeFileDialog.NFD_OKAY ) {
+							String path = IDEFilePath.convertToIDE(outPath.getStringUTF8(0));
+							try {
+								this.instance.set(field, path);
+							}catch(Exception e) {
+								e.printStackTrace();
+							}
+						} else {
 							//
 						}
-					} else {
-						//
+					}catch(Exception e1) {
+						e1.printStackTrace();
 					}
 				});
 			}
