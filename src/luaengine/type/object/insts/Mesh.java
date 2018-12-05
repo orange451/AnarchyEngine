@@ -32,7 +32,6 @@ public class Mesh extends AssetLoadable implements TreeViewable,FileResource {
 		if ( changed && !this.get("FilePath").isnil() && this.get("FilePath").toString().length()>1 ) {
 			String path = this.get("FilePath").toString();
 			String realPath = IDEFilePath.convertToSystem(path);
-			
 			mesh = BufferedMesh.Import(realPath);
 			changed = false;
 		}

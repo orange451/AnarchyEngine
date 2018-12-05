@@ -21,14 +21,15 @@ public class PrefabRenderer {
 	private BufferedMesh combined;
 	private Prefab parent;
 	
+	private boolean updated;
+	
 	public PrefabRenderer(Prefab parent) {
 		models = Collections.synchronizedList(new ArrayList<Model>());
 		AABB = new Pair<Vector3f,Vector3f>(new Vector3f(), new Vector3f());
 		this.parent = parent;
 		
 		this.parent.changedEvent().connect((args)-> {
-			calculateAABB();
-			calculateCombined();
+			update();
 		});
 	}
 
@@ -63,6 +64,9 @@ public class PrefabRenderer {
 		AABB.value1().set(Integer.MAX_VALUE);
 		AABB.value2().set(Integer.MIN_VALUE);
 		
+		float scale = parent.get("Scale").tofloat();
+		Vector3f minTemp = new Vector3f();
+		Vector3f maxTemp = new Vector3f();
 		for (int i = 0; i < models.size(); i++) {
 			BufferedMesh mesh = models.get(i).getMesh();
 			if ( mesh == null )
@@ -71,8 +75,8 @@ public class PrefabRenderer {
 			Pair<Vector3f, Vector3f> aabb = mesh.getAABB();
 			Vector3f min1 = AABB.value1();
 			Vector3f max1 = AABB.value2();
-			Vector3f min2 = aabb.value1().mul(parent.get("Scale").tofloat(), new Vector3f());
-			Vector3f max2 = aabb.value2().mul(parent.get("Scale").tofloat(), new Vector3f());
+			Vector3f min2 = aabb.value1().mul(scale, minTemp);
+			Vector3f max2 = aabb.value2().mul(scale, maxTemp);
 
 			if ( min2.x < min1.x )
 				min1.x = min2.x;
@@ -99,12 +103,12 @@ public class PrefabRenderer {
 			models.add(model);
 		}
 		calculateAABB();
-		calculateCombined();
+		updated = true;
 	}
 	
 	public void update() {
 		calculateAABB();
-		calculateCombined();
+		updated = true;
 	}
 
 	public void removeModel(Model model) {
@@ -112,7 +116,7 @@ public class PrefabRenderer {
 			models.remove(model);
 		}
 		calculateAABB();
-		calculateCombined();
+		updated = true;
 	}
 	
 	private void calculateCombined() {
@@ -123,6 +127,7 @@ public class PrefabRenderer {
 		
 		combined = BufferedMesh.combineMeshes(getMeshes());
 		combined.scale(parent.get("Scale").tofloat());
+		updated = false;
 	}
 
 	private BufferedMesh[] getMeshes() {
@@ -145,6 +150,10 @@ public class PrefabRenderer {
 	}
 
 	public BufferedMesh getCombinedMesh() {
+		if ( updated ) {
+			calculateCombined();
+		}
+		
 		return this.combined;
 	}
 

@@ -7,6 +7,7 @@ import engine.gl.Resources;
 import engine.gl.Texture2D;
 import engine.io.AsynchronousImage;
 import engine.io.FileResource;
+import engine.io.Image;
 import engine.util.TextureUtils;
 import ide.IDEFilePath;
 import ide.layout.windows.icons.Icons;
@@ -83,6 +84,10 @@ public class Texture extends AssetLoadable implements TreeViewable,FileResource 
 	protected LuaValue onValueSet(LuaValue key, LuaValue value) {
 		if ( this.containsField(key.toString()) ) {
 			if ( key.toString().equals("FilePath") || key.toString().equals("FlipY") ) {
+				if ( key.toString().equals("FlipY") ) {
+					this.rawset(key, value);
+				}
+				
 				String texturePath = value.toString();
 				if ( !key.toString().equals("FilePath") )
 					texturePath = this.getFilePath();
