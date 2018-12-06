@@ -94,6 +94,8 @@ public class CustomEnums extends TwoArgFunction {
 					this.rawset("Enter",		GLFW.GLFW_KEY_ENTER);
 					this.rawset("LeftAlt",		GLFW.GLFW_KEY_LEFT_ALT);
 					this.rawset("RightAlt",		GLFW.GLFW_KEY_RIGHT_ALT);
+					this.rawset("RightControl",	GLFW.GLFW_KEY_RIGHT_CONTROL);
+					this.rawset("LeftControl",	GLFW.GLFW_KEY_LEFT_CONTROL);
 				}
 			});
 		}

@@ -313,9 +313,13 @@ public abstract class Instance extends LuaInstancetype {
 	public void set(LuaValue key, LuaValue value) {
 		LuaValue oldValue = this.get(key);
 		super.set( key, value );
+		
 		checkSetParent(key, oldValue, value); // value may have changed
 		checkSetName(key, oldValue, value); // value may have changed
 
+		if ( oldValue.equals(value) )
+			return;
+		
 		LuaEvent event = this.changedEvent();
 		event.fire(key, value);
 		
