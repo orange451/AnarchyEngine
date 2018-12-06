@@ -366,5 +366,6 @@ public class PhysicsObjectInternal {
 	 */
 	public void refresh() {
 		this.refresh = true;
+		this.desiredShape = null;
 	}
 }
