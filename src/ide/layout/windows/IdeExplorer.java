@@ -6,10 +6,12 @@ import java.util.List;
 import org.luaj.vm2.LuaValue;
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.system.MemoryUtil;
+import org.lwjgl.util.nfd.NFDPathSet;
 import org.lwjgl.util.nfd.NativeFileDialog;
 
 import engine.Game;
 import engine.GameSubscriber;
+import engine.util.FileUtils;
 import ide.IDE;
 import ide.layout.IdePane;
 import ide.layout.windows.icons.Icons;
@@ -226,13 +228,33 @@ public class IdeExplorer extends IdePane implements GameSubscriber {
 				int result = NativeFileDialog.NFD_OpenDialog("obj,fbx", new File("").getAbsolutePath(), outPath);
 				if ( result == NativeFileDialog.NFD_OKAY ) {
 					path = outPath.getStringUTF8(0);
+					Game.assets().importPrefab(path);
 				} else {
 					return;
 				}
-				
-				Game.getService("Assets").get("ImportPrefab").invoke(LuaValue.NIL, LuaValue.valueOf(path));
 			});
 			c.getItems().add(prefi);
+			
+			// Import Texture
+			MenuItem texi = new MenuItem("Import Texture", Icons.icon_texture.getView());
+			texi.setOnAction(event -> {
+				NFDPathSet outPaths = NFDPathSet.calloc();
+				int result = NativeFileDialog.NFD_OpenDialogMultiple("png,bmp,tga,jpg,jpeg,hdr", new File("").getAbsolutePath(), outPaths);
+				if ( result == NativeFileDialog.NFD_OKAY ) {
+					long count = NativeFileDialog.NFD_PathSet_GetCount(outPaths);
+					for (long i = 0; i < count; i++) {
+						String path = NativeFileDialog.NFD_PathSet_GetPath(outPaths, i);
+						Instance t = Game.assets().importTexture(path);
+						File ff = new File(path);
+						if ( ff.exists() ) {
+							t.forceSetName(FileUtils.getFileNameWithoutExtension(ff.getName()));
+						}
+					}
+				} else {
+					return;
+				}
+			});
+			c.getItems().add(texi);
 			
 			// New Prefab
 			MenuItem pref = new MenuItem("New Prefab", Icons.icon_model.getView());

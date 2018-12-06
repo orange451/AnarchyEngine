@@ -19,6 +19,9 @@ public class PlayerPhysics extends PhysicsBase implements TreeViewable {
 		this.defineField("Height", LuaValue.valueOf(1.0f), false);
 		this.defineField("StepHeight", LuaValue.valueOf(0.1f), false);
 		
+		// No bounciness
+		this.rawset("Bounciness", LuaValue.valueOf(0));
+		
 		// Force to capsule
 		this.set("Shape", "Capsule");
 		this.getField("Shape").setLocked(true);
@@ -33,7 +36,9 @@ public class PlayerPhysics extends PhysicsBase implements TreeViewable {
 		
 		// If height changes, rebuild physics
 		this.changedEvent().connect((args)-> {
-			PlayerPhysics.this.forceRefresh();
+			if ( args[0].toString().equals("Height") ) {
+				PlayerPhysics.this.forceRefresh();
+			}
 		});
 	}
 	

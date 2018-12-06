@@ -3,6 +3,7 @@ package ide;
 import java.io.IOException;
 
 import engine.Game;
+import luaengine.type.object.insts.Player;
 
 public class RunnerClient extends RunnerServer {
 	

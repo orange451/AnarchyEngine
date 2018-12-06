@@ -1,11 +1,13 @@
 package luaengine.type.object.insts;
 
 import org.luaj.vm2.LuaValue;
+import org.luaj.vm2.lib.ThreeArgFunction;
 
 import engine.Game;
 import engine.gl.Resources;
 import engine.gl.mesh.BufferedMesh;
 import engine.io.FileResource;
+import engine.util.MeshUtils;
 import ide.IDEFilePath;
 import ide.layout.windows.icons.Icons;
 import luaengine.type.object.AssetLoadable;
@@ -21,6 +23,14 @@ public class Mesh extends AssetLoadable implements TreeViewable,FileResource {
 		super("Mesh");
 		
 		this.setLocked(false);
+		
+		this.getmetatable().set("Capsule", new ThreeArgFunction() {
+			@Override
+			public LuaValue call(LuaValue myself, LuaValue radius, LuaValue height) {
+				setMesh(MeshUtils.capsule(radius.tofloat(), height.tofloat(), 16));
+				return LuaValue.NIL;
+			}
+		});
 	}
 	
 	public void setMesh(BufferedMesh mesh) {

@@ -3,21 +3,28 @@ package luaengine.network.internal;
 import java.util.List;
 
 import engine.Game;
-import luaengine.type.LuaConnection;
 import luaengine.type.object.Instance;
-import luaengine.type.object.Service;
+import luaengine.type.object.insts.Connection;
 import luaengine.type.object.insts.Player;
 import luaengine.type.object.services.Players;
 
 public class ClientConnectFinishTCP implements ClientProcessable {
-	public long SID; // optional for server
+	public long SID = -1; // optional for server
 	
 	@Override
 	public void clientProcess() {
 		final long playerId = SID;
 		
-		Players players = Game.players();
+		// If there already is a local player, destroy it, because the server made a new one!
+		if ( SID != -1 ) {
+			Player p = Game.players().getLocalPlayer();
+			if ( p != null ) {
+				p.destroy();
+			}
+		}
 
+		// Find new server local player
+		Players players = Game.players();
 		List<Player> children = players.getPlayers();
 		for (int i = 0; i < children.size(); i++) {
 			Instance player = children.get(i);
@@ -26,8 +33,11 @@ public class ClientConnectFinishTCP implements ClientProcessable {
 				
 				// Setup local player stuff
 				players.rawset("LocalPlayer", player);
-				Game.connections().getLocalConnection().rawset("Player", player);
-				player.rawset("Connection", Game.connections().getLocalConnection());
+				Connection localConnection = Game.connections().getLocalConnection();
+				if ( localConnection != null ) {
+					localConnection.rawset("Player", player);
+					player.rawset("Connection", localConnection);
+				}
 				
 				// Copy starter player scripts in to player
 				Instance starterScripts = Game.getService("Storage").findFirstChild("StarterPlayerScripts");

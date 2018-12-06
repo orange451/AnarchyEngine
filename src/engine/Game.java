@@ -19,6 +19,8 @@ import luaengine.type.ScriptData;
 import luaengine.type.object.Instance;
 import luaengine.type.object.Service;
 import luaengine.type.object.insts.Camera;
+import luaengine.type.object.insts.Player;
+import luaengine.type.object.insts.PlayerScripts;
 import luaengine.type.object.insts.PlayerScriptsStart;
 import luaengine.type.object.insts.Script;
 import luaengine.type.object.services.Assets;
@@ -468,6 +470,21 @@ public class Game implements Tickable {
 		if (running) {
 			Game.runLater(()->{
 				((LuaEvent)LuaEngine.globals.get("game").get("OnLoad")).fire();
+
+				// Create local player
+				if ( !Game.isServer() && Game.players().getLocalPlayer() == null ) {
+					
+					// Create the player
+					Player p = new Player();
+					p.forceSetParent(Game.players());
+					
+					// Player scripts folder
+					Instance sc = new PlayerScripts();
+					sc.forceSetParent(p);
+					
+					// Set him as local
+					new luaengine.network.internal.ClientConnectFinishTCP().clientProcess();
+				}
 			});
 		}
 	}

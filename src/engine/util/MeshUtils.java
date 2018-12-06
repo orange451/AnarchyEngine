@@ -1,41 +1,16 @@
 package engine.util;
 
-import static org.lwjgl.assimp.Assimp.aiProcess_JoinIdenticalVertices;
-import static org.lwjgl.assimp.Assimp.aiProcess_Triangulate;
-
-import java.io.File;
-import java.net.URL;
-import java.nio.ByteBuffer;
-import java.nio.IntBuffer;
 import java.util.ArrayList;
 
 import org.joml.Vector2f;
 import org.joml.Vector3f;
-import org.lwjgl.PointerBuffer;
-import org.lwjgl.assimp.AIColor4D;
-import org.lwjgl.assimp.AIFace;
-import org.lwjgl.assimp.AIMaterial;
-import org.lwjgl.assimp.AIMaterialProperty;
-import org.lwjgl.assimp.AIMesh;
-import org.lwjgl.assimp.AIScene;
-import org.lwjgl.assimp.AIString;
-import org.lwjgl.assimp.AIVector3D;
-import org.lwjgl.assimp.Assimp;
-
 import engine.gl.mesh.BufferedMesh;
-import engine.gl.mesh.BufferedPrefab;
 import engine.gl.mesh.Quad;
 import engine.gl.mesh.QuadStrip;
 import engine.gl.mesh.Triangle;
 import engine.gl.mesh.TriangleFan;
 import engine.gl.mesh.TriangleStrip;
 import engine.gl.mesh.Vertex;
-import engine.gl.mesh.mm3d.Mm3dImporter;
-import luaengine.type.data.Color3;
-import luaengine.type.object.insts.Material;
-import luaengine.type.object.insts.Mesh;
-import luaengine.type.object.insts.Prefab;
-import luaengine.type.object.insts.Texture;
 
 public class MeshUtils {
 	private static final int CACHE_SIZE = 240;

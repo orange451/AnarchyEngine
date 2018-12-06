@@ -61,10 +61,7 @@ public class Assets extends Service implements TreeViewable {
 		this.getmetatable().set("ImportTexture", new TwoArgFunction() {
 			@Override
 			public LuaValue call(LuaValue arg1, LuaValue arg3) {
-				Texture t = new Texture();
-				t.setFilePath(arg3.toString());
-				t.forceSetParent(t.getPreferredParent());
-				return t;
+				return importTexture(arg3.toString());
 			}
 		});
 		
@@ -72,6 +69,15 @@ public class Assets extends Service implements TreeViewable {
 			@Override
 			public LuaValue call(LuaValue myself, LuaValue path) {
 				return importPrefab(path.toString());
+			}
+		});
+		
+		this.getmetatable().set("NewMesh", new ZeroArgFunction() {
+			@Override
+			public LuaValue call() {
+				Mesh t = new Mesh();
+				t.forceSetParent(t.getPreferredParent());
+				return t;
 			}
 		});
 		
@@ -101,6 +107,13 @@ public class Assets extends Service implements TreeViewable {
 				return p;
 			}
 		});
+	}
+	
+	public Texture importTexture(String filepath) {
+		Texture t = new Texture();
+		t.setFilePath(filepath);
+		t.forceSetParent(t.getPreferredParent());
+		return t;
 	}
 
 	public LuaValue importPrefab(String filePath) {
