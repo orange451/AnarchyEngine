@@ -312,12 +312,14 @@ public abstract class Instance extends LuaInstancetype {
 	@Override
 	public void set(LuaValue key, LuaValue value) {
 		LuaValue oldValue = this.get(key);
+		boolean changed = !oldValue.equals(value);
+		
 		super.set( key, value );
 		
 		checkSetParent(key, oldValue, value); // value may have changed
 		checkSetName(key, oldValue, value); // value may have changed
 
-		if ( oldValue.equals(value) )
+		if ( !changed )
 			return;
 		
 		LuaEvent event = this.changedEvent();

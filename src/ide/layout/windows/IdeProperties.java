@@ -119,6 +119,7 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 		if ( value instanceof LuaValuetype )
 			return new DataTypePropertyModifier(instance, field, value, editable);
 		
+		// Edit an instance pointer
 		if ( instance.getField(field).getType().equals(Instance.class) )
 			return new InstancePropertyModifier(instance, field, value, editable);
 		
@@ -289,7 +290,7 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 
 		@Override
 		public void onValueSet(String text) {
-			instance.set(field, ((LuaValuetype)initialValue).fromString(text));
+			instance.set(field, ((LuaValuetype)initialValue).clone().fromString(text));
 		}
 	}
 	

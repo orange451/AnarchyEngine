@@ -5,6 +5,7 @@ import org.luaj.vm2.LuaString;
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.Varargs;
 import org.luaj.vm2.lib.OneArgFunction;
+import org.luaj.vm2.lib.ThreeArgFunction;
 import org.luaj.vm2.lib.TwoArgFunction;
 import org.luaj.vm2.lib.VarArgFunction;
 import org.luaj.vm2.lib.ZeroArgFunction;
@@ -12,7 +13,6 @@ import org.luaj.vm2.lib.ZeroArgFunction;
 import luaengine.LuaEngine;
 import luaengine.type.ScriptData;
 import luaengine.type.object.ScriptBase;
-import luaengine.type.object.insts.Script;
 
 public class GameEngineLib extends TwoArgFunction {
 
@@ -26,8 +26,19 @@ public class GameEngineLib extends TwoArgFunction {
 		env.set("tick", new tick()); // Returns the elapsed time (seconds) since start of application
 		env.set("spawn", new spawn()); // Spawns a new thread
 		env.set("wait", new wait()); // Sleeps current thread
-		env.set("print", new print(env)); // Override LuaJ's because it doesn't respect multithreading
+		env.set("print", new print(env)); // Override LuaJ's because it doesn't respect multi-threading
 		
+		// math.clamp( value, min, max )
+		env.get("math").set("clamp", new ThreeArgFunction() {
+			@Override
+			public LuaValue call(LuaValue arg1, LuaValue arg2, LuaValue arg3) {
+				float f1 = arg2.tofloat();
+				float f2 = arg3.tofloat();
+				float x = arg1.tofloat();
+				
+				return LuaValue.valueOf(Math.max(f1, Math.min(f2, x)));
+			}
+		});
 		return env;
 	}
 	

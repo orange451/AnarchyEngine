@@ -468,24 +468,22 @@ public class Game implements Tickable {
 		game.gameUpdate(true);
 		
 		if (running) {
-			Game.runLater(()->{
-
-				// Create local player
-				if ( !Game.isServer() && Game.players().getLocalPlayer() == null ) {
-					
-					// Create the player
-					Player p = new Player();
-					p.forceSetParent(Game.players());
-					
-					// Player scripts folder
-					Instance sc = new PlayerScripts();
-					sc.forceSetParent(p);
-					
-					// Set him as local
-					new luaengine.network.internal.ClientConnectFinishTCP().clientProcess();
-				}
+			// Create local player
+			if ( !Game.isServer() && Game.players().getLocalPlayer() == null ) {
 				
-				// Run OnLoad method
+				// Create the player
+				Player p = new Player();
+				p.forceSetParent(Game.players());
+				
+				// Player scripts folder
+				Instance sc = new PlayerScripts();
+				sc.forceSetParent(p);
+				
+				// Set him as local
+				new luaengine.network.internal.ClientConnectFinishTCP().clientProcess();
+			}
+			
+			Game.runLater(()->{
 				((LuaEvent)LuaEngine.globals.get("game").get("OnLoad")).fire();
 			});
 		}
