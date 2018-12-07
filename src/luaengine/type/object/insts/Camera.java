@@ -41,6 +41,22 @@ public class Camera extends Instance implements TreeViewable {
 				return null;
 			}
 		});
+		
+		this.getmetatable().set("MoveTo", new TwoArgFunction() {
+			@Override
+			public LuaValue call(LuaValue myself, LuaValue arg2) {
+				Vector3 position = (Vector3)arg2;
+				Vector3 lookAt = Camera.this.getLookAt();
+				Vector3 offset = (Vector3) Camera.this.getPosition().sub(position);
+				Vector3 t2 = (Vector3) lookAt.add(offset);
+				
+				Camera.this.rawset("Position",position);
+				Camera.this.rawset("LookAt",t2.clone());
+				//Camera.this.setPosition(position);
+				//Camera.this.setLookAt(t2);
+				return null;
+			}
+		});
 		updateMatrix();
 	}
 
@@ -90,7 +106,7 @@ public class Camera extends Instance implements TreeViewable {
 	}
 	
 	public void setPosition( Vector3 position ) {
-		this.set("Position", position);
+		this.set("Position", position.clone());
 	}
 	
 	public Vector3 getPosition() {
@@ -98,7 +114,7 @@ public class Camera extends Instance implements TreeViewable {
 	}
 	
 	public void setLookAt( Vector3 lookat ) {
-		this.set("LookAt", lookat);
+		this.set("LookAt", lookat.clone());
 	}
 	
 	public Vector3 getLookAt() {

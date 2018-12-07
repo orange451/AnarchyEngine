@@ -469,7 +469,6 @@ public class Game implements Tickable {
 		
 		if (running) {
 			Game.runLater(()->{
-				((LuaEvent)LuaEngine.globals.get("game").get("OnLoad")).fire();
 
 				// Create local player
 				if ( !Game.isServer() && Game.players().getLocalPlayer() == null ) {
@@ -485,6 +484,9 @@ public class Game implements Tickable {
 					// Set him as local
 					new luaengine.network.internal.ClientConnectFinishTCP().clientProcess();
 				}
+				
+				// Run OnLoad method
+				((LuaEvent)LuaEngine.globals.get("game").get("OnLoad")).fire();
 			});
 		}
 	}
