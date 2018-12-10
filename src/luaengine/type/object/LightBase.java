@@ -15,6 +15,17 @@ public abstract class LightBase extends Instance {
 		this.defineField("Intensity", LuaValue.valueOf(1), false);
 		this.defineField("Color", Color3.white(), false);
 		this.defineField("Shadows", LuaValue.valueOf(true), false);
+		this.defineField("Visible", LuaValue.valueOf(true), false);
+		
+		this.changedEvent().connect((args)->{
+			if ( args[0].toString().equals("Visible") ) {
+				Light l = this.getLightInternal();
+				if ( l == null )
+					return;
+				
+				l.visible = args[1].toboolean();
+			}
+		});
 	}
 
 	@Override
@@ -28,6 +39,14 @@ public abstract class LightBase extends Instance {
 	}
 	
 	public abstract Light getLightInternal();
+	
+	public void setVisible( boolean visible ) {
+		this.set("Visible", LuaValue.valueOf(visible));
+	}
+	
+	public boolean isVisible() {
+		return this.get("Visible").toboolean();
+	}
 
 	public void setIntensity(float intensity) {
 		this.set("Intensity", LuaValue.valueOf(intensity));

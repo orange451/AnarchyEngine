@@ -85,6 +85,9 @@ public class PointLightHandler {
 				
 			for (int i = 0; i < lights.size(); i++) {
 				PointLightInternal light = lights.get(i);
+				if ( !light.visible )
+					continue;
+				
 				Matrix4f worldMatrix = new Matrix4f();
 				worldMatrix.translate(light.x, light.y, light.z);
 				worldMatrix.scale(light.radius);
