@@ -185,6 +185,7 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 			this.check.setFontSize(16);
 			this.check.setSize(16);
 			this.check.setChecked(value.checkboolean());
+			this.check.setDisabled(!editable);
 			this.getChildren().add(check);
 			
 			if ( editable ) {

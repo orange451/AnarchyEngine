@@ -21,6 +21,8 @@ import lwjgui.Color;
 public class TextureUtils {
 	public static boolean autoResize = false;
 	
+	public static int MAX_TEXTURE_SIZE = 1024;
+	
 	public static Texture2D loadRGBATexture(String filename) {
 		return loadTexture(filename, GL11.GL_LINEAR, GL11.GL_LINEAR_MIPMAP_LINEAR, false);
 	}
@@ -52,7 +54,7 @@ public class TextureUtils {
 		Image image = new Image( path, flipY );
 
 		// Resize if too big
-		int maxRes = 2048;
+		int maxRes = MAX_TEXTURE_SIZE;
 		if ( autoResize && image.getData() != null && (image.getWidth() > maxRes || image.getHeight() > maxRes) ) {
 			image.resize( maxRes, maxRes );
 		}

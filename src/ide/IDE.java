@@ -31,7 +31,7 @@ public class IDE extends RenderableApplication {
 		win.setWindowAutoDraw(false); // We want to draw the main IDE window manually
 		win.setWindowAutoClear(false); // We want control of clearing
 		
-		InternalRenderThread.desiredFPS = 120;
+		InternalRenderThread.desiredFPS = 60;
 		InternalGameThread.desiredTPS = 60;
 		
 		// Setup background pane

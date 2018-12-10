@@ -1,5 +1,6 @@
 package luaengine.type.object.insts;
 
+import org.joml.Matrix4f;
 import org.luaj.vm2.LuaValue;
 
 import engine.gl.shader.BaseShader;
@@ -43,6 +44,14 @@ public class GameObject extends Instance implements RenderableInstance,TreeViewa
 			matrix = new Matrix4();
 		
 		this.set("WorldMatrix", matrix);
+	}
+	
+	/**
+	 * Set the world matrix for this game object. Convenience function for joml.
+	 * @param matrix
+	 */
+	public void setWorldMatrix(Matrix4f matrix) {
+		this.setWorldMatrix(new Matrix4(matrix));
 	}
 	
 	/**

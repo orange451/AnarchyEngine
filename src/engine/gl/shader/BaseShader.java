@@ -303,6 +303,7 @@ public class BaseShader {
 		lastViewMatrix.set(mat);
 	}
 
+	Matrix3f tempNormal = new Matrix3f();
 	public void setWorldMatrix(Matrix4f mat) {
 		if ( worldMatLoc == -1 || mat.equals(lastWorldMatrix) )
 			return;
@@ -311,7 +312,7 @@ public class BaseShader {
 		glUniformMatrix4fv(worldMatLoc, false, matrix44Buffer);
 
 		if ( worldNormalMatLoc > 0 ) {
-			Matrix3f normalMatrix = mat.normal(new Matrix3f());
+			Matrix3f normalMatrix = mat.normal(tempNormal);
 			normalMatrix.get(matrix33Buffer);
 			glUniformMatrix3fv(worldNormalMatLoc, false, matrix33Buffer);
 		}

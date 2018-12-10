@@ -15,7 +15,7 @@ public class SkySphere extends SkyBoxDynamic {
 	private MaterialGL material;
 	
 	public SkySphere(Image image) {
-		this( image, 512 );
+		this( image, SKYBOX_TEXTURE_SIZE );
 	}
 	
 	public SkySphere(Image image, int size) {

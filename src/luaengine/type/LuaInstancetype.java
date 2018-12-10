@@ -57,7 +57,7 @@ public abstract class LuaInstancetype extends LuaDatatype {
 		this.defineField("ClassName",		LuaValue.valueOf(name), true);
 		this.defineField("SID", 			LuaValue.valueOf(-1),   true);
 		this.defineField("Parent",			LuaValue.NIL,			false);
-		this.defineField("Archivable",		LuaValue.valueOf(true), true);
+		this.defineField("Archivable",		LuaValue.valueOf(true), false);
 
 		this.rawset("Changed",		new LuaEvent());
 		this.rawset("ChildAdded",	new LuaEvent());

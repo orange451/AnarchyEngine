@@ -4,6 +4,7 @@ import org.luaj.vm2.LuaValue;
 import org.lwjgl.glfw.GLFW;
 
 import engine.Game;
+import engine.InternalRenderThread;
 import ide.RunnerClient;
 import luaengine.RunnableArgs;
 import luaengine.type.data.Color3;

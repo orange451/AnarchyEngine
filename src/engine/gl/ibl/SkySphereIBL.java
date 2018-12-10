@@ -10,14 +10,14 @@ public class SkySphereIBL extends SkySphere {
 	private float lightMultiplier = 1.0f;
 	
 	public SkySphereIBL(Image reflection, Image light) {
-		this(reflection, light, 512);
+		this(reflection, light, SKYBOX_TEXTURE_SIZE);
 	}
 	
 	public SkySphereIBL(Image reflection, Image light, int size) {
 		super(reflection, size);
 		
 		if ( reflection != null && light != null ) {
-			lightSphere = new SkySphereIBL(light,null, 128);
+			lightSphere = new SkySphereIBL(light,null, SKYBOX_TEXTURE_SIZE/2);
 		}
 	}
 	

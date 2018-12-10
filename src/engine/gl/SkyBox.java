@@ -21,6 +21,8 @@ public class SkyBox {
 
 	protected int width;
 	protected int height;
+	
+	public static int SKYBOX_TEXTURE_SIZE = 256;
 
 	public SkyBox(Image image){
 		cubemap = glGenTextures();
