@@ -22,6 +22,8 @@ import org.lwjgl.opengl.GL13;
 import engine.Game;
 import engine.application.RenderableApplication;
 import engine.gl.gbuffer.GBuffer;
+import engine.gl.lua.HandlesRenderer;
+import engine.gl.lua.OutlineRenderer;
 import engine.gl.mesh.BufferedMesh;
 import engine.gl.shader.BaseShader;
 import engine.observer.Renderable;
@@ -107,6 +109,7 @@ public class Pipeline implements Renderable {
 		// Draw to GBuffer
 		gbuffer.bind();
 		{
+			// OpenGL render flags
 			setOpenGLState();
 			
 			// Render workspace into gbuffer
@@ -128,6 +131,9 @@ public class Pipeline implements Renderable {
 					OutlineRenderer.render(instance);
 				}
 			}
+			
+			// Render selected instances (handles)
+			HandlesRenderer.render(instances);
 		}
 		gbuffer.unbind();
 		
@@ -196,6 +202,8 @@ public class Pipeline implements Renderable {
 		List<Instance> instances = root.getChildren();
 		for (int i = 0; i < instances.size(); i++) {
 			Instance inst = instances.get(i);
+			if ( inst instanceof Camera )
+				continue;
 			renderInstance(shader, inst);
 		}
 		

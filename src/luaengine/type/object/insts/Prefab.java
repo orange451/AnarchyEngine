@@ -1,10 +1,13 @@
 package luaengine.type.object.insts;
 
+import org.joml.Vector3f;
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.OneArgFunction;
 import org.luaj.vm2.lib.ThreeArgFunction;
 
 import engine.Game;
+import engine.util.AABBUtil;
+import engine.util.Pair;
 import ide.layout.windows.icons.Icons;
 import luaengine.type.LuaEvent;
 import luaengine.type.object.Asset;
@@ -60,6 +63,13 @@ public class Prefab extends Asset implements TreeViewable {
 				return LuaValue.NIL;
 			}
 		});
+	}
+	
+	public Pair<Vector3f, Vector3f> getAABB() {
+		if ( this.prefab.isEmpty() ) {
+			return AABBUtil.newAABB(new Vector3f(-0.5f), new Vector3f(0.5f));
+		}
+		return this.prefab.getAABB();
 	}
 	
 	public Model addModel(Mesh mesh, Material material) {

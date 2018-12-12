@@ -1,6 +1,7 @@
 package luaengine.type.object.insts;
 
 import org.joml.Matrix4f;
+import org.joml.Vector3f;
 import org.luaj.vm2.LuaValue;
 
 import engine.gl.shader.BaseShader;
@@ -144,5 +145,10 @@ public class GameObject extends Instance implements RenderableInstance,TreeViewa
 	public Prefab getPrefab() {
 		LuaValue p = this.get("Prefab");
 		return p.equals(LuaValue.NIL)?null:(Prefab)p;
+	}
+
+	
+	public Vector3 getPosition() {
+		return (Vector3) this.get("Position");
 	}
 }

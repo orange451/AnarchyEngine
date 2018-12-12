@@ -10,6 +10,7 @@ import org.joml.Vector3f;
 import engine.gl.Resources;
 import engine.gl.mesh.BufferedMesh;
 import engine.gl.shader.BaseShader;
+import engine.util.AABBUtil;
 import engine.util.Pair;
 import luaengine.type.object.insts.Model;
 import luaengine.type.object.insts.Prefab;
@@ -61,37 +62,9 @@ public class PrefabRenderer {
 	}
 	
 	private void calculateAABB() {
-		AABB.value1().set(Integer.MAX_VALUE);
-		AABB.value2().set(Integer.MIN_VALUE);
-		
 		float scale = parent.get("Scale").tofloat();
-		Vector3f minTemp = new Vector3f();
-		Vector3f maxTemp = new Vector3f();
-		for (int i = 0; i < models.size(); i++) {
-			BufferedMesh mesh = models.get(i).getMesh();
-			if ( mesh == null )
-				continue;
-			
-			Pair<Vector3f, Vector3f> aabb = mesh.getAABB();
-			Vector3f min1 = AABB.value1();
-			Vector3f max1 = AABB.value2();
-			Vector3f min2 = aabb.value1().mul(scale, minTemp);
-			Vector3f max2 = aabb.value2().mul(scale, maxTemp);
-
-			if ( min2.x < min1.x )
-				min1.x = min2.x;
-			if ( min2.y < min1.y )
-				min1.y = min2.y;
-			if ( min2.z < min1.z )
-				min1.z = min2.z;
-
-			if ( max2.x > max1.x )
-				max1.x = max2.x;
-			if ( max2.y > max1.y )
-				max1.y = max2.y;
-			if ( max2.z > max1.z )
-				max1.z = max2.z;
-		}
+		Model[] temp = models.toArray(new Model[models.size()]);
+		this.AABB = AABBUtil.prefabAABB(scale, temp);
 	}
 	
 	public Pair<Vector3f,Vector3f> getAABB() {
@@ -150,9 +123,8 @@ public class PrefabRenderer {
 	}
 
 	public BufferedMesh getCombinedMesh() {
-		if ( updated ) {
+		if ( updated )
 			calculateCombined();
-		}
 		
 		return this.combined;
 	}
@@ -162,5 +134,9 @@ public class PrefabRenderer {
 			models.clear();
 		if ( combined != null )
 			combined.cleanup();
+	}
+
+	public boolean isEmpty() {
+		return models.size() == 0;
 	}
 }

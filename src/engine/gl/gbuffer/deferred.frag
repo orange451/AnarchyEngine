@@ -67,11 +67,6 @@ void main(void) {
 
 		// Combine cubemap into diffuse
 		diffuseSample.rgb *= cubemapSample;
-
-		// Calculate IBL
-		//vec3 iblSample = (enableIBL == 0.0) ? vec3( 0.0 ) : textureLod( texture_ibl, reflectEnv( nViewSpacePos, normal ).xyz, MAX_REFLECTION_LOD * fRoughness).rgb;
-		//iblSample *= uSkyBoxLightMultiplier;
-		//diffuseSample.rgb += iblSample * uReflective * (1.0-fMetalness) * uAmbient;
     }
 	
 	// Calculate fresnel

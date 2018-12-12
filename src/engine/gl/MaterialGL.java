@@ -13,9 +13,9 @@ public class MaterialGL {
 	private Texture2D metalnessTexture;
 	private Texture2D roughnessTexture;
 
-	private float metalness = 0.3f;
+	private float metalness = 0.2f;
 	private float roughness = 0.3f;
-	private float reflective = 0.3f;
+	private float reflective = 0.1f;
 	
 	private Vector3f emissive;
 	private Vector3f color;

@@ -134,15 +134,12 @@ public abstract class RenderableApplication extends Application implements Rende
 	@Override
 	protected void onStart(String[] args) {
 		ClientLauncher.launch(this);
-
 		if ( !glfwInit() ) {
 			GLFW_INITIALIZED = false;
 			new ErrorWindow("Unable to initialize GLFW.");
 			return;
 		}
 		
-		GLFW_INITIALIZED = true;
-
 		GLFWErrorCallback.createPrint(System.err).set();
 
 		// Configure GLFW
@@ -158,8 +155,10 @@ public abstract class RenderableApplication extends Application implements Rende
 
 		// Create the window
 		window = glfwCreateWindow(1024, 640, "Window", NULL, NULL);
-		if ( window == NULL )
+		if ( window == NULL ) {
+			new ErrorWindow("Failed to create the GLFW window.");
 			throw new RuntimeException("Failed to create the GLFW window");
+		}
 
 		GLFW.glfwSetWindowSizeCallback(window, new GLFWWindowSizeCallbackI() {
 			@Override
@@ -209,10 +208,16 @@ public abstract class RenderableApplication extends Application implements Rende
 		GL.createCapabilities();
 
 		// Start thread
-		internalInitialize();
-		initialize(args);
-		initialized = true;
-		Resources.initialize();
+		GLFW_INITIALIZED = true;
+		try {
+			internalInitialize();
+			initialize(args);
+			initialized = true;
+			Resources.initialize();
+		} catch(Exception e) {
+			new ErrorWindow("Error initializing engine.");
+			return;
+		}
 		renderThread.run();
 	}
 }

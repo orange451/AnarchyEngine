@@ -1,8 +1,11 @@
-package engine.gl;
+package engine.gl.lua;
 
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
+import engine.gl.MaterialGL;
+import engine.gl.Pipeline;
+import engine.gl.Resources;
 import engine.gl.mesh.BufferedMesh;
 import engine.gl.shader.BaseShader;
 import engine.util.Pair;

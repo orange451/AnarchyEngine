@@ -12,6 +12,8 @@ public class Resources {
 	public static final Texture2D TEXTURE_NORMAL_RGBA;
 	public static final BufferedMesh MESH_SPHERE;
 	public static final BufferedMesh MESH_CUBE;
+	public static final BufferedMesh MESH_CONE;
+	public static final BufferedMesh MESH_CYLINDER;
 	public static final MaterialGL MATERIAL_BLANK;
 	
 	static {
@@ -21,6 +23,8 @@ public class Resources {
 		
 		MESH_SPHERE = MeshUtils.sphere(1, 16);
 		MESH_CUBE = MeshUtils.cube(1);
+		MESH_CONE = MeshUtils.cone(1, 1, 16);
+		MESH_CYLINDER = MeshUtils.cylinder(1, 1, 16);
 		
 		MATERIAL_BLANK = new MaterialGL();
 	}
