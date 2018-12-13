@@ -27,8 +27,16 @@ public class ErrorWindow {
 	
 	private static final int WIDTH = 300;
 	private static final int HEIGHT = 120;
-
+	private final boolean fatalError;
+	private boolean clicked;
+	
 	public ErrorWindow(String string) {
+		this( string, false);
+	}
+	
+	public ErrorWindow(String string, boolean fatal) {
+		fatalError = fatal;
+		
 		if ( RenderableApplication.GLFW_INITIALIZED ) {
 			errorLWJGUI(string);
 		} else {
@@ -44,8 +52,12 @@ public class ErrorWindow {
 		} catch (Exception e) {
 			//e.printStackTrace();
 		}
+		
+		String prefix = "";
+		if ( fatalError )
+			prefix = "Fatal ";
 
-		final JFrame frame = new JFrame("Error!");
+		final JFrame frame = new JFrame(prefix + "Error!");
 		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		frame.setResizable( false );
 
@@ -64,8 +76,7 @@ public class ErrorWindow {
 			public void actionPerformed(ActionEvent arg0) {
 				frame.setVisible(false);
 				frame.dispose();
-				//clicked = true;
-				//System.exit(0);
+				clicked = true;
 			}
 
 		});
@@ -84,17 +95,23 @@ public class ErrorWindow {
 		//frame.pack();
 		frame.setVisible(true);
 
-		/*while ( !clicked ) {
-			try {
-				Thread.sleep(1000);
-			} catch (InterruptedException e) {
-				//
+		if ( fatalError ) {
+			while ( !clicked ) {
+				try {
+					Thread.sleep(1000);
+				} catch (InterruptedException e) {
+					//
+				}
 			}
-		}*/
+			System.exit(0);
+		}
 	}
 
 	private void errorLWJGUI(String string) {
-		long win = LWJGUIUtil.createOpenGLCoreWindow("Error", WIDTH, HEIGHT, false, true);
+		String prefix = "";
+		if ( fatalError )
+			prefix = "Fatal ";
+		long win = LWJGUIUtil.createOpenGLCoreWindow(prefix + "Error!", WIDTH, HEIGHT, false, true);
 		Window window = LWJGUI.initialize(win);
 		
 		BorderPane root = new BorderPane();
@@ -110,6 +127,10 @@ public class ErrorWindow {
 		
 		b.setOnAction(event -> {
 			GLFW.glfwSetWindowShouldClose(win, true);
+			clicked = true;
+			if ( fatalError) {
+				System.exit(0);
+			}
 		});
 	}
 }
