@@ -1,13 +1,9 @@
 package ide.layout.windows;
 
-import org.lwjgl.glfw.GLFW;
-
 import engine.Game;
-import engine.InternalGameThread;
 import engine.InternalRenderThread;
 import engine.gl.Pipeline;
 import engine.gl.Surface;
-import engine.io.Load;
 import ide.IDE;
 import ide.layout.IdePane;
 import luaengine.type.object.services.UserInputService;
@@ -96,9 +92,9 @@ public class IdeGameView extends IdePane {
 	
 	@Override
 	public void render(Context context) {
-		super.render(context);
-		
-		IDE.pipeline.setSize((int)internal.getWidth(), (int)internal.getHeight());
 		fps.setText(InternalRenderThread.fps + " fps");
+		IDE.pipeline.setSize((int)internal.getWidth(), (int)internal.getHeight());
+		
+		super.render(context);
 	}
 }

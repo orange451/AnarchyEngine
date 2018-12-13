@@ -459,6 +459,35 @@ public class Game implements Tickable {
 		return selectedInstances;
 	}
 	
+	public static List<Instance> selectedExtended() {
+		List<Instance> sel = new ArrayList<Instance>(selected());
+		List<Instance> extended = new ArrayList<Instance>();
+		
+		// Add all selected instances into extended (including descendents);
+		synchronized(selectedInstances) {
+			for (int i = 0; i < selectedInstances.size(); i++) {
+				Instance t = selectedInstances.get(i);
+				List<Instance> desc = t.getDescendents();
+				extended.add(t);
+				sel.remove(t);
+				
+				// Add all descendents in. Remove them from the remaining list if already selected
+				for (int j = 0; j < desc.size(); j++) {
+					Instance k = desc.get(j);
+					extended.add(k);
+					sel.remove(k);
+				}
+			}
+		}
+		
+		// Add all remaining selected instances in.
+		for (int i = 0; i < sel.size(); i++) {
+			extended.add(sel.get(i));
+		}
+		
+		return extended;
+	}
+	
 	public static void setRunning( boolean running ) {
 		if ( Game.running == running )
 			return;

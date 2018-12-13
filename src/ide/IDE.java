@@ -2,6 +2,7 @@ package ide;
 
 import java.io.IOException;
 
+import org.joml.Vector2f;
 import org.lwjgl.glfw.GLFW;
 
 import engine.Game;
@@ -73,6 +74,11 @@ public class IDE extends RenderableApplication {
 	@Override
 	protected boolean shouldLockMouse() {
 		return Game.isLoaded() && layout.getGamePane().isDescendentHovered();
+	}
+	
+	@Override
+	protected Vector2f getMouseOffset() {
+		return new Vector2f( (float)layout.getGamePane().getAbsoluteX(), (float)layout.getGamePane().getAbsoluteY() );
 	}
 	
 	@Override

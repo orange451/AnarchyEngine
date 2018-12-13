@@ -30,6 +30,7 @@ import static org.lwjgl.system.MemoryUtil.NULL;
 
 import java.nio.IntBuffer;
 
+import org.joml.Vector2f;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.glfw.GLFWVidMode;
@@ -54,7 +55,7 @@ public abstract class RenderableApplication extends Application implements Rende
 
 	public static int viewportWidth = 0;
 	public static int viewportHeight = 0;
-
+	
 	public static double mouseX;
 	public static double mouseY;
 	
@@ -101,8 +102,8 @@ public abstract class RenderableApplication extends Application implements Rende
 		GLFW.glfwGetCursorPos(window, mxpos, mypos);
 		double tx = mouseX;
 		double ty = mouseY;
-		mouseX = mxpos[0];
-		mouseY = mypos[0];
+		mouseX = mxpos[0] - getMouseOffset().x;
+		mouseY = mypos[0] - getMouseOffset().y;
 		mouseDeltaX = mouseX-tx;
 		mouseDeltaY = mouseY-ty;
 		
@@ -114,8 +115,8 @@ public abstract class RenderableApplication extends Application implements Rende
 				double x = windowWidth/2f;
 				double y = windowHeight/2f;
 				GLFW.glfwSetCursorPos(window, x, y);
-				mouseX = x;
-				mouseY = y;
+				mouseX = x - getMouseOffset().x;
+				mouseY = y - getMouseOffset().y;
 				mouseDeltaX = 0;
 				mouseDeltaY = 0;
 			}
@@ -130,6 +131,8 @@ public abstract class RenderableApplication extends Application implements Rende
 	protected boolean shouldLockMouse() {
 		return true;
 	}
+	
+	protected abstract Vector2f getMouseOffset();
 
 	@Override
 	protected void onStart(String[] args) {
@@ -208,11 +211,11 @@ public abstract class RenderableApplication extends Application implements Rende
 		GL.createCapabilities();
 
 		// Start thread
-		GLFW_INITIALIZED = true;
 		try {
 			internalInitialize();
 			initialize(args);
 			initialized = true;
+			GLFW_INITIALIZED = true;
 			Resources.initialize();
 		} catch(Exception e) {
 			new ErrorWindow("Error initializing engine.");

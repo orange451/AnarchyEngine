@@ -151,4 +151,8 @@ public class GameObject extends Instance implements RenderableInstance,TreeViewa
 	public Vector3 getPosition() {
 		return (Vector3) this.get("Position");
 	}
+
+	public void setPosition(Vector3 pos) {
+		this.set("Position", pos);
+	}
 }

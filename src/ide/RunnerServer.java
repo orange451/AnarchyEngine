@@ -2,6 +2,8 @@ package ide;
 
 import java.io.IOException;
 
+import org.joml.Vector2f;
+
 import engine.InternalRenderThread;
 import engine.application.Runner;
 import engine.io.Load;
@@ -43,5 +45,10 @@ public class RunnerServer extends Runner {
 	
 	public static void main(String[] args) throws IOException {
 		launch(args);
+	}
+
+	@Override
+	protected Vector2f getMouseOffset() {
+		return new Vector2f();
 	}
 }

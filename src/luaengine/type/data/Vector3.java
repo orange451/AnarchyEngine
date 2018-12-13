@@ -144,6 +144,10 @@ public class Vector3 extends LuaValuetype {
 		return inst;
 	}
 
+	public static Vector3 newInstance(Vector3f vector) {
+		return newInstance( vector.x, vector.y, vector.z );
+	}
+
 	public static Vector3 getVector(LuaValue value) {
 		if ( value instanceof Vector3 ) {
 			return (Vector3)value;

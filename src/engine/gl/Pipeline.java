@@ -15,6 +15,7 @@ import java.util.List;
 
 import org.joml.Matrix4f;
 import org.joml.Vector2i;
+import org.joml.Vector3f;
 import org.luaj.vm2.LuaValue;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
@@ -41,6 +42,8 @@ public class Pipeline implements Renderable {
 	
 	private Matrix4f viewMatrix;
 	private Matrix4f projMatrix;
+	private Vector3f cameraPosition;
+	private Camera currentCamera;
 	private BufferedMesh fullscreenMesh;
 	
 	private BaseShader currentShader;
@@ -58,6 +61,7 @@ public class Pipeline implements Renderable {
 		gbuffer = new GBuffer(this, size.x,size.y);
 		viewMatrix = new Matrix4f();
 		projMatrix = new Matrix4f();
+		cameraPosition = new Vector3f();
 		renderables = Collections.synchronizedList(new ArrayList<Renderable>());
 	}
 	
@@ -124,7 +128,7 @@ public class Pipeline implements Renderable {
 			}
 			
 			// Render selected instances
-			List<Instance> instances = Game.selected();
+			List<Instance> instances = Game.selectedExtended();
 			synchronized(instances) {
 				for (int i = 0; i < instances.size(); i++) {
 					Instance instance = instances.get(i);
@@ -157,12 +161,10 @@ public class Pipeline implements Renderable {
 			boolean debug = false;
 			if ( debug ) {
 				int s = 150;
-				drawTexture( gbuffer.getBuffer0(), s*0,   0, s, s );
+				drawTexture( gbuffer.getBuffer0(), s*0, 0, s, s );
 				drawTexture( gbuffer.getBuffer1(), s*1, 0, s, s );
 				drawTexture( gbuffer.getBuffer2(), s*2, 0, s, s );
-				//drawTexture( gbuffer.getBuffer3(), 300, 0, 100, 100 );
 				drawTexture( gbuffer.getAccumulationBuffer(), s*3, 0, s, s );
-				//drawTexture( gbuffer.getMergeProcessor().getBuffer(), 500, 0, 100, 100 );
 			}
 		}
 		buffer.unbind();
@@ -215,6 +217,8 @@ public class Pipeline implements Renderable {
 	public void ortho() {
 		projMatrix.set(IDENTITY).ortho(0, size.x, 0, size.y, -3200, 3200);
 		viewMatrix.set(IDENTITY);
+		cameraPosition.zero();
+		currentCamera = null;
 	}
 	
 	private void perspective() {
@@ -227,9 +231,13 @@ public class Pipeline implements Renderable {
 			// Set matrices
 			viewMatrix.set(camera.getViewMatrix().getInternal());
 			projMatrix.identity().perspective((float) Math.toRadians(fov), aspect, 0.1f, 512);
+			cameraPosition.set(camera.getPosition().toJoml());
+			currentCamera = camera;
 		} else {
 			viewMatrix.set(gbuffer.getViewMatrix());
 			projMatrix.set(gbuffer.getProjectionMatrix());
+			cameraPosition.zero();
+			currentCamera = null;
 		}
 	}
 
@@ -272,6 +280,22 @@ public class Pipeline implements Renderable {
 	 */
 	public void setEnabled( boolean enabled ) {
 		this.enabled = enabled;
+	}
+	
+	/**
+	 * Returns the position of the camera.
+	 * @return
+	 */
+	public Vector3f getCameraPosition() {
+		return this.cameraPosition;
+	}
+	
+	/**
+	 * Returns the camera object used to render the scene. Can be null, if no camera object was used in the current rendering functionality.
+	 * @return
+	 */
+	public Camera getCamera() {
+		return this.currentCamera;
 	}
 
 	/**
