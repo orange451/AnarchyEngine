@@ -113,6 +113,7 @@ public class ErrorWindow {
 			prefix = "Fatal ";
 		long win = LWJGUIUtil.createOpenGLCoreWindow(prefix + "Error!", WIDTH, HEIGHT, false, true);
 		Window window = LWJGUI.initialize(win);
+		window.setCanUserClose(false);
 		
 		BorderPane root = new BorderPane();
 		root.setPadding(new Insets(4,4,4,4));

@@ -24,6 +24,8 @@ import lwjgui.Color;
 public class HandlesRenderer {
 
 	public static MoveType moveType = MoveType.WORLD_SPACE;
+	public static float GRID_SIZE = 1/8f;
+	
 	private static MaterialGL baseMaterial;
 	private static Vector3f hoveredHandleDirection;
 	private static Vector3f selectedHandleDirection;
@@ -92,6 +94,18 @@ public class HandlesRenderer {
 					// Project mouse to 3d position
 					Vector3f reprojected = projectMouseTo3D(origin, selectedHandleDirection);
 					
+					// Snap to grid
+					float gs = 1/GRID_SIZE;
+					Vector3f delta = reprojected.sub(origin, new Vector3f()).sub(selectedOffset);
+					delta.mul(gs);
+					delta.x = Math.round(delta.x);
+					delta.y = Math.round(delta.y);
+					delta.z = Math.round(delta.z);
+					delta.mul(GRID_SIZE);
+					
+					// Final dragged position
+					Vector3f reprojectedOffset = origin.add(delta, new Vector3f());
+					
 					// Reposition
 					for (int i = 0; i < instances.size(); i++) {
 						Instance t = instances.get(i);
@@ -100,9 +114,8 @@ public class HandlesRenderer {
 						GameObject g = ((GameObject)t);
 						Vector3f cPos = g.getPosition().toJoml();
 						Vector3f offset = cPos.sub(origin, new Vector3f());
-						Vector3f reprojectedOffset = reprojected.sub(selectedOffset, new Vector3f());
 						
-						g.setPosition(Vector3.newInstance(reprojectedOffset.add(offset)));
+						g.setPosition(Vector3.newInstance(offset.add(reprojectedOffset)));
 					}
 				}
 			}
@@ -136,7 +149,7 @@ public class HandlesRenderer {
 		Vector3f normal = getPlaneNormal( moveDirection );
 		
 		// Return the intersection from ray to normal plane
-		return linePlaneIntersection( origin, normal, Pipeline.pipeline_get().getCamera().getPosition().toJoml(), ray);
+		return linePlaneIntersection( origin, normal, Pipeline.pipeline_get().getCamera().getPosition().toJoml(), ray).mul(moveDirection);
 	}
 	
 	/**
