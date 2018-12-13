@@ -52,7 +52,7 @@ public class MatrixUtils {
 		mCoords.mulProject(iViewMat);
 	
 		// Subtract cameras position ( World-space into Object space )
-		Vector3f camPos = Pipeline.pipeline_get().getCameraPosition();
+		Vector3f camPos = Pipeline.pipeline_get().getCamera().getPosition().toJoml();
 		Vector3f finalCoords = mCoords.sub(camPos, new Vector3f());
 	
 		// Normalize

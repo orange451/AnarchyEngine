@@ -2,6 +2,7 @@ package luaengine.type.object.insts;
 
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.ThreeArgFunction;
+import org.luaj.vm2.lib.TwoArgFunction;
 
 import engine.Game;
 import engine.gl.Resources;
@@ -27,10 +28,26 @@ public class Mesh extends AssetLoadable implements TreeViewable,FileResource {
 		this.getmetatable().set("Capsule", new ThreeArgFunction() {
 			@Override
 			public LuaValue call(LuaValue myself, LuaValue radius, LuaValue height) {
-				setMesh(MeshUtils.capsule(radius.tofloat(), height.tofloat(), 16));
+				capsule(radius.tofloat(), height.tofloat());
 				return LuaValue.NIL;
 			}
 		});
+		
+		this.getmetatable().set("Sphere", new TwoArgFunction() {
+			@Override
+			public LuaValue call(LuaValue myself, LuaValue radius) {
+				sphere(radius.tofloat());
+				return LuaValue.NIL;
+			}
+		});
+	}
+	
+	public void capsule(float radius, float height) {
+		setMesh(MeshUtils.capsule(radius, height, 16));
+	}
+	
+	public void sphere( float radius ) {
+		setMesh(MeshUtils.sphere(radius, 16));
 	}
 	
 	public void setMesh(BufferedMesh mesh) {

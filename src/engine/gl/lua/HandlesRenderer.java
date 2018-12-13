@@ -261,9 +261,10 @@ public class HandlesRenderer {
 		Vector2f pos = MatrixUtils.project3Dto2D(arrowPos);
 		Vector2f mou = new Vector2f((float)RenderableApplication.mouseX, (float)RenderableApplication.mouseY);
 		boolean closer = true;
-		float d1 = arrowPos.distance(Pipeline.pipeline_get().getCameraPosition());
+		Vector3f cameraPosition = Pipeline.pipeline_get().getCamera().getPosition().toJoml();
+		float d1 = arrowPos.distance(cameraPosition);
 		if ( tempPos != null ) {
-			float d2 = tempPos.distance(Pipeline.pipeline_get().getCameraPosition());
+			float d2 = tempPos.distance(cameraPosition);
 			closer = d1 < d2;
 		}
 		if ( pos.distance(mou) < 200/d1 ) {

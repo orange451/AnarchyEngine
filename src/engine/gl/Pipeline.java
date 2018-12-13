@@ -42,7 +42,6 @@ public class Pipeline implements Renderable {
 	
 	private Matrix4f viewMatrix;
 	private Matrix4f projMatrix;
-	private Vector3f cameraPosition;
 	private Camera currentCamera;
 	private BufferedMesh fullscreenMesh;
 	
@@ -61,7 +60,6 @@ public class Pipeline implements Renderable {
 		gbuffer = new GBuffer(this, size.x,size.y);
 		viewMatrix = new Matrix4f();
 		projMatrix = new Matrix4f();
-		cameraPosition = new Vector3f();
 		renderables = Collections.synchronizedList(new ArrayList<Renderable>());
 	}
 	
@@ -217,7 +215,6 @@ public class Pipeline implements Renderable {
 	public void ortho() {
 		projMatrix.set(IDENTITY).ortho(0, size.x, 0, size.y, -3200, 3200);
 		viewMatrix.set(IDENTITY);
-		cameraPosition.zero();
 		currentCamera = null;
 	}
 	
@@ -231,12 +228,10 @@ public class Pipeline implements Renderable {
 			// Set matrices
 			viewMatrix.set(camera.getViewMatrix().getInternal());
 			projMatrix.identity().perspective((float) Math.toRadians(fov), aspect, 0.1f, 512);
-			cameraPosition.set(camera.getPosition().toJoml());
 			currentCamera = camera;
 		} else {
 			viewMatrix.set(gbuffer.getViewMatrix());
 			projMatrix.set(gbuffer.getProjectionMatrix());
-			cameraPosition.zero();
 			currentCamera = null;
 		}
 	}
@@ -280,14 +275,6 @@ public class Pipeline implements Renderable {
 	 */
 	public void setEnabled( boolean enabled ) {
 		this.enabled = enabled;
-	}
-	
-	/**
-	 * Returns the position of the camera.
-	 * @return
-	 */
-	public Vector3f getCameraPosition() {
-		return this.cameraPosition;
 	}
 	
 	/**
