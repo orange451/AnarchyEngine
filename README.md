@@ -16,5 +16,5 @@ Game Engine written with LWJGL3. Powered by luaj.
 
 
 ![pong](https://i.imgur.com/EBIDL8M.gif)
-![editor1](https://cdn.discordapp.com/attachments/511187289897173009/522436178088034305/unknown.png)
-![a](https://i.imgur.com/580uHdZ.png)
+![editor1](https://i.imgur.com/580uHdZ.png)
+![editor2](https://cdn.discordapp.com/attachments/511187289897173009/522436178088034305/unknown.png)
