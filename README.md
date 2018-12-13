@@ -1,6 +1,6 @@
-# AnarchyEngine
+# Overview
 
-Game Engine written with LWJGL3. Powered by luaj.
+Anarchy Engine is a java-based game engine. It's designed to aid in the creation of video games primarily with the intent to be multiplayer. It uses OpenGL for rendering and lua for high-level scripting. Games can be made with the editor or in your favoriate java-IDE directly.
 
 # Required Libraries
 - [LWJGL3](https://www.lwjgl.org/)
@@ -14,7 +14,7 @@ Game Engine written with LWJGL3. Powered by luaj.
 - [JSON-Simple](https://code.google.com/archive/p/json-simple/downloads)
 - [luaj](http://www.luaj.org/luaj/3.0/README.html)
 
-
+# Screenshots
 ![pong](https://i.imgur.com/EBIDL8M.gif)
 ![editor1](https://i.imgur.com/580uHdZ.png)
 ![editor2](https://cdn.discordapp.com/attachments/511187289897173009/522436178088034305/unknown.png)
