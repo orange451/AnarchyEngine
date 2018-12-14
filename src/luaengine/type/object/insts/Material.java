@@ -9,6 +9,7 @@ import engine.gl.Resources;
 import engine.gl.Texture2D;
 import ide.layout.windows.icons.Icons;
 import luaengine.type.LuaConnection;
+import luaengine.type.NumberClamp;
 import luaengine.type.data.Color3;
 import luaengine.type.data.Vector3;
 import luaengine.type.object.Asset;
@@ -31,9 +32,16 @@ public class Material extends Asset implements TreeViewable {
 		this.defineField("NormalTexture", LuaValue.NIL, false);
 		this.defineField("MetallicTexture", LuaValue.NIL, false);
 		this.defineField("RoughnessTexture", LuaValue.NIL, false);
+		
 		this.defineField("Metalness", LuaValue.valueOf(0.3f), false);
+		this.getField("Metalness").setClamp(new NumberClamp(0, 1));
+		
 		this.defineField("Roughness", LuaValue.valueOf(0.3f), false);
+		this.getField("Roughness").setClamp(new NumberClamp(0, 1));
+		
 		this.defineField("Reflective", LuaValue.valueOf(0.3f), false);
+		this.getField("Reflective").setClamp(new NumberClamp(0, 1));
+		
 		this.defineField("Color", Color3.newInstance(255, 255, 255), false);
 		this.defineField("Emissive", Vector3.newInstance(0,0,0), false);
 		

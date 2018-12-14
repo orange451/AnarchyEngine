@@ -7,6 +7,7 @@ import org.luaj.vm2.lib.TwoArgFunction;
 
 import engine.Game;
 import ide.layout.windows.icons.Icons;
+import luaengine.type.NumberClamp;
 import luaengine.type.data.Matrix4;
 import luaengine.type.data.Vector3;
 import luaengine.type.object.Instance;
@@ -21,7 +22,10 @@ public class Camera extends Instance implements TreeViewable {
 		this.defineField("LookAt",		Vector3.newInstance(0, 0, 0), false);
 		this.defineField("Pitch",		LuaValue.valueOf(0), false);
 		this.defineField("Yaw",			LuaValue.valueOf(0), false);
+		
 		this.defineField("Fov",			LuaValue.valueOf(70), false);
+		this.getField("Fov").setClamp(new NumberClamp(1, 120));
+		
 		this.defineField("ViewMatrix",	new Matrix4(), false);
 		
 		this.set("LookAt", Vector3.newInstance(0, 0, 0));

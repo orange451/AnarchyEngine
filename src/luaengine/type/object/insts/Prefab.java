@@ -10,6 +10,7 @@ import engine.util.AABBUtil;
 import engine.util.Pair;
 import ide.layout.windows.icons.Icons;
 import luaengine.type.LuaEvent;
+import luaengine.type.NumberClamp;
 import luaengine.type.object.Asset;
 import luaengine.type.object.Instance;
 import luaengine.type.object.PrefabRenderer;
@@ -23,6 +24,7 @@ public class Prefab extends Asset implements TreeViewable {
 		super("Prefab");
 		
 		this.defineField("Scale", LuaValue.valueOf(1.0), false);
+		this.getField("Scale").setClamp(new NumberClamp(0, 2048));
 		
 		prefab = new PrefabRenderer(this);
 		

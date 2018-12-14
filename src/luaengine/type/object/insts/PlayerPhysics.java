@@ -7,6 +7,7 @@ import com.bulletphysics.dynamics.RigidBody;
 
 import engine.util.Pair;
 import ide.layout.windows.icons.Icons;
+import luaengine.type.NumberClamp;
 import luaengine.type.object.PhysicsBase;
 import luaengine.type.object.TreeViewable;
 
@@ -16,8 +17,13 @@ public class PlayerPhysics extends PhysicsBase implements TreeViewable {
 		super("PlayerPhysics");
 		
 		this.defineField("Radius", LuaValue.valueOf(0.3f), false);
+		this.getField("Radius").setClamp(new NumberClamp(0.1f, 512));
+		
 		this.defineField("Height", LuaValue.valueOf(1.0f), false);
+		this.getField("Height").setClamp(new NumberClamp(0.1f, 512));
+		
 		this.defineField("StepHeight", LuaValue.valueOf(0.1f), false);
+		this.getField("StepHeight").setClamp(new NumberClamp(0.1f, 512));
 		
 		// No bounciness
 		this.rawset("Bounciness", LuaValue.valueOf(0));

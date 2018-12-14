@@ -13,6 +13,7 @@ import luaengine.network.InternalClient;
 import luaengine.network.InternalServer;
 import luaengine.network.internal.InstanceUpdateUDP;
 import luaengine.type.LuaConnection;
+import luaengine.type.NumberClamp;
 import luaengine.type.data.Matrix4;
 import luaengine.type.data.Vector3;
 import luaengine.type.object.insts.GameObject;
@@ -34,11 +35,22 @@ public abstract class PhysicsBase extends Instance implements GameSubscriber {
 		super(typename);
 		
 		this.defineField("Linked", LuaValue.NIL, true);
+		
 		this.defineField("Mass", LuaValue.valueOf(0.5f), false);
+		this.getField("Mass").setClamp(new NumberClamp(0, 1));
+		
 		this.defineField("Friction", LuaValue.valueOf(0.1f), false);
+		this.getField("Friction").setClamp(new NumberClamp(0, 1));
+		
 		this.defineField("Bounciness", LuaValue.valueOf(0.5f), false);
+		this.getField("Bounciness").setClamp(new NumberClamp(0, 2));
+		
 		this.defineField("AngularFactor", LuaValue.valueOf(1.0f), false);
+		this.getField("AngularFactor").setClamp(new NumberClamp(0, 1));
+		
 		this.defineField("LinearDamping", LuaValue.valueOf(0.0f), false);
+		this.getField("LinearDamping").setClamp(new NumberClamp(0, 1));
+		
 		this.defineField("Shape", LuaValue.valueOf("Box"), false);
 		this.defineField("Velocity", Vector3.newInstance(0, 0, 0), false);
 		this.defineField("WorldMatrix", new Matrix4(), false);

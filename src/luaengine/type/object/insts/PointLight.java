@@ -12,6 +12,7 @@ import engine.util.AABBUtil;
 import engine.util.Pair;
 import ide.IDE;
 import ide.layout.windows.icons.Icons;
+import luaengine.type.NumberClamp;
 import luaengine.type.data.Color3;
 import luaengine.type.data.Matrix4;
 import luaengine.type.data.Vector3;
@@ -28,6 +29,7 @@ public class PointLight extends LightBase implements TreeViewable,GameSubscriber
 		super("PointLight");
 		
 		this.defineField("Radius", LuaValue.valueOf(8), false);
+		this.getField("Radius").setClamp(new NumberClamp(0, 2048));
 		
 		Game.getGame().subscribe(this);
 		
