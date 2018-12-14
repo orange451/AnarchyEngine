@@ -13,6 +13,7 @@ public class LuaField {
 	private Class<?> fieldType;
 	private boolean canModify;
 	protected boolean isInstance;
+	private Clamp clamp;
 
 	public LuaField(String fieldName, Class<?> fieldType, boolean isFinal) {
 		this.fieldName = fieldName;
@@ -47,6 +48,13 @@ public class LuaField {
 		}
 		return cls.equals(fieldType);
 	}
+	
+	public LuaValue clamp(LuaValue value) {
+		if ( clamp == null )
+			return value;
+		
+		return clamp.clamp(value);
+	}
 
 	public boolean canModify() {
 		return canModify;
@@ -74,5 +82,9 @@ public class LuaField {
 	public void cleanup() {
 		fieldName = null;
 		fieldType = null;
+	}
+
+	public void setClamp(Clamp<?> clamp) {
+		this.clamp = clamp;
 	}
 }

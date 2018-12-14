@@ -9,6 +9,7 @@ import engine.observer.RenderableInstance;
 import engine.util.AABBUtil;
 import engine.util.Pair;
 import ide.layout.windows.icons.Icons;
+import luaengine.type.NumberClamp;
 import luaengine.type.data.Matrix4;
 import luaengine.type.data.Vector3;
 import luaengine.type.object.Instance;
@@ -24,6 +25,8 @@ public class GameObject extends Instance implements RenderableInstance,TreeViewa
 		this.defineField("Prefab", LuaValue.NIL, false);
 		this.defineField("WorldMatrix", new Matrix4(), false);
 		this.defineField("Position", Vector3.newInstance(0, 0, 0), false );
+		this.defineField("Transparency", LuaValue.valueOf(0), false);
+		this.getField("Transparency").setClamp(new NumberClamp(0, 1));
 	}
 	
 	public void render(BaseShader shader) {

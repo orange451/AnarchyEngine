@@ -322,10 +322,12 @@ public abstract class Instance extends LuaInstancetype {
 		if ( !changed )
 			return;
 		
-		LuaEvent event = this.changedEvent();
-		event.fire(key, value);
+		LuaValue newValue = this.get(key);
 		
-		notifyPropertySubscribers(key.toString(), value);
+		LuaEvent event = this.changedEvent();
+		event.fire(key, newValue);
+		
+		notifyPropertySubscribers(key.toString(), newValue);
 	}
 	
 	public void notifyPropertySubscribers(String key, LuaValue value) {

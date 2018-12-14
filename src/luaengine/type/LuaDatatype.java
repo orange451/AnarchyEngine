@@ -193,6 +193,11 @@ public abstract class LuaDatatype extends LuaTable {
 					LuaValue.error("Cannot set field " + key.toString() + ". Type mismatch.");
 					return;
 				}
+				
+				LuaValue t = f.clamp(value);
+				if ( t != value ) {
+					value = t;
+				}
 			}
 		}
 
