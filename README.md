@@ -9,7 +9,7 @@ Anarchy Engine is a java-based game engine. It's designed to aid in the creation
 - [Assimp](https://github.com/assimp/assimp) (Can download with [LWJGL](https://www.lwjgl.org/customize))
 - [STB](https://github.com/nothings/stb) (Can download with [LWJGL](https://www.lwjgl.org/customize))
 - [LWJGUI](https://github.com/orange451/LWJGUI/)
-- [JBullet](https://github.com/jMonkeyEngine/jmonkeyengine/tree/master/jme3-jbullet)
+- [JBullet](https://code.google.com/archive/p/jbullet-jme/downloads)
 - [Kryonet](https://github.com/EsotericSoftware/kryonet)
 - [JSON-Simple](https://code.google.com/archive/p/json-simple/downloads)
 - [luaj](http://www.luaj.org/luaj/3.0/README.html)
