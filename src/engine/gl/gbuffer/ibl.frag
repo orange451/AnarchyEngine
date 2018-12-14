@@ -49,7 +49,7 @@ void main(void) {
 	radiance = max( radiance, 0.0 );
 	
 	// Calculate final IBL based on reflectiveness
-	vec3 final = mix( kD + radiance, (kD * radiance) + radiance * 0.25, reflectiveness );
+	vec3 final = mix( kD + radiance, (kD * radiance) + radiance * 0.25, roughness );
 
 	// Write
 	outColor = vec4( final*uAmbient, 1.0 );
