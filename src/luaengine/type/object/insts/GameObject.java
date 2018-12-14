@@ -6,14 +6,17 @@ import org.luaj.vm2.LuaValue;
 
 import engine.gl.shader.BaseShader;
 import engine.observer.RenderableInstance;
+import engine.util.AABBUtil;
+import engine.util.Pair;
 import ide.layout.windows.icons.Icons;
 import luaengine.type.data.Matrix4;
 import luaengine.type.data.Vector3;
 import luaengine.type.object.Instance;
+import luaengine.type.object.Positionable;
 import luaengine.type.object.PrefabRenderer;
 import luaengine.type.object.TreeViewable;
 
-public class GameObject extends Instance implements RenderableInstance,TreeViewable {
+public class GameObject extends Instance implements RenderableInstance,TreeViewable,Positionable {
 	
 	public GameObject() {
 		super("GameObject");
@@ -154,5 +157,13 @@ public class GameObject extends Instance implements RenderableInstance,TreeViewa
 
 	public void setPosition(Vector3 pos) {
 		this.set("Position", pos);
+	}
+
+	@Override
+	public Pair<Vector3f, Vector3f> getAABB() {
+		if ( this.getPrefab() == null ) {
+			return AABBUtil.newAABB(getPosition().toJoml(), getPosition().toJoml());
+		}
+		return this.getPrefab().getAABB();
 	}
 }

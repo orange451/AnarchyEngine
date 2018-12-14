@@ -5,7 +5,7 @@ import org.joml.Vector3f;
 import engine.gl.Resources;
 import engine.gl.mesh.BufferedMesh;
 import luaengine.type.object.Instance;
-import luaengine.type.object.insts.GameObject;
+import luaengine.type.object.Positionable;
 import luaengine.type.object.insts.Model;
 import luaengine.type.object.insts.Prefab;
 
@@ -35,12 +35,11 @@ public class AABBUtil {
 		
 		for (int i = 0; i < instances.length; i++) {
 			Instance t = instances[i];
-			if ( !( t instanceof GameObject ) )
+			if ( !( t instanceof Positionable ) )
 				continue;
 			
-			GameObject obj = (GameObject)t;
-			Prefab pf = obj.getPrefab();
-			Pair<Vector3f, Vector3f> taabb = pf.getAABB();
+			Positionable obj = (Positionable)t;
+			Pair<Vector3f, Vector3f> taabb = obj.getAABB();
 
 			//Vector3f min2 = obj.getPosition().toJoml().add(taabb.value1());
 			//Vector3f max2 = obj.getPosition().toJoml().add(taabb.value2());

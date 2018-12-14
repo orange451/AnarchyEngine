@@ -1,13 +1,17 @@
 package luaengine.type.object;
 
+import org.joml.Vector3f;
 import org.luaj.vm2.LuaValue;
 
 import engine.gl.light.Light;
+import engine.util.AABBUtil;
+import engine.util.Pair;
 import luaengine.type.data.Color3;
+import luaengine.type.data.Matrix4;
 import luaengine.type.data.Vector3;
 import luaengine.type.object.Instance;
 
-public abstract class LightBase extends Instance {
+public abstract class LightBase extends Instance implements Positionable {
 	public LightBase(String typename) {
 		super(typename);
 
@@ -58,5 +62,20 @@ public abstract class LightBase extends Instance {
 	
 	public void setPosition(Vector3 position) {
 		this.set("Position", position.clone());
+	}
+	
+	@Override
+	public Vector3 getPosition() {
+		return (Vector3) this.get("Position");
+	}
+	
+	@Override
+	public Pair<Vector3f, Vector3f> getAABB() {
+		return AABBUtil.newAABB(new Vector3f(), new Vector3f());
+	}
+	
+	@Override
+	public Matrix4 getWorldMatrix() {
+		return new Matrix4(getPosition());
 	}
 }

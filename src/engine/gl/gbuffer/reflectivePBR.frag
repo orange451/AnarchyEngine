@@ -9,7 +9,7 @@ vec3 reflectivePBR( vec3 cubemapSample, vec3 viewSpacePos, vec3 surfaceNormal, f
 	f = clamp( f - reflective, 0.0, 1.0 );
 
 	// Apply power
-	f = 1.0 - pow( 1.0 - f, 1.25 );
+	f = 1.0 - pow( 1.0 - f, 1.5 - reflective );
 
 	// Combine reflective with cubemap sample
 	return mix( cubemapSample, vec3(1.0), clamp( f, 0.0, 1.0 ) );

@@ -18,7 +18,7 @@ import engine.util.Pair;
 import luaengine.type.data.Matrix4;
 import luaengine.type.data.Vector3;
 import luaengine.type.object.Instance;
-import luaengine.type.object.insts.GameObject;
+import luaengine.type.object.Positionable;
 import lwjgui.Color;
 
 public class HandlesRenderer {
@@ -52,8 +52,8 @@ public class HandlesRenderer {
 		Matrix4f firstMatrix = null;
 		for (int i = 0; i < instances.size(); i++) {
 			Instance t = instances.get(i);
-			if ( !t.get("WorldMatrix").isnil() ) {
-				firstMatrix = ((Matrix4)t.get("WorldMatrix")).toJoml();
+			if ( t instanceof Positionable ) {
+				firstMatrix = ((Positionable) t).getWorldMatrix().toJoml();
 				break;
 			}
 		}
@@ -109,9 +109,9 @@ public class HandlesRenderer {
 					// Reposition
 					for (int i = 0; i < instances.size(); i++) {
 						Instance t = instances.get(i);
-						if ( !( t instanceof GameObject ) )
+						if ( !( t instanceof Positionable ) )
 							continue;
-						GameObject g = ((GameObject)t);
+						Positionable g = ((Positionable)t);
 						Vector3f cPos = g.getPosition().toJoml();
 						Vector3f offset = cPos.sub(origin, new Vector3f());
 						

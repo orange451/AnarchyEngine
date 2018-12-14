@@ -10,6 +10,7 @@ import engine.gl.mesh.BufferedMesh;
 import engine.gl.shader.BaseShader;
 import engine.util.Pair;
 import luaengine.type.object.Instance;
+import luaengine.type.object.Positionable;
 import luaengine.type.object.insts.GameObject;
 import luaengine.type.object.insts.Prefab;
 import lwjgui.Color;
@@ -27,18 +28,13 @@ public class OutlineRenderer {
 	}
 	
 	public static void render(Instance instance) {
-		if ( !(instance instanceof GameObject) )
+		if ( !(instance instanceof Positionable) )
 			return;
 		
-		GameObject object = (GameObject) instance;
-		
-		// Get prefab from GameObject
-		Prefab prefab = object.getPrefab();
+		Positionable object = (Positionable) instance;
 		
 		// Get AABB of prefab
-		Pair<Vector3f, Vector3f> aabb = new Pair<Vector3f, Vector3f>(new Vector3f(-0.5f,-0.5f,-0.5f), new Vector3f(0.5f,0.5f,0.5f));
-		if ( prefab != null )
-			aabb = prefab.getPrefab().getAABB();
+		Pair<Vector3f, Vector3f> aabb = object.getAABB();
 		
 		// Get size
 		float width = aabb.value2().x-aabb.value1().x;

@@ -93,8 +93,9 @@ public class IdeGameView extends IdePane {
 	@Override
 	public void render(Context context) {
 		fps.setText(InternalRenderThread.fps + " fps");
-		IDE.pipeline.setSize((int)internal.getWidth(), (int)internal.getHeight());
 		
 		super.render(context);
+
+		IDE.pipeline.setSize((int)internal.getWidth(), (int)internal.getHeight());
 	}
 }

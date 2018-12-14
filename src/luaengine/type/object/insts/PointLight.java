@@ -8,11 +8,15 @@ import engine.GameSubscriber;
 import engine.InternalGameThread;
 import engine.application.RenderableApplication;
 import engine.gl.light.Light;
+import engine.util.AABBUtil;
+import engine.util.Pair;
 import ide.IDE;
 import ide.layout.windows.icons.Icons;
 import luaengine.type.data.Color3;
+import luaengine.type.data.Matrix4;
 import luaengine.type.data.Vector3;
 import luaengine.type.object.LightBase;
+import luaengine.type.object.Positionable;
 import luaengine.type.object.TreeViewable;
 import lwjgui.Color;
 
@@ -99,5 +103,4 @@ public class PointLight extends LightBase implements TreeViewable,GameSubscriber
 			onDestroy();
 		}
 	}
-
 }
