@@ -21,7 +21,6 @@ public class Image {
 	private int w = -1;
 	private int h = -1;
 	private int comp;
-	private boolean resized;
 	private boolean flipped;
 	private boolean loaded;
 	
@@ -65,7 +64,28 @@ public class Image {
 
 		// Decode the image
 		ByteBuffer data = stbi_load_from_memory(imageBuffer, w, h, comp, 0);
-		setData( data );
+		
+		ByteBuffer ff = data;
+		if ( flipped ) {
+			ByteBuffer temp = BufferUtils.createByteBuffer( data.capacity() );
+		
+			for (int row = this.h-1; row >= 0; row--) {
+				int offset = row*this.w*this.comp;
+				for (int x = 0; x < this.w; x++) {
+					for (int i = 0; i < this.comp; i++) {
+						byte t = data.get(offset+(x*this.comp+i));
+						temp.put(t);
+					}
+				}
+			}
+			temp.flip();
+			ff = temp;
+			
+			data.clear();
+			BufferUtils.zeroBuffer(data);
+		}
+		
+		setData( ff );
 
 		if ( image == null ) {
 			System.err.println("Failed to load image: " + stbi_failure_reason());
@@ -109,6 +129,8 @@ public class Image {
 	public void resize(int width, int height) {
 		if ( getData() == null )
 			return;
+		
+		this.loaded = false;
 
 		long start = System.currentTimeMillis();
 		ByteBuffer newImage = BufferUtils.createByteBuffer( width * height * this.comp );
@@ -131,11 +153,8 @@ public class Image {
 		        STBImageResize.STBIR_EDGE_WRAP,
 		        STBImageResize.STBIR_FILTER_CUBICBSPLINE,
 		        STBImageResize.STBIR_FILTER_CUBICBSPLINE,
-		        STBImageResize.STBIR_COLORSPACE_LINEAR);
-
-		if ( !resized ) {
-			resized = true;
-		}
+		        STBImageResize.STBIR_COLORSPACE_LINEAR
+		);
 
 
 		this.w = width;
@@ -201,31 +220,6 @@ public class Image {
 
 	private void setData(ByteBuffer data) {
 		ByteBuffer ff = data;
-		
-		if ( flipped ) {
-			ByteBuffer temp = BufferUtils.createByteBuffer( data.capacity() );
-			
-			try {
-				for (int row = h-1; row >= 0; row--) {
-					int offset = h;
-					int len = w * comp;
-	
-					for (int x = 0; x < len; x++) {
-						byte t = data.get(offset+x*len);
-						temp.put(t);
-					}
-				}
-				temp.flip();
-				ff = temp;
-				
-				System.out.println("DONE " + data.capacity() + " / " + temp.capacity() + " /// " + data.remaining() + " / " + temp.remaining());
-				
-				//data.clear();
-				//BufferUtils.zeroBuffer(data);
-			}catch(Exception e) {
-				e.printStackTrace();
-			}
-		}
 		
 		this.image = ff;
 		this.imageArray = null;
