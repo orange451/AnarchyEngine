@@ -304,6 +304,25 @@ public abstract class Instance extends LuaInstancetype {
 		return false;
 	}
 	
+	public void forceset(String key, LuaValue value) {
+		forceset(LuaValue.valueOf(key),value);
+	}
+	
+	private void onKeyChange(LuaValue key, LuaValue value) {
+		LuaEvent event = this.changedEvent();
+		event.fire(key, value);
+		notifyPropertySubscribers(key.toString(), value);
+	}
+	
+	public void forceset(LuaValue key, LuaValue value) {
+		LuaValue oldValue = this.get(key);
+		this.rawset(key, value);
+		
+		if ( !oldValue.equals(value) ) {
+			onKeyChange( key, value );
+		}
+	}
+	
 	@Override
 	public void rawset(LuaValue key, LuaValue value) {
 		super.rawset(key, value);
@@ -322,12 +341,7 @@ public abstract class Instance extends LuaInstancetype {
 		if ( !changed )
 			return;
 		
-		LuaValue newValue = this.get(key);
-		
-		LuaEvent event = this.changedEvent();
-		event.fire(key, newValue);
-		
-		notifyPropertySubscribers(key.toString(), newValue);
+		onKeyChange( key, this.get(key) );
 	}
 	
 	public void notifyPropertySubscribers(String key, LuaValue value) {

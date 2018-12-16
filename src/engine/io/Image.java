@@ -22,6 +22,8 @@ public class Image {
 	private int h = -1;
 	private int comp;
 	private boolean resized;
+	private boolean flipped;
+	private boolean loaded;
 	
 	public Image( String imagePath ) {
 		this( imagePath, false );
@@ -45,8 +47,7 @@ public class Image {
 		IntBuffer h = BufferUtils.createIntBuffer(1);
 		IntBuffer comp = BufferUtils.createIntBuffer(1);
 		
-		// FLIP
-		STBImage.stbi_set_flip_vertically_on_load(flipY);
+		this.flipped = flipY;
 
 		// Use info to read image metadata without decoding the entire image.
 		// We don't need this for this demo, just testing the API.
@@ -57,6 +58,10 @@ public class Image {
 		System.out.println("Image height: " + h.get(0));
 		System.out.println("Image components: " + comp.get(0));
 		System.out.println("Image HDR: " + stbi_is_hdr_from_memory(imageBuffer));*/
+		
+		this.w = w.get(0);
+		this.h = h.get(0);
+		this.comp = comp.get(0);
 
 		// Decode the image
 		ByteBuffer data = stbi_load_from_memory(imageBuffer, w, h, comp, 0);
@@ -67,26 +72,24 @@ public class Image {
 			image = null;
 			return;
 		}
-
-		this.w = w.get(0);
-		this.h = h.get(0);
-		this.comp = comp.get(0);
 	}
 
 	public Image(ByteBuffer imageData, int width, int height) {
-		this.setData( imageData );
 		this.w = width;
 		this.h = height;
 
 		this.comp = imageData.capacity() / ( width * height );
 
+		this.setData( imageData );
 	}
 
 	public Image(Color color, int width, int height) {
 		this.comp = 4;
-		ByteBuffer data = BufferUtils.createByteBuffer( width*height*comp );
 		this.w = width;
 		this.h = height;
+		
+
+		ByteBuffer data = BufferUtils.createByteBuffer( w*h*comp );
 
 		byte rr = (byte) (color.getRed() & 0xff);
 		byte gg = (byte) (color.getGreen() & 0xff);
@@ -110,7 +113,7 @@ public class Image {
 		long start = System.currentTimeMillis();
 		ByteBuffer newImage = BufferUtils.createByteBuffer( width * height * this.comp );
 		int alpha = (comp == 4)?3:STBImageResize.STBIR_ALPHA_CHANNEL_NONE;
-
+		
 		STBImageResize.stbir_resize(
 		        image, //BUFFER LOADED FROM stbi_load_from_memory
 		        this.w,
@@ -132,13 +135,13 @@ public class Image {
 
 		if ( !resized ) {
 			resized = true;
-			STBImage.stbi_image_free(image);
 		}
 
-		this.setData( newImage );
 
 		this.w = width;
 		this.h = height;
+		this.setData( newImage );
+
 		System.out.println("Image resized in " + (System.currentTimeMillis() - start) + " ms");
 	}
 
@@ -197,11 +200,39 @@ public class Image {
 	}
 
 	private void setData(ByteBuffer data) {
-		this.image = data;
+		ByteBuffer ff = data;
+		
+		if ( flipped ) {
+			ByteBuffer temp = BufferUtils.createByteBuffer( data.capacity() );
+			
+			try {
+				for (int row = h-1; row >= 0; row--) {
+					int offset = h;
+					int len = w * comp;
+	
+					for (int x = 0; x < len; x++) {
+						byte t = data.get(offset+x*len);
+						temp.put(t);
+					}
+				}
+				temp.flip();
+				ff = temp;
+				
+				System.out.println("DONE " + data.capacity() + " / " + temp.capacity() + " /// " + data.remaining() + " / " + temp.remaining());
+				
+				//data.clear();
+				//BufferUtils.zeroBuffer(data);
+			}catch(Exception e) {
+				e.printStackTrace();
+			}
+		}
+		
+		this.image = ff;
 		this.imageArray = null;
+		this.loaded = true;
 	}
 
 	public boolean loaded() {
-		return w > -1 && h > -1;
+		return loaded;
 	}
 }

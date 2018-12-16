@@ -3,6 +3,8 @@ package luaengine.type.object.insts;
 import org.luaj.vm2.LuaValue;
 
 import engine.Game;
+import engine.InternalGameThread;
+import engine.InternalRenderThread;
 import engine.gl.Resources;
 import engine.gl.Texture2D;
 import engine.io.AsynchronousImage;
@@ -26,8 +28,8 @@ public class Texture extends AssetLoadable implements TreeViewable,FileResource 
 	public Texture() {
 		super("Texture");
 		
-		this.defineField("SRGB", LuaValue.valueOf(false), false);
-		this.defineField("FlipY", LuaValue.valueOf(false), false);
+		this.defineField("SRGB", LuaValue.FALSE, false);
+		this.defineField("FlipY", LuaValue.FALSE, false);
 		
 		this.rawset("TextureLoaded", new LuaEvent());
 	}
@@ -76,7 +78,7 @@ public class Texture extends AssetLoadable implements TreeViewable,FileResource 
 		String realPath = IDEFilePath.convertToSystem(path);
 		
 		loaded = false; // Force image to reload
-		image = new AsynchronousImage(realPath, this.get("FlipY").toboolean());
+		image = new AsynchronousImage(realPath, this.rawget("FlipY").toboolean());
 		Game.resourceLoader().addResource(image);
 	}
 
@@ -92,7 +94,8 @@ public class Texture extends AssetLoadable implements TreeViewable,FileResource 
 				if ( !key.toString().equals("FilePath") )
 					texturePath = this.getFilePath();
 				
-				this.reloadFromFile(texturePath);
+				final String fTexPath = texturePath;
+				this.reloadFromFile(fTexPath);
 			} else {
 				changed = true; // Force image to be re-sent to GPU
 			}

@@ -130,7 +130,7 @@ public class PhysicsWorld {
 
 		RigidBody collisionObject = physObj.body;
 		javax.vecmath.Vector3f from = new javax.vecmath.Vector3f( origin.x, origin.y, origin.z );
-		javax.vecmath.Vector3f to   = new javax.vecmath.Vector3f( origin.x + (direction.x * 512) + 0.01f, origin.y + (direction.y * 512), origin.z + (direction.z * 512) );
+		javax.vecmath.Vector3f to   = new javax.vecmath.Vector3f( origin.x + direction.x, origin.y + direction.y, origin.z + direction.z );
 
 		// Calculate ray transforms
 		Transform start = new Transform();
@@ -147,7 +147,7 @@ public class PhysicsWorld {
 		collisionObject.getAabb(minBound, maxBound);
 
 		// Test if inside AABB
-		boolean aabb = aabbTest( from, direction, minBound, maxBound );
+		boolean aabb = aabbTest( origin, direction, minBound, maxBound );
 
 		// Perform more intensive ray test now
 		if ( aabb ) {
@@ -157,20 +157,20 @@ public class PhysicsWorld {
 		return (ClosestRayResultCallback) callback;
 	}
 
-	private boolean aabbTest(Vector3f from, org.joml.Vector3f direction, Vector3f lb, Vector3f rt) {
-		Vector3f dirfrac = new Vector3f();
+	private boolean aabbTest(org.joml.Vector3f from, org.joml.Vector3f to, Vector3f lb, Vector3f rt) {
+		org.joml.Vector3f direction = new org.joml.Vector3f(to).normalize();
 		// r.dir is unit direction vector of ray
-		dirfrac.x = 1.0f / direction.x;
-		dirfrac.y = 1.0f / direction.y;
-		dirfrac.z = 1.0f / direction.z;
+		float dirfracx = 1.0f / direction.x;
+		float dirfracy = 1.0f / direction.y;
+		float dirfracz = 1.0f / direction.z;
 		// lb is the corner of AABB with minimal coordinates - left bottom, rt is maximal corner
 		// r.org is origin of ray
-		float t1 = (lb.x - from.x)*dirfrac.x;
-		float t2 = (rt.x - from.x)*dirfrac.x;
-		float t3 = (lb.y - from.y)*dirfrac.y;
-		float t4 = (rt.y - from.y)*dirfrac.y;
-		float t5 = (lb.z - from.z)*dirfrac.z;
-		float t6 = (rt.z - from.z)*dirfrac.z;
+		float t1 = (lb.x - from.x)*dirfracx;
+		float t2 = (rt.x - from.x)*dirfracx;
+		float t3 = (lb.y - from.y)*dirfracy;
+		float t4 = (rt.y - from.y)*dirfracy;
+		float t5 = (lb.z - from.z)*dirfracz;
+		float t6 = (rt.z - from.z)*dirfracz;
 
 		float tmin = Math.max(Math.max(Math.min(t1, t2), Math.min(t3, t4)), Math.min(t5, t6));
 		float tmax = Math.min(Math.min(Math.max(t1, t2), Math.max(t3, t4)), Math.max(t5, t6));
@@ -198,7 +198,7 @@ public class PhysicsWorld {
 	public ClosestRayResultCallback rayTestExcluding( org.joml.Vector3f origin, org.joml.Vector3f direction, PhysicsObjectInternal... excluding ) {
 		//ArrayList<ClosestRayResultCallback> callbacks = new ArrayList<ClosestRayResultCallback>();
 		float maxDist = Float.MAX_VALUE;
-		ClosestRayResultCallback ret = null;
+		ClosestRayResultCallback ret = new ClosestRayResultCallback(new Vector3f(origin.x, origin.y, origin.z), new Vector3f(origin.x, origin.y, origin.z));
 		synchronized(objects) {
 			for (int i = 0; i < objects.size(); i++) {
 				PhysicsObjectInternal obj = objects.get(i);

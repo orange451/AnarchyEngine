@@ -240,6 +240,23 @@ public abstract class PhysicsBase extends Instance implements GameSubscriber {
 		}
 	}
 	
+	public void setVelocity(Vector3f velocity) {
+		Vector3 vel = Vector3.newInstance(velocity);
+		this.setVelocity(vel);
+	}
+	
+	public void setVelocity(Vector3 velocity) {
+		this.set("Velocity", velocity);
+	}
+	
+	public float getFriction() {
+		return this.get("Friction").tofloat();
+	}
+	
+	public Vector3 getVelocity() {
+		return (Vector3) ((Vector3)this.get("Velocity")).clone();
+	}
+	
 	public LuaValue updatePhysics(LuaValue key, LuaValue value) {
 		
 		// User updated the world matrix
@@ -438,6 +455,10 @@ public abstract class PhysicsBase extends Instance implements GameSubscriber {
 		}
 		
 		checkAddPhysics();
+	}
+	
+	public Vector3 getPosition() {
+		return ((Matrix4)this.get("WorldMatrix")).getPosition();
 	}
 
 	public abstract Pair<Vector3f, Vector3f> getAABB();

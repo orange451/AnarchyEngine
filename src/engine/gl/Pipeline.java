@@ -32,6 +32,7 @@ import engine.observer.RenderableInstance;
 import engine.util.MeshUtils;
 import luaengine.type.object.Instance;
 import luaengine.type.object.insts.Camera;
+import luaengine.type.object.insts.GameObject;
 
 public class Pipeline implements Renderable {
 	private boolean enabled = true;
@@ -208,7 +209,17 @@ public class Pipeline implements Renderable {
 		}
 		
 		if ( root instanceof RenderableInstance ) {
-			((RenderableInstance)root).render(shader);
+			float transparency = 0;
+			if ( root instanceof GameObject )
+				transparency = ((GameObject)root).get("Transparency").tofloat();
+			
+			if ( transparency == 0 ) { // Solid
+				((RenderableInstance)root).render(shader);
+			} else if ( transparency < 1 ) { // Partially transparent
+				
+			} else { // Invisible
+				
+			}
 		}
 	}
 	

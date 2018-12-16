@@ -3,8 +3,11 @@ package luaengine.type.object.insts;
 import org.joml.Vector3f;
 import org.luaj.vm2.LuaValue;
 
+import com.bulletphysics.collision.dispatch.CollisionWorld.ClosestRayResultCallback;
 import com.bulletphysics.dynamics.RigidBody;
 
+import engine.Game;
+import engine.InternalGameThread;
 import engine.util.Pair;
 import ide.layout.windows.icons.Icons;
 import luaengine.type.NumberClamp;
@@ -15,6 +18,8 @@ public class PlayerPhysics extends PhysicsBase implements TreeViewable {
 
 	public PlayerPhysics() {
 		super("PlayerPhysics");
+
+		this.defineField("OnGround", LuaValue.valueOf(false), true);
 		
 		this.defineField("Radius", LuaValue.valueOf(0.3f), false);
 		this.getField("Radius").setClamp(new NumberClamp(0.1f, 512));
@@ -57,8 +62,37 @@ public class PlayerPhysics extends PhysicsBase implements TreeViewable {
 			RigidBody body = this.physics.getBody();
 			if ( body != null ) {
 				body.setSleepingThresholds( 0.0f, 0.0f );
+				body.setFriction(0);
+			}
+			
+			float zOff = (this.getHeight()/2f) - this.getStepHeight();
+			Vector3f origin = this.getPosition().toJoml().sub(0,0,zOff);
+			ClosestRayResultCallback ret = Game.workspace().getPhysicsWorld().rayTestExcluding(origin, new Vector3f(0,0,-this.getStepHeight()*1.1f), this.physics);
+			if ( ret.hasHit() ) {
+				this.forceset("OnGround", LuaValue.TRUE);
+			} else {
+				this.forceset("OnGround", LuaValue.FALSE);
+			}
+			
+			if ( this.isOnGround() ) {
+				float scale = (float)Math.pow(1f - this.getFriction(), InternalGameThread.delta);
+				//System.out.println(scale);
+				Vector3f newVel = this.physics.getVelocity().mul(scale, scale, 1);
+				this.setVelocity(newVel);
 			}
 		}
+	}
+	
+	public float getHeight() {
+		return this.get("Height").tofloat();
+	}
+	
+	public float getStepHeight() {
+		return this.get("StepHeight").tofloat();
+	}
+	
+	public boolean isOnGround() {
+		return this.get("OnGround").toboolean();
 	}
 
 	@Override

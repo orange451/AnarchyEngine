@@ -477,9 +477,13 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 				PropertyModifier t2 = getPropertyModifier( inst, field, value );
 				if ( i % 2 == 1 )
 					t2.setBackground(alt);
-				if ( t2 instanceof PropertyModifierTemp ) {
+				
+				// Make cell 1 text color match cell 2
+				boolean editable = inst.getField(field).canModify();
+				if ( t2 instanceof PropertyModifierTemp )
 					fieldLabel.setTextFill(((PropertyModifierTemp) t2).label.getTextFill());
-				}
+				if ( !editable )
+					fieldLabel.setTextFill(Color.GRAY);
 				
 				// Add them to grid
 				getInternal().add(t1, 0, i);
