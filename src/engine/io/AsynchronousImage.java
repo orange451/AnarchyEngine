@@ -36,7 +36,6 @@ public class AsynchronousImage extends AsynchronousResource<Image> {
 	protected void internalLoad() {
 		Image i = TextureUtils.loadImage(this.filePath, flipY);
 		if ( i.loaded() ) {
-			System.out.println("IMAGE LOADED: " + this.filePath);
 			image = i;
 		}
 	}

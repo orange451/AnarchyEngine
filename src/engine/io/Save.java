@@ -30,12 +30,15 @@ import luaengine.type.object.insts.Mesh;
 import lwjgui.LWJGUI;
 import lwjgui.LWJGUIUtil;
 import lwjgui.geometry.Insets;
+import lwjgui.geometry.Pos;
 import lwjgui.scene.Scene;
 import lwjgui.scene.Window;
 import lwjgui.scene.control.Button;
 import lwjgui.scene.control.Label;
 import lwjgui.scene.layout.BorderPane;
 import lwjgui.scene.layout.HBox;
+import lwjgui.scene.layout.StackPane;
+import lwjgui.theme.Theme;
 
 public class Save {
 	private static int REFID = 0;
@@ -50,16 +53,24 @@ public class Save {
 
 		// Create root pane
 		BorderPane root = new BorderPane();
-		root.setPadding(new Insets(4,4,4,4));
 		scene.setRoot(root);
 
 		// Create a label
 		Label l = new Label("Unsaved changes. Would you like to save?");
 		root.setCenter(l);
 
-		HBox hbox = new HBox();
-		hbox.setSpacing(16);
-		root.setBottom(hbox);
+		StackPane bottom = new StackPane();
+		bottom.setPrefHeight(32);
+		bottom.setAlignment(Pos.CENTER);
+		bottom.setFillToParentWidth(true);
+		bottom.setBackground(Theme.currentTheme().getControlAlt());
+		root.setBottom(bottom);
+		
+		HBox t = new HBox();
+		t.setAlignment(Pos.CENTER);
+		t.setBackground(null);
+		t.setSpacing(16);
+		bottom.getChildren().add(t);
 
 		// Create a button
 		Button b = new Button("Yes");
@@ -72,7 +83,7 @@ public class Save {
 				});
 			}
 		});
-		hbox.getChildren().add(b);
+		t.getChildren().add(b);
 
 		// Create a button
 		Button b2 = new Button("No");
@@ -83,7 +94,7 @@ public class Save {
 				after.run();
 			});
 		});
-		hbox.getChildren().add(b2);
+		t.getChildren().add(b2);
 
 		// Create a button
 		Button b3 = new Button("Cancel");
@@ -91,7 +102,7 @@ public class Save {
 		b3.setOnAction(event -> {
 			GLFW.glfwSetWindowShouldClose(win, true);
 		});
-		hbox.getChildren().add(b3);
+		t.getChildren().add(b3);
 	}
 	
 	public static boolean save() {

@@ -18,10 +18,14 @@ import engine.application.RenderableApplication;
 import lwjgui.LWJGUI;
 import lwjgui.LWJGUIUtil;
 import lwjgui.geometry.Insets;
+import lwjgui.geometry.Pos;
 import lwjgui.scene.Window;
 import lwjgui.scene.control.Button;
 import lwjgui.scene.control.Label;
 import lwjgui.scene.layout.BorderPane;
+import lwjgui.scene.layout.HBox;
+import lwjgui.scene.layout.StackPane;
+import lwjgui.theme.Theme;
 
 public class ErrorWindow {
 	
@@ -116,15 +120,27 @@ public class ErrorWindow {
 		window.setCanUserClose(false);
 		
 		BorderPane root = new BorderPane();
-		root.setPadding(new Insets(4,4,4,4));
 		window.getScene().setRoot(root);
 		
 		Label l = new Label(string);
 		root.setCenter(l);
 		
+		StackPane bottom = new StackPane();
+		bottom.setPrefHeight(32);
+		bottom.setAlignment(Pos.CENTER);
+		bottom.setFillToParentWidth(true);
+		bottom.setBackground(Theme.currentTheme().getControlAlt());
+		root.setBottom(bottom);
+		
+		HBox hbox = new HBox();
+		hbox.setAlignment(Pos.CENTER);
+		hbox.setBackground(null);
+		hbox.setSpacing(16);
+		bottom.getChildren().add(hbox);
+		
 		Button b = new Button("Ok");
 		b.setMinWidth(64);
-		root.setBottom(b);
+		hbox.getChildren().add(b);
 		
 		b.setOnAction(event -> {
 			GLFW.glfwSetWindowShouldClose(win, true);
