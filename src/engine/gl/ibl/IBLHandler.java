@@ -4,7 +4,7 @@ import java.net.URL;
 
 import engine.gl.Pipeline;
 import engine.gl.SkyBox;
-import engine.gl.gbuffer.LightProcessor;
+import engine.gl.renderer.LightProcessor;
 import engine.gl.shader.BaseShader;
 
 public class IBLHandler {

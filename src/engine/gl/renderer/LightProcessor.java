@@ -1,4 +1,4 @@
-package engine.gl.gbuffer;
+package engine.gl.renderer;
 
 import engine.gl.Pipeline;
 import engine.gl.PostProcessor;

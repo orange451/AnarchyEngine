@@ -5,7 +5,6 @@ uniform sampler2D texture_normal;
 uniform sampler2D texture_metalness;
 uniform sampler2D texture_roughness;
 uniform samplerCube texture_cubemap;
-uniform samplerCube texture_ibl;
 
 uniform float uMetalness;
 uniform float uRoughness;
@@ -13,11 +12,7 @@ uniform float uReflective;
 
 uniform float normalMapEnabled;
 uniform float enableSkybox;
-uniform float enableIBL;
 
-uniform float uSkyBoxLightMultiplier;
-
-uniform vec3 uAmbient;
 uniform vec3 uMaterialColor;
 uniform vec3 uMaterialEmissive;
 
@@ -34,6 +29,8 @@ vec3 normalmap(vec3 normalSample, vec3 vNormal, vec3 vViewSpacePos, vec2 vTexCoo
 vec3 calculateFresnel( vec3 viewSpacePos, vec3 surfaceNormal, float roughness, float metalness );
 vec3 reflectEnv( vec3 viewSpacePos, vec3 surfaceNormal );
 vec3 reflectivePBR( vec3 cubemapSample, vec3 viewSpacePos, vec3 surfaceNormal, float roughness, float reflective );
+
+out vec4 outColor;
 
 void main(void) {
 	vec4 colorSRGB = vec4( pow( uMaterialColor, vec3(2.2)), 1.0 );
@@ -73,6 +70,6 @@ void main(void) {
 	vec3 fresnel = calculateFresnel( nViewSpacePos, normal, fRoughness, fMetalness ) * uReflective;
 	vec3 emissive = uMaterialEmissive+fresnel;
 
-	// Write to GBuffer
-	write( diffuseSample.rgb, normal, fMetalness, fRoughness, uReflective, emissive );
+	// Write
+	outColor = vec4(diffuseSample.rgb, 0.5);
 }

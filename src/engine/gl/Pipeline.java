@@ -15,17 +15,17 @@ import java.util.List;
 
 import org.joml.Matrix4f;
 import org.joml.Vector2i;
-import org.joml.Vector3f;
 import org.luaj.vm2.LuaValue;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 
 import engine.Game;
 import engine.application.RenderableApplication;
-import engine.gl.gbuffer.GBuffer;
 import engine.gl.lua.HandlesRenderer;
 import engine.gl.lua.OutlineRenderer;
 import engine.gl.mesh.BufferedMesh;
+import engine.gl.renderer.GBuffer;
+import engine.gl.renderer.TransparencyRenderer;
 import engine.gl.shader.BaseShader;
 import engine.observer.Renderable;
 import engine.observer.RenderableInstance;
@@ -36,9 +36,10 @@ import luaengine.type.object.insts.GameObject;
 
 public class Pipeline implements Renderable {
 	private boolean enabled = true;
-	private Vector2i size = new Vector2i();
+	private Vector2i size = new Vector2i(1,1);
 	private Surface buffer;
 	private GBuffer gbuffer;
+	private TransparencyRenderer tbuffer;
 	private BaseShader genericShader;
 	
 	private Matrix4f viewMatrix;
@@ -59,6 +60,7 @@ public class Pipeline implements Renderable {
 		genericShader = new BaseShader();
 		buffer = new Surface(size.x,size.y, GL11.GL_RGBA8);
 		gbuffer = new GBuffer(this, size.x,size.y);
+		tbuffer = new TransparencyRenderer(this, size.x,size.y);
 		viewMatrix = new Matrix4f();
 		projMatrix = new Matrix4f();
 		renderables = Collections.synchronizedList(new ArrayList<Renderable>());
@@ -81,6 +83,9 @@ public class Pipeline implements Renderable {
 		}
 		if ( gbuffer != null )
 			this.gbuffer.resize(width, height);
+		
+		if ( tbuffer != null )
+			this.tbuffer.resize(width, height);
 
 		if ( fullscreenMesh == null )
 			fullscreenMesh = MeshUtils.quad(1, 1);
@@ -97,6 +102,8 @@ public class Pipeline implements Renderable {
 			renderables.remove(renderable);
 		}
 	}
+	
+	private ArrayList<Renderable> transparencies = new ArrayList<Renderable>();
 
 	@Override
 	public void render() {
@@ -116,7 +123,8 @@ public class Pipeline implements Renderable {
 			setOpenGLState();
 			
 			// Render workspace into gbuffer
-			renderInstance(gbuffer.getShader(), Game.workspace());
+			transparencies.clear();
+			renderInstancesRecursive(gbuffer.getShader(), Game.workspace());
 			
 			// Render everything attached
 			synchronized(renderables) {
@@ -140,6 +148,18 @@ public class Pipeline implements Renderable {
 		}
 		gbuffer.unbind();
 		
+		tbuffer.bind();
+		{
+			this.shader_get().setViewMatrix(gbuffer.getViewMatrix());
+			this.shader_get().setProjectionMatrix(gbuffer.getProjectionMatrix());
+			
+			// Order and render all transparent geometry
+			//synchronized(transparencies) {
+				Resources.MESH_SPHERE.render(this.shader_get(), new Matrix4f(), Resources.MATERIAL_BLANK);
+			//}
+		}
+		tbuffer.unbind();
+		
 		// Do post processing
 		gbuffer.postProcess();
 		
@@ -157,13 +177,14 @@ public class Pipeline implements Renderable {
 			drawTexture( gbuffer.getBufferFinal(), 0, 0, size.x, size.y );
 			
 			// Draw buffers
-			boolean debug = false;
+			boolean debug = true;
 			if ( debug ) {
 				int s = 150;
 				drawTexture( gbuffer.getBuffer0(), s*0, 0, s, s );
 				drawTexture( gbuffer.getBuffer1(), s*1, 0, s, s );
 				drawTexture( gbuffer.getBuffer2(), s*2, 0, s, s );
 				drawTexture( gbuffer.getAccumulationBuffer(), s*3, 0, s, s );
+				drawTexture( tbuffer.getBuffer(), s*4, 0, s, s );
 			}
 		}
 		buffer.unbind();
@@ -171,6 +192,10 @@ public class Pipeline implements Renderable {
 	
 	public GBuffer getGBuffer() {
 		return this.gbuffer;
+	}
+	
+	public TransparencyRenderer getTransparencyRenderer() {
+		return this.tbuffer;
 	}
 	
 	public void fullscreenQuad( ) {
@@ -199,13 +224,13 @@ public class Pipeline implements Renderable {
 		glDepthFunc(GL_LESS);
 	}
 
-	private void renderInstance(BaseShader shader, Instance root) {
+	private void renderInstancesRecursive(BaseShader shader, Instance root) {
 		List<Instance> instances = root.getChildren();
 		for (int i = 0; i < instances.size(); i++) {
 			Instance inst = instances.get(i);
 			if ( inst instanceof Camera )
 				continue;
-			renderInstance(shader, inst);
+			renderInstancesRecursive(shader, inst);
 		}
 		
 		if ( root instanceof RenderableInstance ) {
@@ -216,7 +241,7 @@ public class Pipeline implements Renderable {
 			if ( transparency == 0 ) { // Solid
 				((RenderableInstance)root).render(shader);
 			} else if ( transparency < 1 ) { // Partially transparent
-				
+				transparencies.add((Renderable) root);
 			} else { // Invisible
 				
 			}

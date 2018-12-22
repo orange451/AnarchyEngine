@@ -1,4 +1,4 @@
-package engine.gl.gbuffer;
+package engine.gl.renderer;
 
 import java.net.URL;
 
@@ -43,6 +43,7 @@ public class MergeProcessor implements PostProcessor {
 		int accumulation = pipeline.getGBuffer().getAccumulationBuffer().getTextureId(); // Light Accumulation buffer
 		int ssao = -1; // SSAO - Not yet implemented
 		int buffer2 = pipeline.getGBuffer().getBuffer2(); // PBR stuff
+		int transparency = pipeline.getTransparencyRenderer().getBuffer();
 		Texture2D depth = pipeline.getGBuffer().getBufferDepth();
 		
 		// Refresh merge surface if window was resized
@@ -73,7 +74,8 @@ public class MergeProcessor implements PostProcessor {
 			shader.texture_set_stage(shader.shader_get_uniform("texture_ssao"), ssao, 3);
 			shader.texture_set_stage(shader.shader_get_uniform("texture_pbr"), buffer2, 4);
 			shader.texture_set_stage(shader.shader_get_uniform("texture_depth"), depth, 5);
-			shader.texture_set_stage(shader.shader_get_uniform("texture_skybox"), skyBox, 6);
+			shader.texture_set_stage(shader.shader_get_uniform("texture_transparency"), transparency, 6);
+			shader.texture_set_stage(shader.shader_get_uniform("texture_skybox"), skyBox, 7);
 			shader.shader_set_uniform_f(shader.shader_get_uniform("uAmbient"), pipeline.getGBuffer().getAmbient());
 			shader.shader_set_uniform_matrix(shader.shader_get_uniform("inverseProjectionMatrix"), pipeline.getGBuffer().getInverseProjectionMatrix());
 			shader.shader_set_uniform_matrix(shader.shader_get_uniform("inverseViewMatrix"), pipeline.getGBuffer().getInverseViewMatrix());

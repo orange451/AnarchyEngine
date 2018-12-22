@@ -6,6 +6,7 @@ uniform sampler2D texture_accumulation;
 uniform sampler2D texture_ssao;
 uniform sampler2D texture_pbr;
 uniform sampler2D texture_depth;
+uniform sampler2D texture_transparency;
 uniform samplerCube texture_skybox;
 
 uniform mat4 inverseViewMatrix;
@@ -50,5 +51,6 @@ void main(void) {
 		//diffuseLight = skybox;
 	}
 	
-	outColor = vec4( diffuseLight, 1.0 );
+	
+	outColor = vec4( diffuseLight, 1.0 ) + texture(texture_transparency, passTexCoord);
 }

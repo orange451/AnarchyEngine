@@ -1,4 +1,4 @@
-package engine.gl.gbuffer;
+package engine.gl.renderer;
 
 import static org.lwjgl.opengl.GL11.GL_CULL_FACE;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;

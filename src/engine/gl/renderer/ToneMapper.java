@@ -1,4 +1,4 @@
-package engine.gl.gbuffer;
+package engine.gl.renderer;
 
 import java.net.URL;
 
