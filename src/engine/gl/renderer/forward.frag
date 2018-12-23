@@ -10,6 +10,11 @@ uniform float uMetalness;
 uniform float uRoughness;
 uniform float uReflective;
 
+uniform float uTransparencyObject;
+uniform float uTransparencyMaterial;
+
+uniform vec3 uAmbient;
+
 uniform float normalMapEnabled;
 uniform float enableSkybox;
 
@@ -70,6 +75,12 @@ void main(void) {
 	vec3 fresnel = calculateFresnel( nViewSpacePos, normal, fRoughness, fMetalness ) * uReflective;
 	vec3 emissive = uMaterialEmissive+fresnel;
 
+	// Apply global ambient
+	diffuseSample.rgb *= uAmbient;
+	
+	// Overall transparency
+	float transparency = (1.0 - uTransparencyObject) * (1.0 - uTransparencyMaterial);
+
 	// Write
-	outColor = vec4(diffuseSample.rgb, 0.5);
+	outColor = vec4(diffuseSample.rgb, transparency);
 }

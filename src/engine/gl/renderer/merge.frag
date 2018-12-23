@@ -25,6 +25,7 @@ void main(void) {
 	vec3 albedoSample = texture(texture_albedo, passTexCoord).rgb;
 	vec3 emissiveSample = texture(texture_emissive, passTexCoord).rgb;
 	vec3 accumulationSample = texture(texture_accumulation, passTexCoord).rgb;
+	vec4 transparencySample = texture(texture_transparency, passTexCoord);
 	vec4 pbrSample = texture(texture_pbr, passTexCoord);
 	float rawDepth = texture(texture_depth, passTexCoord).r;
 	
@@ -51,6 +52,8 @@ void main(void) {
 		//diffuseLight = skybox;
 	}
 	
+	vec3 finalColor = vec3( diffuseLight);
+	finalColor = finalColor * (1.0 - transparencySample.a) + transparencySample.rgb;
 	
-	outColor = vec4( diffuseLight, 1.0 ) + texture(texture_transparency, passTexCoord);
+	outColor = vec4( finalColor, 1.0 );
 }

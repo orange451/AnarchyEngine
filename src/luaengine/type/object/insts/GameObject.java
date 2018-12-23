@@ -39,6 +39,9 @@ public class GameObject extends Instance implements RenderableInstance,TreeViewa
 		Prefab luaPrefab = (Prefab) this.rawget("Prefab");
 		Matrix4 matrix = (Matrix4) this.rawget("WorldMatrix");
 		PrefabRenderer prefab = luaPrefab.getPrefab();
+		
+		shader.shader_set_uniform_f(shader.shader_get_uniform("uTransparencyObject"), this.getTransparency());
+		
 		prefab.render(shader, matrix.toJoml());
 	}
 	
@@ -153,11 +156,17 @@ public class GameObject extends Instance implements RenderableInstance,TreeViewa
 		return p.equals(LuaValue.NIL)?null:(Prefab)p;
 	}
 
-	
+	/**
+	 * Returns the vector3 position of this object.
+	 */
 	public Vector3 getPosition() {
 		return (Vector3) this.get("Position");
 	}
 
+	/**
+	 * Sets the vector3 position of this object.
+	 * If there is a physics object inside this object, that will be updated as well.
+	 */
 	public void setPosition(Vector3 pos) {
 		this.set("Position", pos);
 	}
@@ -168,5 +177,21 @@ public class GameObject extends Instance implements RenderableInstance,TreeViewa
 			return AABBUtil.newAABB(getPosition().toJoml(), getPosition().toJoml());
 		}
 		return this.getPrefab().getAABB();
+	}
+
+	/**
+	 * Returns the transparency of the object.
+	 * @return
+	 */
+	public float getTransparency() {
+		return this.get("Transparency").tofloat();
+	}
+	
+	/**
+	 * Sets the transparency of the object.
+	 * @param f
+	 */
+	public void setTransparency(float f) {
+		this.set("Transparency", LuaValue.valueOf(f));
 	}
 }

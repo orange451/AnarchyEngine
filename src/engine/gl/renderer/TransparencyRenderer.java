@@ -36,20 +36,27 @@ public class TransparencyRenderer {
 		
 		glEnable(GL_DEPTH_TEST);
 		glDepthMask(false);
-		pipeline.shader_set(shader);
 
 		glBindTexture(GL_TEXTURE_2D, 0);
 		glBindFramebuffer(GL_FRAMEBUFFER, fboId);
 		
-		glClearColor(0,0,0,1);
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		glClearColor(0, 0, 0, 0);
 		glClear(GL_COLOR_BUFFER_BIT);
+		
+		pipeline.shader_set(shader);
+
+		shader.shader_set_uniform_f(shader.shader_get_uniform("uAmbient"), pipeline.getGBuffer().getAmbient());
+		
 	}
 
 	/**
 	 * Unbinds transparency renderer. Re-enables writing to depth buffer.
 	 */
 	public void unbind() {
-		GL11.glDepthMask(true);
+		glDepthMask(true);
+		glDisable(GL_BLEND);
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
 	

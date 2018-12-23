@@ -16,6 +16,7 @@ public class MaterialGL {
 	private float metalness = 0.2f;
 	private float roughness = 0.3f;
 	private float reflective = 0.1f;
+	private float transparency = 0;
 	
 	private Vector3f emissive;
 	private Vector3f color;
@@ -74,6 +75,15 @@ public class MaterialGL {
 	public MaterialGL setRoughness(float value) {
 		this.roughness = value;
 		return this;
+	}
+	
+	public MaterialGL setTransparency(float value) {
+		this.transparency = value;
+		return this;
+	}
+	
+	public float getTransparency() {
+		return this.transparency;
 	}
 	
 	public MaterialGL setDiffuseTexture(Texture2D texture) {
@@ -156,6 +166,7 @@ public class MaterialGL {
 		shader.shader_set_uniform_f(shader.shader_get_uniform("enableSkybox"), cubemap == null ? 0:1);
 		shader.shader_set_uniform_f(shader.shader_get_uniform("enableIBL"), ibl == null ? 0:1);
 		shader.shader_set_uniform_f(shader.shader_get_uniform("normalMapEnabled"), normalTexture.equals(Resources.TEXTURE_NORMAL_RGBA) ? 0:1);
+		shader.shader_set_uniform_f(shader.shader_get_uniform("uTransparencyMaterial"), transparency);
 	}
 
 }

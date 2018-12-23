@@ -2,6 +2,7 @@ package luaengine.type.object.insts;
 
 import java.util.HashMap;
 
+import org.joml.Vector3f;
 import org.luaj.vm2.LuaValue;
 
 import engine.Game;
@@ -16,6 +17,7 @@ import luaengine.type.object.Asset;
 import luaengine.type.object.Instance;
 import luaengine.type.object.Service;
 import luaengine.type.object.TreeViewable;
+import lwjgui.Color;
 
 public class Material extends Asset implements TreeViewable {	
 	private engine.gl.MaterialGL material;
@@ -45,15 +47,50 @@ public class Material extends Asset implements TreeViewable {
 		this.defineField("Color", Color3.newInstance(255, 255, 255), false);
 		this.defineField("Emissive", Vector3.newInstance(0,0,0), false);
 		
+		this.defineField("Transparency", LuaValue.ZERO, false);
+		this.getField("Transparency").setClamp(new NumberClamp(0, 1));
+		
 		this.material = new engine.gl.MaterialGL();
+	}
+	
+	public float getMetalness() {
+		return this.get("Metalness").tofloat();
+	}
+	
+	public float getRoughness() {
+		return this.get("Roughness").tofloat();
+	}
+	
+	public float getReflectivness() {
+		return this.get("Reflective").tofloat();
+	}
+	
+	public float getTransparency() {
+		return this.get("Transparency").tofloat();
+	}
+	
+	public Color3 getColor() {
+		return (Color3)this.get("Color");
 	}
 	
 	public void setColor(Color3 color) {
 		this.set("Color", color);
 	}
 	
+	public void setColor(Color color) {
+		this.setColor(Color3.newInstance(color.getRed(), color.getGreen(), color.getBlue()));
+	}
+	
 	public void setEmissive(Vector3 emissive) {
 		this.set("Emissive", emissive);
+	}
+	
+	public void setEmissive(Vector3f emissive) {
+		this.setEmissive(Vector3.newInstance(emissive));
+	}
+	
+	public Vector3 getEmissive() {
+		return (Vector3) this.get("Emissive");
 	}
 	
 	public void setMetalness(float f) {
@@ -167,11 +204,12 @@ public class Material extends Asset implements TreeViewable {
 				rt = ((Texture)this.rawget("RoughnessTexture")).getTexture();
 			material.setRoughnessTexture(rt);
 
-			material.setMetalness((float) this.rawget("Metalness").checkdouble());
-			material.setRoughness((float) this.rawget("Roughness").checkdouble());
-			material.setReflective((float) this.rawget("Reflective").checkdouble());
-			material.setColor(((Color3)this.rawget("Color")).toColor());
-			material.setEmissive(((Vector3)this.rawget("Emissive")).toJoml());
+			material.setMetalness(this.getMetalness());
+			material.setRoughness(this.getRoughness());
+			material.setReflective(this.getReflectivness());
+			material.setColor(this.getColor().toColor());
+			material.setEmissive(this.getEmissive().toJoml());
+			material.setTransparency(this.getTransparency());
 		}
 		return material;
 	}

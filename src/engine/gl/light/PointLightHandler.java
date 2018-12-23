@@ -115,11 +115,12 @@ public class PointLightHandler {
 		public PointLightShader() {
 			super(
 				new URL[] {
-						PointLightInternal.class.getResource("pointlight.vert")
+						PointLightInternal.class.getResource("pointlightDeferred.vert")
 				},
 				new URL[] {
 						PointLightInternal.class.getResource("pbr.frag"),
-						PointLightInternal.class.getResource("pointlight.frag")
+						PointLightInternal.class.getResource("pointlight.frag"),
+						PointLightInternal.class.getResource("pointlightDeferred.frag")
 				}
 			);
 		}

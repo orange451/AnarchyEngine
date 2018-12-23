@@ -103,7 +103,7 @@ public class Pipeline implements Renderable {
 		}
 	}
 	
-	private ArrayList<Renderable> transparencies = new ArrayList<Renderable>();
+	private ArrayList<RenderableInstance> transparencies = new ArrayList<RenderableInstance>();
 
 	@Override
 	public void render() {
@@ -123,8 +123,10 @@ public class Pipeline implements Renderable {
 			setOpenGLState();
 			
 			// Render workspace into gbuffer
-			transparencies.clear();
-			renderInstancesRecursive(gbuffer.getShader(), Game.workspace());
+			synchronized(transparencies) {
+				transparencies.clear();
+				renderInstancesRecursive(gbuffer.getShader(), Game.workspace());
+			}
 			
 			// Render everything attached
 			synchronized(renderables) {
@@ -150,13 +152,15 @@ public class Pipeline implements Renderable {
 		
 		tbuffer.bind();
 		{
-			this.shader_get().setViewMatrix(gbuffer.getViewMatrix());
-			this.shader_get().setProjectionMatrix(gbuffer.getProjectionMatrix());
-			
 			// Order and render all transparent geometry
-			//synchronized(transparencies) {
-				Resources.MESH_SPHERE.render(this.shader_get(), new Matrix4f(), Resources.MATERIAL_BLANK);
-			//}
+			synchronized(transparencies) {
+				//Resources.MESH_SPHERE.render(this.shader_get(), new Matrix4f(), Resources.MATERIAL_BLANK);
+				
+				for (int i = 0; i < transparencies.size(); i++) {
+					RenderableInstance r = transparencies.get(i);
+					r.render(this.shader_get());
+				}
+			}
 		}
 		tbuffer.unbind();
 		
@@ -235,13 +239,15 @@ public class Pipeline implements Renderable {
 		
 		if ( root instanceof RenderableInstance ) {
 			float transparency = 0;
-			if ( root instanceof GameObject )
-				transparency = ((GameObject)root).get("Transparency").tofloat();
+			if ( root instanceof GameObject ) {
+				GameObject g = ((GameObject)root);
+				transparency = g.getTransparency();
+			}
 			
 			if ( transparency == 0 ) { // Solid
 				((RenderableInstance)root).render(shader);
 			} else if ( transparency < 1 ) { // Partially transparent
-				transparencies.add((Renderable) root);
+				transparencies.add((RenderableInstance) root);
 			} else { // Invisible
 				
 			}
