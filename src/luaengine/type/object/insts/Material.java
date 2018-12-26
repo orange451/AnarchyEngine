@@ -69,6 +69,10 @@ public class Material extends Asset implements TreeViewable {
 		return this.get("Transparency").tofloat();
 	}
 	
+	public void setTransparency(float f) {
+		this.set("Transparency", LuaValue.valueOf(f));
+	}
+	
 	public Color3 getColor() {
 		return (Color3)this.get("Color");
 	}

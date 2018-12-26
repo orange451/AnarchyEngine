@@ -9,7 +9,9 @@ import engine.gl.shader.BaseShader;
 import engine.observer.RenderableInstance;
 import engine.util.MeshUtils;
 import engine.util.TextureUtils;
+import luaengine.type.data.Matrix4;
 import luaengine.type.object.Instance;
+import luaengine.type.object.insts.Prefab;
 
 public class TestObject extends Instance implements RenderableInstance {
 	private static BufferedMesh mesh;
@@ -47,6 +49,18 @@ public class TestObject extends Instance implements RenderableInstance {
 	@Override
 	protected boolean onValueGet(LuaValue key) {
 		return true;
+	}
+
+	@Override
+	public Prefab getPrefab() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Matrix4 getWorldMatrix() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

@@ -16,7 +16,7 @@ import luaengine.type.object.insts.PointLight;
 import luaengine.type.object.insts.Prefab;
 import luaengine.type.object.insts.Texture;
 
-public class RunnerTestPBR extends RunnerClient {
+public class TestPBR extends RunnerClient {
 	
 	@Override
 	public void loadScene(String[] args) {

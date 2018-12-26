@@ -25,9 +25,10 @@ import engine.gl.MaterialGL;
 import engine.gl.shader.BaseShader;
 import engine.io.BinaryInputStream;
 import engine.io.BinaryOutputStream;
+import engine.observer.RenderableMesh;
 import engine.util.Pair;
 
-public class BufferedMesh {
+public class BufferedMesh implements RenderableMesh {
 	private int vaoId;
 	private int vboId;
 	private Vertex[] vertices;

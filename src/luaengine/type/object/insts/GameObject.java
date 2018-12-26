@@ -40,8 +40,6 @@ public class GameObject extends Instance implements RenderableInstance,TreeViewa
 		Matrix4 matrix = (Matrix4) this.rawget("WorldMatrix");
 		PrefabRenderer prefab = luaPrefab.getPrefab();
 		
-		shader.shader_set_uniform_f(shader.shader_get_uniform("uTransparencyObject"), this.getTransparency());
-		
 		prefab.render(shader, matrix.toJoml());
 	}
 	

@@ -7,6 +7,7 @@ import java.util.List;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
+import engine.gl.Pipeline;
 import engine.gl.Resources;
 import engine.gl.mesh.BufferedMesh;
 import engine.gl.shader.BaseShader;
@@ -55,6 +56,12 @@ public class PrefabRenderer {
 				if ( material == null )
 					material = Resources.MATERIAL_BLANK;
 				
+				// If transparent send to transparent queue
+				if ( material.getTransparency() > 0 ) {
+					Pipeline.pipeline_get().addTransparentRenderableToQueue(p, wmat, 0.0f);
+					continue;
+				}
+				
 				// Draw
 				mesh.render(shader, null, material);
 			}
@@ -69,6 +76,14 @@ public class PrefabRenderer {
 	
 	public Pair<Vector3f,Vector3f> getAABB() {
 		return this.AABB;
+	}
+	
+	public Model getModel(int index) {
+		return models.get(index);
+	}
+	
+	public int size() {
+		return this.models.size();
 	}
 
 	public void addModel(Model model) {

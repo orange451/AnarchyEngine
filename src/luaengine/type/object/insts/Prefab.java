@@ -67,6 +67,14 @@ public class Prefab extends Asset implements TreeViewable {
 		});
 	}
 	
+	public float getScale() {
+		return this.get("Scale").tofloat();
+	}
+	
+	public void setScale(float f) {
+		this.set("Scale", LuaValue.valueOf(f));
+	}
+	
 	public Pair<Vector3f, Vector3f> getAABB() {
 		if ( this.prefab.isEmpty() ) {
 			return AABBUtil.newAABB(new Vector3f(-0.5f), new Vector3f(0.5f));

@@ -79,8 +79,8 @@ void main(void) {
 	diffuseSample.rgb *= uAmbient;
 	
 	// Overall transparency
-	float transparency = (1.0 - uTransparencyObject) * (1.0 - uTransparencyMaterial);
+	float alpha = (1.0 - uTransparencyObject) * (1.0 - uTransparencyMaterial);
 
 	// Write
-	outColor = vec4(diffuseSample.rgb, transparency);
+	outColor = vec4(diffuseSample.rgb, alpha);
 }

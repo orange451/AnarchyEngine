@@ -15,7 +15,7 @@ import luaengine.type.object.insts.PointLight;
 import luaengine.type.object.insts.Prefab;
 import luaengine.type.object.insts.Texture;
 
-public class RunnerTestSimple extends RunnerClient {
+public class TestSimple extends RunnerClient {
 	
 	@Override
 	public void loadScene(String[] args) {
@@ -53,6 +53,7 @@ public class RunnerTestSimple extends RunnerClient {
 		material.setRoughness(1.0f);
 		material.setMetalness(1.0f);
 		material.setReflective(0.1f);
+		material.setTransparency(0.5f);
 		
 		// Create prefab
 		Prefab p = Game.assets().newPrefab();

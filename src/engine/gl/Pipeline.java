@@ -29,10 +29,15 @@ import engine.gl.renderer.TransparencyRenderer;
 import engine.gl.shader.BaseShader;
 import engine.observer.Renderable;
 import engine.observer.RenderableInstance;
+import engine.observer.RenderableMesh;
 import engine.util.MeshUtils;
+import engine.util.Pair;
 import luaengine.type.object.Instance;
+import luaengine.type.object.PrefabRenderer;
 import luaengine.type.object.insts.Camera;
 import luaengine.type.object.insts.GameObject;
+import luaengine.type.object.insts.Model;
+import luaengine.type.object.insts.Prefab;
 
 public class Pipeline implements Renderable {
 	private boolean enabled = true;
@@ -102,8 +107,11 @@ public class Pipeline implements Renderable {
 			renderables.remove(renderable);
 		}
 	}
+
+	//private ArrayList<RenderableInstance> transparentObjects = new ArrayList<RenderableInstance>();
+	//private ArrayList<RenderableMesh> transparentMeshes = new ArrayList<RenderableMesh>();
 	
-	private ArrayList<RenderableInstance> transparencies = new ArrayList<RenderableInstance>();
+	private ArrayList<Pair<Float,Pair<RenderableMesh,Pair<Matrix4f,MaterialGL>>>> transparencies = new ArrayList<Pair<Float,Pair<RenderableMesh,Pair<Matrix4f,MaterialGL>>>>();
 
 	@Override
 	public void render() {
@@ -157,8 +165,18 @@ public class Pipeline implements Renderable {
 				//Resources.MESH_SPHERE.render(this.shader_get(), new Matrix4f(), Resources.MATERIAL_BLANK);
 				
 				for (int i = 0; i < transparencies.size(); i++) {
-					RenderableInstance r = transparencies.get(i);
-					r.render(this.shader_get());
+					Pair<Float, Pair<RenderableMesh, Pair<Matrix4f, MaterialGL>>> t1 = transparencies.get(i);
+					float alpha = t1.value1();
+					Pair<RenderableMesh, Pair<Matrix4f, MaterialGL>> t2 = t1.value2();
+					RenderableMesh mesh = t2.value1();
+					Pair<Matrix4f, MaterialGL> t3 = t2.value2();
+					Matrix4f worldMatrix = t3.value1();
+					MaterialGL material = t3.value2();
+					
+					BaseShader shader = this.shader_get();
+					shader.shader_set_uniform_f(shader.shader_get_uniform("uTransparencyObject"), alpha);
+					
+					mesh.render(shader, worldMatrix, material);
 				}
 			}
 		}
@@ -227,6 +245,31 @@ public class Pipeline implements Renderable {
 		glEnable(GL_DEPTH_TEST);
 		glDepthFunc(GL_LESS);
 	}
+	
+	public void addTransparentRenderableToQueue( RenderableInstance instance, float transparency ) {
+		Prefab prefab = instance.getPrefab();
+		if ( prefab != null ) {
+			PrefabRenderer renderer = prefab.getPrefab();
+			for (int i = 0; i < renderer.size(); i++) {
+				Model model = renderer.getModel(i);
+
+				Matrix4f worldMatrix = instance.getWorldMatrix().toJoml();
+				worldMatrix.scale(prefab.getScale());
+				
+				addTransparentRenderableToQueue( model, worldMatrix, transparency );
+			}
+		}
+	}
+	
+	public void addTransparentRenderableToQueue(Model model, Matrix4f worldMatrix, float transparency) {
+		MaterialGL material = model.getMaterial();
+		BufferedMesh mesh = model.getMesh();
+		
+		Pair<Matrix4f, MaterialGL> t3 = new Pair<Matrix4f, MaterialGL>(worldMatrix, material);
+		Pair<RenderableMesh, Pair<Matrix4f, MaterialGL>> t2 = new Pair<RenderableMesh, Pair<Matrix4f, MaterialGL>>(mesh, t3);
+		Pair<Float, Pair<RenderableMesh, Pair<Matrix4f, MaterialGL>>> p = new Pair<Float, Pair<RenderableMesh, Pair<Matrix4f, MaterialGL>>>(transparency, t2);
+		transparencies.add(p);
+	}
 
 	private void renderInstancesRecursive(BaseShader shader, Instance root) {
 		List<Instance> instances = root.getChildren();
@@ -247,7 +290,7 @@ public class Pipeline implements Renderable {
 			if ( transparency == 0 ) { // Solid
 				((RenderableInstance)root).render(shader);
 			} else if ( transparency < 1 ) { // Partially transparent
-				transparencies.add((RenderableInstance) root);
+				addTransparentRenderableToQueue( (RenderableInstance) root, transparency );
 			} else { // Invisible
 				
 			}
