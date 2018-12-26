@@ -1,7 +1,12 @@
 package engine.gl.renderer;
 
+import static org.lwjgl.opengl.GL11.GL_BACK;
 import static org.lwjgl.opengl.GL11.GL_CULL_FACE;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
+import static org.lwjgl.opengl.GL11.GL_LESS;
+import static org.lwjgl.opengl.GL11.glCullFace;
+import static org.lwjgl.opengl.GL11.glDepthFunc;
+import static org.lwjgl.opengl.GL11.glEnable;
 import static org.lwjgl.opengl.GL30.glBindFragDataLocation;
 
 import java.net.URL;
@@ -104,6 +109,11 @@ public class GBuffer {
 		viewMatrix.invert(iViewMatrix);
 		projMatrix.set(pipeline.getProjectionMatrix());
 		projMatrix.invert(iProjMatrix);
+		
+		glEnable(GL_CULL_FACE);
+		glCullFace(GL_BACK);
+		glEnable(GL_DEPTH_TEST);
+		glDepthFunc(GL_LESS);
 	}
 
 	public void unbind() {

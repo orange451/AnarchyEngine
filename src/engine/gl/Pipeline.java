@@ -11,10 +11,12 @@ import static org.lwjgl.opengl.GL11.glEnable;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import org.joml.Matrix4f;
 import org.joml.Vector2i;
+import org.joml.Vector3f;
 import org.luaj.vm2.LuaValue;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
@@ -127,9 +129,6 @@ public class Pipeline implements Renderable {
 		// Draw to GBuffer
 		gbuffer.bind();
 		{
-			// OpenGL render flags
-			setOpenGLState();
-			
 			// Render workspace into gbuffer
 			synchronized(transparencies) {
 				transparencies.clear();
@@ -162,7 +161,25 @@ public class Pipeline implements Renderable {
 		{
 			// Order and render all transparent geometry
 			synchronized(transparencies) {
-				//Resources.MESH_SPHERE.render(this.shader_get(), new Matrix4f(), Resources.MATERIAL_BLANK);
+				
+				// Sort based on distance
+				Vector3f tv1 = new Vector3f();
+				Vector3f tv2 = new Vector3f();
+				Collections.sort(transparencies, new Comparator<Pair<Float, Pair<RenderableMesh, Pair<Matrix4f, MaterialGL>>>>() {
+					@Override
+					public int compare(Pair<Float, Pair<RenderableMesh, Pair<Matrix4f, MaterialGL>>> o1, Pair<Float, Pair<RenderableMesh, Pair<Matrix4f, MaterialGL>>> o2) {
+						Matrix4f m1 = o1.value2().value2().value1();
+						Matrix4f m2 = o2.value2().value2().value1();
+						Vector3f p1 = m1.getTranslation(tv1);
+						Vector3f p2 = m2.getTranslation(tv2);
+						Vector3f ca = Pipeline.this.getCamera().getPosition().toJoml();
+
+						float d1 = p1.distanceSquared(ca);
+						float d2 = p2.distanceSquared(ca);
+						
+						return (int) (d2-d1);
+					}
+				});
 				
 				for (int i = 0; i < transparencies.size(); i++) {
 					Pair<Float, Pair<RenderableMesh, Pair<Matrix4f, MaterialGL>>> t1 = transparencies.get(i);
@@ -236,14 +253,6 @@ public class Pipeline implements Renderable {
 	
 	private void drawTexture( Surface surface, int x, int y, int width, int height) {
 		drawTexture(surface.getTextureId(),x,y,width,height);
-	}
-
-	private void setOpenGLState() {
-		// Face culling and depth testing...
-		glEnable(GL_CULL_FACE);
-		glCullFace(GL_BACK);
-		glEnable(GL_DEPTH_TEST);
-		glDepthFunc(GL_LESS);
 	}
 	
 	public void addTransparentRenderableToQueue( RenderableInstance instance, float transparency ) {
