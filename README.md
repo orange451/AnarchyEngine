@@ -2,6 +2,8 @@
 
 Anarchy Engine is a java-based game engine. It's designed to aid in the creation of video games primarily with the intent to be multiplayer. It uses OpenGL for rendering and lua for high-level scripting. Games can be made with the editor or in your favoriate java-IDE directly.
 
+For support, see: http://firstrecon.net/
+
 # Required Libraries
 - [LWJGL3](https://www.lwjgl.org/)
 - [JOML](https://github.com/JOML-CI/JOML) (Can download with [LWJGL](https://www.lwjgl.org/customize))
