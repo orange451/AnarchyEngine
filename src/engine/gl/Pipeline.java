@@ -272,7 +272,12 @@ public class Pipeline implements Renderable {
 	
 	public void addTransparentRenderableToQueue(Model model, Matrix4f worldMatrix, float transparency) {
 		MaterialGL material = model.getMaterial();
+		if ( material == null )
+			material = Resources.MATERIAL_BLANK;
+		
 		BufferedMesh mesh = model.getMesh();
+		if ( mesh == null )
+			mesh = Resources.MESH_SPHERE;
 		
 		Pair<Matrix4f, MaterialGL> t3 = new Pair<Matrix4f, MaterialGL>(worldMatrix, material);
 		Pair<RenderableMesh, Pair<Matrix4f, MaterialGL>> t2 = new Pair<RenderableMesh, Pair<Matrix4f, MaterialGL>>(mesh, t3);
