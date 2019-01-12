@@ -10,7 +10,9 @@ float GeometrySchlickGGX(float NdotV, float roughness);
 float GeometrySmith(vec3 N, vec3 V, vec3 L, float roughness);
 vec3 fresnelSchlick(float cosTheta, vec3 F0);
 
-vec3 light( vec3 N, vec3 L, vec4 eyeSpace, vec3 dPos, vec3 albedo, float metallic, float roughness, float radius, vec3 lightColor, float intensity ) {
+vec3 pointLight( in vec3 N, in vec3 eyeSpace, in vec3 lightPosition, in vec3 albedo, in float metallic, in float roughness, in float radius, in vec3 lightColor, in float intensity ) {
+	vec3 dPos = lightPosition - eyeSpace.xyz;
+	vec3 L = normalize(dPos);
 	float NdotL = max(dot(N, L), 0.0);
 
 	vec3 color = vec3(0.0);

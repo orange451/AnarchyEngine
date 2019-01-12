@@ -24,10 +24,21 @@ uniform vec3 uMaterialEmissive;
 in vec2 passTexCoord;
 in vec4 passColor;
 in vec3 passNormal;
-in vec3 vViewSpacePos;
+in vec4 vViewSpacePos;
 in vec3 vViewSpaceNor;
-
 const float MAX_REFLECTION_LOD = 14.0;
+
+struct PointLight {
+	vec3 Position;
+	vec3 Color;
+	float Intensity;
+	float Radius;
+};
+
+uniform PointLight uPointLights[32];
+uniform float uNumPointLights;
+
+vec3 pointLight( vec3 N, vec3 eyeSpace, vec3 lightPosition, vec3 albedo, float metallic, float roughness, float radius, vec3 lightColor, float intensity );
 
 void write(vec3 diffuse, vec3 normal, float metalness, float roughness, float reflective, vec3 emissive);
 vec3 normalmap(vec3 normalSample, vec3 vNormal, vec3 vViewSpacePos, vec2 vTexCoords );
@@ -74,9 +85,18 @@ void main(void) {
 	// Calculate fresnel
 	vec3 fresnel = calculateFresnel( nViewSpacePos, normal, fRoughness, fMetalness ) * uReflective;
 	vec3 emissive = uMaterialEmissive+fresnel;
-
+	
 	// Apply global ambient
 	diffuseSample.rgb *= uAmbient;
+	
+	// Add lighting
+	for (int i = 0; i < int(uNumPointLights); i++) {
+		PointLight light = uPointLights[i];
+		
+		vec3 eyeSpace = (vViewSpacePos.xyz / vViewSpacePos.w);
+		
+		diffuseSample.rgb += pointLight( normal, eyeSpace.xyz, light.Position, diffuseSample.rgb, fMetalness, fRoughness, light.Radius, light.Color, light.Intensity );
+	}
 	
 	// Overall transparency
 	float alpha = (1.0 - uTransparencyObject) * (1.0 - uTransparencyMaterial);

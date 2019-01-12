@@ -88,17 +88,19 @@ public class PointLightHandler {
 				if ( !light.visible )
 					continue;
 				
-				Matrix4f worldMatrix = new Matrix4f();
-				worldMatrix.translate(light.x, light.y, light.z);
-				worldMatrix.scale(light.radius);
-				
 				Vector4f lightEyePos = new Vector4f(light.x, light.y, light.z, 1.0f);
 				viewMatrix.transform(lightEyePos, lightEyePos);
+				
+				//System.out.println(lightEyePos);
 
 				lightShader.shader_set_uniform_f( lightShader.shader_get_uniform( "radius"), light.radius );
 				lightShader.shader_set_uniform_f( lightShader.shader_get_uniform( "intensity"), light.intensity );
 				lightShader.shader_set_uniform_f( lightShader.shader_get_uniform( "lightPosition"), lightEyePos.x, lightEyePos.y, lightEyePos.z );
 				lightShader.shader_set_uniform_f( lightShader.shader_get_uniform( "lightColor"), light.color.x, light.color.y, light.color.z );
+				
+				Matrix4f worldMatrix = new Matrix4f();
+				worldMatrix.translate(light.x, light.y, light.z);
+				worldMatrix.scale(light.radius);
 				
 				mesh.render(lightShader, worldMatrix, null);
 			}
@@ -123,6 +125,12 @@ public class PointLightHandler {
 						PointLightInternal.class.getResource("pointlightDeferred.frag")
 				}
 			);
+		}
+	}
+
+	public synchronized PointLightInternal[] getLights() {
+		synchronized(lights) {
+			return lights.toArray(new PointLightInternal[lights.size()]);
 		}
 	}
 }

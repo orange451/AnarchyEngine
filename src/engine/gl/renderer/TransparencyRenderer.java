@@ -5,11 +5,15 @@ import static org.lwjgl.opengl.GL30.*;
 
 import java.net.URL;
 
+import org.joml.Matrix4f;
+import org.joml.Vector3f;
+import org.joml.Vector4f;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 import org.lwjgl.opengl.GL30;
 import engine.gl.Pipeline;
 import engine.gl.Surface;
+import engine.gl.light.PointLightInternal;
 import engine.gl.shader.BaseShader;
 
 public class TransparencyRenderer {
@@ -48,6 +52,23 @@ public class TransparencyRenderer {
 		pipeline.shader_set(shader);
 
 		shader.shader_set_uniform_f(shader.shader_get_uniform("uAmbient"), pipeline.getGBuffer().getAmbient());
+		
+		// Send point light data
+		// TODO replace this with a Uniform buffer. MUCH BETTER
+		PointLightInternal[] pointLights = pipeline.getGBuffer().getLightProcessor().getPointLightHandler().getLights();
+		Matrix4f viewMatrix = pipeline.getGBuffer().getViewMatrix();
+		shader.shader_set_uniform_f(shader.shader_get_uniform("uNumPointLights"), pointLights.length);
+		for (int i = 0; i < pointLights.length; i++) {
+			PointLightInternal light = pointLights[i];
+			
+			Vector3f lightEyePos = new Vector3f(light.x, light.y, light.z);
+			viewMatrix.transformPosition(lightEyePos, lightEyePos);
+			
+			shader.shader_set_uniform_f(shader.shader_get_uniform("uPointLights["+i+"].Position"), lightEyePos);
+			shader.shader_set_uniform_f(shader.shader_get_uniform("uPointLights["+i+"].Color"), light.color);
+			shader.shader_set_uniform_f(shader.shader_get_uniform("uPointLights["+i+"].Radius"), light.radius);
+			shader.shader_set_uniform_f(shader.shader_get_uniform("uPointLights["+i+"].Intensity"), light.intensity);
+		}
 		
 	}
 
@@ -109,6 +130,8 @@ public class TransparencyRenderer {
 					GBuffer.class.getResource("forward.vert")
 				},
 				new URL[] {
+					PointLightInternal.class.getResource("pbr.frag"),
+					PointLightInternal.class.getResource("pointlight.frag"),
 					GBuffer.class.getResource("normalmap.frag"),
 					GBuffer.class.getResource("reflect.frag"),
 					GBuffer.class.getResource("fresnel.frag"),

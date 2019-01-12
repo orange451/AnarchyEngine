@@ -16,7 +16,7 @@ layout(location = 3) in vec4 inColor;
 out vec2 passTexCoord;
 out vec4 passColor;
 out vec3 passNormal;
-out vec3 vViewSpacePos;
+out vec4 vViewSpacePos;
 out vec3 vViewSpaceNor;
 
 void main(void) {
@@ -29,6 +29,6 @@ void main(void) {
 	
 	passTexCoord = inTexCoord;
 	passColor = inColor;
-	vViewSpacePos = viewPos.xyz;
+	vViewSpacePos = viewPos;
 	vViewSpaceNor = viewNor.xyz;
 }

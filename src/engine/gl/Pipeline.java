@@ -216,7 +216,7 @@ public class Pipeline implements Renderable {
 			drawTexture( gbuffer.getBufferFinal(), 0, 0, size.x, size.y );
 			
 			// Draw buffers
-			boolean debug = true;
+			boolean debug = false;
 			if ( debug ) {
 				int s = 150;
 				drawTexture( gbuffer.getBuffer0(), s*0, 0, s, s );
