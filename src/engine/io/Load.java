@@ -17,12 +17,12 @@ import org.lwjgl.system.MemoryUtil;
 import org.lwjgl.util.nfd.NativeFileDialog;
 
 import engine.Game;
+import engine.lua.type.LuaValuetype;
+import engine.lua.type.object.Instance;
+import engine.lua.type.object.Service;
 import engine.util.FileUtils;
 import ide.ErrorWindow;
 import ide.IDE;
-import luaengine.type.LuaValuetype;
-import luaengine.type.object.Instance;
-import luaengine.type.object.Service;
 
 public class Load {
 	private static ArrayList<LoadedInstance> instances;

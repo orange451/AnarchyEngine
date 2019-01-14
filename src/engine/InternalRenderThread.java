@@ -14,11 +14,11 @@ import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
 
 import engine.application.RenderableApplication;
+import engine.lua.type.LuaEvent;
 import engine.observer.InternalRenderable;
 import engine.observer.PostRenderable;
 import engine.observer.Renderable;
 import engine.util.Sync;
-import luaengine.type.LuaEvent;
 
 public class InternalRenderThread {
 	public static float delta;

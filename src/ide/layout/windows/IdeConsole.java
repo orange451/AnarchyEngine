@@ -6,8 +6,8 @@ import java.io.PrintStream;
 
 import org.lwjgl.glfw.GLFW;
 
+import engine.lua.LuaEngine;
 import ide.layout.IdePane;
-import luaengine.LuaEngine;
 import lwjgui.LWJGUI;
 import lwjgui.geometry.Pos;
 import lwjgui.scene.control.TextArea;

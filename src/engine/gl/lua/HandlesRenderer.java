@@ -12,13 +12,13 @@ import engine.application.RenderableApplication;
 import engine.gl.MaterialGL;
 import engine.gl.Pipeline;
 import engine.gl.Resources;
+import engine.lua.type.data.Matrix4;
+import engine.lua.type.data.Vector3;
+import engine.lua.type.object.Instance;
+import engine.lua.type.object.Positionable;
 import engine.util.AABBUtil;
 import engine.util.MatrixUtils;
 import engine.util.Pair;
-import luaengine.type.data.Matrix4;
-import luaengine.type.data.Vector3;
-import luaengine.type.object.Instance;
-import luaengine.type.object.Positionable;
 import lwjgui.Color;
 
 public class HandlesRenderer {

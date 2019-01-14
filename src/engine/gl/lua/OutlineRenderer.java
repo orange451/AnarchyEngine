@@ -8,11 +8,11 @@ import engine.gl.Pipeline;
 import engine.gl.Resources;
 import engine.gl.mesh.BufferedMesh;
 import engine.gl.shader.BaseShader;
+import engine.lua.type.object.Instance;
+import engine.lua.type.object.Positionable;
+import engine.lua.type.object.insts.GameObject;
+import engine.lua.type.object.insts.Prefab;
 import engine.util.Pair;
-import luaengine.type.object.Instance;
-import luaengine.type.object.Positionable;
-import luaengine.type.object.insts.GameObject;
-import luaengine.type.object.insts.Prefab;
 import lwjgui.Color;
 
 public class OutlineRenderer {

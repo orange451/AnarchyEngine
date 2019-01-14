@@ -23,7 +23,7 @@ import engine.gl.PostProcessor;
 import engine.gl.Surface;
 import engine.gl.Texture2D;
 import engine.gl.shader.BaseShader;
-import luaengine.type.data.Color3;
+import engine.lua.type.data.Color3;
 import lwjgui.Color;
 
 public class GBuffer {

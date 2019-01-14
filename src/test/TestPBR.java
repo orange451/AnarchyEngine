@@ -4,17 +4,17 @@ import org.luaj.vm2.LuaValue;
 import org.lwjgl.glfw.GLFW;
 
 import engine.Game;
+import engine.lua.RunnableArgs;
+import engine.lua.type.data.Color3;
+import engine.lua.type.data.Matrix4;
+import engine.lua.type.data.Vector3;
+import engine.lua.type.object.insts.GameObject;
+import engine.lua.type.object.insts.Material;
+import engine.lua.type.object.insts.Mesh;
+import engine.lua.type.object.insts.PointLight;
+import engine.lua.type.object.insts.Prefab;
+import engine.lua.type.object.insts.Texture;
 import ide.RunnerClient;
-import luaengine.RunnableArgs;
-import luaengine.type.data.Color3;
-import luaengine.type.data.Matrix4;
-import luaengine.type.data.Vector3;
-import luaengine.type.object.insts.GameObject;
-import luaengine.type.object.insts.Material;
-import luaengine.type.object.insts.Mesh;
-import luaengine.type.object.insts.PointLight;
-import luaengine.type.object.insts.Prefab;
-import luaengine.type.object.insts.Texture;
 
 public class TestPBR extends RunnerClient {
 	
@@ -79,10 +79,10 @@ public class TestPBR extends RunnerClient {
 		mat.setParent(Game.assets().materials());
 		
 		// Make rows of balls
-		makeRow( mesh, mat,  1, Color3.newInstance(255, 255, 255),	Color3.newInstance(255, 255, 255),	0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f);
-		makeRow( mesh, mat,  0, Color3.newInstance(0, 128, 16),		Color3.newInstance(0, 128, 16),		0.4f, 1.0f, 0.2f, 0.2f, 0.3f, 0.0f);
-		makeRow( mesh, mat, -1, Color3.newInstance(255,220,96),		Color3.newInstance(255, 220, 96),	0.0f, 1.0f, 0.8f, 0.8f, 1.0f, 0.0f);
-		makeRow( mesh, mat, -2, Color3.red(),						Color3.red(),						0.0f, 0.0f, 0.2f, 0.2f, 0.0f, 0.4f);
+		makeRow( mesh, mat,  1, Color3.newInstance(255, 255, 255),	Color3.newInstance(255, 255, 255),	0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f);
+		makeRow( mesh, mat,  0, Color3.newInstance(0, 128, 16),		Color3.newInstance(0, 128, 16),		0.4f, 1.0f, 0.2f, 0.2f, 0.3f, 0.0f, 0.0f, 0.0f);
+		makeRow( mesh, mat, -1, Color3.newInstance(255,220,96),		Color3.newInstance(255, 220, 96),	0.0f, 1.0f, 0.8f, 0.8f, 1.0f, 0.0f, 0.0f, 0.0f);
+		makeRow( mesh, mat, -2, Color3.red(),						Color3.red(),						0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.3f, 0.0f, 0.9f);
 		
 		// Add lights
 		int close = 8;
@@ -120,7 +120,7 @@ public class TestPBR extends RunnerClient {
 		l5.setParent(Game.workspace());
 	}
 	
-	private void makeRow( Mesh mesh, Material mat, float y, Color3 fromColor, Color3 toColor, float fromRough, float toRough, float fromMetal, float toMetal, float fromReflective, float toReflective ) {
+	private void makeRow( Mesh mesh, Material mat, float y, Color3 fromColor, Color3 toColor, float fromRough, float toRough, float fromMetal, float toMetal, float fromReflective, float toReflective, float fromTrans, float toTrans ) {
 		int balls = 8;
 		for (int i = 0; i < balls; i++) {
 			float frac = i/(float)(balls-1);
@@ -134,6 +134,7 @@ public class TestPBR extends RunnerClient {
 			material.setColor(Color3.newInstance(cx, cy, cz));
 			material.setRoughness(fromRough + (toRough-fromRough)*frac);
 			material.setMetalness(fromMetal + (toMetal-fromMetal)*frac);
+			material.setTransparency(fromTrans + (toTrans-fromTrans)*frac);
 			material.setReflective(fromReflective + (toReflective-fromReflective)*frac);
 			material.setParent(Game.assets().materials());
 			

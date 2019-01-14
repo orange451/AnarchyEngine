@@ -6,12 +6,12 @@ import org.luaj.vm2.LuaValue;
 import engine.gl.MaterialGL;
 import engine.gl.mesh.BufferedMesh;
 import engine.gl.shader.BaseShader;
+import engine.lua.type.data.Matrix4;
+import engine.lua.type.object.Instance;
+import engine.lua.type.object.insts.Prefab;
 import engine.observer.RenderableInstance;
 import engine.util.MeshUtils;
 import engine.util.TextureUtils;
-import luaengine.type.data.Matrix4;
-import luaengine.type.object.Instance;
-import luaengine.type.object.insts.Prefab;
 
 public class TestObject extends Instance implements RenderableInstance {
 	private static BufferedMesh mesh;

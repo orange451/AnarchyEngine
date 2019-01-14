@@ -4,16 +4,16 @@ import org.luaj.vm2.LuaValue;
 import org.lwjgl.glfw.GLFW;
 
 import engine.Game;
+import engine.lua.RunnableArgs;
+import engine.lua.type.data.Color3;
+import engine.lua.type.data.Vector3;
+import engine.lua.type.object.insts.GameObject;
+import engine.lua.type.object.insts.Material;
+import engine.lua.type.object.insts.Mesh;
+import engine.lua.type.object.insts.PointLight;
+import engine.lua.type.object.insts.Prefab;
+import engine.lua.type.object.insts.Texture;
 import ide.RunnerClient;
-import luaengine.RunnableArgs;
-import luaengine.type.data.Color3;
-import luaengine.type.data.Vector3;
-import luaengine.type.object.insts.GameObject;
-import luaengine.type.object.insts.Material;
-import luaengine.type.object.insts.Mesh;
-import luaengine.type.object.insts.PointLight;
-import luaengine.type.object.insts.Prefab;
-import luaengine.type.object.insts.Texture;
 
 public class TestSimple extends RunnerClient {
 	

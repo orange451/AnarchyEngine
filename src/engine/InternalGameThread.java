@@ -9,10 +9,10 @@ import java.util.Observer;
 import org.luaj.vm2.LuaValue;
 
 import engine.application.Application;
+import engine.lua.type.LuaEvent;
+import engine.lua.type.object.services.RunService;
 import engine.observer.Tickable;
 import engine.util.Sync;
-import luaengine.type.LuaEvent;
-import luaengine.type.object.services.RunService;
 
 public class InternalGameThread extends Observable implements Runnable {
     private static boolean running = false;

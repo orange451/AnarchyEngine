@@ -14,13 +14,13 @@ import com.bulletphysics.linearmath.Transform;
 import engine.Game;
 import engine.InternalGameThread;
 import engine.gl.mesh.BufferedMesh;
+import engine.lua.type.data.Matrix4;
+import engine.lua.type.object.PhysicsBase;
+import engine.lua.type.object.insts.Mesh;
+import engine.lua.type.object.insts.Prefab;
+import engine.lua.type.object.services.Workspace;
 import engine.util.Pair;
 import engine.util.PhysicsUtils;
-import luaengine.type.data.Matrix4;
-import luaengine.type.object.PhysicsBase;
-import luaengine.type.object.insts.Mesh;
-import luaengine.type.object.insts.Prefab;
-import luaengine.type.object.services.Workspace;
 
 public class PhysicsObjectInternal {
 	protected RigidBody body;

@@ -12,11 +12,11 @@ import org.lwjgl.util.nfd.NativeFileDialog;
 
 import engine.Game;
 import engine.GameSubscriber;
+import engine.lua.type.LuaValuetype;
+import engine.lua.type.object.Instance;
+import engine.lua.type.object.InstancePropertySubscriber;
 import ide.IDEFilePath;
 import ide.layout.IdePane;
-import luaengine.type.LuaValuetype;
-import luaengine.type.object.Instance;
-import luaengine.type.object.InstancePropertySubscriber;
 import lwjgui.Color;
 import lwjgui.LWJGUI;
 import lwjgui.geometry.Insets;

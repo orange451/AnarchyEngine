@@ -12,28 +12,28 @@ import org.luaj.vm2.lib.TwoArgFunction;
 
 import engine.io.AsynchronousResourceLoader;
 import engine.io.Save;
+import engine.lua.LuaEngine;
+import engine.lua.type.LuaEvent;
+import engine.lua.type.ScriptData;
+import engine.lua.type.object.Instance;
+import engine.lua.type.object.Service;
+import engine.lua.type.object.insts.Camera;
+import engine.lua.type.object.insts.Player;
+import engine.lua.type.object.insts.PlayerScripts;
+import engine.lua.type.object.insts.PlayerScriptsStart;
+import engine.lua.type.object.insts.Script;
+import engine.lua.type.object.services.Assets;
+import engine.lua.type.object.services.Connections;
+import engine.lua.type.object.services.Core;
+import engine.lua.type.object.services.Debris;
+import engine.lua.type.object.services.Lighting;
+import engine.lua.type.object.services.Players;
+import engine.lua.type.object.services.RunService;
+import engine.lua.type.object.services.ScriptService;
+import engine.lua.type.object.services.Storage;
+import engine.lua.type.object.services.UserInputService;
+import engine.lua.type.object.services.Workspace;
 import engine.observer.Tickable;
-import luaengine.LuaEngine;
-import luaengine.type.LuaEvent;
-import luaengine.type.ScriptData;
-import luaengine.type.object.Instance;
-import luaengine.type.object.Service;
-import luaengine.type.object.insts.Camera;
-import luaengine.type.object.insts.Player;
-import luaengine.type.object.insts.PlayerScripts;
-import luaengine.type.object.insts.PlayerScriptsStart;
-import luaengine.type.object.insts.Script;
-import luaengine.type.object.services.Assets;
-import luaengine.type.object.services.Connections;
-import luaengine.type.object.services.Core;
-import luaengine.type.object.services.Debris;
-import luaengine.type.object.services.Lighting;
-import luaengine.type.object.services.Players;
-import luaengine.type.object.services.RunService;
-import luaengine.type.object.services.ScriptService;
-import luaengine.type.object.services.Storage;
-import luaengine.type.object.services.UserInputService;
-import luaengine.type.object.services.Workspace;
 
 public class Game implements Tickable {
 	private static Game game;
@@ -509,7 +509,7 @@ public class Game implements Tickable {
 				sc.forceSetParent(p);
 				
 				// Set him as local
-				new luaengine.network.internal.ClientConnectFinishTCP().clientProcess();
+				new engine.lua.network.internal.ClientConnectFinishTCP().clientProcess();
 			}
 			
 			Game.runLater(()->{

@@ -16,9 +16,9 @@ import engine.gl.mesh.BufferedPrefab;
 import engine.gl.mesh.Triangle;
 import engine.gl.mesh.Vertex;
 import engine.gl.shader.BaseShader;
+import engine.lua.type.object.PrefabRenderer;
 import engine.util.FileIO;
 import engine.util.TextureUtils;
-import luaengine.type.object.PrefabRenderer;
 import lwjgui.Color;
 
 public class ModelMM3D {

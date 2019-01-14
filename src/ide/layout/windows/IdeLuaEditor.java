@@ -1,8 +1,8 @@
 package ide.layout.windows;
 
+import engine.lua.type.object.ScriptBase;
+import engine.lua.type.object.insts.Script;
 import ide.layout.IdePane;
-import luaengine.type.object.ScriptBase;
-import luaengine.type.object.insts.Script;
 import lwjgui.scene.Node;
 import lwjgui.scene.control.CodeArea;
 

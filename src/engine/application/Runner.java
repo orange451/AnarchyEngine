@@ -7,7 +7,7 @@ import engine.Game;
 import engine.InternalGameThread;
 import engine.InternalRenderThread;
 import engine.gl.Pipeline;
-import luaengine.type.object.services.UserInputService;
+import engine.lua.type.object.services.UserInputService;
 import lwjgui.LWJGUI;
 import lwjgui.geometry.Insets;
 import lwjgui.geometry.Pos;

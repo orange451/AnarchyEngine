@@ -29,17 +29,17 @@ import engine.gl.mesh.BufferedMesh;
 import engine.gl.renderer.GBuffer;
 import engine.gl.renderer.TransparencyRenderer;
 import engine.gl.shader.BaseShader;
+import engine.lua.type.object.Instance;
+import engine.lua.type.object.PrefabRenderer;
+import engine.lua.type.object.insts.Camera;
+import engine.lua.type.object.insts.GameObject;
+import engine.lua.type.object.insts.Model;
+import engine.lua.type.object.insts.Prefab;
 import engine.observer.Renderable;
 import engine.observer.RenderableInstance;
 import engine.observer.RenderableMesh;
 import engine.util.MeshUtils;
 import engine.util.Pair;
-import luaengine.type.object.Instance;
-import luaengine.type.object.PrefabRenderer;
-import luaengine.type.object.insts.Camera;
-import luaengine.type.object.insts.GameObject;
-import luaengine.type.object.insts.Model;
-import luaengine.type.object.insts.Prefab;
 
 public class Pipeline implements Renderable {
 	private boolean enabled = true;
