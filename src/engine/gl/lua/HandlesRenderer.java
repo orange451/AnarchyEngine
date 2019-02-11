@@ -12,7 +12,6 @@ import engine.application.RenderableApplication;
 import engine.gl.MaterialGL;
 import engine.gl.Pipeline;
 import engine.gl.Resources;
-import engine.lua.type.data.Matrix4;
 import engine.lua.type.data.Vector3;
 import engine.lua.type.object.Instance;
 import engine.lua.type.object.Positionable;

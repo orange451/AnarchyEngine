@@ -1,4 +1,4 @@
-package ide;
+package engine.application.impl;
 
 import java.io.IOException;
 
@@ -11,10 +11,10 @@ import lwjgui.Color;
 import lwjgui.LWJGUI;
 import lwjgui.scene.control.Label;
 
-public class RunnerServer extends Runner {
+public class ServerApplication extends Runner {
 	private Label label;
 	
-	public RunnerServer() {
+	public ServerApplication() {
 		// Create FPS label
 		label = new Label();
 		label.setTextFill(Color.white);

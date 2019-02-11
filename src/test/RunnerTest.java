@@ -1,8 +1,8 @@
 package test;
 
-import ide.RunnerClient;
+import engine.application.impl.ClientApplication;
 
-public class RunnerTest extends RunnerClient {
+public class RunnerTest extends ClientApplication {
 	
 	@Override
 	public void loadScene(String[] args) {

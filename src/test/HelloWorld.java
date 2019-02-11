@@ -4,6 +4,7 @@ import org.luaj.vm2.LuaValue;
 import org.lwjgl.glfw.GLFW;
 
 import engine.Game;
+import engine.application.impl.ClientApplication;
 import engine.lua.RunnableArgs;
 import engine.lua.type.data.Color3;
 import engine.lua.type.data.Vector3;
@@ -12,9 +13,8 @@ import engine.lua.type.object.insts.Material;
 import engine.lua.type.object.insts.Mesh;
 import engine.lua.type.object.insts.PointLight;
 import engine.lua.type.object.insts.Prefab;
-import ide.RunnerClient;
 
-public class HelloWorld extends RunnerClient {
+public class HelloWorld extends ClientApplication {
 	
 	@Override
 	public void loadScene(String[] args) {
@@ -31,7 +31,7 @@ public class HelloWorld extends RunnerClient {
 		material.setRoughness(0.1f);
 		material.setMetalness(0.0f);
 		material.setReflective(0.0f);
-		material.setColor(Color3.white());
+		material.setColor(Color3.red());
 		
 		// Create prefab
 		Prefab p = Game.assets().newPrefab();

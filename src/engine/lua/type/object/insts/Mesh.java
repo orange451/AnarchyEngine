@@ -43,11 +43,11 @@ public class Mesh extends AssetLoadable implements TreeViewable,FileResource {
 	}
 	
 	public void capsule(float radius, float height) {
-		setMesh(MeshUtils.capsule(radius, height, 16));
+		setMesh(MeshUtils.capsule(radius, height, 24));
 	}
 	
 	public void sphere( float radius ) {
-		setMesh(MeshUtils.sphere(radius, 16));
+		setMesh(MeshUtils.sphere(radius, 24));
 	}
 	
 	public void setMesh(BufferedMesh mesh) {

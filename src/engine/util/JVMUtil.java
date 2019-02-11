@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import engine.Game;
-import ide.RunnerClient;
+import engine.application.impl.ClientApplication;
 
 public class JVMUtil {
 	public static boolean restartJVM(boolean startFirstThread, boolean needsOutput, Class<?> customClass, String... args) {

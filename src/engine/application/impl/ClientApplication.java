@@ -1,13 +1,12 @@
-package ide;
+package engine.application.impl;
 
 import java.io.IOException;
 
 import engine.Game;
-import engine.lua.type.object.insts.Player;
 
-public class RunnerClient extends RunnerServer {
+public class ClientApplication extends ServerApplication {
 	
-	public RunnerClient() {
+	public ClientApplication() {
 		game = new Game(); // Overwrite the game object with the client one.
 		game.setServer(false);
 	}

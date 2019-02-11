@@ -4,6 +4,7 @@ import org.luaj.vm2.LuaValue;
 import org.lwjgl.glfw.GLFW;
 
 import engine.Game;
+import engine.application.impl.ClientApplication;
 import engine.lua.RunnableArgs;
 import engine.lua.type.data.Color3;
 import engine.lua.type.data.Matrix4;
@@ -14,9 +15,8 @@ import engine.lua.type.object.insts.Mesh;
 import engine.lua.type.object.insts.PointLight;
 import engine.lua.type.object.insts.Prefab;
 import engine.lua.type.object.insts.Texture;
-import ide.RunnerClient;
 
-public class TestPBR extends RunnerClient {
+public class TestPBR extends ClientApplication {
 	
 	@Override
 	public void loadScene(String[] args) {

@@ -2,12 +2,12 @@ package ide.layout;
 
 import engine.Game;
 import engine.InternalGameThread;
+import engine.application.impl.ClientApplication;
+import engine.application.impl.ServerApplication;
 import engine.io.Load;
 import engine.io.Save;
 import engine.util.JVMUtil;
 import ide.IDE;
-import ide.RunnerClient;
-import ide.RunnerServer;
 import ide.layout.windows.IdeConsole;
 import ide.layout.windows.IdeExplorer;
 import ide.layout.windows.IdeGameView;
@@ -126,7 +126,7 @@ public class IdeLayout {
 			if ( !saved )
 				return;
 			
-			JVMUtil.newJVM(RunnerServer.class, new String[] {Game.saveFile});
+			JVMUtil.newJVM(ServerApplication.class, new String[] {Game.saveFile});
 		});
 		menuEdit.getItems().add(t2);
 		
@@ -141,7 +141,7 @@ public class IdeLayout {
 			if ( !saved )
 				return;
 			
-			JVMUtil.newJVM(RunnerClient.class, new String[] {Game.saveFile});
+			JVMUtil.newJVM(ClientApplication.class, new String[] {Game.saveFile});
 		});
 		menuEdit.getItems().add(t);
 		

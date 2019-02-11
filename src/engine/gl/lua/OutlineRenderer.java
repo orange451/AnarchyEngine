@@ -10,8 +10,6 @@ import engine.gl.mesh.BufferedMesh;
 import engine.gl.shader.BaseShader;
 import engine.lua.type.object.Instance;
 import engine.lua.type.object.Positionable;
-import engine.lua.type.object.insts.GameObject;
-import engine.lua.type.object.insts.Prefab;
 import engine.util.Pair;
 import lwjgui.Color;
 

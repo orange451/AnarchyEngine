@@ -9,7 +9,6 @@ import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 
 import org.lwjgl.BufferUtils;
-import org.lwjgl.stb.STBImage;
 import org.lwjgl.stb.STBImageResize;
 
 import engine.util.IOUtil;
