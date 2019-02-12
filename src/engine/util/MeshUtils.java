@@ -159,7 +159,7 @@ public class MeshUtils {
 		return ret;
 	}
 
-	private static BufferedMesh cylinder( float baseRadius, float topRadius, float height, int slices, int stacks ) {
+	private static BufferedMesh cylinder( float baseRadius, float topRadius, float height, int slices, int stacks, boolean closed ) {
 		float[] sinCache = new float[CACHE_SIZE];
 		float[] cosCache = new float[CACHE_SIZE];
 		float angle;
@@ -251,15 +251,47 @@ public class MeshUtils {
 		}
 
 		// Create tops
-		OFFSET.z -= height/2f;
-		BufferedMesh bottom = disk( 0, baseRadius, slices, 1 );
-		bottom.flipFaces();
-		OFFSET.z += height;
-		BufferedMesh top = disk( 0, topRadius, slices, 1 );
-		OFFSET.z -= height/2f;
+		if ( closed ) {
+			OFFSET.z -= height/2f;
+			BufferedMesh bottom = disk( 0, baseRadius, slices, 1 );
+			bottom.flipFaces();
+			OFFSET.z += height;
+			BufferedMesh top = disk( 0, topRadius, slices, 1 );
+			OFFSET.z -= height/2f;
+	
+			// Return final mesh
+			return BufferedMesh.combineMeshes( mesh, bottom, top );
+		}
+		
+		return mesh;
+	}
+	
+	private static BufferedMesh hemisphere( float radius, int slices, int stacks, boolean bottom ) {
+		BufferedMesh sphereMesh = sphere( radius, slices, stacks );
+		BufferedMesh temp = new BufferedMesh(sphereMesh.getSize());
+		
+		int a = 0;
+		for (int i = 0; i < sphereMesh.getSize(); i+=3) {
+			Vertex t1 = sphereMesh.getVertex(i+0);
+			Vertex t2 = sphereMesh.getVertex(i+1);
+			Vertex t3 = sphereMesh.getVertex(i+2);
+			
+			if ( bottom ) {
+				if ( t1.getXYZ()[2] > OFFSET.z || t2.getXYZ()[2] > OFFSET.z || t3.getXYZ()[2] > OFFSET.z )
+					continue;
+			} else {
+				if ( t1.getXYZ()[2] < OFFSET.z || t2.getXYZ()[2] < OFFSET.z || t3.getXYZ()[2] < OFFSET.z )
+					continue;
+			}
 
-		// Return final mesh
-		return BufferedMesh.combineMeshes( mesh, bottom, top );
+			temp.setVertex(a++, t1);
+			temp.setVertex(a++, t2);
+			temp.setVertex(a++, t3);
+		}
+		
+		temp.clip();
+		
+		return temp;
 	}
 
 	private static BufferedMesh sphere( float radius, int slices, int stacks ) {
@@ -389,11 +421,11 @@ public class MeshUtils {
 			return null;
 
 		float offsetOriginal = OFFSET.z;
-		BufferedMesh mesh2 = cylinder( radius, height, steps );
+		BufferedMesh mesh2 = cylinder( radius, height, steps, false );
 		OFFSET.z += height/2;
-		BufferedMesh mesh1 = sphere( radius, steps, steps );
+		BufferedMesh mesh1 = hemisphere( radius, steps, steps, false );
 		OFFSET.z -= height;
-		BufferedMesh mesh3 = sphere( radius, steps, steps );
+		BufferedMesh mesh3 = hemisphere( radius, steps, steps, true );
 		OFFSET.z = offsetOriginal;
 
 		BufferedMesh ret = BufferedMesh.combineMeshes( mesh1, mesh2, mesh3 );
@@ -488,11 +520,19 @@ public class MeshUtils {
 	}
 
 	public static BufferedMesh cylinder( float radius, float height, int steps ) {
-		return cylinder( radius, radius, height, steps, 1 );
+		return cylinder( radius, height, steps, true );
+	}
+
+	public static BufferedMesh cylinder( float radius, float height, int steps, boolean closed ) {
+		return cylinder( radius, radius, height, steps, 1, closed );
 	}
 
 	public static BufferedMesh cone( float radius, float height, int steps ) {
-		return cylinder( radius, 0, height, steps, 1 );
+		return cylinder( radius, height, steps, true );
+	}
+
+	public static BufferedMesh cone( float radius, float height, int steps, boolean closed ) {
+		return cylinder( radius, 0, height, steps, 1, closed );
 	}
 
 	public static BufferedMesh teapot( float radius ) {

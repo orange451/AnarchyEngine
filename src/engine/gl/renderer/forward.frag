@@ -45,6 +45,7 @@ vec3 normalmap(vec3 normalSample, vec3 vNormal, vec3 vViewSpacePos, vec2 vTexCoo
 vec3 calculateFresnel( vec3 viewSpacePos, vec3 surfaceNormal, float roughness, float metalness );
 vec3 reflectEnv( vec3 viewSpacePos, vec3 surfaceNormal );
 vec3 reflectivePBR( vec3 cubemapSample, vec3 viewSpacePos, vec3 surfaceNormal, float roughness, float reflective );
+float getReflectionIndex( vec3 viewSpacePos, vec3 surfaceNormal, float reflective );
 
 out vec4 outColor;
 
@@ -57,7 +58,7 @@ void main(void) {
 	vec3 nViewSpacePos = normalize(vViewSpacePos.xyz);
 	
 	// Alpha Test
-	if ( diffuseSample.a < 0.25 )
+	if ( diffuseSample.a < 0.1 )
 		discard;
 	
 	// Normal mapping
@@ -68,7 +69,7 @@ void main(void) {
 	
 	// Get PBR samples
 	float fMetalness = metalnessSample.r * uMetalness ;
-	float fRoughness = max(0.05, roughnessSample.r*uRoughness );
+	float fRoughness = max(0.05, roughnessSample.r * uRoughness );
 		
 	// Cubemapping
 	if ( enableSkybox == 1.0 ) {
@@ -86,8 +87,11 @@ void main(void) {
 	vec3 fresnel = calculateFresnel( nViewSpacePos, normal, fRoughness, fMetalness ) * uReflective;
 	vec3 emissive = uMaterialEmissive+fresnel;
 	
+	// Initial color
+	vec3 finalColor = diffuseSample.rgb;
+	
 	// Apply global ambient
-	diffuseSample.rgb *= uAmbient;
+	finalColor.rgb *= uAmbient;
 	
 	// Add lighting
 	for (int i = 0; i < int(uNumPointLights); i++) {
@@ -95,12 +99,19 @@ void main(void) {
 		
 		vec3 eyeSpace = (vViewSpacePos.xyz / vViewSpacePos.w);
 		
-		diffuseSample.rgb += pointLight( normal, eyeSpace.xyz, light.Position, diffuseSample.rgb, fMetalness, fRoughness, light.Radius, light.Color, light.Intensity );
+		finalColor.rgb += pointLight( normal, eyeSpace.xyz, light.Position, diffuseSample.rgb, fMetalness, fRoughness, light.Radius, light.Color, light.Intensity );
 	}
 	
-	// Overall transparency
+	// Apply emissive
+	finalColor.rgb += emissive;
+	
+	// Alpha
 	float alpha = (1.0 - uTransparencyObject) * (1.0 - uTransparencyMaterial);
+	
+	// make non reflective parts more transparent
+	float ri = 1.0 - (getReflectionIndex( nViewSpacePos, normal, uReflective + alpha*0.5 ) );
+	alpha *= ri;
 
 	// Write
-	outColor = vec4(diffuseSample.rgb, alpha);
+	outColor = vec4(finalColor.rgb, alpha);
 }

@@ -51,6 +51,8 @@ public class Icons {
 	}
 	
 	public ImageView getView() {
-		return new ImageView(image);
+		ImageView iconView = new ImageView(image);
+		iconView.setPrefSize(16, 16);
+		return iconView;
 	}
 }
