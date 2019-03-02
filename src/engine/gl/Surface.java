@@ -41,7 +41,7 @@ import org.lwjgl.opengl.GL14;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
 
-import lwjgui.Color;
+import lwjgui.paint.Color;
 import lwjgui.gl.GenericShader;
 import lwjgui.gl.TexturedQuad;
 

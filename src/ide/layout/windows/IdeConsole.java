@@ -10,8 +10,8 @@ import engine.lua.LuaEngine;
 import ide.layout.IdePane;
 import lwjgui.LWJGUI;
 import lwjgui.geometry.Pos;
-import lwjgui.scene.control.TextArea;
-import lwjgui.scene.control.TextField;
+import lwjgui.scene.control.text_input.TextArea;
+import lwjgui.scene.control.text_input.TextField;
 import lwjgui.scene.layout.BorderPane;
 
 public class IdeConsole extends IdePane {
@@ -25,13 +25,13 @@ public class IdeConsole extends IdePane {
 
 		TextArea console = new TextArea();
 		console.setEditable(false);
-		console.setPreferredColumnCount(1024);
-		console.setPreferredRowCount(1024);
+		console.setFillToParentHeight(true);
+		console.setFillToParentWidth(true);
 		editBox.setCenter(console);
 		
 		TextField luaInput = new TextField();
 		luaInput.setPrompt("Lua Command Line");
-		luaInput.setPreferredColumnCount(1024);
+		luaInput.setFillToParentWidth(true);
 		editBox.setBottom(luaInput);
 
 		this.setOnKeyPressed(event -> {

@@ -17,7 +17,6 @@ import engine.lua.type.object.TreeInvisible;
 import engine.lua.type.object.TreeViewable;
 import engine.lua.type.object.insts.GameObject;
 import engine.lua.type.object.insts.Prefab;
-import engine.lua.type.object.insts.Script;
 import engine.lua.type.object.services.Assets;
 import engine.util.FileUtils;
 import ide.IDE;
@@ -28,6 +27,7 @@ import lwjgui.collections.ObservableList;
 import lwjgui.scene.control.ContextMenu;
 import lwjgui.scene.control.MenuItem;
 import lwjgui.scene.control.ScrollPane;
+import lwjgui.scene.control.SeparatorMenuItem;
 import lwjgui.scene.control.TreeBase;
 import lwjgui.scene.control.TreeItem;
 import lwjgui.scene.control.TreeView;
@@ -220,6 +220,8 @@ public class IdeExplorer extends IdePane implements GameSubscriber {
 		
 		// Asset functions
 		if ( inst instanceof Assets ) {
+			c.getItems().add(new SeparatorMenuItem());
+			
 			// New Prefab
 			MenuItem prefi = new MenuItem("Import Prefab", Icons.icon_model.getView());
 			prefi.setOnAction(event -> {
@@ -255,6 +257,8 @@ public class IdeExplorer extends IdePane implements GameSubscriber {
 				}
 			});
 			c.getItems().add(texi);
+			
+			c.getItems().add(new SeparatorMenuItem());
 			
 			// New Prefab
 			MenuItem pref = new MenuItem("New Prefab", Icons.icon_model.getView());

@@ -4,7 +4,7 @@ import engine.gl.mesh.BufferedMesh;
 import engine.io.Image;
 import engine.util.MeshUtils;
 import engine.util.TextureUtils;
-import lwjgui.Color;
+import lwjgui.paint.Color;
 
 public class Resources {
 	public static final Texture2D TEXTURE_WHITE_SRGB;

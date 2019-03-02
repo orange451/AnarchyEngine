@@ -6,6 +6,7 @@ import static org.lwjgl.opengl.GL13.*;
 import static org.lwjgl.opengl.GL30.*;
 
 import java.nio.ByteBuffer;
+import java.nio.FloatBuffer;
 
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
@@ -17,7 +18,7 @@ public class SkyBox {
 	protected int cubemap;
 	protected int framebuffer;
 	protected int depthbuffer;
-	protected ByteBuffer imageBuffer;
+	protected FloatBuffer imageBuffer;
 
 	protected int width;
 	protected int height;
@@ -48,11 +49,13 @@ public class SkyBox {
 		int components = image.getComponents();
 
 		if ( imageBuffer == null || (oldWidth != width || oldHeight != height) )
-			imageBuffer = BufferUtils.createByteBuffer(size * size * components);
-
+			imageBuffer = BufferUtils.createFloatBuffer(size * size * components);
+		
 		int internalFormat = GL_RGBA16F;
 		int externalFormat = GL_RGBA;
-		int type = GL_UNSIGNED_BYTE;
+		int type = GL_FLOAT;
+		
+		//glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, SCR_WIDTH, SCR_HEIGHT, 0, GL_RGBA, GL_FLOAT, NULL); 
 
 		//TextureUtils.loadImageBuffer(image, size*2, size, size, size, handler, imageBuffer);
 		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X, 0, internalFormat, size, size, 0, externalFormat, type, imageBuffer);

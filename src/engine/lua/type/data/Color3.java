@@ -7,7 +7,7 @@ import org.luaj.vm2.lib.ThreeArgFunction;
 import org.luaj.vm2.lib.ZeroArgFunction;
 
 import engine.lua.type.LuaValuetype;
-import lwjgui.Color;
+import lwjgui.paint.Color;
 
 public class Color3 extends LuaValuetype {
 

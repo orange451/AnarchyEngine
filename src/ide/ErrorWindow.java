@@ -118,6 +118,7 @@ public class ErrorWindow {
 		long win = LWJGUIUtil.createOpenGLCoreWindow(prefix + "Error!", WIDTH, HEIGHT, false, true);
 		Window window = LWJGUI.initialize(win);
 		window.setCanUserClose(false);
+		window.show();
 		
 		BorderPane root = new BorderPane();
 		window.getScene().setRoot(root);
@@ -129,7 +130,7 @@ public class ErrorWindow {
 		bottom.setPrefHeight(32);
 		bottom.setAlignment(Pos.CENTER);
 		bottom.setFillToParentWidth(true);
-		bottom.setBackground(Theme.currentTheme().getControlAlt());
+		bottom.setBackground(Theme.current().getControlAlt());
 		root.setBottom(bottom);
 		
 		HBox hbox = new HBox();

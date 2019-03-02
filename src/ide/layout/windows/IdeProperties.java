@@ -17,8 +17,9 @@ import engine.lua.type.object.Instance;
 import engine.lua.type.object.InstancePropertySubscriber;
 import ide.IDEFilePath;
 import ide.layout.IdePane;
-import lwjgui.Color;
+import lwjgui.paint.Color;
 import lwjgui.LWJGUI;
+import lwjgui.font.FontStyle;
 import lwjgui.geometry.Insets;
 import lwjgui.geometry.Pos;
 import lwjgui.scene.Node;
@@ -27,9 +28,8 @@ import lwjgui.scene.control.CheckBox;
 import lwjgui.scene.control.Label;
 import lwjgui.scene.control.ScrollPane;
 import lwjgui.scene.control.ScrollPane.ScrollBarPolicy;
-import lwjgui.scene.control.TextField;
+import lwjgui.scene.control.text_input.TextField;
 import lwjgui.scene.layout.ColumnConstraint;
-import lwjgui.scene.layout.FontStyle;
 import lwjgui.scene.layout.GridPane;
 import lwjgui.scene.layout.Priority;
 import lwjgui.scene.layout.StackPane;
@@ -42,7 +42,7 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 	
 	private PropertyGrid grid;
 	
-	static Color alt = Theme.currentTheme().getControlAlt();
+	static Color alt = Theme.current().getControlAlt();
 	
 	public IdeProperties() {
 		super("Properties", true);
@@ -158,6 +158,7 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 			
 			this.setPadding(new Insets(0,0,0,4));
 			this.setPrefSize(1, 1);
+			this.setAlignment(Pos.TOP_LEFT);
 		}
 	}
 	
@@ -213,12 +214,13 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 					((Region)this.getChildren().get(0)).setPadding(new Insets(0,0,0,4));
 				}
 			};
-			this.textField.setPreferredColumnCount(1024);
+			//this.textField.setPreferredColumnCount(1024);
+			this.textField.setFillToParentWidth(true);
 			this.setMaxHeight(16);
 			this.textField.setAlignment(Pos.CENTER_LEFT);
 			
 			if ( editable ) {
-				this.setMouseReleasedEvent(event -> {
+				this.setOnMouseReleased(event -> {
 					textField.setText(label.getText());
 					this.getChildren().add(textField);
 					editing = true;
@@ -302,7 +304,7 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 			super(instance, field, initialValue, editable);
 			
 			if ( editable ) {
-				this.setMouseReleasedEvent(event -> {
+				this.setOnMouseReleased(event -> {
 					
 					try {
 						PointerBuffer outPath = MemoryUtil.memAllocPointer(1);
@@ -336,7 +338,7 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 			super(instance, field, initialValue, editable);
 			
 			if ( editable ) {
-				this.setMouseReleasedEvent(event -> {
+				this.setOnMouseReleased(event -> {
 					if ( !selected ) {
 						selected = true;
 						t = new StackPane();

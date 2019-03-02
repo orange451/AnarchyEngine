@@ -67,8 +67,11 @@ public class SkySphereIBL extends SkySphere {
 		String base = path.replace(extension, "");
 		String env = base + "_env" + extension;
 		
-		return new SkySphereIBL(
-				TextureUtils.loadImage(ref),
-				TextureUtils.loadImage(env));
+		Image refi = TextureUtils.loadImage(ref);
+		Image envi = TextureUtils.loadImage(env);
+		if ( envi == null )
+			envi = refi;
+		
+		return new SkySphereIBL(refi, envi);
 	}
 }

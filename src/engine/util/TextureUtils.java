@@ -16,7 +16,7 @@ import engine.InternalRenderThread;
 import engine.gl.PixelHandler;
 import engine.gl.Texture2D;
 import engine.io.Image;
-import lwjgui.Color;
+import lwjgui.paint.Color;
 
 public class TextureUtils {
 	public static boolean autoResize = false;

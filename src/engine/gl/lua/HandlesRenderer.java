@@ -18,7 +18,7 @@ import engine.lua.type.object.Positionable;
 import engine.util.AABBUtil;
 import engine.util.MatrixUtils;
 import engine.util.Pair;
-import lwjgui.Color;
+import lwjgui.paint.Color;
 
 public class HandlesRenderer {
 

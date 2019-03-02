@@ -23,6 +23,7 @@ import lwjgui.scene.control.MenuBar;
 import lwjgui.scene.control.MenuItem;
 import lwjgui.scene.control.SplitPane;
 import lwjgui.scene.layout.BorderPane;
+import lwjgui.scene.layout.Pane;
 
 public class IdeLayout {
 	
@@ -32,7 +33,7 @@ public class IdeLayout {
 	private IdeDockPane center;
 	private IdePane gameView;
 	
-	public IdeLayout(Region root) {
+	public IdeLayout(Pane root) {
 		root.setAlignment(Pos.TOP_LEFT);
 	
 		BorderPane pane = new BorderPane();
@@ -74,13 +75,12 @@ public class IdeLayout {
 		east.dockNorth(new IdeExplorer());
 		east.dockSouth(new IdeProperties());
 		split.getItems().add(east);
-
-		// TESTING
-		SplitPane.setResizableWithParent(split.getItems().get(0), false);
-		SplitPane.setResizableWithParent(split.getItems().get(2), false);
-		SplitPane.setResizableWithParent(middle.getItems().get(1), false);
 		
 		LWJGUI.runLater(() -> {
+			SplitPane.setResizableWithParent(split.getItems().get(0), false);
+			SplitPane.setResizableWithParent(split.getItems().get(2), false);
+			SplitPane.setResizableWithParent(middle.getItems().get(1), false);
+			
 			split.setDividerPosition(0, 0.0);
 			split.setDividerPosition(1, 0.75);
 			middle.setDividerPosition(0, 0.8);
@@ -113,11 +113,11 @@ public class IdeLayout {
 	
 	private void testMenu(MenuBar menuBar) {
 		Menu menuEdit = new Menu("Test");
+		menuEdit.setAutoHide(false);
 		menuBar.getItems().add(menuEdit);
 		
 		// Normal server test
-		MenuItem t2 = new MenuItem("Test Server");
-		t2.setGraphic(Icons.icon_play_server.getView());
+		MenuItem t2 = new MenuItem("Test Server", Icons.icon_play_server.getView());
 		t2.setOnAction( event -> {
 			if ( Game.isRunning() )
 				return;
@@ -131,8 +131,7 @@ public class IdeLayout {
 		menuEdit.getItems().add(t2);
 		
 		// Normal test
-		MenuItem t = new MenuItem("Test Client");
-		t.setGraphic(Icons.icon_play.getView());
+		MenuItem t = new MenuItem("Test Client", Icons.icon_play.getView());
 		t.setOnAction( event -> {
 			if ( Game.isRunning() )
 				return;
@@ -182,8 +181,7 @@ public class IdeLayout {
 		menuEdit.getItems().add(t2);*/
 		
 		// Normal server test
-		MenuItem ts = new MenuItem("Test Server (IDE)");
-		ts.setGraphic(Icons.icon_play_server.getView());
+		MenuItem ts = new MenuItem("Test Server (IDE)", Icons.icon_play_server.getView());
 		ts.setOnAction( event -> {
 			if ( Game.isRunning() )
 				return;
@@ -198,8 +196,7 @@ public class IdeLayout {
 		
 		
 		// Normal client test
-		MenuItem tc = new MenuItem("Test Client (IDE)");
-		tc.setGraphic(Icons.icon_play.getView());
+		MenuItem tc = new MenuItem("Test Client (IDE)", Icons.icon_play.getView());
 		tc.setOnAction( event -> {
 			if ( Game.isRunning() )
 				return;
@@ -215,17 +212,16 @@ public class IdeLayout {
 
 	private void fileMenu(MenuBar menuBar) {
 		Menu menuFile = new Menu("File");
+		menuFile.setAutoHide(false);
 		
-		MenuItem mnew = new MenuItem("New");
-		mnew.setGraphic(Icons.icon_new.getView());
+		MenuItem mnew = new MenuItem("New", Icons.icon_new.getView());
 		mnew.setOnAction(event -> {
 			Game.newProject();
 		});
 		menuFile.getItems().add(mnew);
 		//mnew.setAccelerator(KeyCombination.valueOf("SHORTCUT+N"));
 		
-		MenuItem mload = new MenuItem("Open");
-		mload.setGraphic(Icons.icon_folder.getView());
+		MenuItem mload = new MenuItem("Open", Icons.icon_folder.getView());
 		mload.setOnAction(event -> {
 			Runnable r = new Runnable() {
 				@Override
@@ -242,24 +238,21 @@ public class IdeLayout {
 		menuFile.getItems().add(mload);
 		//mload.setAccelerator(KeyCombination.valueOf("SHORTCUT+O"));
 		
-		MenuItem msave = new MenuItem("Save");
-		msave.setGraphic(Icons.icon_save.getView());
+		MenuItem msave = new MenuItem("Save", Icons.icon_save.getView());
 		msave.setOnAction(event -> {
 			Save.save();
 		});
 		menuFile.getItems().add(msave);
 		//msave.setAccelerator(KeyCombination.valueOf("SHORTCUT+S"));
 
-		MenuItem msave2 = new MenuItem("Save As...");
-		msave2.setGraphic(Icons.icon_saveas.getView());
+		MenuItem msave2 = new MenuItem("Save As...", Icons.icon_saveas.getView());
 		msave2.setOnAction(event -> {
 			Save.save(true);
 		});
 		menuFile.getItems().add(msave2);
 		//msave2.setAccelerator(KeyCombination.valueOf("SHORTCUT+SHIFT+S"));
 		
-		MenuItem mquit = new MenuItem("Quit");
-		mquit.setGraphic(Icons.icon_cross.getView());
+		MenuItem mquit = new MenuItem("Quit", Icons.icon_cross.getView());
 		menuFile.getItems().add(mquit);
 		mquit.setOnAction(event -> {
 			Runnable r = new Runnable() {

@@ -7,8 +7,8 @@ import org.joml.Vector2f;
 import engine.InternalRenderThread;
 import engine.application.Runner;
 import engine.io.Load;
-import lwjgui.Color;
 import lwjgui.LWJGUI;
+import lwjgui.paint.Color;
 import lwjgui.scene.control.Label;
 
 public class ServerApplication extends Runner {
@@ -17,7 +17,7 @@ public class ServerApplication extends Runner {
 	public ServerApplication() {
 		// Create FPS label
 		label = new Label();
-		label.setTextFill(Color.white);
+		label.setTextFill(Color.WHITE);
 		LWJGUI.runLater(()->{
 			getRootPane().getChildren().add(label);
 		});

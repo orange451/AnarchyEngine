@@ -1,7 +1,7 @@
 package engine.io;
 
 import engine.util.TextureUtils;
-import lwjgui.Color;
+import lwjgui.paint.Color;
 
 public class AsynchronousImage extends AsynchronousResource<Image> {
 	private static Image TEMP;

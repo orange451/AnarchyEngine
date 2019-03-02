@@ -9,10 +9,11 @@ import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 
 import org.lwjgl.BufferUtils;
+import org.lwjgl.stb.STBImage;
 import org.lwjgl.stb.STBImageResize;
 
 import engine.util.IOUtil;
-import lwjgui.Color;
+import lwjgui.paint.Color;
 
 public class Image {
 	private ByteBuffer image;
@@ -22,6 +23,7 @@ public class Image {
 	private int comp;
 	private boolean flipped;
 	private boolean loaded;
+	private boolean hdr;
 	
 	public Image( String imagePath ) {
 		this( imagePath, false );
@@ -60,6 +62,7 @@ public class Image {
 		this.w = w.get(0);
 		this.h = h.get(0);
 		this.comp = comp.get(0);
+		this.hdr = STBImage.stbi_is_hdr_from_memory(imageBuffer);
 
 		// Decode the image
 		ByteBuffer data = stbi_load_from_memory(imageBuffer, w, h, comp, 0);
@@ -190,6 +193,10 @@ public class Image {
 
 	public int getComponents() {
 		return this.comp;
+	}
+	
+	public boolean isHDR() {
+		return this.hdr;
 	}
 
 	public int[] getDataArray() {

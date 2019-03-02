@@ -16,7 +16,7 @@ import engine.gl.Texture2D;
 import engine.gl.ibl.SkySphereIBL;
 import engine.gl.shader.BaseShader;
 import engine.util.TextureUtils;
-import lwjgui.Color;
+import lwjgui.paint.Color;
 
 public class MergeProcessor implements PostProcessor {
 	private BaseShader shader;
@@ -31,6 +31,7 @@ public class MergeProcessor implements PostProcessor {
 		//skyBox = new SkyBox(TextureUtils.loadImage("Resources/Testing/skybox.png"));
 		//skyBox = SkySphereIBL.create("Resources/Testing/IBL/apartment.hdr");
 		skyBox = SkySphereIBL.create("Resources/Testing/IBL/office.hdr");
+		//skyBox = SkySphereIBL.create("Resources/Testing/IBL/noon_grass.hdr");
 		((SkySphereIBL)skyBox).setLightMultiplier(10);
 		TextureUtils.autoResize = true;
 		skyBoxRotation.rotateX((float) (-Math.PI/2f));
@@ -65,7 +66,7 @@ public class MergeProcessor implements PostProcessor {
 		// Merge!
 		surface.bind();
 		{
-			surface.draw_clear_alpha(Color.black, 0.0f);
+			surface.draw_clear_alpha(Color.BLACK, 0.0f);
 			
 			pipeline.shader_set(shader);
 			shader.texture_set_stage(shader.shader_get_uniform("texture_albedo"), buffer0, 0);

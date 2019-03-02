@@ -3,7 +3,7 @@ package engine.gl.mesh.mm3d;
 import org.joml.Vector4f;
 
 import engine.gl.MaterialGL;
-import lwjgui.Color;
+import lwjgui.paint.Color;
 
 public class Mm3dMaterial {
 	private int flags;

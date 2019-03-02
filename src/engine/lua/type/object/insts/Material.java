@@ -17,7 +17,7 @@ import engine.lua.type.object.Instance;
 import engine.lua.type.object.Service;
 import engine.lua.type.object.TreeViewable;
 import ide.layout.windows.icons.Icons;
-import lwjgui.Color;
+import lwjgui.paint.Color;
 
 public class Material extends Asset implements TreeViewable {	
 	private engine.gl.MaterialGL material;

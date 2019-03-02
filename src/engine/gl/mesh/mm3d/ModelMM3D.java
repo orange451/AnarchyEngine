@@ -19,7 +19,7 @@ import engine.gl.shader.BaseShader;
 import engine.lua.type.object.PrefabRenderer;
 import engine.util.FileIO;
 import engine.util.TextureUtils;
-import lwjgui.Color;
+import lwjgui.paint.Color;
 
 public class ModelMM3D {
 	public static final boolean DEBUG = true;
@@ -98,7 +98,7 @@ public class ModelMM3D {
 
 			Color color = Color.WHITE;
 			if (currentJoint.getParent() == -1)
-				color = Color.red;
+				color = Color.RED;
 
 			/*GameResources.cubeModel.matrix_set_from_4x4(ma_mat);
 			GameResources.cubeModel.matrix_set_scaling(0.125f, 0.125f, 0.125f);

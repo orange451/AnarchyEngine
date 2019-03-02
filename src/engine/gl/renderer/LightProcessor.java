@@ -5,7 +5,7 @@ import engine.gl.PostProcessor;
 import engine.gl.Surface;
 import engine.gl.ibl.IBLHandler;
 import engine.gl.light.PointLightHandler;
-import lwjgui.Color;
+import lwjgui.paint.Color;
 
 public class LightProcessor implements PostProcessor {
 	private PointLightHandler pointLight = new PointLightHandler();

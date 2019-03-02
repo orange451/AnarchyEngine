@@ -24,7 +24,7 @@ import engine.gl.Surface;
 import engine.gl.Texture2D;
 import engine.gl.shader.BaseShader;
 import engine.lua.type.data.Color3;
-import lwjgui.Color;
+import lwjgui.paint.Color;
 
 public class GBuffer {
 	private int buffer0Tex; // Albedo

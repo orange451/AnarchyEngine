@@ -5,7 +5,7 @@ import org.joml.Vector3f;
 import engine.gl.ibl.SkySphere;
 import engine.gl.ibl.SkySphereIBL;
 import engine.gl.shader.BaseShader;
-import lwjgui.Color;
+import lwjgui.paint.Color;
 
 public class MaterialGL {
 	private Texture2D diffuseTexture;

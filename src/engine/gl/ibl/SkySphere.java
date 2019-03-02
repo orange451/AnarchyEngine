@@ -8,7 +8,7 @@ import engine.gl.SkyBoxDynamic;
 import engine.gl.mesh.BufferedMesh;
 import engine.io.Image;
 import engine.util.TextureUtils;
-import lwjgui.Color;
+import lwjgui.paint.Color;
 
 public class SkySphere extends SkyBoxDynamic {
 	private BufferedMesh sphere;

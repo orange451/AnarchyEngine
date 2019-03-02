@@ -78,7 +78,7 @@ public class IDE extends RenderableApplication {
 	
 	@Override
 	protected Vector2f getMouseOffset() {
-		return new Vector2f( (float)layout.getGamePane().getAbsoluteX(), (float)layout.getGamePane().getAbsoluteY() );
+		return new Vector2f( (float)layout.getGamePane().getX(), (float)layout.getGamePane().getY() );
 	}
 	
 	@Override

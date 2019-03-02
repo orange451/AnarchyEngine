@@ -19,7 +19,7 @@ import engine.util.AABBUtil;
 import engine.util.Pair;
 import ide.IDE;
 import ide.layout.windows.icons.Icons;
-import lwjgui.Color;
+import lwjgui.paint.Color;
 
 public class PointLight extends LightBase implements TreeViewable,GameSubscriber {
 

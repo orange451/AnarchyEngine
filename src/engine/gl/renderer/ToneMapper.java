@@ -6,7 +6,7 @@ import engine.gl.Pipeline;
 import engine.gl.PostProcessor;
 import engine.gl.Surface;
 import engine.gl.shader.BaseShader;
-import lwjgui.Color;
+import lwjgui.paint.Color;
 
 public class ToneMapper implements PostProcessor {
 	private BaseShader shader;
@@ -23,7 +23,7 @@ public class ToneMapper implements PostProcessor {
 		// Woah brah! u toned!
 		buffer.bind();
 		{
-			buffer.draw_clear_alpha(Color.black, 1.0f);
+			buffer.draw_clear_alpha(Color.BLACK, 1.0f);
 			pipeline.shader_set(shader);
 			shader.texture_set_stage(shader.shader_get_uniform("texture_diffuse"), buffer0, 0);
 			shader.shader_set_uniform_f(shader.shader_get_uniform("uExposure"), pipeline.getGBuffer().getExposure());

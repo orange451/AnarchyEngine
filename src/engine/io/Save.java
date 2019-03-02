@@ -47,6 +47,7 @@ public class Save {
 		long win = LWJGUIUtil.createOpenGLCoreWindow("Save Dialog", 300, 100, false, true);
 		Window window = LWJGUI.initialize(win);
 		window.setCanUserClose(false);
+		window.show();
 
 		Scene scene = window.getScene();
 
@@ -62,7 +63,7 @@ public class Save {
 		bottom.setPrefHeight(32);
 		bottom.setAlignment(Pos.CENTER);
 		bottom.setFillToParentWidth(true);
-		bottom.setBackground(Theme.currentTheme().getControlAlt());
+		bottom.setBackground(Theme.current().getControlAlt());
 		root.setBottom(bottom);
 		
 		HBox t = new HBox();

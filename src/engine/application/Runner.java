@@ -47,11 +47,11 @@ public abstract class Runner extends RenderableApplication {
 			UserInputService uis = (UserInputService) Game.getService("UserInputService");
 			uis.onKeyReleased(event.getKey());
 		});
-		rootPane.setMousePressedEvent(event -> {
+		rootPane.setOnMousePressed(event -> {
 			UserInputService uis = (UserInputService) Game.getService("UserInputService");
 			uis.onMousePress(event.button);
 		});
-		rootPane.setMouseReleasedEvent(event -> {
+		rootPane.setOnMouseReleased(event -> {
 			UserInputService uis = (UserInputService) Game.getService("UserInputService");
 			uis.onMouseRelease(event.button);
 		});

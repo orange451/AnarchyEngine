@@ -11,7 +11,7 @@ import engine.gl.shader.BaseShader;
 import engine.lua.type.object.Instance;
 import engine.lua.type.object.Positionable;
 import engine.util.Pair;
-import lwjgui.Color;
+import lwjgui.paint.Color;
 
 public class OutlineRenderer {
 	

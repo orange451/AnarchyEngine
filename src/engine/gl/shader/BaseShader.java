@@ -35,7 +35,7 @@ import engine.gl.SkyBox;
 import engine.gl.Texture2D;
 import engine.io.Image;
 import engine.util.TextureUtils;
-import lwjgui.Color;
+import lwjgui.paint.Color;
 import lwjgui.scene.Context;
 
 public class BaseShader {

@@ -7,7 +7,7 @@ import engine.gl.Surface;
 import engine.lua.type.object.services.UserInputService;
 import ide.IDE;
 import ide.layout.IdePane;
-import lwjgui.Color;
+import lwjgui.paint.Color;
 import lwjgui.geometry.Insets;
 import lwjgui.geometry.Pos;
 import lwjgui.gl.GenericShader;
@@ -62,12 +62,12 @@ public class IdeGameView extends IdePane {
 			
 			uis.onKeyReleased(event.getKey());
 		});
-		internal.setMousePressedEvent(event -> {
+		internal.setOnMousePressed(event -> {
 			UserInputService uis = (UserInputService) Game.getService("UserInputService");
 			uis.onMousePress(event.button);
 			cached_context.setSelected(internal);
 		});
-		internal.setMouseReleasedEvent(event -> {
+		internal.setOnMouseReleased(event -> {
 			UserInputService uis = (UserInputService) Game.getService("UserInputService");
 			uis.onMouseRelease(event.button);
 		});
