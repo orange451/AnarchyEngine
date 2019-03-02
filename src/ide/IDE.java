@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import org.joml.Vector2f;
 import org.lwjgl.glfw.GLFW;
+import org.lwjgl.glfw.GLFWWindowSizeCallbackI;
 
 import engine.Game;
 import engine.InternalGameThread;
@@ -39,6 +40,15 @@ public class IDE extends RenderableApplication {
 		Pane background = new Pane();
 		background.setBackground(null);
 		win.getScene().setRoot(background);
+		
+		// Redraw window if resized
+		GLFW.glfwSetWindowSizeCallback(window, new GLFWWindowSizeCallbackI() {
+			@Override
+			public void invoke(long handle, int wid, int hei) {
+				LWJGUI.render();
+				renderThread.forceUpdate();
+			}
+		});
 		
 		// Create rendering pipeline
 		this.attachRenderable(pipeline = new Pipeline());

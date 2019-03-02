@@ -3,6 +3,7 @@ package ide.layout.windows;
 import java.io.File;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.luaj.vm2.LuaValue;
 import org.lwjgl.PointerBuffer;
@@ -13,6 +14,7 @@ import org.lwjgl.util.nfd.NativeFileDialog;
 import engine.Game;
 import engine.GameSubscriber;
 import engine.lua.type.LuaValuetype;
+import engine.lua.type.data.Color3;
 import engine.lua.type.object.Instance;
 import engine.lua.type.object.InstancePropertySubscriber;
 import ide.IDEFilePath;
@@ -25,6 +27,7 @@ import lwjgui.geometry.Pos;
 import lwjgui.scene.Node;
 import lwjgui.scene.Region;
 import lwjgui.scene.control.CheckBox;
+import lwjgui.scene.control.ColorPicker;
 import lwjgui.scene.control.Label;
 import lwjgui.scene.control.ScrollPane;
 import lwjgui.scene.control.ScrollPane.ScrollBarPolicy;
@@ -90,6 +93,23 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 		currentInstance = null;	
 	}
 	
+
+	
+	@Override
+	public void onOpen() {
+		//
+	}
+
+	@Override
+	public void onClose() {
+		//
+	}
+
+	@Override
+	public void gameUpdateEvent(boolean important) {
+		update();
+	}
+	
 	@Override
 	public void onPropertyChange(Instance instance, String property, LuaValue value) {
 		//System.out.println(instance.getFullName() + " :: " + property + " => " + value);
@@ -109,6 +129,11 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 		if ( field.equals("FilePath") )
 			return new FilePathPropertyModifier(instance, field, value, editable);
 		
+		// Edit a color
+		if ( value instanceof Color3 ) {
+			return new ColorPropertyModifier(instance, field, value, editable);
+		}
+		
 		// Edit a boolean
 		if ( value.isboolean() )
 			return new BooleanPropertyModifier(instance, field, value, editable);
@@ -127,21 +152,6 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 		
 		// Fallback
 		return new PropertyModifierTemp( instance, field, value, editable );
-	}
-	
-	@Override
-	public void onOpen() {
-		//
-	}
-
-	@Override
-	public void onClose() {
-		//
-	}
-
-	@Override
-	public void gameUpdateEvent(boolean important) {
-		update();
 	}
 	
 	static class PropertyModifier extends StackPane {
@@ -201,6 +211,30 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 		}
 	}
 	
+	static class ColorPropertyModifier extends PropertyModifier {
+		private ColorPicker picker;
+		
+		public ColorPropertyModifier(Instance instance, String field, LuaValue value, boolean editable) {
+			super(instance,field,value,editable);
+			
+			Color color = Color.WHITE;
+			if ( value instanceof Color3 )
+				color = ((Color3)value).toColor();
+			
+			this.picker = new ColorPicker(color);
+			this.picker.setMaxHeight(16);
+			this.picker.setPadding(new Insets(0,8,0,8));
+			this.picker.setFontSize(16);
+			this.getChildren().add(picker);
+			
+			if ( editable ) {
+				this.picker.setOnAction(event -> {
+					this.instance.set(field, Color3.newInstance(this.picker.getColor()));
+				});
+			}
+		}
+	}
+	
 	static abstract class PropertyModifierInput extends PropertyModifierTemp {
 		private TextField textField;
 		private boolean editing;
@@ -208,10 +242,31 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 		public PropertyModifierInput(Instance instance, String field, LuaValue initialValue, boolean editable) {
 			super(instance, field, initialValue, editable);
 
+			AtomicBoolean editingAtomic = new AtomicBoolean(false);
+			
 			this.setPadding(Insets.EMPTY);
 			this.textField = new TextField() {
 				{
 					((Region)this.getChildren().get(0)).setPadding(new Insets(0,0,0,4));
+				}
+				
+				@Override
+				protected void resize() {
+					super.resize();
+					
+					if ( editing )  {
+						editingAtomic.set(true);
+					} else {
+						if ( editingAtomic.get() ) {
+							editingAtomic.set(false);
+							try {
+								onValueSet(textField.getText());
+								label.setText(instance.get(field).toString());
+							} catch(Exception e) {
+								//e.printStackTrace();
+							}
+						}
+					}
 				}
 			};
 			//this.textField.setPreferredColumnCount(1024);
