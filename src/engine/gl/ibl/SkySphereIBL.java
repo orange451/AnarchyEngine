@@ -7,8 +7,8 @@ import engine.util.TextureUtils;
 public class SkySphereIBL extends SkySphere {
 	private SkySphereIBL lightSphere;
 	private int buffers;
-	private float lightMultiplier = 0.8f;
-	private float power = 2.5f;
+	private float lightMultiplier = 2f;
+	private float power = 3f;
 	
 	private SkySphereIBL(Image reflection) {
 		this(reflection, SKYBOX_TEXTURE_SIZE);

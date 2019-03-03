@@ -13,6 +13,9 @@ uniform float uReflective;
 uniform float uTransparencyObject;
 uniform float uTransparencyMaterial;
 
+uniform float uSkyBoxLightPower;
+uniform float uSkyBoxLightMultiplier;
+
 uniform vec3 uAmbient;
 
 uniform float normalMapEnabled;
@@ -72,15 +75,16 @@ void main(void) {
 	float fRoughness = max(0.05, roughnessSample.r * uRoughness );
 		
 	// Cubemapping
+	vec3 cubemapSample = vec3(0.0);
 	if ( enableSkybox == 1.0 ) {
 		// Compute normal environment map based on roughness
-		vec3 cubemapSample = textureLod(texture_cubemap, reflectEnv( nViewSpacePos, normal ).xyz, MAX_REFLECTION_LOD * fRoughness).rgb;
+		cubemapSample = textureLod(texture_cubemap, reflectEnv( nViewSpacePos, normal ).xyz, MAX_REFLECTION_LOD * fRoughness).rgb;
 		
 		// Apply reflection PBR parameter
-		cubemapSample = reflectivePBR( cubemapSample, nViewSpacePos, normal, fRoughness, uReflective );
+		vec3 pbrCubemapSample = reflectivePBR( cubemapSample, nViewSpacePos, normal, fRoughness, uReflective );
 
 		// Combine cubemap into diffuse
-		diffuseSample.rgb *= cubemapSample;
+		diffuseSample.rgb *= pbrCubemapSample;
     }
 	
 	// Calculate fresnel
@@ -111,6 +115,21 @@ void main(void) {
 	// make non reflective parts more transparent
 	float ri = 1.0 - (getReflectionIndex( nViewSpacePos, normal, uReflective + alpha*0.5 ) );
 	alpha *= ri;
+	
+	// IBL
+	if ( enableSkybox == 1.0 ) {
+		vec3 kD = diffuseSample.rgb;
+		kD *= 1.0 - fMetalness;
+		
+		// Correct radiance (boost brightness)
+		vec3 radiance = max( cubemapSample, 0.0 );
+		radiance = pow( radiance, vec3(uSkyBoxLightPower) );
+		radiance = radiance * uSkyBoxLightMultiplier;
+		radiance = mix( kD + radiance, (kD * radiance) + radiance * uReflective, fRoughness );
+		radiance = radiance*uAmbient;
+		
+		finalColor += radiance;
+	}
 
 	// Write
 	outColor = vec4(finalColor.rgb, alpha);

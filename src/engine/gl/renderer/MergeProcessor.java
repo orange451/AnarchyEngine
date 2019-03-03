@@ -10,7 +10,6 @@ import org.lwjgl.opengl.GL30;
 import engine.Game;
 import engine.gl.Pipeline;
 import engine.gl.PostProcessor;
-import engine.gl.SkyBox;
 import engine.gl.Surface;
 import engine.gl.Texture2D;
 import engine.gl.ibl.SkySphereIBL;
@@ -20,7 +19,7 @@ import lwjgui.paint.Color;
 
 public class MergeProcessor implements PostProcessor {
 	private BaseShader shader;
-	private SkyBox skyBox;
+	private SkySphereIBL skyBox;
 	private Matrix3f skyBoxRotation = new Matrix3f();
 	private Surface surface;
 	
@@ -28,9 +27,9 @@ public class MergeProcessor implements PostProcessor {
 		shader = new MergeShader();
 		
 		TextureUtils.autoResize = false;
-		//skyBox = SkySphereIBL.create("Resources/Testing/IBL/apartment.hdr");
-		skyBox = SkySphereIBL.create("Resources/Testing/IBL/office.hdr");
-		//skyBox = SkySphereIBL.create("Resources/Testing/IBL/autoshop_01_2k.hdr");
+		//skyBox = SkySphereIBL.create("Resources/Testing/IBL/valley.hdr");
+		//skyBox = SkySphereIBL.create("Resources/Testing/IBL/office.hdr");
+		skyBox = SkySphereIBL.create("Resources/Testing/IBL/autoshop_01_2k.hdr");
 		//skyBox = SkySphereIBL.create("Resources/Testing/IBL/koppie.hdr");
 		//skyBox = SkySphereIBL.create("Resources/Testing/IBL/noon_grass.hdr");
 		//((SkySphereIBL)skyBox).setLightMultiplier(10);
@@ -99,7 +98,7 @@ public class MergeProcessor implements PostProcessor {
 		}
 	}
 
-	public SkyBox getSkybox() {
+	public SkySphereIBL getSkybox() {
 		return skyBox;
 	}
 

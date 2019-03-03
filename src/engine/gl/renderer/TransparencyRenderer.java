@@ -11,6 +11,8 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 import org.lwjgl.opengl.GL30;
 import engine.gl.Pipeline;
+import engine.gl.SkyBox;
+import engine.gl.ibl.SkySphereIBL;
 import engine.gl.light.PointLightInternal;
 import engine.gl.shader.BaseShader;
 
@@ -50,6 +52,9 @@ public class TransparencyRenderer {
 		pipeline.shader_set(shader);
 
 		shader.shader_set_uniform_f(shader.shader_get_uniform("uAmbient"), pipeline.getGBuffer().getAmbient());
+		SkyBox skybox = pipeline.getGBuffer().getMergeProcessor().getSkybox();
+		shader.shader_set_uniform_f(shader.shader_get_uniform("uSkyBoxLightPower"), ((SkySphereIBL)skybox).getLightPower());
+		shader.shader_set_uniform_f(shader.shader_get_uniform("uSkyBoxLightMultiplier"), ((SkySphereIBL)skybox).getLightMultiplier());
 		
 		// Send point light data
 		// TODO replace this with a Uniform buffer. MUCH BETTER

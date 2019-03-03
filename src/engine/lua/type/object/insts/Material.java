@@ -134,6 +134,10 @@ public class Material extends Asset implements TreeViewable {
 				|| key.toString().equals("NormalTexture")
 				|| key.toString().equals("MetallicTexture")
 				|| key.toString().equals("RoughnessTexture")) {
+			if ( !value.isnil() && !(value instanceof Texture) ) {
+				return null;
+			}
+			
 			onTextureSet(key, value);
 		}
 		return value;
