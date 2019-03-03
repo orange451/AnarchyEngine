@@ -10,13 +10,14 @@ uniform vec3 uAmbient;
 uniform mat4 uInverseViewMatrix;
 uniform mat4 uInverseProjectionMatrix;
 
+uniform float uSkyBoxLightPower;
+uniform float uSkyBoxLightMultiplier;
+
 in vec2 passTexCoord;
 in vec4 passColor;
 
 out vec4 outColor;
 
-const float MULTIPLIER = 0.2;
-const float CUTOFF = 0.4;
 const float MAX_REFLECTION_LOD = 14.0;
 
 vec3 reflectEnv( vec3 viewSpacePos, vec3 surfaceNormal );
@@ -31,9 +32,9 @@ void main(void) {
 	eyeSpace.xyz /= eyeSpace.w;
 	
 	vec3 L = normalize(eyeSpace.xyz);
-	vec3 N = texture( texture_normal, passTexCoord ).rgb;
-	vec3 PBR = texture( texture_pbr, passTexCoord ).rgb;
-	vec3 kD = texture( texture_diffuse, passTexCoord ).rgb;
+	vec3 N = texture( texture_normal, passTexCoord ).rgb;	// View Space Normals
+	vec3 PBR = texture( texture_pbr, passTexCoord ).rgb;	// Material data (roughness/metalness)
+	vec3 kD = texture( texture_diffuse, passTexCoord ).rgb;	// Diffuse texture (from gbuffer)
 	
 	// Some PBR stuff
 	float metallic = PBR.x;
@@ -45,12 +46,16 @@ void main(void) {
 	vec3 radiance = textureLod( texture_ibl, reflectEnv( L, N ), MAX_REFLECTION_LOD * roughness ).rgb;
 	
 	// Correct radiance (boost brightness)
-	radiance = MULTIPLIER >= 1 ? ((radiance - CUTOFF) * MULTIPLIER) + CUTOFF : radiance * MULTIPLIER;
 	radiance = max( radiance, 0.0 );
+	radiance = pow( radiance, vec3(uSkyBoxLightPower) );
+	radiance = radiance * uSkyBoxLightMultiplier;
 	
 	// Calculate final IBL based on reflectiveness
-	vec3 final = mix( kD + radiance, (kD * radiance) + radiance * 0.25, roughness );
+	vec3 final = mix( kD + radiance, (kD * radiance) + radiance * reflectiveness, roughness );
+	
+	// Scale based on ambient
+	final = final*uAmbient;
 
 	// Write
-	outColor = vec4( final*uAmbient, 1.0 );
+	outColor = vec4( final, 1.0 );
 }

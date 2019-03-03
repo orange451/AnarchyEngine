@@ -52,6 +52,9 @@ public class TextureUtils {
 			return new Image(Color.WHITE,1,1);
 		
 		Image image = new Image( path, flipY );
+		if ( !image.loaded() )
+			image = new Image(Color.BLACK,2,2);
+			
 
 		// Resize if too big
 		int maxRes = MAX_TEXTURE_SIZE;
@@ -110,25 +113,4 @@ public class TextureUtils {
 		
 		return loadTexture(image, near, far, srgb);
 	}
-	
-    public static ByteBuffer loadImageBuffer(Image image, int x, int y, int width, int height, PixelHandler handler, ByteBuffer buffer) {
-        int[] pixels = image.getDataArray();
-
-        if(buffer == null){
-            buffer = BufferUtils.createByteBuffer(width * height * handler.getBytesPerPixel());
-        }
-
-        int startY = y * image.getWidth();
-        int startX = x;
-        for(int yy = 0; yy < height; yy++){
-        	int layer = startY + (yy * image.getWidth());
-            for(int xx = startX; xx < startX + width; xx++){
-            	int pix = pixels[layer + xx];
-                handler.handlePixel(buffer, pix);
-            }
-        }
-
-        buffer.flip();
-        return buffer;
-    }
 }

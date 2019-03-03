@@ -7,18 +7,23 @@ import engine.util.TextureUtils;
 public class SkySphereIBL extends SkySphere {
 	private SkySphereIBL lightSphere;
 	private int buffers;
-	private float lightMultiplier = 1.0f;
+	private float lightMultiplier = 0.8f;
+	private float power = 2.5f;
 	
-	public SkySphereIBL(Image reflection, Image light) {
-		this(reflection, light, SKYBOX_TEXTURE_SIZE);
+	private SkySphereIBL(Image reflection) {
+		this(reflection, SKYBOX_TEXTURE_SIZE);
 	}
 	
-	public SkySphereIBL(Image reflection, Image light, int size) {
+	private SkySphereIBL(Image reflection, int size) {
 		super(reflection, size);
-		
-		if ( reflection != null && light != null ) {
-			lightSphere = new SkySphereIBL(light,null, SKYBOX_TEXTURE_SIZE/2);
-		}
+	}
+	
+	public void setLightPower( float power ) {
+		this.power = power;
+	}
+
+	public float getLightPower() {
+		return power;
 	}
 	
 	@Override
@@ -27,13 +32,9 @@ public class SkySphereIBL extends SkySphere {
 			return true;
 		
 		pipeline.shader_reset();
-		boolean b = super.draw(pipeline);
-		if ( b && lightSphere != null ) {
-			lightSphere.draw(pipeline);
-		}
 		
 		buffers++;
-		return b;
+		return super.draw(pipeline);
 	}
 	
 	public void setLightMultiplier(float i) {
@@ -53,25 +54,11 @@ public class SkySphereIBL extends SkySphere {
 	 * Convenience method to create a SkySphereIBL. For this method to work, your IBL must be structured like this:
 	 * <br>
 	 * <br>
-	 * File 1: office.hdr
-	 * <br>
-	 * File 2: office_env.hdr
-	 * <br>
-	 * <br>
 	 * SkySPhereIBL ibl = SkySphereIBL.create("path/office.hdr");
 	 */
 	public static SkySphereIBL create(String path) {
-		String ref = path;
-		String[] t = path.split("\\.");
-		String extension = "." + t[t.length-1];
-		String base = path.replace(extension, "");
-		String env = base + "_env" + extension;
+		Image refi = TextureUtils.loadImage(path);
 		
-		Image refi = TextureUtils.loadImage(ref);
-		Image envi = TextureUtils.loadImage(env);
-		if ( envi == null )
-			envi = refi;
-		
-		return new SkySphereIBL(refi, envi);
+		return new SkySphereIBL(refi);
 	}
 }

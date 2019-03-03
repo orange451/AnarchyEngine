@@ -7,12 +7,10 @@ import java.net.URL;
 
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
-import org.joml.Vector4f;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 import org.lwjgl.opengl.GL30;
 import engine.gl.Pipeline;
-import engine.gl.Surface;
 import engine.gl.light.PointLightInternal;
 import engine.gl.shader.BaseShader;
 

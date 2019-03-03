@@ -21,10 +21,12 @@ public class IBLHandler {
 		shader.texture_set_stage(shader.shader_get_uniform("texture_diffuse"), pipeline.getGBuffer().getBuffer0(), 1);
 		shader.texture_set_stage(shader.shader_get_uniform("texture_normal"), pipeline.getGBuffer().getBuffer1(), 2);
 		shader.texture_set_stage(shader.shader_get_uniform("texture_pbr"), pipeline.getGBuffer().getBuffer2(), 3);
-		shader.texture_set_stage(shader.shader_get_uniform("texture_ibl"), ((SkySphereIBL)skybox).getLightSphere(), 4);
+		shader.texture_set_stage(shader.shader_get_uniform("texture_ibl"), ((SkySphereIBL)skybox), 4);
 		shader.shader_set_uniform_f(shader.shader_get_uniform("uAmbient"), pipeline.getGBuffer().getAmbient());
 		shader.shader_set_uniform_matrix(shader.shader_get_uniform("uInverseViewMatrix"), pipeline.getGBuffer().getInverseViewMatrix());
 		shader.shader_set_uniform_matrix(shader.shader_get_uniform("uInverseProjectionMatrix"), pipeline.getGBuffer().getInverseProjectionMatrix());
+		shader.shader_set_uniform_f(shader.shader_get_uniform("uSkyBoxLightPower"), ((SkySphereIBL)skybox).getLightPower());
+		shader.shader_set_uniform_f(shader.shader_get_uniform("uSkyBoxLightMultiplier"), ((SkySphereIBL)skybox).getLightMultiplier());
 		pipeline.fullscreenQuad();
 	}
 	

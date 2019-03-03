@@ -28,11 +28,12 @@ public class MergeProcessor implements PostProcessor {
 		shader = new MergeShader();
 		
 		TextureUtils.autoResize = false;
-		//skyBox = new SkyBox(TextureUtils.loadImage("Resources/Testing/skybox.png"));
 		//skyBox = SkySphereIBL.create("Resources/Testing/IBL/apartment.hdr");
 		skyBox = SkySphereIBL.create("Resources/Testing/IBL/office.hdr");
+		//skyBox = SkySphereIBL.create("Resources/Testing/IBL/autoshop_01_2k.hdr");
+		//skyBox = SkySphereIBL.create("Resources/Testing/IBL/koppie.hdr");
 		//skyBox = SkySphereIBL.create("Resources/Testing/IBL/noon_grass.hdr");
-		((SkySphereIBL)skyBox).setLightMultiplier(10);
+		//((SkySphereIBL)skyBox).setLightMultiplier(10);
 		TextureUtils.autoResize = true;
 		skyBoxRotation.rotateX((float) (-Math.PI/2f));
 	}
