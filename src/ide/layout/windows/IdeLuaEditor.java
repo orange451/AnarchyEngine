@@ -5,6 +5,7 @@ import java.util.regex.Pattern;
 
 import engine.lua.type.object.ScriptBase;
 import ide.layout.IdePane;
+import lwjgui.font.Font;
 import lwjgui.font.FontMetaData;
 import lwjgui.font.FontStyle;
 import lwjgui.paint.Color;
@@ -19,6 +20,8 @@ public class IdeLuaEditor extends IdePane {
 		super(script.getName()+".lua", true);
 		
 		code = new CodeArea();
+		code.setFontSize(16);
+		code.setFont(Font.COURIER);
 		code.setFillToParentHeight(true);
 		code.setFillToParentWidth(true);
 		this.getChildren().add(code);

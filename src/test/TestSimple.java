@@ -53,7 +53,6 @@ public class TestSimple extends ClientApplication {
 		material.setRoughness(1.0f);
 		material.setMetalness(1.0f);
 		material.setReflective(0.1f);
-		material.setTransparency(0.5f);
 		
 		// Create prefab
 		Prefab p = Game.assets().newPrefab();

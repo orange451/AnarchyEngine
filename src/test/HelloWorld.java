@@ -31,7 +31,7 @@ public class HelloWorld extends ClientApplication {
 		material.setRoughness(0.1f);
 		material.setMetalness(0.0f);
 		material.setReflective(0.0f);
-		material.setColor(Color3.red());
+		material.setColor(Color3.white());
 		
 		// Create prefab
 		Prefab p = Game.assets().newPrefab();

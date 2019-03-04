@@ -227,7 +227,7 @@ public class IdeExplorer extends IdePane implements GameSubscriber {
 			prefi.setOnAction(event -> {
 				String path = "";
 				PointerBuffer outPath = MemoryUtil.memAllocPointer(1);
-				int result = NativeFileDialog.NFD_OpenDialog("obj,fbx", new File("").getAbsolutePath(), outPath);
+				int result = NativeFileDialog.NFD_OpenDialog("obj,fbx,md5mesh", new File("").getAbsolutePath(), outPath);
 				if ( result == NativeFileDialog.NFD_OKAY ) {
 					path = outPath.getStringUTF8(0);
 					Game.assets().importPrefab(path);

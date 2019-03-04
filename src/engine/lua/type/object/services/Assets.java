@@ -16,6 +16,7 @@ import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.TwoArgFunction;
 import org.luaj.vm2.lib.ZeroArgFunction;
 import org.lwjgl.PointerBuffer;
+import org.lwjgl.assimp.AIAnimation;
 import org.lwjgl.assimp.AIColor4D;
 import org.lwjgl.assimp.AIFace;
 import org.lwjgl.assimp.AIMaterial;
@@ -198,16 +199,26 @@ public class Assets extends Service implements TreeViewable {
 			}
 	
 			// Get scene
-			int flags = aiProcess_JoinIdenticalVertices | aiProcess_Triangulate;
+			int flags = aiProcess_JoinIdenticalVertices | aiProcess_Triangulate | Assimp.aiProcess_GenSmoothNormals;
 			if ( extraFlags > 0 )
 				flags = flags | extraFlags;
 			AIScene scene = Assimp.aiImportFile(file.getAbsolutePath(), flags);
 			if ( scene == null || scene.mNumMeshes() <= 0 )
 				return null;
-	
+			
 			// Get meshes
 			ArrayList<AIMesh> meshes = assimpGetMeshes(scene.mMeshes());
 			ArrayList<AIMaterial> materials = assimpGetMaterials(scene.mMaterials());
+			ArrayList<AIAnimation> animations = assimpGetAnimations(scene.mAnimations());
+			
+			for (int i = 0; i < animations.size(); i++) {
+				AIAnimation animation = animations.get(i);
+				int frames = (int) Math.ceil(animation.mDuration());
+				
+				System.out.println("Found animation: " + animation.mName().dataString() + " ("+frames+")");
+				
+			}
+			
 			for ( int i = 0; i < meshes.size(); i++ ) {
 				AIMesh mesh = meshes.get(i);
 	
@@ -377,6 +388,14 @@ public class Assets extends Service implements TreeViewable {
 			meshes.add( AIMesh.create(mMeshes.get(i)) );
 		}
 		return meshes;
+	}
+
+	private static ArrayList<AIAnimation> assimpGetAnimations(PointerBuffer mAnims) {
+		ArrayList<AIAnimation> array = new ArrayList<AIAnimation>();
+		for ( int i = 0; i < mAnims.remaining(); i++ ) {
+			array.add( AIAnimation.create(mAnims.get(i)) );
+		}
+		return array;
 	}
 
 	private static ArrayList<AIMaterial> assimpGetMaterials(PointerBuffer mMeshes) {

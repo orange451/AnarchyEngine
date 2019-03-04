@@ -6,6 +6,7 @@ import lwjgui.scene.image.ImageView;
 public class Icons {
 	public static final Icons icon_wat = new Icons("wat.gif");
 	public static final Icons icon_cross = new Icons("Cross.png");
+	public static final Icons icon_animation_data = new Icons("AnimationData.png");
 	public static final Icons icon_world = new Icons("World.png");
 	public static final Icons icon_folder = new Icons("Folder.png");
 	public static final Icons icon_asset_folder = new Icons("AssetFolder.png");
