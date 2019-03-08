@@ -69,7 +69,18 @@ public class IdeExplorer extends IdePane implements GameSubscriber {
 		update();
 	}
 
+	private long lastUpdate = -1;
+	private boolean requiresUpdate; // TODO Maybe check in game logic thread if this is true and then force update if lastUpdate hasn't updated in more than 5 ms?
+	
 	public void update() {
+		if (System.currentTimeMillis()-lastUpdate < 5 ) {
+			requiresUpdate = true;
+			return;
+		}
+		
+		lastUpdate = System.currentTimeMillis();
+		requiresUpdate = false;
+		
 		LWJGUI.runLater(() -> {
 			cache2.clear();
 			synchronized(children) {

@@ -5,18 +5,13 @@ import org.luaj.vm2.LuaValue;
 
 import engine.Game;
 import engine.GameSubscriber;
-import engine.InternalGameThread;
 import engine.application.RenderableApplication;
 import engine.gl.light.Light;
 import engine.lua.type.NumberClamp;
 import engine.lua.type.data.Color3;
-import engine.lua.type.data.Matrix4;
 import engine.lua.type.data.Vector3;
 import engine.lua.type.object.LightBase;
-import engine.lua.type.object.Positionable;
 import engine.lua.type.object.TreeViewable;
-import engine.util.AABBUtil;
-import engine.util.Pair;
 import ide.IDE;
 import ide.layout.windows.icons.Icons;
 import lwjgui.paint.Color;

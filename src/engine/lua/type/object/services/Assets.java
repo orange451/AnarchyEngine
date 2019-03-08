@@ -17,6 +17,7 @@ import org.luaj.vm2.lib.TwoArgFunction;
 import org.luaj.vm2.lib.ZeroArgFunction;
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.assimp.AIAnimation;
+import org.lwjgl.assimp.AIBone;
 import org.lwjgl.assimp.AIColor4D;
 import org.lwjgl.assimp.AIFace;
 import org.lwjgl.assimp.AIMaterial;
@@ -27,6 +28,7 @@ import org.lwjgl.assimp.AIString;
 import org.lwjgl.assimp.AIVector3D;
 import org.lwjgl.assimp.Assimp;
 
+import engine.InternalGameThread;
 import engine.gl.mesh.BufferedMesh;
 import engine.gl.mesh.Vertex;
 import engine.lua.type.data.Color3;
@@ -35,6 +37,7 @@ import engine.lua.type.object.AssetLoadable;
 import engine.lua.type.object.Instance;
 import engine.lua.type.object.Service;
 import engine.lua.type.object.TreeViewable;
+import engine.lua.type.object.insts.AnimationData;
 import engine.lua.type.object.insts.AssetFolder;
 import engine.lua.type.object.insts.Material;
 import engine.lua.type.object.insts.Mesh;
@@ -43,6 +46,7 @@ import engine.lua.type.object.insts.Texture;
 import engine.util.FileUtils;
 import engine.util.IOUtil;
 import ide.layout.windows.icons.Icons;
+import lwjgui.LWJGUI;
 
 public class Assets extends Service implements TreeViewable {
 
@@ -219,13 +223,19 @@ public class Assets extends Service implements TreeViewable {
 				
 			}
 			
+			AnimationData aData = null;
+			if ( animations.size() > 0 ) {
+				aData = new AnimationData();
+				aData.forceSetParent(prefab);
+			}
+			
 			for ( int i = 0; i < meshes.size(); i++ ) {
 				AIMesh mesh = meshes.get(i);
 	
 				// Create temp mesh
 				BufferedMesh bm = new BufferedMesh( mesh.mNumFaces() * 3 );
 				int vertCounter = 0;
-	
+				
 				// Get every face in mesh
 				org.lwjgl.assimp.AIVector3D.Buffer vertices = mesh.mVertices();
 				org.lwjgl.assimp.AIVector3D.Buffer normals = mesh.mNormals();
@@ -271,7 +281,17 @@ public class Assets extends Service implements TreeViewable {
 				mm.setMesh(bm);
 				mm.forceSetParent(mm.getPreferredParent());
 	
+				// Check for bones
+				if ( aData != null ) {
+					aData.processBones(mm, mesh.mBones());
+				}
+				
 				prefab.addModel(mm, tm);
+			}
+
+			// Add animations
+			if ( aData != null ) {
+				aData.processAnimations(animations);
 			}
 			System.out.println("Loaded");
 			
@@ -305,6 +325,7 @@ public class Assets extends Service implements TreeViewable {
 		{
 			if ( diffuse != null ) {
 				Texture t1 = new Texture();
+				t1.forceSetName(diffuse.replace(baseDir, ""));
 				t1.setSRGB(true);
 				t1.setFilePath(diffuse);
 				t1.forceSetParent(t1.getPreferredParent());
@@ -313,6 +334,7 @@ public class Assets extends Service implements TreeViewable {
 			
 			if ( normal != null ) {
 				Texture t2 = new Texture();
+				t2.forceSetName(normal.replace(baseDir, ""));
 				t2.setFilePath(normal);
 				t2.forceSetParent(t2.getPreferredParent());
 				tm.setNormalMap(t2);
@@ -320,6 +342,7 @@ public class Assets extends Service implements TreeViewable {
 			
 			if ( specular != null ) {
 				Texture t3 = new Texture();
+				t3.forceSetName(specular.replace(baseDir, ""));
 				t3.setFilePath(specular);
 				t3.forceSetParent(t3.getPreferredParent());
 				tm.setMetalMap(t3);
@@ -327,6 +350,7 @@ public class Assets extends Service implements TreeViewable {
 			
 			if ( glossy != null ) {
 				Texture t4 = new Texture();
+				t4.forceSetName(glossy.replace(baseDir, ""));
 				t4.setFilePath(glossy);
 				t4.forceSetParent(t4.getPreferredParent());
 				tm.setRoughMap(t4);

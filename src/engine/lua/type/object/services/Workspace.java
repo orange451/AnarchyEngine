@@ -113,6 +113,6 @@ public class Workspace extends Service implements TreeViewable,Tickable,RunScrip
 	}
 
 	public PhysicsWorld getPhysicsWorld() {
-		return this.physicsWorld;
+		return Workspace.physicsWorld;
 	}
 }

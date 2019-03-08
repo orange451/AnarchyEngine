@@ -52,9 +52,6 @@ public class TextureUtils {
 			return new Image(Color.WHITE,1,1);
 		
 		Image image = new Image( path, flipY );
-		if ( !image.loaded() )
-			image = new Image(Color.BLACK,2,2);
-			
 
 		// Resize if too big
 		int maxRes = MAX_TEXTURE_SIZE;

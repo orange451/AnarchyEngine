@@ -404,9 +404,9 @@ public abstract class Instance extends LuaInstancetype {
 				
 				// Add to children list
 				List<Instance> newParentChildren = newParInst.getChildren();
-				synchronized(newParentChildren) {
+				//synchronized(newParentChildren) {
 					newParentChildren.add(this);
-				}
+				//}
 				
 				// Fire added event
 				((LuaEvent)newParInst.rawget("ChildAdded")).fire(this);
