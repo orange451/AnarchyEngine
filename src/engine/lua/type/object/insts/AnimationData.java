@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.joml.Matrix4f;
 import org.luaj.vm2.LuaValue;
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.assimp.AIAnimation;
@@ -14,6 +15,7 @@ import org.lwjgl.assimp.AIQuatKey;
 import org.lwjgl.assimp.AIVectorKey;
 import org.lwjgl.assimp.AIVertexWeight;
 
+import engine.lua.type.data.Matrix4;
 import engine.lua.type.object.Instance;
 import engine.lua.type.object.TreeViewable;
 import ide.layout.windows.icons.Icons;
@@ -155,8 +157,22 @@ public class AnimationData extends Instance implements TreeViewable {
 				
 				HashMap<Bone, TempKeyframe> keyframes = entry.getValue();
 				for (Map.Entry<Bone,TempKeyframe> entryK : keyframes.entrySet()) {
+					Matrix4f offsetMatrix = new Matrix4f();
+					offsetMatrix.translate(
+							entryK.getValue().position.mValue().x(),
+							entryK.getValue().position.mValue().y(),
+							entryK.getValue().position.mValue().z()
+						);
+					offsetMatrix.rotate(
+							entryK.getValue().rotation.mValue().w(),
+							entryK.getValue().rotation.mValue().x(),
+							entryK.getValue().rotation.mValue().y(),
+							entryK.getValue().rotation.mValue().z()
+						);
+					
 					AnimationKeyframe keyframe = new AnimationKeyframe();
 					keyframe.forceset("Bone", entryK.getKey());
+					keyframe.forceset("Matrix", new Matrix4(offsetMatrix));
 					keyframe.forceSetName(entryK.getKey().getName());
 					keyframe.forceSetParent(seq);
 				}
