@@ -83,6 +83,7 @@ public class JVMUtil {
 				String line;
 
 				while ((line = br.readLine()) != null) {
+					Thread.sleep(10);
 					System.out.println(line);
 				}
 				System.exit(0);
@@ -134,6 +135,7 @@ public class JVMUtil {
 					String line;
 
 					while ((line = br.readLine()) != null) {
+						Thread.sleep(10);
 						System.out.println(line);
 					}
 					process.waitFor();

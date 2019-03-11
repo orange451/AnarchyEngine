@@ -57,6 +57,11 @@ public class LuaEngine {
 		}
 	}
 	
+	/**
+	 * Every object inside engine.lua.type.objects.insts needs to be instantiated ONCE at run-time.
+	 * <br>
+	 * Ideally we should have a function that finds all these objects and creates them for us...
+	 */
 	private static void loadDataTypesTEMP() {
 		
 		// Vars
@@ -83,7 +88,18 @@ public class LuaEngine {
 		new Texture();
 		new PlayerScripts();
 		new PointLight();
+		
+		// Animation objects
 		new AnimationData();
+		new Animation();
+		new AnimationKeyframe();
+		new AnimationKeyframeSequence();
+		new Animations();
+		new Bone();
+		new Bones();
+		new BoneTree();
+		new BoneTreeNode();
+		new BoneWeight();
 	}
 	
 	/*private static void loadDataTypes(String packageName) {

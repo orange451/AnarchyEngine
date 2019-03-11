@@ -84,7 +84,7 @@ public class Sync {
 		try {
 			// sleep until the average sleep time is greater than the time remaining till nextFrame
 			for (long t0 = getTime(), t1; (nextFrame - t0) > sleepDurations.avg(); t0 = t1) {
-				Thread.sleep(1);
+				Thread.sleep(2);
 				sleepDurations.add((t1 = getTime()) - t0); // update average sleep time
 			}
 	

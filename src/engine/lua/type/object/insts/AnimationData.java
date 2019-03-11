@@ -2,6 +2,7 @@ package engine.lua.type.object.insts;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -10,6 +11,8 @@ import org.luaj.vm2.LuaValue;
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.assimp.AIAnimation;
 import org.lwjgl.assimp.AIBone;
+import org.lwjgl.assimp.AIMatrix4x4;
+import org.lwjgl.assimp.AINode;
 import org.lwjgl.assimp.AINodeAnim;
 import org.lwjgl.assimp.AIQuatKey;
 import org.lwjgl.assimp.AIVectorKey;
@@ -51,23 +54,24 @@ public class AnimationData extends Instance implements TreeViewable {
 		return Icons.icon_animation_data;
 	}
 
-	public void processBones(Mesh mesh, PointerBuffer mBones) {
+	public void processBones(Mesh mesh, Instance boneData, PointerBuffer mBones) {
 		if ( mBones == null )
 			return;
 
-		Instance boneData = this.findFirstChild("Bones");
-		if ( this.findFirstChild("Bones") == null ) {
-			boneData = new Bones();
-			boneData.forceSetParent(this);
-		}
-
 		for (int a = 0; a < mBones.remaining(); a++) {
 			AIBone bone = AIBone.create(mBones.get(a));
+			AIMatrix4x4 mOff = bone.mOffsetMatrix();
+			Matrix4f offsetMat = new Matrix4f(
+					mOff.a1(), mOff.a2(), mOff.a3(), mOff.a4(),
+					mOff.b1(), mOff.b2(), mOff.b3(), mOff.b4(),
+					mOff.c1(), mOff.c2(), mOff.c3(), mOff.c4(),
+					mOff.d1(), mOff.d2(), mOff.d3(), mOff.d4()
+				);
 
 			Bone b = new Bone();
-			b.forceset("Mesh", mesh);
+			b.rawset("Mesh", mesh);
+			b.rawset("OffsetMatrix", new Matrix4(offsetMat));
 			b.forceSetName(bone.mName().dataString());
-			b.forceSetParent(boneData);
 
 			for (int i = 0; i < bone.mNumWeights(); i++) {
 				AIVertexWeight weight = bone.mWeights().get(i);
@@ -77,15 +81,36 @@ public class AnimationData extends Instance implements TreeViewable {
 				w.forceset("Weight", LuaValue.valueOf(weight.mWeight()));
 				w.forceSetParent(b);
 			}
+			
+			b.forceSetParent(boneData);
 		}
+	}
+	
+	public void processBoneTree(AINode node, Instance parent) {
+		if ( parent == null ) {
+			Instance boneTree = this.findFirstChild("BoneTree");
+			if ( boneTree == null )
+				boneTree = new BoneTree();
+			boneTree.forceSetParent(this);
+			parent = boneTree;
+		}
+		
+		BoneTreeNode t = new BoneTreeNode();
+		t.forceSetName(node.mName().dataString());
+		
+		for (int i = 0; i < node.mNumChildren(); i++) {
+			AINode child = AINode.create(node.mChildren().get(i));
+			processBoneTree( child, t );
+		}
+		
+		t.forceSetParent(parent);
 	}
 
 	public void processAnimations(ArrayList<AIAnimation> animations) {
-		Instance a = this.findFirstChild("Animations");
-		if ( this.findFirstChild("Animations") == null ) {
-			a = new Animations();
-			a.forceSetParent(this);
-		}
+		
+		Instance anim = this.findFirstChild("Animations");
+		if ( anim == null )
+			anim = new Animations();
 
 		for (int i = 0; i < animations.size(); i++) {
 			AIAnimation aiAnimation = animations.get(i);
@@ -106,44 +131,47 @@ public class AnimationData extends Instance implements TreeViewable {
 				if ( bones == null )
 					continue;
 
-				Instance bone = bones.findFirstChild(nodeData.mNodeName().dataString());
-				if ( bone == null || !(bone instanceof Bone))
-					continue;
-
-				// Add in positions
-				for (int k = 0; k < nodeData.mNumPositionKeys(); k++) {
-					AIVectorKey key = nodeData.mPositionKeys().get(k);
-					Double time = key.mTime();
-
-					if ( !temp.containsKey(time) ) {
-						temp.put(time, new HashMap<Bone,TempKeyframe>());
+				List<Instance> boneList = bones.getChildrenWithName(nodeData.mNodeName().dataString());
+				for (int a = 0; a < boneList.size(); a++) {
+					Instance bone = boneList.get(a);
+					if ( bone == null || !(bone instanceof Bone))
+						continue;
+	
+					// Add in positions
+					for (int k = 0; k < nodeData.mNumPositionKeys(); k++) {
+						AIVectorKey key = nodeData.mPositionKeys().get(k);
+						Double time = key.mTime();
+	
+						if ( !temp.containsKey(time) ) {
+							temp.put(time, new HashMap<Bone,TempKeyframe>());
+						}
+	
+						HashMap<Bone, TempKeyframe> keyframes = temp.get(time);
+						if ( !keyframes.containsKey(bone) ) {
+							keyframes.put((Bone) bone, new TempKeyframe((Bone) bone));
+						}
+						
+						TempKeyframe keyframeModifier = keyframes.get(bone);
+						keyframeModifier.position = key;
 					}
-
-					HashMap<Bone, TempKeyframe> keyframes = temp.get(time);
-					if ( !keyframes.containsKey(bone) ) {
-						keyframes.put((Bone) bone, new TempKeyframe((Bone) bone));
+	
+					// Add in rotations
+					for (int k = 0; k < nodeData.mNumRotationKeys(); k++) {
+						AIQuatKey key = nodeData.mRotationKeys().get(k);
+						Double time = key.mTime();
+	
+						if ( !temp.containsKey(time) ) {
+							temp.put(time, new HashMap<Bone,TempKeyframe>());
+						}
+	
+						HashMap<Bone, TempKeyframe> keyframes = temp.get(time);
+						if ( !keyframes.containsKey(bone) ) {
+							keyframes.put((Bone) bone, new TempKeyframe((Bone) bone));
+						}
+						
+						TempKeyframe keyframeModifier = keyframes.get(bone);
+						keyframeModifier.rotation = key;
 					}
-					
-					TempKeyframe keyframeModifier = keyframes.get(bone);
-					keyframeModifier.position = key;
-				}
-
-				// Add in rotations
-				for (int k = 0; k < nodeData.mNumRotationKeys(); k++) {
-					AIQuatKey key = nodeData.mRotationKeys().get(k);
-					Double time = key.mTime();
-
-					if ( !temp.containsKey(time) ) {
-						temp.put(time, new HashMap<Bone,TempKeyframe>());
-					}
-
-					HashMap<Bone, TempKeyframe> keyframes = temp.get(time);
-					if ( !keyframes.containsKey(bone) ) {
-						keyframes.put((Bone) bone, new TempKeyframe((Bone) bone));
-					}
-					
-					TempKeyframe keyframeModifier = keyframes.get(bone);
-					keyframeModifier.rotation = key;
 				}
 			}
 			
@@ -180,8 +208,10 @@ public class AnimationData extends Instance implements TreeViewable {
 				seq.forceSetParent(animObject);
 			}
 
-			animObject.forceSetParent(a);
+			animObject.forceSetParent(anim);
 		}
+
+		anim.forceSetParent(this);
 	}
 	
 	static class TempKeyframe {

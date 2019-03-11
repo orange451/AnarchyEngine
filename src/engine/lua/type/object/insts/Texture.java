@@ -3,13 +3,10 @@ package engine.lua.type.object.insts;
 import org.luaj.vm2.LuaValue;
 
 import engine.Game;
-import engine.InternalGameThread;
-import engine.InternalRenderThread;
 import engine.gl.Resources;
 import engine.gl.Texture2D;
 import engine.io.AsynchronousImage;
 import engine.io.FileResource;
-import engine.io.Image;
 import engine.lua.type.LuaEvent;
 import engine.lua.type.object.AssetLoadable;
 import engine.lua.type.object.Instance;

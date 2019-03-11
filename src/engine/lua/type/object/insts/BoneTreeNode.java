@@ -1,19 +1,14 @@
 package engine.lua.type.object.insts;
 
 import org.luaj.vm2.LuaValue;
-
-import engine.lua.type.data.Matrix4;
 import engine.lua.type.object.Instance;
 import engine.lua.type.object.TreeViewable;
 import ide.layout.windows.icons.Icons;
 
-public class Bone extends Instance implements TreeViewable {
+public class BoneTreeNode extends Instance implements TreeViewable {
 
-	public Bone() {
-		super("Bone");
-		
-		this.defineField("Mesh", LuaValue.NIL, true);
-		this.defineField("OffsetMatrix", new Matrix4(), true);
+	public BoneTreeNode() {
+		super("BoneTree");
 		
 		this.setLocked(true);
 		this.setInstanceable(false);
@@ -23,7 +18,7 @@ public class Bone extends Instance implements TreeViewable {
 
 	@Override
 	protected LuaValue onValueSet(LuaValue key, LuaValue value) {
-		return value;
+		return value;	
 	}
 
 	@Override

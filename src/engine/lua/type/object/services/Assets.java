@@ -39,6 +39,7 @@ import engine.lua.type.object.Service;
 import engine.lua.type.object.TreeViewable;
 import engine.lua.type.object.insts.AnimationData;
 import engine.lua.type.object.insts.AssetFolder;
+import engine.lua.type.object.insts.Bones;
 import engine.lua.type.object.insts.Material;
 import engine.lua.type.object.insts.Mesh;
 import engine.lua.type.object.insts.Prefab;
@@ -210,23 +211,18 @@ public class Assets extends Service implements TreeViewable {
 			if ( scene == null || scene.mNumMeshes() <= 0 )
 				return null;
 			
-			// Get meshes
+			// Get data
 			ArrayList<AIMesh> meshes = assimpGetMeshes(scene.mMeshes());
 			ArrayList<AIMaterial> materials = assimpGetMaterials(scene.mMaterials());
 			ArrayList<AIAnimation> animations = assimpGetAnimations(scene.mAnimations());
-			
-			for (int i = 0; i < animations.size(); i++) {
-				AIAnimation animation = animations.get(i);
-				int frames = (int) Math.ceil(animation.mDuration());
-				
-				System.out.println("Found animation: " + animation.mName().dataString() + " ("+frames+")");
-				
-			}
-			
+
+			// Create animation data folder
 			AnimationData aData = null;
+			Instance boneData = null;
 			if ( animations.size() > 0 ) {
 				aData = new AnimationData();
 				aData.forceSetParent(prefab);
+				boneData = new Bones();
 			}
 			
 			for ( int i = 0; i < meshes.size(); i++ ) {
@@ -283,7 +279,7 @@ public class Assets extends Service implements TreeViewable {
 	
 				// Check for bones
 				if ( aData != null ) {
-					aData.processBones(mm, mesh.mBones());
+					aData.processBones(mm, boneData, mesh.mBones());
 				}
 				
 				prefab.addModel(mm, tm);
@@ -291,7 +287,9 @@ public class Assets extends Service implements TreeViewable {
 
 			// Add animations
 			if ( aData != null ) {
+				boneData.forceSetParent(aData);
 				aData.processAnimations(animations);
+				aData.processBoneTree(scene.mRootNode(), null);
 			}
 			System.out.println("Loaded");
 			
@@ -408,6 +406,10 @@ public class Assets extends Service implements TreeViewable {
 
 	private static ArrayList<AIMesh> assimpGetMeshes(PointerBuffer mMeshes) {
 		ArrayList<AIMesh> meshes = new ArrayList<AIMesh>();
+		
+		if ( mMeshes == null )
+			return meshes;
+		
 		for ( int i = 0; i < mMeshes.remaining(); i++ ) {
 			meshes.add( AIMesh.create(mMeshes.get(i)) );
 		}
@@ -416,6 +418,10 @@ public class Assets extends Service implements TreeViewable {
 
 	private static ArrayList<AIAnimation> assimpGetAnimations(PointerBuffer mAnims) {
 		ArrayList<AIAnimation> array = new ArrayList<AIAnimation>();
+
+		if ( mAnims == null )
+			return array;
+		
 		for ( int i = 0; i < mAnims.remaining(); i++ ) {
 			array.add( AIAnimation.create(mAnims.get(i)) );
 		}

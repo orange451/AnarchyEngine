@@ -610,14 +610,18 @@ public abstract class Instance extends LuaInstancetype {
 
 	public List<Instance> getChildrenWithName(String name) {
 		List<Instance> ret = new ArrayList<Instance>();
-		synchronized(children) {
-			for (int i = 0; i < children.size(); i++) {
-				Instance child = children.get(i);
-				String cName = child.get("Name").toString();
-				if ( cName.equals(name) ) {
-					ret.add(child);
-				}
-			}
+		
+		for (int i = 0; i < children.size(); i++) {
+			if ( i >= children.size() )
+				continue;
+			Instance child = children.get(i);
+			if ( child == null )
+				continue;
+			
+			String cName = child.get("Name").toString();
+			if ( cName.equals(name) ) {
+				ret.add(child);
+			}			
 		}
 
 		return ret;

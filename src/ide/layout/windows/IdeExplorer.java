@@ -73,7 +73,7 @@ public class IdeExplorer extends IdePane implements GameSubscriber {
 	private boolean requiresUpdate; // TODO Maybe check in game logic thread if this is true and then force update if lastUpdate hasn't updated in more than 5 ms?
 	
 	public void update() {
-		if (System.currentTimeMillis()-lastUpdate < 5 ) {
+		if (System.currentTimeMillis()-lastUpdate < 50 ) {
 			requiresUpdate = true;
 			return;
 		}
@@ -96,6 +96,7 @@ public class IdeExplorer extends IdePane implements GameSubscriber {
 	}
 
 	private void list(TreeBase<Instance> treeItem, Instance root) {
+		lastUpdate = System.currentTimeMillis();
 		// Remove objects whos parents are gone/changed
 		for (int i = 0; i < treeItem.getItems().size(); i++) {
 			TreeItem<Instance> t = treeItem.getItems().get(i);
@@ -325,6 +326,9 @@ public class IdeExplorer extends IdePane implements GameSubscriber {
 
 	@Override
 	public void gameUpdateEvent(boolean important) {
+		if ( !important )
+			return;
+		
 		update();
 	}
 }

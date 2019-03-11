@@ -71,7 +71,7 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 		if ( !Game.isLoaded() )
 			return;
 		
-		if ( System.currentTimeMillis()-lastUpdate < 5 )
+		if ( System.currentTimeMillis()-lastUpdate < 50 )
 			return;
 		lastUpdate = System.currentTimeMillis();
 		
