@@ -6,7 +6,7 @@ import engine.lua.type.object.TreeViewable;
 import ide.layout.windows.icons.Icons;
 
 public class Bones extends Instance implements TreeViewable {
-
+	
 	public Bones() {
 		super("Bones");
 		
@@ -14,6 +14,13 @@ public class Bones extends Instance implements TreeViewable {
 		this.setInstanceable(false);
 
 		this.getField("Archivable").setLocked(true);
+		
+		this.childAddedEvent().connect((args)->{
+			LuaValue c = args[0];
+			if ( c instanceof Bone ) {
+				System.out.println("Adding bone " + c);
+			}
+		});
 	}
 
 	@Override

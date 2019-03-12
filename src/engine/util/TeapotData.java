@@ -49,6 +49,8 @@ public class TeapotData {
 	public static BufferedMesh mesh( float radius ) {
 		if ( mesh == null ) {
 			
+			Vector3f center = new Vector3f();
+			
 			// Generate all the triangles of the teapot
 			ArrayList<Triangle> tris = new ArrayList<Triangle>();
 			for (int i = 0; i < TOTAL_FACES; i++) {
@@ -86,6 +88,10 @@ public class TeapotData {
 				rotMat.transformDirection(normal1);
 				rotMat.transformDirection(normal2);
 				rotMat.transformDirection(normal3);
+
+				center.add(position1);
+				center.add(position2);
+				center.add(position3);
 				
 				// Add vertices to triangle
 				t.addVertex( new Vertex( position1.x, position1.y, position1.z, normal1.x, normal1.y, normal1.z, 0, 0) );
@@ -94,15 +100,20 @@ public class TeapotData {
 				tris.add(t);
 			}
 			
+			center.div(TOTAL_FACES*3);
+			center.mul(-1);
+			
 			// Create & cache the teapot mesh.
 			int pointer = 0;
 			mesh = new BufferedMesh( tris.size() * 3 );
 			for (int i = 0; i < tris.size(); i++) {
 				Triangle triangle = tris.get(i);
-				mesh.setVertex(pointer++, triangle.getVertex(0));
-				mesh.setVertex(pointer++, triangle.getVertex(1));
-				mesh.setVertex(pointer++, triangle.getVertex(2));
+				mesh.setVertex(pointer++, triangle.getVertex(0).add(center));
+				mesh.setVertex(pointer++, triangle.getVertex(1).add(center));
+				mesh.setVertex(pointer++, triangle.getVertex(2).add(center));
 			}
+			
+			System.out.println(center);
 		}
 		
 		// Return a copy of the teapot mesh.

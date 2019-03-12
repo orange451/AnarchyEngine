@@ -2,6 +2,8 @@ package engine.gl.mesh;
 
 import java.util.Arrays;
 
+import org.joml.Vector3f;
+
 public class Vertex {
 	// Vertex data
 	private float[] v_xyz = new float[] {0f, 0f, 0f};
@@ -128,5 +130,12 @@ public class Vertex {
 
 	public boolean equalsLoose(Vertex vertex) {
 		return Arrays.equals(v_xyz, vertex.v_xyz);
+	}
+
+	public Vertex add(Vector3f offset) {
+		v_xyz[0] += offset.x;
+		v_xyz[1] += offset.y;
+		v_xyz[2] += offset.z;
+		return this;
 	}
 }

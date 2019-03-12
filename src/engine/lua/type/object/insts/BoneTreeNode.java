@@ -8,7 +8,7 @@ import ide.layout.windows.icons.Icons;
 public class BoneTreeNode extends Instance implements TreeViewable {
 
 	public BoneTreeNode() {
-		super("BoneTree");
+		super("BoneTreeNode");
 		
 		this.setLocked(true);
 		this.setInstanceable(false);

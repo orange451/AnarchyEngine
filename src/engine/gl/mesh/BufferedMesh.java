@@ -432,7 +432,8 @@ public class BufferedMesh implements RenderableMesh {
 			}
 			
 		} catch(Exception e ) {
-			e.printStackTrace();
+			//e.printStackTrace();
+			System.out.println("Could not load mesh: " + filepath);
 		}
 		
 		return ret;

@@ -355,7 +355,7 @@ public class Save {
 			String filePath = a.getFilePath();
 			filePath = filePath.replace("%PROJECT%", new File(Game.saveDirectory).getAbsolutePath());
 			
-			if ( filePath != null && filePath.length() > 0 ) {
+			if ( filePath != null && filePath.length() > 3 ) {
 				String fileName = FileUtils.getFileNameFromPath(filePath);
 				String fileNameEx = FileUtils.getFileNameWithoutExtension(fileName);
 				String fileExtension = FileUtils.getFileExtension(filePath);

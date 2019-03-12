@@ -133,7 +133,7 @@ public final class BinaryInputStream {
 			fillBuffer();
 		}
 		catch (IOException ioe) {
-			ioe.printStackTrace();
+			//ioe.printStackTrace();
 			System.err.println("Could not open " + name);
 		}
 	}
