@@ -4,7 +4,7 @@ import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.TwoArgFunction;
 import org.lwjgl.glfw.GLFW;
 
-public class CustomEnums extends TwoArgFunction {
+public class Enums extends TwoArgFunction {
 
 	public LuaValue call(LuaValue modname, LuaValue env) {
 		env.set("Enum", new EnumTable());

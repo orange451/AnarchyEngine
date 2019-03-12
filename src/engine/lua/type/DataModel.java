@@ -9,7 +9,7 @@ import org.luaj.vm2.lib.OneArgFunction;
 import engine.lua.LuaEngine;
 import engine.lua.type.object.Instance;
 
-public abstract class LuaInstancetype extends LuaDatatype {
+public abstract class DataModel extends LuaDatatype {
 	protected static HashMap<String,LuaInstancetypeData> TYPES = new HashMap<String,LuaInstancetypeData>();
 	class LuaInstancetypeData {
 		Class<?> instanceableClass;
@@ -30,7 +30,7 @@ public abstract class LuaInstancetype extends LuaDatatype {
 				if ( c != null ) {
 					if ( c.instanceable ) {
 						try {
-							return (LuaInstancetype) c.instanceableClass.newInstance();
+							return (DataModel) c.instanceableClass.newInstance();
 						} catch (Exception e) {
 							//
 						}
@@ -45,7 +45,7 @@ public abstract class LuaInstancetype extends LuaDatatype {
 		LuaEngine.globals.set("Instance", table);
 	}
 
-	public LuaInstancetype(String name) {
+	public DataModel(String name) {
 		if ( !TYPES.containsKey(name) ) {
 			TYPES.put(name, new LuaInstancetypeData(this.getClass()));
 		}
@@ -107,13 +107,13 @@ public abstract class LuaInstancetype extends LuaDatatype {
 		return (LuaEvent)this.rawget("DescendantRemoved");
 	}
 	
-	public static LuaInstancetype instance(String type) {
+	public static DataModel instance(String type) {
 		if ( type == null )
 			return null;
 		
 		LuaInstancetypeData c = TYPES.get(type);
 		try {
-			return (LuaInstancetype) c.instanceableClass.getDeclaredConstructor().newInstance();
+			return (DataModel) c.instanceableClass.getDeclaredConstructor().newInstance();
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

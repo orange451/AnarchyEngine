@@ -6,6 +6,7 @@ import org.luaj.vm2.LuaNumber;
 import org.luaj.vm2.LuaString;
 import org.luaj.vm2.LuaValue;
 
+import engine.lua.lib.EnumType;
 import engine.lua.type.object.Instance;
 
 public class LuaField {
@@ -13,7 +14,8 @@ public class LuaField {
 	private Class<?> fieldType;
 	private boolean canModify;
 	protected boolean isInstance;
-	private Clamp clamp;
+	private Clamp<?> clamp;
+	private EnumType enumType;
 
 	public LuaField(String fieldName, Class<?> fieldType, boolean isFinal) {
 		this.fieldName = fieldName;
@@ -86,5 +88,13 @@ public class LuaField {
 
 	public void setClamp(Clamp<?> clamp) {
 		this.clamp = clamp;
+	}
+
+	public void setEnum(EnumType enumType) {
+		this.enumType = enumType;
+	}
+	
+	public EnumType getEnumType() {
+		return this.enumType;
 	}
 }

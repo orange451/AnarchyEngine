@@ -11,7 +11,7 @@ import org.luaj.vm2.compiler.LuaC;
 import org.luaj.vm2.lib.*;
 import org.luaj.vm2.lib.jse.*;
 
-import engine.lua.lib.CustomEnums;
+import engine.lua.lib.Enums;
 import engine.lua.lib.GameEngineLib;
 import engine.lua.lib.PreventInfiniteInstructions;
 import engine.lua.type.*;
@@ -39,7 +39,7 @@ public class LuaEngine {
 		globals.load(new JseOsLib());
 		globals.load(new PreventInfiniteInstructions());
 		globals.load(new GameEngineLib());
-		globals.load(new CustomEnums());
+		globals.load(new Enums());
 		LoadState.install(globals);
 		LuaC.install(globals);
 		

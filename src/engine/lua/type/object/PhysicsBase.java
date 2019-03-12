@@ -7,6 +7,7 @@ import org.luaj.vm2.LuaValue;
 
 import engine.Game;
 import engine.GameSubscriber;
+import engine.lua.lib.EnumType;
 import engine.lua.network.InternalClient;
 import engine.lua.network.InternalServer;
 import engine.lua.network.internal.InstanceUpdateUDP;
@@ -52,6 +53,8 @@ public abstract class PhysicsBase extends Instance implements GameSubscriber {
 		this.getField("LinearDamping").setClamp(new NumberClamp(0, 1));
 		
 		this.defineField("Shape", LuaValue.valueOf("Box"), false);
+		this.getField("Shape").setEnum(new EnumType("Shape"));
+		
 		this.defineField("Velocity", Vector3.newInstance(0, 0, 0), false);
 		this.defineField("WorldMatrix", new Matrix4(), false);
 		this.defineField("UseCustomMesh", LuaValue.valueOf(false), false);

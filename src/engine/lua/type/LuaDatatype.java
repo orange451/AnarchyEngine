@@ -9,6 +9,8 @@ import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.jse.CoerceJavaToLua;
 
 import engine.Game;
+import engine.lua.LuaEngine;
+import engine.lua.lib.Enums;
 import engine.lua.type.object.Instance;
 
 public abstract class LuaDatatype extends LuaTable {
@@ -194,14 +196,24 @@ public abstract class LuaDatatype extends LuaTable {
 					return;
 				}
 				
+				// Clamp the value (will only clamp if a clamp was defined)
 				LuaValue t = f.clamp(value);
 				if ( t != value ) {
 					value = t;
 				}
+				
+				// If it needs to be an enum, check here
+				if ( f.getEnumType() != null ) {
+					LuaValue tab = LuaEngine.globals.get("Enum");
+					LuaValue enu = tab.get(f.getEnumType().getType());
+					
+					if ( enu.get(value).isnil() ) {
+						LuaValue.error("Cannot set field " + key.toString() + ". Enum type mismatch.");
+					}
+				}
 			}
 		}
 
-		
 		LuaValue newSet = value;
 		if ( !key.toString().equals("Name") && !key.toString().equals("Parent") ) {
 			newSet = onValueSet(key,value);

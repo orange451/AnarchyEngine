@@ -13,6 +13,8 @@ import org.lwjgl.util.nfd.NativeFileDialog;
 
 import engine.Game;
 import engine.GameSubscriber;
+import engine.lua.LuaEngine;
+import engine.lua.lib.LuaTableReadOnly;
 import engine.lua.type.LuaValuetype;
 import engine.lua.type.data.Color3;
 import engine.lua.type.object.Instance;
@@ -21,13 +23,16 @@ import ide.IDEFilePath;
 import ide.layout.IdePane;
 import lwjgui.paint.Color;
 import lwjgui.LWJGUI;
+import lwjgui.collections.ObservableList;
 import lwjgui.font.FontStyle;
 import lwjgui.geometry.Insets;
 import lwjgui.geometry.Pos;
 import lwjgui.scene.Node;
 import lwjgui.scene.Region;
+import lwjgui.scene.control.Button;
 import lwjgui.scene.control.CheckBox;
 import lwjgui.scene.control.ColorPicker;
+import lwjgui.scene.control.ComboBox;
 import lwjgui.scene.control.Label;
 import lwjgui.scene.control.ScrollPane;
 import lwjgui.scene.control.ScrollPane.ScrollBarPolicy;
@@ -130,6 +135,11 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 		boolean editable = instance.getField(field).canModify();
 		if ( (field.equals("Name") || field.equals("Parent")) && instance.isLocked() )
 			editable = false;
+		
+		// Enum modifier
+		if ( instance.getField(field).getEnumType() != null ) {
+			return new EnumPropertyModifier(instance, field, value, editable);
+		}
 		
 		// Edit a filepath
 		if ( field.equals("FilePath") )
@@ -239,6 +249,44 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 				});
 			}
 		}
+	}
+	
+	static class EnumPropertyModifier extends PropertyModifier {
+		public EnumPropertyModifier(Instance instance, String field, LuaValue value, boolean editable) {
+			super(instance, field, value, editable);
+			
+			this.dropdown = new ComboBox<String>() {
+				@Override
+				public void resize() {
+					super.resize();
+					for (int i = 0; i < this.buttons.size(); i++) {
+						Button button = this.buttons.get(i);
+						button.setPadding(new Insets(0,8,0,8));
+						button.setMaxHeight(16);
+					}
+				}
+			};
+			String enumName = instance.getField(field).getEnumType().getType();
+			LuaTableReadOnly enm = (LuaTableReadOnly) LuaEngine.globals.get("Enum").rawget(enumName);
+			LuaValue[] keys = enm.keys();
+			for (int i = 0; i < keys.length; i++) {
+				String type = keys[i].toString();
+				dropdown.getItems().add(type);
+			}
+			this.setPadding(Insets.EMPTY);
+			this.dropdown.setMaxHeight(16);
+			this.dropdown.setPrefWidth(100);
+			this.dropdown.setValue(instance.get(field).toString());
+			this.getChildren().add(dropdown);
+			
+			if ( editable ) {
+				this.dropdown.setOnAction((event)->{
+					instance.set(field, LuaValue.valueOf(this.dropdown.getValue()));
+				});
+			}
+		}
+
+		private ComboBox<String> dropdown;
 	}
 	
 	static abstract class PropertyModifierInput extends PropertyModifierTemp {

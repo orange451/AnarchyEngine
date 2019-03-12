@@ -17,10 +17,10 @@ import engine.Game;
 import engine.lua.LuaEngine;
 import engine.lua.type.LuaEvent;
 import engine.lua.type.LuaField;
-import engine.lua.type.LuaInstancetype;
+import engine.lua.type.DataModel;
 import engine.lua.type.LuaValuetype;
 
-public abstract class Instance extends LuaInstancetype {
+public abstract class Instance extends DataModel {
 	private List<Instance> children = Collections.synchronizedList(new ArrayList<Instance>());
 	private HashSet<Instance> descendents = new HashSet<Instance>();
 	private List<InstancePropertySubscriber> propertySubscribers = Collections.synchronizedList(new ArrayList<InstancePropertySubscriber>());
@@ -192,7 +192,7 @@ public abstract class Instance extends LuaInstancetype {
 		}
 		
 		// Create an instance of the desired class (SLOW)
-		LuaInstancetype instance2 = LuaInstancetype.instance(class2);
+		DataModel instance2 = DataModel.instance(class2);
 		if ( instance2 == null )
 			return LuaValue.FALSE;
 		if ( !(instance2 instanceof Instance) )
@@ -200,7 +200,7 @@ public abstract class Instance extends LuaInstancetype {
 
 		// Get classes
 		Class<? extends Instance> c1 = instance1.getClass();
-		Class<? extends LuaInstancetype> c2 = instance2.getClass();
+		Class<? extends DataModel> c2 = instance2.getClass();
 		
 		// If they are the same, or parent (c2) contains this child (c1)
 		if ( c1.equals(c2) || c1.isAssignableFrom(c2) ) {
