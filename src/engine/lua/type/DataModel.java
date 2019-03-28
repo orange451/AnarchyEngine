@@ -1,5 +1,6 @@
 package engine.lua.type;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.luaj.vm2.LuaTable;
@@ -43,6 +44,19 @@ public abstract class DataModel extends LuaDatatype {
 		});
 		table.set(LuaValue.INDEX, table);
 		LuaEngine.globals.set("Instance", table);
+	}
+	
+	public static ArrayList<Class<?>> getInstanceableTypes() {
+		ArrayList<Class<?>> ret = new ArrayList<Class<?>>();
+		String[] keys = TYPES.keySet().toArray(new String[TYPES.keySet().size()]);
+		for (int i = 0; i < keys.length; i++) {
+			LuaInstancetypeData datatype = TYPES.get(keys[i]);
+			if ( datatype.instanceable ) {
+				ret.add(datatype.instanceableClass);
+			}
+		}
+		
+		return ret;
 	}
 
 	public DataModel(String name) {
@@ -126,6 +140,10 @@ public abstract class DataModel extends LuaDatatype {
 		TYPES.get(this.get("ClassName").toString()).instanceable = instanceable;
 	}
 
+	/**
+	 * Returns whether or not this object-type is user-instancable.
+	 * @return
+	 */
 	public boolean isInstanceable() {
 		return TYPES.get(this.get("ClassName").toString()).instanceable;
 	}

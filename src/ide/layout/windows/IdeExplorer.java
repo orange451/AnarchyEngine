@@ -173,6 +173,7 @@ public class IdeExplorer extends IdePane implements GameSubscriber {
 
 	private ContextMenu getContetxMenu(Instance inst) {
 		ContextMenu c = new ContextMenu();
+		c.setAutoHide(false);
 
 		// Cut
 		MenuItem cut = new MenuItem("Cut", Icons.icon_cut.getView());
@@ -208,6 +209,21 @@ public class IdeExplorer extends IdePane implements GameSubscriber {
 			t.clone().forceSetParent(inst);
 		});
 		c.getItems().add(paste);
+
+		// Copy
+		MenuItem duplicate = new MenuItem("Duplicate", Icons.icon_copy.getView());
+		duplicate.setOnAction(event -> {
+			if ( inst.isInstanceable() ) {
+				Instance t = inst.clone();
+				if ( t == null || t.isnil() )
+					return;
+				t.forceSetParent(inst.getParent());
+			}
+		});
+		c.getItems().add(duplicate);
+		
+		// Separate
+		c.getItems().add(new SeparatorMenuItem());
 
 		// New Model
 		if ( inst instanceof Prefab ) {
@@ -270,6 +286,7 @@ public class IdeExplorer extends IdePane implements GameSubscriber {
 			});
 			c.getItems().add(texi);
 			
+			// Separate
 			c.getItems().add(new SeparatorMenuItem());
 			
 			// New Prefab
@@ -301,6 +318,14 @@ public class IdeExplorer extends IdePane implements GameSubscriber {
 			c.getItems().add(tex);
 		}
 
+
+		// Cut
+		MenuItem insert = new MenuItem("Insert Object  \u25ba", Icons.icon_new.getView());
+		insert.setOnAction(event -> {
+			new InsertWindow(inst);
+		});
+		c.getItems().add(insert);
+		
 		return c;
 	}
 
