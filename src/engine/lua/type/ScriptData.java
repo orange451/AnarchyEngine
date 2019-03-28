@@ -71,7 +71,7 @@ public class ScriptData extends LuaValue implements Runnable {
 
 	@Override
 	public void run() {
-		String fullName = "nil";
+		String fullName = "CMD";
 		if ( script != null )
 			fullName = script.getFullName();
 		

@@ -9,6 +9,7 @@ import org.lwjgl.glfw.GLFW;
 import engine.lua.LuaEngine;
 import ide.layout.IdePane;
 import lwjgui.LWJGUI;
+import lwjgui.font.Font;
 import lwjgui.geometry.Pos;
 import lwjgui.scene.control.text_input.TextArea;
 import lwjgui.scene.control.text_input.TextField;
@@ -24,6 +25,7 @@ public class IdeConsole extends IdePane {
 		this.getChildren().add(editBox);
 
 		TextArea console = new TextArea();
+		console.setFont(Font.COURIER);
 		console.setEditable(false);
 		console.setFillToParentHeight(true);
 		console.setFillToParentWidth(true);
@@ -43,6 +45,7 @@ public class IdeConsole extends IdePane {
 			
 			if (cached_context.getSelected().isDescendentOf(luaInput) ) {
 				String lua = luaInput.getText();
+				console.appendText("> " + lua+"\n");
 				LuaEngine.runLua(lua);
 				luaInput.setText("");
 			}

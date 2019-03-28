@@ -13,6 +13,7 @@ import engine.lua.network.InternalServer;
 import engine.lua.network.internal.InstanceUpdateUDP;
 import engine.lua.type.LuaConnection;
 import engine.lua.type.NumberClamp;
+import engine.lua.type.NumberClampPreferred;
 import engine.lua.type.data.Matrix4;
 import engine.lua.type.data.Vector3;
 import engine.lua.type.object.insts.GameObject;
@@ -41,10 +42,10 @@ public abstract class PhysicsBase extends Instance implements GameSubscriber {
 		this.getField("Mass").setClamp(new NumberClamp(0, 1));
 		
 		this.defineField("Friction", LuaValue.valueOf(0.1f), false);
-		this.getField("Friction").setClamp(new NumberClamp(0, 1));
+		this.getField("Friction").setClamp(new NumberClampPreferred(0, 10, 0, 1));
 		
 		this.defineField("Bounciness", LuaValue.valueOf(0.5f), false);
-		this.getField("Bounciness").setClamp(new NumberClamp(0, 2));
+		this.getField("Bounciness").setClamp(new NumberClampPreferred(0, 2, 0, 1));
 		
 		this.defineField("AngularFactor", LuaValue.valueOf(1.0f), false);
 		this.getField("AngularFactor").setClamp(new NumberClamp(0, 1));
@@ -312,7 +313,7 @@ public abstract class PhysicsBase extends Instance implements GameSubscriber {
 			}
 		}
 		
-		// User updated the AngularFactor
+		// User updated the LinearDamping
 		if ( key.toString().equals("LinearDamping") ) {
 			if ( physics != null ) {
 				physics.setLinearDamping( Math.min( value.tofloat(), 1 ) );

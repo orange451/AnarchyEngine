@@ -15,18 +15,21 @@ import engine.Game;
 import engine.GameSubscriber;
 import engine.lua.LuaEngine;
 import engine.lua.lib.LuaTableReadOnly;
+import engine.lua.type.Clamp;
+import engine.lua.type.LuaField;
 import engine.lua.type.LuaValuetype;
+import engine.lua.type.NumberClamp;
+import engine.lua.type.NumberClampPreferred;
 import engine.lua.type.data.Color3;
 import engine.lua.type.object.Instance;
 import engine.lua.type.object.InstancePropertySubscriber;
 import ide.IDEFilePath;
 import ide.layout.IdePane;
-import lwjgui.paint.Color;
 import lwjgui.LWJGUI;
-import lwjgui.collections.ObservableList;
 import lwjgui.font.FontStyle;
 import lwjgui.geometry.Insets;
 import lwjgui.geometry.Pos;
+import lwjgui.paint.Color;
 import lwjgui.scene.Node;
 import lwjgui.scene.Region;
 import lwjgui.scene.control.Button;
@@ -36,9 +39,11 @@ import lwjgui.scene.control.ComboBox;
 import lwjgui.scene.control.Label;
 import lwjgui.scene.control.ScrollPane;
 import lwjgui.scene.control.ScrollPane.ScrollBarPolicy;
+import lwjgui.scene.control.Slider;
 import lwjgui.scene.control.text_input.TextField;
 import lwjgui.scene.layout.ColumnConstraint;
 import lwjgui.scene.layout.GridPane;
+import lwjgui.scene.layout.HBox;
 import lwjgui.scene.layout.Priority;
 import lwjgui.scene.layout.StackPane;
 import lwjgui.scene.layout.VBox;
@@ -131,13 +136,15 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 	}
 	
 	private static PropertyModifier getPropertyModifier( Instance instance, String field, LuaValue value ) {
+		LuaField luaField = instance.getField(field);
+		
 		// Calculate editable
-		boolean editable = instance.getField(field).canModify();
+		boolean editable = luaField.canModify();
 		if ( (field.equals("Name") || field.equals("Parent")) && instance.isLocked() )
 			editable = false;
 		
 		// Enum modifier
-		if ( instance.getField(field).getEnumType() != null ) {
+		if ( luaField.getEnumType() != null ) {
 			return new EnumPropertyModifier(instance, field, value, editable);
 		}
 		
@@ -151,8 +158,15 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 		}
 		
 		// Edit a boolean
-		if ( value.isboolean() )
+		if ( value.isboolean() ) {
 			return new BooleanPropertyModifier(instance, field, value, editable);
+		}
+		
+		// Clampable number value, use slider!
+		Clamp<?> clamp = luaField.getClamp();
+		if ( value.isnumber() && clamp != null && clamp instanceof NumberClamp ) {
+			return new SliderPropertyModifier(instance, field, value, editable);
+		}
 		
 		// Edit a string/number
 		if ( value.isstring() || value.isnumber() )
@@ -227,6 +241,58 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 		}
 	}
 	
+	static class SliderPropertyModifier extends PropertyModifier {
+		private HBox hbox;
+		private Slider check;
+		private PropertyModifierInput direct;
+		
+		public SliderPropertyModifier(Instance instance, String field, LuaValue value, boolean editable) {
+			super(instance,field,value,editable);
+			
+			Clamp<?> clamp = instance.getField(field).getClamp();
+			NumberClamp nc = (NumberClamp)clamp;
+			
+			float min = nc.getMin();
+			float max = nc.getMax();
+			if ( nc instanceof NumberClampPreferred ) {
+				min = ((NumberClampPreferred)nc).getPreferredMin();
+				max = ((NumberClampPreferred)nc).getPreferredMax();
+			}
+			
+			this.hbox = new HBox();
+			this.hbox.setBackground(null);
+			this.getChildren().add(hbox);
+			
+			this.check = new Slider(min, max, value.tofloat());
+			this.check.setDisabled(!editable);
+			this.check.setPrefWidth(100);
+			this.hbox.getChildren().add(check);
+			
+			this.direct = new StringPropertyModifier(instance, field, value, editable) {
+				@Override
+				public void onValueSet(String text) {
+					super.onValueSet(text);
+					check.setValue(Double.parseDouble(text));
+				}
+			};
+			this.direct.setBackground(null);
+			this.direct.textField.setPrefWidth(32);
+			this.direct.textField.setMinWidth(32);
+			this.direct.textField.setMaxWidth(32);
+			this.direct.textField.setFillToParentWidth(false);
+			this.direct.setPrefWidth(32);
+			this.hbox.getChildren().add(direct);
+			
+			if ( editable ) {
+				this.check.setOnValueChangedEvent(event->{
+					double v = Math.floor(check.getValue()*100)/100f;
+					this.instance.set(field, check.getValue());
+					this.direct.label.setText(""+v);
+				});
+			}
+		}
+	}
+	
 	static class ColorPropertyModifier extends PropertyModifier {
 		private ColorPicker picker;
 		
@@ -290,8 +356,8 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 	}
 	
 	static abstract class PropertyModifierInput extends PropertyModifierTemp {
-		private TextField textField;
-		private boolean editing;
+		protected TextField textField;
+		protected boolean editing;
 		
 		public PropertyModifierInput(Instance instance, String field, LuaValue initialValue, boolean editable) {
 			super(instance, field, initialValue, editable);
@@ -324,7 +390,7 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 				}
 			};
 			//this.textField.setPreferredColumnCount(1024);
-			this.textField.setFillToParentWidth(true);
+			//this.textField.setFillToParentWidth(true);
 			this.setMaxHeight(16);
 			this.textField.setAlignment(Pos.CENTER_LEFT);
 			

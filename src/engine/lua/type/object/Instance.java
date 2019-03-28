@@ -569,15 +569,33 @@ public abstract class Instance extends DataModel {
 		return children;
 	}
 
+	/**
+	 * Returns the first child with the matching name.
+	 * <br>
+	 * It is O(1) time if the name is NOT the name of a field for the object.
+	 * <br>
+	 * if the name parameter is the name of a field, it is O(n) time, as it has to search for the first child.
+	 * <br>
+	 * Non field name objects are automatically generated when added as a child.
+	 * @param name
+	 * @return
+	 */
 	public Instance findFirstChild(String name) {
-		synchronized(children) {
-			for (int i = 0; i < children.size(); i++) {
-				Instance child = children.get(i);
-				if ( child.get("Name").toString().equals(name) ) {
-					return child;
+		if ( this.containsField(name) ) {
+			synchronized(children) {
+				for (int i = 0; i < children.size(); i++) {
+					Instance child = children.get(i);
+					if ( child.get("Name").toString().equals(name) ) {
+						return child;
+					}
 				}
 			}
+			return null;
 		}
+		LuaValue temp = this.get(name);
+		if ( temp instanceof Instance && ((Instance)temp).getName().equals(name) )
+			return (Instance)temp;
+		
 		return null;
 	}
 

@@ -12,7 +12,6 @@ import org.luaj.vm2.lib.VarArgFunction;
 
 import engine.lua.RunnableArgs;
 import engine.lua.type.object.ScriptBase;
-import engine.lua.type.object.insts.Script;
 
 public class LuaEvent extends LuaDatatype {
 

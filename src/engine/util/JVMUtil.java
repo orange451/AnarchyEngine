@@ -8,9 +8,6 @@ import java.lang.management.ManagementFactory;
 import java.util.ArrayList;
 import java.util.List;
 
-import engine.Game;
-import engine.application.impl.ClientApplication;
-
 public class JVMUtil {
 	public static boolean restartJVM(boolean startFirstThread, boolean needsOutput, Class<?> customClass, String... args) {
 		if ( startFirstThread ) {
@@ -84,6 +81,7 @@ public class JVMUtil {
 
 				while ((line = br.readLine()) != null) {
 					Thread.sleep(10);
+					Thread.yield();
 					System.out.println(line);
 				}
 				System.exit(0);

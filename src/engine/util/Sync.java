@@ -40,7 +40,6 @@ import java.util.HashMap;
 *
 * @author Riven
 * @author kappaOne
-* @author orange451
 */
 public class Sync {
 
@@ -84,7 +83,7 @@ public class Sync {
 		try {
 			// sleep until the average sleep time is greater than the time remaining till nextFrame
 			for (long t0 = getTime(), t1; (nextFrame - t0) > sleepDurations.avg(); t0 = t1) {
-				Thread.sleep(2);
+				Thread.sleep(10);
 				sleepDurations.add((t1 = getTime()) - t0); // update average sleep time
 			}
 	
@@ -93,6 +92,7 @@ public class Sync {
 	
 			// yield until the average yield time is greater than the time remaining till nextFrame
 			for (long t0 = getTime(), t1; (nextFrame - t0) > yieldDurations.avg(); t0 = t1) {
+				Thread.sleep(1);
 				Thread.yield();
 				yieldDurations.add((t1 = getTime()) - t0); // update average yield time
 			}

@@ -143,6 +143,7 @@ public class LuaEngine {
 		String name = "CMD";
 		String full = name;
 		if ( script != null ) {
+			System.out.println("Running: " + script.getFullName());
 			name = script.getName();
 			full = script.getFullName();
 		}
@@ -151,20 +152,13 @@ public class LuaEngine {
 			LuaValue currentChunk = LuaEngine.globals.load(source, name);
 			return (ScriptData) globals.get("spawn").call(currentChunk, script); // Run spawn class from GameEngineLib
 		}catch(LuaError e) {
-			
 			// This will only run for syntax errors. Not logical errors.
 			String message = e.getMessage();
 			String[] split = message.split(":");
 			String reason = split[split.length-1];
 			String line = split[split.length-2];
-			
-			String timeStamp = new SimpleDateFormat("HH:mm:ss").format(new Date());
-			String newMessage = timeStamp + " - [" + full + "], Line " + line + ": " + reason + "\n";
-			try {
-				LuaEngine.globals.STDERR.write(newMessage.getBytes());
-			} catch (IOException e1) {
-				//
-			}
+
+			LuaEngine.error("[" + full + "], Line " + line + ": " + reason);
 		}
 		
 		return null;

@@ -13,7 +13,6 @@ import engine.lua.type.LuaEvent;
 import engine.lua.type.object.Instance;
 import engine.lua.type.object.Service;
 import engine.lua.type.object.TreeViewable;
-import engine.lua.type.object.insts.GameObject;
 import engine.lua.type.object.insts.Player;
 import ide.layout.windows.icons.Icons;
 
@@ -65,6 +64,14 @@ public class Players extends Service implements TreeViewable {
 					((LuaEvent)Players.this.rawget("PlayerAdded")).fire(arg);
 				}
 				return LuaValue.NIL;
+			}
+		});
+		
+		// Fire player removed when a player is removed
+		LuaEvent removed = this.childRemovedEvent();
+		removed.connect((args)->{
+			if ( args[0] instanceof Player ) {
+				((LuaEvent)Players.this.rawget("PlayerRemoved")).fire(args[0]);
 			}
 		});
 	}

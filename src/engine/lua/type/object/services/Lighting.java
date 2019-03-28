@@ -2,6 +2,7 @@ package engine.lua.type.object.services;
 
 import org.luaj.vm2.LuaValue;
 
+import engine.lua.type.NumberClampPreferred;
 import engine.lua.type.data.Color3;
 import engine.lua.type.object.Service;
 import engine.lua.type.object.TreeViewable;
@@ -13,9 +14,15 @@ public class Lighting extends Service implements TreeViewable {
 		super("Lighting");
 		
 		this.defineField("Ambient", Color3.newInstance(128, 128, 128), false);
+		
 		this.defineField("Exposure", LuaValue.valueOf(1.0f), false);
+		this.getField("Exposure").setClamp(new NumberClampPreferred(0, 25, 0, 2));
+		
 		this.defineField("Saturation", LuaValue.valueOf(1.2f), false);
+		this.getField("Saturation").setClamp(new NumberClampPreferred(0, 100, 0, 2));
+		
 		this.defineField("Gamma", LuaValue.valueOf(2.2f), false);
+		this.getField("Gamma").setClamp(new NumberClampPreferred(0, 10, 0, 4));
 	}
 	
 	public Color3 getAmbient() {

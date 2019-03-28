@@ -89,6 +89,10 @@ public class LuaField {
 	public void setClamp(Clamp<?> clamp) {
 		this.clamp = clamp;
 	}
+	
+	public Clamp<?> getClamp() {
+		return this.clamp;
+	}
 
 	public void setEnum(EnumType enumType) {
 		this.enumType = enumType;

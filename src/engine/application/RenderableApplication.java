@@ -137,6 +137,7 @@ public abstract class RenderableApplication extends Application implements Rende
 	@Override
 	protected void onStart(String[] args) {
 		ClientLauncher.launch(this);
+		
 		if ( !glfwInit() ) {
 			GLFW_INITIALIZED = false;
 			new ErrorWindow("Unable to initialize GLFW.", true);
