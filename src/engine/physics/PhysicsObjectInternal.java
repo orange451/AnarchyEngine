@@ -27,7 +27,6 @@ public class PhysicsObjectInternal {
 	protected PhysicsWorld world;
 	protected boolean destroyed;
 	protected SoundMaterial soundMaterial;
-	protected boolean anchored;
 	private float desiredMass = 0.5f;
 	private float desiredBounce = 0.5f;
 	private float desiredFriction = 0.5f;
@@ -176,41 +175,49 @@ public class PhysicsObjectInternal {
 		this.destroyed = true;
 	}
 
-	public void setAnchored(boolean anchored) {
-		this.anchored = anchored;
-		if ( this.anchored ) {
-			body.setMassProps(0, new javax.vecmath.Vector3f(0,0,0));
-		}
-		this.refresh = true;
-	}
-
 	public void setMass(float mass) {
-		this.desiredMass = mass;
-		if ( anchored )
-			return;
-
 		this.desiredShape = null;
 		this.refresh = true;
 	}
 	
 	public void setFriction(float friction) {
 		this.desiredFriction = friction;
-		this.refresh = true;
+		
+		if ( this.body != null ) {
+			this.body.setFriction(friction);
+		} else {
+			this.refresh = true;
+		}
 	}
 	
 	public void setAngularFactor( float desiredAngularFactor ) {
 		this.desiredAngularFactor = desiredAngularFactor;
-		this.refresh = true;
+
+		if ( this.body != null ) {
+			this.body.setAngularFactor(desiredAngularFactor);
+		} else {
+			this.refresh = true;
+		}
 	}
 	
 	public void setLinearDamping( float desiredLinearDamping ) {
 		this.desiredLinearDamping = desiredLinearDamping;
-		this.refresh = true;
+		
+		if ( this.body != null ) {
+			this.body.setDamping(desiredLinearDamping, 0.3f);
+		} else {
+			this.refresh = true;
+		}
 	}
 
 	public void setBounciness(float bounciness) {
 		this.desiredBounce = bounciness;
-		this.refresh = true;
+		
+		if ( this.body != null ) {
+			this.body.setRestitution(bounciness);
+		} else {
+			this.refresh = true;
+		}
 	}
 
 	private void refreshBody() {
@@ -218,7 +225,7 @@ public class PhysicsObjectInternal {
 		
 		Matrix4f worldMat = this.getWorldMatrix();
 		final javax.vecmath.Vector3f vel = this.getVelocityInternal();
-		final float newMass = anchored ? 0 : desiredMass;
+		final float newMass = desiredMass;
 		RigidBody old = body;
 		
 		InternalGameThread.runLater(() -> {

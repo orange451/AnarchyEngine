@@ -295,28 +295,28 @@ public abstract class PhysicsBase extends Instance implements GameSubscriber {
 		// User updated the bounciness
 		if ( key.toString().equals("Bounciness") ) {
 			if ( physics != null ) {
-				physics.setBounciness(Math.min( value.tofloat(), 2));
+				physics.setBounciness(value.tofloat());
 			}
 		}
 		
 		// User updated the friction
 		if ( key.toString().equals("Friction") ) {
 			if ( physics != null ) {
-				physics.setFriction(Math.min( value.tofloat(), 2));
+				physics.setFriction(value.tofloat());
 			}
 		}
 		
 		// User updated the AngularFactor
 		if ( key.toString().equals("AngularFactor") ) {
 			if ( physics != null ) {
-				physics.setAngularFactor( Math.min( value.tofloat(), 1 ) );
+				physics.setAngularFactor( value.tofloat() );
 			}
 		}
 		
 		// User updated the LinearDamping
 		if ( key.toString().equals("LinearDamping") ) {
 			if ( physics != null ) {
-				physics.setLinearDamping( Math.min( value.tofloat(), 1 ) );
+				physics.setLinearDamping(value.tofloat());
 			}
 		}
 		
