@@ -248,7 +248,6 @@ public class IdeExplorer extends IdePane implements GameSubscriber {
 		
 		// Asset functions
 		if ( inst instanceof Assets ) {
-			c.getItems().add(new SeparatorMenuItem());
 			
 			// New Prefab
 			MenuItem prefi = new MenuItem("Import Prefab", Icons.icon_model.getView());
@@ -316,6 +315,9 @@ public class IdeExplorer extends IdePane implements GameSubscriber {
 				Game.getService("Assets").get("NewTexture").invoke();
 			});
 			c.getItems().add(tex);
+			
+			// Separate
+			c.getItems().add(new SeparatorMenuItem());
 		}
 
 

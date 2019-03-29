@@ -39,20 +39,12 @@ public class InsertWindow {
 		Label l = new Label("Insert object into: " + parent.getFullName());
 		tempV.getChildren().add(l);
 		
-		ScrollPane scroll = new ScrollPane() {
-			@Override
-			public void position(Node parent) {
-				super.position(parent);
-				
-				System.out.println(this.getContent().getY() + " / " + this.getY() + " / " + tempV.getY());
-			}
-		};
+		ScrollPane scroll = new ScrollPane();
 		scroll.setFillToParentHeight(true);
 		scroll.setFillToParentWidth(true);
 		tempV.getChildren().add(scroll);
 		
 		VBox items = new VBox();
-		items.setBackground(Color.ORANGE);
 		scroll.setContent(items);
 		
 		ArrayList<Class<?>> TYPES = Instance.getInstanceableTypes();

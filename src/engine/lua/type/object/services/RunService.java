@@ -12,6 +12,7 @@ public class RunService extends Service {
 		
 		this.rawset("Heartbeat", new LuaEvent());
 		this.rawset("RenderStepped", new LuaEvent());
+		this.rawset("PhysicsStepped", new LuaEvent());
 		this.setLocked(true);
 	}
 
@@ -31,5 +32,9 @@ public class RunService extends Service {
 	
 	public LuaEvent renderSteppedEvent() {
 		return (LuaEvent) this.get("RenderStepped");
+	}
+	
+	public LuaEvent physicsSteppedEvent() {
+		return (LuaEvent) this.get("PhysicsStepped");
 	}
 }

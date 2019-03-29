@@ -572,8 +572,12 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 				//
 			}
 			
-			Game.deselectAll();
+			//Game.deselectAll();
 			Game.select(this.instance);
+			
+			LWJGUI.runLater(()->{
+				Game.deselect((Instance) instance);
+			});
 		}
 		
 		public void cancel() {

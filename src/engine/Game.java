@@ -243,7 +243,7 @@ public class Game implements Tickable {
 			LuaEngine.globals.set("game", this);
 			
 			// On load event
-			this.rawset("OnLoad", new LuaEvent());
+			this.rawset("Loaded", new LuaEvent());
 			
 			// Fields
 			this.defineField("Running", LuaValue.valueOf(false), true);
@@ -413,19 +413,13 @@ public class Game implements Tickable {
 	}
 
 	public static void select(Instance inst) {
-		
-		boolean r = false;
 		//synchronized(selectedInstances) {
 			if ( selectedInstances.contains(inst) )
 				return;
-			
-			r = true;
 			selectedInstances.add(inst);
 		//}
 		
-		if ( r ) {
-			game.gameUpdate(false);
-		}
+		game.gameUpdate(false);
 	}
 
 	public static void deselect(Instance inst) {
@@ -513,7 +507,7 @@ public class Game implements Tickable {
 			}
 			
 			Game.runLater(()->{
-				((LuaEvent)LuaEngine.globals.get("game").get("OnLoad")).fire();
+				((LuaEvent)LuaEngine.globals.get("game").get("Loaded")).fire();
 			});
 		}
 	}

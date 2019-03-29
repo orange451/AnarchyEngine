@@ -8,6 +8,7 @@ import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import org.joml.Vector2f;
@@ -17,7 +18,6 @@ import org.luaj.vm2.lib.TwoArgFunction;
 import org.luaj.vm2.lib.ZeroArgFunction;
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.assimp.AIAnimation;
-import org.lwjgl.assimp.AIBone;
 import org.lwjgl.assimp.AIColor4D;
 import org.lwjgl.assimp.AIFace;
 import org.lwjgl.assimp.AIMaterial;
@@ -28,11 +28,9 @@ import org.lwjgl.assimp.AIString;
 import org.lwjgl.assimp.AIVector3D;
 import org.lwjgl.assimp.Assimp;
 
-import engine.InternalGameThread;
 import engine.gl.mesh.BufferedMesh;
 import engine.gl.mesh.Vertex;
 import engine.lua.type.data.Color3;
-import engine.lua.type.object.Asset;
 import engine.lua.type.object.AssetLoadable;
 import engine.lua.type.object.Instance;
 import engine.lua.type.object.Service;
@@ -47,7 +45,6 @@ import engine.lua.type.object.insts.Texture;
 import engine.util.FileUtils;
 import engine.util.IOUtil;
 import ide.layout.windows.icons.Icons;
-import lwjgui.LWJGUI;
 
 public class Assets extends Service implements TreeViewable {
 
@@ -302,8 +299,15 @@ public class Assets extends Service implements TreeViewable {
 		return prefab;
 	}
 
+	private static HashMap<AIMaterial, Material> materialLookup = new HashMap<AIMaterial, Material>();
+	
 	private static Material getMaterialFromAssimp( String baseDir, AIMaterial material ) {
-
+		if ( materialLookup.containsKey(material) ) {
+			Material ret = (Material) materialLookup.get(material).clone();
+			ret.forceSetParent(materialLookup.get(material).getParent());
+			return ret;
+		}
+		
 		// Load textures
 		String diffuse  = assimpGetTextureFile( material, Assimp.aiTextureType_DIFFUSE );
 		String normal   = assimpGetTextureFile( material, Assimp.aiTextureType_NORMALS );
@@ -379,6 +383,8 @@ public class Assets extends Service implements TreeViewable {
 				//tm.setGlossiness(shine);
 			}
 		}
+		
+		materialLookup.put(material, tm);
 
 		return tm;
 	}

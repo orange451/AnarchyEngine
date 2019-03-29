@@ -7,7 +7,7 @@ import engine.Game;
 import engine.GameSubscriber;
 import engine.application.RenderableApplication;
 import engine.gl.light.Light;
-import engine.lua.type.NumberClamp;
+import engine.lua.type.NumberClampPreferred;
 import engine.lua.type.data.Color3;
 import engine.lua.type.data.Vector3;
 import engine.lua.type.object.LightBase;
@@ -24,7 +24,7 @@ public class PointLight extends LightBase implements TreeViewable,GameSubscriber
 		super("PointLight");
 		
 		this.defineField("Radius", LuaValue.valueOf(8), false);
-		this.getField("Radius").setClamp(new NumberClamp(0, 2048));
+		this.getField("Radius").setClamp(new NumberClampPreferred(0, 1024, 0, 64));
 		
 		Game.getGame().subscribe(this);
 		

@@ -6,6 +6,8 @@ import java.util.List;
 
 import javax.vecmath.Vector3f;
 
+import org.luaj.vm2.LuaValue;
+
 import com.bulletphysics.collision.broadphase.AxisSweep3;
 import com.bulletphysics.collision.dispatch.CollisionConfiguration;
 import com.bulletphysics.collision.dispatch.CollisionDispatcher;
@@ -42,7 +44,13 @@ public class PhysicsWorld {
 		synchronized(dynamicsWorld) {
 			dynamicsWorld.setGravity(new Vector3f(0, 0, -(Game.workspace()).get("Gravity").tofloat()));
 			try{
-				dynamicsWorld.stepSimulation(dt,2);
+				int reps = 2;
+				
+				for (int i = 0; i < reps; i++) {
+					float ndt = dt/(float)reps;
+					Game.runService().physicsSteppedEvent().fire(LuaValue.valueOf(ndt));
+					dynamicsWorld.stepSimulation(ndt,1);
+				}
 			}catch(Exception e) {
 				System.err.println("Error Stepping Physics");
 				e.printStackTrace();
