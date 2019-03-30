@@ -507,7 +507,7 @@ public class Game implements Tickable {
 			}
 			
 			Game.runLater(()->{
-				((LuaEvent)LuaEngine.globals.get("game").get("Loaded")).fire();
+				loadEvent().fire();
 			});
 		}
 	}
@@ -536,5 +536,9 @@ public class Game implements Tickable {
 	
 	public static String version() {
 		return "0.5a";
+	}
+
+	public static LuaEvent loadEvent() {
+		return ((LuaEvent)LuaEngine.globals.get("game").get("Loaded"));
 	}
 }

@@ -34,27 +34,31 @@ public class Debris extends Service {
 
 		this.setLocked(true);
 		
-		Game.runLater(() -> {
+		Game.loadEvent().connect((a)->{
+			
 			// Debris check
-			Game.runService().heartbeatEvent().connect( new RunnableArgs() {
-				@Override
-				public void run(LuaValue[] args) {
-					long currentTime = System.currentTimeMillis();
+			Game.runService().heartbeatEvent().connect((args)->{
+				long currentTime = System.currentTimeMillis();
 
-					synchronized(objects) {
-						for (int i = 0; i < objects.size(); i++) {
-							if ( i >= objects.size() )
-								continue;
-							DebrisInstance obj = objects.get(i);
-							if ( obj == null )
-								continue;
+				ArrayList<DebrisInstance> toRemove = new ArrayList<DebrisInstance>();
+				int len = objects.size();
+				synchronized(objects) {
+					for (int i = 0; i < len; i++) {
+						if ( i >= objects.size() )
+							continue;
+						DebrisInstance obj = objects.get(i);
+						if ( obj == null )
+							continue;
 
-							if ( obj.removeTime < currentTime ) {
-								obj.instance.destroy();
-								objects.remove(i--);
-							}
+						if ( obj.removeTime < currentTime ) {
+							toRemove.add(obj);
+							obj.instance.destroy();
 						}
 					}
+				}
+
+				synchronized(objects) {
+					objects.removeAll(toRemove);
 				}
 			});
 		});
