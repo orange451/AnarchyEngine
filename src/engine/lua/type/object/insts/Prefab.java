@@ -7,7 +7,7 @@ import org.luaj.vm2.lib.ThreeArgFunction;
 
 import engine.Game;
 import engine.lua.type.LuaEvent;
-import engine.lua.type.NumberClamp;
+import engine.lua.type.NumberClampPreferred;
 import engine.lua.type.object.Asset;
 import engine.lua.type.object.Instance;
 import engine.lua.type.object.PrefabRenderer;
@@ -24,7 +24,7 @@ public class Prefab extends Asset implements TreeViewable {
 		super("Prefab");
 		
 		this.defineField("Scale", LuaValue.valueOf(1.0), false);
-		this.getField("Scale").setClamp(new NumberClamp(0, 2048));
+		this.getField("Scale").setClamp(new NumberClampPreferred(0, 1024, 0, 4));
 		
 		prefab = new PrefabRenderer(this);
 		

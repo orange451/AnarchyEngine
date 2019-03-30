@@ -4,6 +4,7 @@ import org.joml.Vector3f;
 import org.luaj.vm2.LuaValue;
 
 import engine.gl.light.Light;
+import engine.lua.type.NumberClampPreferred;
 import engine.lua.type.data.Color3;
 import engine.lua.type.data.Matrix4;
 import engine.lua.type.data.Vector3;
@@ -16,7 +17,10 @@ public abstract class LightBase extends Instance implements Positionable {
 		super(typename);
 
 		this.defineField("Position", Vector3.newInstance(0, 0, 0), false);
+		
 		this.defineField("Intensity", LuaValue.valueOf(1), false);
+		this.getField("Intensity").setClamp(new NumberClampPreferred(0, 100, 0, 8));
+		
 		this.defineField("Color", Color3.white(), false);
 		this.defineField("Shadows", LuaValue.valueOf(true), false);
 		this.defineField("Visible", LuaValue.valueOf(true), false);

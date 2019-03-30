@@ -30,6 +30,7 @@ public class MergeProcessor implements PostProcessor {
 		//skyBox = SkySphereIBL.create("Resources/Testing/IBL/valley.hdr");
 		//skyBox = SkySphereIBL.create("Resources/Testing/IBL/office.hdr");
 		skyBox = SkySphereIBL.create("Resources/Testing/IBL/autoshop_01_2k.hdr");
+		//skyBox = SkySphereIBL.create("Resources/Testing/IBL/studio.hdr");
 		//skyBox = SkySphereIBL.create("Resources/Testing/IBL/koppie.hdr");
 		//skyBox = SkySphereIBL.create("Resources/Testing/IBL/noon_grass.hdr");
 		//((SkySphereIBL)skyBox).setLightMultiplier(10);
