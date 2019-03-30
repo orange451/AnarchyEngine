@@ -64,6 +64,7 @@ public class IdeLuaEditor extends IdePane {
 				// Datatypes
 				"Vector3",
 				"Color3",
+				"Matrix4",
 				"Vector2"
 		}) + ")\\b";
 		

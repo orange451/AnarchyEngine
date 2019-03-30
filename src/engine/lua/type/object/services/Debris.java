@@ -51,7 +51,7 @@ public class Debris extends Service {
 
 							if ( obj.removeTime < currentTime ) {
 								obj.instance.destroy();
-								objects.remove(obj);
+								objects.remove(i--);
 							}
 						}
 					}

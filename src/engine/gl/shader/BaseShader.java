@@ -115,6 +115,8 @@ public class BaseShader {
 
 		GL13.glActiveTexture(GL13.GL_TEXTURE0);
 		baseTexture.bind();
+		
+		this.shader_set_uniform_f(this.shader_get_uniform("uMaterialColor"), new Vector3f(1,1,1));
 
 		lastWorldMatrix.zero();
 		lastViewMatrix.zero();

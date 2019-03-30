@@ -250,7 +250,7 @@ public class HandlesRenderer {
 		// Make material for handle
 		boolean selected = direction.equals(hoveredHandleDirection) || direction.equals(selectedHandleDirection);
 		Vector3f col = moveType.equals(MoveType.WORLD_SPACE)?direction.absolute(new Vector3f()):new Vector3f(0.2f, 0.6f, 1.0f);
-		baseMaterial.setEmissive(selected?col.mul(0.25f):col);
+		baseMaterial.setColor(selected?col.mul(0.25f):col);
 
 		// Draw
 		Resources.MESH_CYLINDER.render(Pipeline.pipeline_get().shader_get(), worldMat, baseMaterial);

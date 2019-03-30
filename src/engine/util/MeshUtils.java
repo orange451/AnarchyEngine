@@ -528,7 +528,7 @@ public class MeshUtils {
 	}
 
 	public static BufferedMesh cone( float radius, float height, int steps ) {
-		return cylinder( radius, height, steps, true );
+		return cone( radius, height, steps, true );
 	}
 
 	public static BufferedMesh cone( float radius, float height, int steps, boolean closed ) {

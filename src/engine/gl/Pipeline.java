@@ -145,9 +145,6 @@ public class Pipeline implements Renderable {
 					OutlineRenderer.render(instance);
 				}
 			}
-			
-			// Render selected instances (handles)
-			HandlesRenderer.render(instances);
 		}
 		gbuffer.unbind();
 		
@@ -218,6 +215,18 @@ public class Pipeline implements Renderable {
 				drawTexture( gbuffer.getBuffer2(), s*2, 0, s, s );
 				drawTexture( gbuffer.getAccumulationBuffer(), s*3, 0, s, s );
 				drawTexture( tbuffer.getBuffer(), s*4, 0, s, s );
+			}
+			
+			// Render final 3d overlay stuff
+			{
+				perspective();
+				shader_get().setProjectionMatrix(projMatrix);
+				shader_get().setViewMatrix(viewMatrix);
+				shader_get().setWorldMatrix(IDENTITY);
+				
+				// Render selected instances (handles)
+				List<Instance> instances = Game.selectedExtended();
+				HandlesRenderer.render(instances);
 			}
 		}
 		buffer.unbind();
