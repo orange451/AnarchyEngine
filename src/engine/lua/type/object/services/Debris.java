@@ -34,9 +34,10 @@ public class Debris extends Service {
 
 		this.setLocked(true);
 		
+		// Wait until game starts
 		Game.loadEvent().connect((a)->{
 			
-			// Debris check
+			// Check for objects to remove every step
 			Game.runService().heartbeatEvent().connect((args)->{
 				long currentTime = System.currentTimeMillis();
 
