@@ -2,13 +2,13 @@ package ide.layout.windows;
 
 import java.util.ArrayList;
 
+import engine.Game;
 import engine.lua.type.object.Instance;
 import engine.lua.type.object.TreeViewable;
 import ide.layout.windows.icons.Icons;
 import lwjgui.LWJGUI;
 import lwjgui.LWJGUIUtil;
 import lwjgui.geometry.Insets;
-import lwjgui.paint.Color;
 import lwjgui.scene.Context;
 import lwjgui.scene.Node;
 import lwjgui.scene.Scene;
@@ -73,6 +73,8 @@ public class InsertWindow {
 						if ( event.getClickCount() == 2 ) {
 							Instance inst = (Instance) instClass.newInstance();
 							inst.forceSetParent(parent);
+							
+							Game.select(inst);
 						}
 					} catch (Exception e) {
 						//

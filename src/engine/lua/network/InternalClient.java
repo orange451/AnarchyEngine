@@ -21,7 +21,7 @@ import engine.lua.network.internal.ClientLoadMapTCP;
 import engine.lua.network.internal.ClientProcessable;
 import engine.lua.network.internal.PingRequest;
 import engine.lua.type.object.services.Connections;
-import ide.ErrorWindow;
+import ide.layout.windows.ErrorWindow;
 
 public class InternalClient extends Client {
 	private String worldJSON;

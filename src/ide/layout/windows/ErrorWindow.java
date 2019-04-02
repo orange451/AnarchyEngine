@@ -1,4 +1,4 @@
-package ide;
+package ide.layout.windows;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -17,7 +17,6 @@ import org.lwjgl.glfw.GLFW;
 import engine.application.RenderableApplication;
 import lwjgui.LWJGUI;
 import lwjgui.LWJGUIUtil;
-import lwjgui.geometry.Insets;
 import lwjgui.geometry.Pos;
 import lwjgui.scene.Window;
 import lwjgui.scene.control.Button;

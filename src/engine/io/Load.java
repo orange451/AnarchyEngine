@@ -21,8 +21,8 @@ import engine.lua.type.LuaValuetype;
 import engine.lua.type.object.Instance;
 import engine.lua.type.object.Service;
 import engine.util.FileUtils;
-import ide.ErrorWindow;
 import ide.IDE;
+import ide.layout.windows.ErrorWindow;
 
 public class Load {
 	private static ArrayList<LoadedInstance> instances;

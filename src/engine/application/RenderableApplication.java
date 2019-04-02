@@ -43,7 +43,7 @@ import engine.gl.Pipeline;
 import engine.gl.Resources;
 import engine.observer.InternalRenderable;
 import engine.observer.Renderable;
-import ide.ErrorWindow;
+import ide.layout.windows.ErrorWindow;
 
 public abstract class RenderableApplication extends Application implements Renderable,InternalRenderable {
 	public static long window;

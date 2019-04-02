@@ -172,6 +172,7 @@ public class Pipeline implements Renderable {
 					}
 				});
 				
+				// Draw them all
 				for (int i = 0; i < transparencies.size(); i++) {
 					Pair<Float, Pair<RenderableMesh, Pair<Matrix4f, MaterialGL>>> t1 = transparencies.get(i);
 					float alpha = t1.value1();
@@ -203,7 +204,7 @@ public class Pipeline implements Renderable {
 			ortho();
 			shader_set(genericShader);
 			
-			// Draw main
+			// Draw final gbuffer composite
 			drawTexture( gbuffer.getBufferFinal(), 0, 0, size.x, size.y );
 			
 			// Draw buffers
@@ -219,10 +220,9 @@ public class Pipeline implements Renderable {
 			
 			// Render final 3d overlay stuff
 			{
+				// Reset perspective projection
 				perspective();
-				shader_get().setProjectionMatrix(projMatrix);
-				shader_get().setViewMatrix(viewMatrix);
-				shader_get().setWorldMatrix(IDENTITY);
+				shader_set(genericShader);
 				
 				// Render selected instances (handles)
 				List<Instance> instances = Game.selectedExtended();
