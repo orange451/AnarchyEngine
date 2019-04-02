@@ -53,8 +53,10 @@ public class TransparencyRenderer {
 
 		shader.shader_set_uniform_f(shader.shader_get_uniform("uAmbient"), pipeline.getGBuffer().getAmbient());
 		SkyBox skybox = pipeline.getGBuffer().getMergeProcessor().getSkybox();
-		shader.shader_set_uniform_f(shader.shader_get_uniform("uSkyBoxLightPower"), ((SkySphereIBL)skybox).getLightPower());
-		shader.shader_set_uniform_f(shader.shader_get_uniform("uSkyBoxLightMultiplier"), ((SkySphereIBL)skybox).getLightMultiplier());
+		if ( skybox != null ) {
+			shader.shader_set_uniform_f(shader.shader_get_uniform("uSkyBoxLightPower"), ((SkySphereIBL)skybox).getLightPower());
+			shader.shader_set_uniform_f(shader.shader_get_uniform("uSkyBoxLightMultiplier"), ((SkySphereIBL)skybox).getLightMultiplier());
+		}
 		
 		// Send point light data
 		// TODO replace this with a Uniform buffer. MUCH BETTER

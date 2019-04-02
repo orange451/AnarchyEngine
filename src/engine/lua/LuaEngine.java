@@ -88,6 +88,7 @@ public class LuaEngine {
 		new Texture();
 		new PlayerScripts();
 		new PointLight();
+		new Skybox();
 		
 		// Animation objects
 		new AnimationData();

@@ -47,18 +47,19 @@ public abstract class PhysicsBase extends Instance implements GameSubscriber {
 		this.defineField("Bounciness", LuaValue.valueOf(0.5f), false);
 		this.getField("Bounciness").setClamp(new NumberClampPreferred(0, 2, 0, 1));
 		
-		this.defineField("AngularFactor", LuaValue.valueOf(1.0f), false);
-		this.getField("AngularFactor").setClamp(new NumberClamp(0, 1));
-		
 		this.defineField("LinearDamping", LuaValue.valueOf(0.0f), false);
 		this.getField("LinearDamping").setClamp(new NumberClamp(0, 1));
+		
+		this.defineField("AngularFactor", LuaValue.valueOf(1.0f), false);
+		this.getField("AngularFactor").setClamp(new NumberClamp(0, 1));
 		
 		this.defineField("Shape", LuaValue.valueOf("Box"), false);
 		this.getField("Shape").setEnum(new EnumType("Shape"));
 		
+		this.defineField("UseCustomMesh", LuaValue.valueOf(false), false);
+		
 		this.defineField("Velocity", Vector3.newInstance(0, 0, 0), false);
 		this.defineField("WorldMatrix", new Matrix4(), false);
-		this.defineField("UseCustomMesh", LuaValue.valueOf(false), false);
 		
 		Game.getGame().subscribe(this);
 	}

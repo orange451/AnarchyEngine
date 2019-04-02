@@ -29,13 +29,17 @@ public class MergeProcessor implements PostProcessor {
 		TextureUtils.autoResize = false;
 		//skyBox = SkySphereIBL.create("Resources/Testing/IBL/valley.hdr");
 		//skyBox = SkySphereIBL.create("Resources/Testing/IBL/office.hdr");
-		skyBox = SkySphereIBL.create("Resources/Testing/IBL/autoshop_01_2k.hdr");
+		//skyBox = SkySphereIBL.create("Resources/Testing/IBL/autoshop_01_2k.hdr");
 		//skyBox = SkySphereIBL.create("Resources/Testing/IBL/studio.hdr");
 		//skyBox = SkySphereIBL.create("Resources/Testing/IBL/koppie.hdr");
 		//skyBox = SkySphereIBL.create("Resources/Testing/IBL/noon_grass.hdr");
 		//((SkySphereIBL)skyBox).setLightMultiplier(10);
 		TextureUtils.autoResize = true;
 		skyBoxRotation.rotateX((float) (-Math.PI/2f));
+	}
+
+	public void setSkybox(SkySphereIBL skybox) {
+		this.skyBox = skybox;
 	}
 	
 	@Override
@@ -77,7 +81,9 @@ public class MergeProcessor implements PostProcessor {
 			shader.texture_set_stage(shader.shader_get_uniform("texture_pbr"), buffer2, 4);
 			shader.texture_set_stage(shader.shader_get_uniform("texture_depth"), depth, 5);
 			shader.texture_set_stage(shader.shader_get_uniform("texture_transparency"), transparency, 6);
-			shader.texture_set_stage(shader.shader_get_uniform("texture_skybox"), skyBox, 7);
+			if ( skyBox != null ) {
+				shader.texture_set_stage(shader.shader_get_uniform("texture_skybox"), skyBox, 7);
+			}
 			shader.shader_set_uniform_f(shader.shader_get_uniform("uAmbient"), pipeline.getGBuffer().getAmbient());
 			shader.shader_set_uniform_matrix(shader.shader_get_uniform("inverseProjectionMatrix"), pipeline.getGBuffer().getInverseProjectionMatrix());
 			shader.shader_set_uniform_matrix(shader.shader_get_uniform("inverseViewMatrix"), pipeline.getGBuffer().getInverseViewMatrix());

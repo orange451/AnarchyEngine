@@ -6,14 +6,10 @@ import static org.lwjgl.opengl.GL11.GL_RGBA;
 import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
 import static org.lwjgl.opengl.GL11.GL_UNSIGNED_BYTE;
 
-import java.nio.ByteBuffer;
-
-import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL21;
 
 import engine.InternalRenderThread;
-import engine.gl.PixelHandler;
 import engine.gl.Texture2D;
 import engine.io.Image;
 import lwjgui.paint.Color;

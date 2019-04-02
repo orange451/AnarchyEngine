@@ -13,7 +13,7 @@ public class IBLHandler {
 	public void handle(Pipeline pipeline) {
 		SkyBox skybox = pipeline.getGBuffer().getMergeProcessor().getSkybox();
 		
-		if ( !(skybox instanceof SkySphereIBL) )
+		if ( skybox == null || !(skybox instanceof SkySphereIBL) )
 			return;
 		
 		pipeline.shader_set(shader);

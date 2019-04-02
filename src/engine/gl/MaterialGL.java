@@ -144,15 +144,18 @@ public class MaterialGL {
 		
 		// Bind environment map
 		SkyBox cubemap = Pipeline.pipeline_get().getGBuffer().getMergeProcessor().getSkybox();
-		shader.texture_set_stage(shader.shader_get_uniform("texture_cubemap"), cubemap, 4);
 		
 		// Bind IBL map (if it exists)
 		SkySphere ibl = null;
-		if ( cubemap instanceof SkySphereIBL ) {
-			shader.shader_set_uniform_f(shader.shader_get_uniform("uSkyBoxLightPower"), ((SkySphereIBL)cubemap).getLightPower());
-			shader.shader_set_uniform_f(shader.shader_get_uniform("uSkyBoxLightMultiplier"), ((SkySphereIBL)cubemap).getLightMultiplier());
-		} else {
-			shader.shader_set_uniform_f(shader.shader_get_uniform("uSkyBoxLightMultiplier"), 1.0f);
+		if ( cubemap != null ) {
+			shader.texture_set_stage(shader.shader_get_uniform("texture_cubemap"), cubemap, 4);
+			
+			if ( cubemap instanceof SkySphereIBL ) {
+				shader.shader_set_uniform_f(shader.shader_get_uniform("uSkyBoxLightPower"), ((SkySphereIBL)cubemap).getLightPower());
+				shader.shader_set_uniform_f(shader.shader_get_uniform("uSkyBoxLightMultiplier"), ((SkySphereIBL)cubemap).getLightMultiplier());
+			} else {
+				shader.shader_set_uniform_f(shader.shader_get_uniform("uSkyBoxLightMultiplier"), 1.0f);
+			}
 		}
 
 		// Set uniforms

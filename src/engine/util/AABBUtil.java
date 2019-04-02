@@ -40,9 +40,7 @@ public class AABBUtil {
 			
 			Positionable obj = (Positionable)t;
 			Pair<Vector3f, Vector3f> taabb = obj.getAABB();
-
-			//Vector3f min2 = obj.getPosition().toJoml().add(taabb.value1());
-			//Vector3f max2 = obj.getPosition().toJoml().add(taabb.value2());
+			
 			Vector3f min2 = obj.getWorldMatrix().toJoml().translate(taabb.value1()).getTranslation(new Vector3f());
 			Vector3f max2 = obj.getWorldMatrix().toJoml().translate(taabb.value2()).getTranslation(new Vector3f());
 			
