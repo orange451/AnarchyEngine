@@ -3,10 +3,8 @@ package engine.lua.type.object.services;
 import org.luaj.vm2.LuaValue;
 
 import engine.Game;
-import engine.InternalGameThread;
 import engine.InternalRenderThread;
 import engine.application.RenderableApplication;
-import engine.gl.Texture2D;
 import engine.gl.ibl.SkySphereIBL;
 import engine.io.Image;
 import engine.lua.type.LuaConnection;
