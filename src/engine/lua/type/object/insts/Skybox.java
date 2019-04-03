@@ -40,4 +40,17 @@ public class Skybox extends Instance implements TreeViewable {
 	public Icons getIcon() {
 		return Icons.icon_skybox;
 	}
+
+	public Texture getImage() {
+		LuaValue ret = this.rawget("Image");
+		return ret.isnil()?null:(Texture)ret;
+	}
+
+	public float getPower() {
+		return this.rawget("Power").tofloat();
+	}
+
+	public float getBrightness() {
+		return this.rawget("Brightness").tofloat();
+	}
 }

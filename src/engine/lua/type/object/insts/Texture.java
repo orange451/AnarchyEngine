@@ -7,6 +7,7 @@ import engine.gl.Resources;
 import engine.gl.Texture2D;
 import engine.io.AsynchronousImage;
 import engine.io.FileResource;
+import engine.io.Image;
 import engine.lua.type.LuaEvent;
 import engine.lua.type.object.AssetLoadable;
 import engine.lua.type.object.Instance;
@@ -21,6 +22,7 @@ public class Texture extends AssetLoadable implements TreeViewable,FileResource 
 	private boolean changed;
 	private boolean loaded;
 	private AsynchronousImage image;
+	private Image loadedImage;
 	
 	public Texture() {
 		super("Texture");
@@ -43,7 +45,14 @@ public class Texture extends AssetLoadable implements TreeViewable,FileResource 
 		this.texture = force;
 		this.changed = false;
 		this.loaded = true;
-		((LuaEvent)this.rawget("TextureLoaded")).fire();
+	}
+	
+	public Image getImage() {
+		// Force load the texture
+		getTexture();
+		
+		// return it
+		return this.loadedImage;
 	}
 	
 	public Texture2D getTexture() {
@@ -61,11 +70,13 @@ public class Texture extends AssetLoadable implements TreeViewable,FileResource 
 				}
 				this.loaded = false;
 			} else {
+				loadedImage = image.getResource();
 				if ( this.get("SRGB").checkboolean() ) {
 					setTexture( TextureUtils.loadSRGBTextureFromImage(image.getResource()) );
 				} else {
 					setTexture( TextureUtils.loadRGBATextureFromImage(image.getResource()) );
 				}
+				((LuaEvent)this.rawget("TextureLoaded")).fire();
 			}
 		}
 		return this.texture;
@@ -77,6 +88,9 @@ public class Texture extends AssetLoadable implements TreeViewable,FileResource 
 		loaded = false; // Force image to reload
 		image = new AsynchronousImage(realPath, this.rawget("FlipY").toboolean());
 		Game.resourceLoader().addResource(image);
+		
+		loadedImage = null;
+		texture = null;
 	}
 
 	@Override

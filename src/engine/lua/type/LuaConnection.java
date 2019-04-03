@@ -1,5 +1,7 @@
 package engine.lua.type;
 
+import java.util.List;
+
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.ZeroArgFunction;
 
@@ -32,10 +34,12 @@ public class LuaConnection extends LuaDatatype {
 		function = null;
 
 		if ( event != null ) {
-			if ( event.connections != null ) {
-				event.connections.remove(this);
-			}
+			List<LuaConnection> con = event.connections;
 			event = null;
+			
+			if ( con != null ) {
+				con.remove(this);
+			}
 		}
 	}
 

@@ -14,6 +14,7 @@ import engine.gl.Surface;
 import engine.gl.Texture2D;
 import engine.gl.ibl.SkySphereIBL;
 import engine.gl.shader.BaseShader;
+import engine.io.Image;
 import engine.util.TextureUtils;
 import lwjgui.paint.Color;
 
@@ -22,6 +23,7 @@ public class MergeProcessor implements PostProcessor {
 	private SkySphereIBL skyBox;
 	private Matrix3f skyBoxRotation = new Matrix3f();
 	private Surface surface;
+	private SkySphereIBL skyBoxBackup;
 	
 	public MergeProcessor() {
 		shader = new MergeShader();
@@ -36,9 +38,17 @@ public class MergeProcessor implements PostProcessor {
 		//((SkySphereIBL)skyBox).setLightMultiplier(10);
 		TextureUtils.autoResize = true;
 		skyBoxRotation.rotateX((float) (-Math.PI/2f));
+		
+		skyBoxBackup = new SkySphereIBL(new Image(Color.GRAY,4,3));
+		skyBoxBackup.setLightMultiplier(1/255f);
+		skyBoxBackup.setLightPower(1f);
+		this.skyBox = skyBoxBackup;
 	}
 
 	public void setSkybox(SkySphereIBL skybox) {
+		if ( skybox == null )
+			skybox = skyBoxBackup;
+		
 		this.skyBox = skybox;
 	}
 	

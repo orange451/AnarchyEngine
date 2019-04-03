@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
 import org.luaj.vm2.LuaTable;
 import org.luaj.vm2.LuaValue;
@@ -16,9 +15,9 @@ import org.luaj.vm2.lib.ZeroArgFunction;
 
 import engine.Game;
 import engine.lua.LuaEngine;
+import engine.lua.type.DataModel;
 import engine.lua.type.LuaEvent;
 import engine.lua.type.LuaField;
-import engine.lua.type.DataModel;
 import engine.lua.type.LuaValuetype;
 
 public abstract class Instance extends DataModel {
