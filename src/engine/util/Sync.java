@@ -32,7 +32,7 @@ public class Sync {
 			e.printStackTrace();
 		}
 				
-		nextFrameMap.put( thread, NextFrame + FrameInNanos );
+		nextFrameMap.put( thread, System.nanoTime() + FrameInNanos );
 	}
 
 	private static Thread checkThread() {
