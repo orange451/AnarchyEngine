@@ -14,6 +14,8 @@ import org.lwjgl.util.nfd.NativeFileDialog;
 
 import engine.Game;
 import engine.GameSubscriber;
+import engine.InternalGameThread;
+import engine.InternalRenderThread;
 import engine.lua.LuaEngine;
 import engine.lua.lib.LuaTableReadOnly;
 import engine.lua.type.Clamp;
@@ -74,16 +76,16 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 		this.grid = new PropertyGrid();
 		this.scroller.setContent(grid);
 		
-		update();
+		update(true);
 	}
 	
 	private long lastUpdate = -1;
 
-	private void update() {
+	private void update(boolean important) {
 		if ( !Game.isLoaded() )
 			return;
 		
-		if ( System.currentTimeMillis()-lastUpdate < 50 )
+		if ( System.currentTimeMillis()-lastUpdate < 50 && !important )
 			return;
 		lastUpdate = System.currentTimeMillis();
 		
@@ -125,7 +127,7 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 
 	@Override
 	public void gameUpdateEvent(boolean important) {
-		update();
+		update(important);
 	}
 	
 	@Override
@@ -582,10 +584,12 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 			}
 			
 			//Game.deselectAll();
-			Game.select(this.instance);
+			//Game.select(this.instance);
 			
-			LWJGUI.runLater(()->{
+			InternalRenderThread.runLater(()->{
+				Game.deselectAll();
 				Game.deselect((Instance) instance);
+				Game.select(this.instance);
 			});
 		}
 		

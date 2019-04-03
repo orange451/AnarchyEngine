@@ -16,7 +16,9 @@ public class Sync {
 	}
 	
 	/**
-	 * Attempts to sync the thread to the desired FPS
+	 * Attempts to sync the thread to the desired FPS.<br>
+	 * This is meant to be called every frame.
+	 * Calling it in any other way will lead to undesired thread sleeping.
 	 * @param fps
 	 */
 	public static void sync(int fps) {
@@ -28,6 +30,7 @@ public class Sync {
 		long SleepMillis = TimeUnit.NANOSECONDS.toMillis(SleepTime);
 		try {
 			Thread.sleep(SleepMillis);
+			Thread.yield();
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}

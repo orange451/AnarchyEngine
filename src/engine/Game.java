@@ -442,7 +442,7 @@ public class Game implements Tickable {
 	
 	public static void deselectAll() {
 		selectedInstances.clear();
-		game.gameUpdate(false);
+		game.gameUpdate(true);
 	}
 	
 	public static boolean isSelected(Instance inst) {

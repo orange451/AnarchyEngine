@@ -68,14 +68,14 @@ public class IdeExplorer extends IdePane implements GameSubscriber {
 		cache1 = new ObservableList<TreeItem<Instance>>();
 		cache2 = new ObservableList<TreeItem<Instance>>();
 
-		update();
+		update(true);
 	}
 
 	private long lastUpdate = -1;
 	private boolean requiresUpdate; // TODO Maybe check in game logic thread if this is true and then force update if lastUpdate hasn't updated in more than 5 ms?
 	
-	public void update() {
-		if (System.currentTimeMillis()-lastUpdate < 50 ) {
+	public void update(boolean important) {
+		if (System.currentTimeMillis()-lastUpdate < 50 && !important ) {
 			requiresUpdate = true;
 			return;
 		}
@@ -358,6 +358,6 @@ public class IdeExplorer extends IdePane implements GameSubscriber {
 		if ( !important )
 			return;
 		
-		update();
+		update(important);
 	}
 }
