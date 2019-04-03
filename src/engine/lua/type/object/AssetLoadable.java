@@ -27,4 +27,8 @@ public abstract class AssetLoadable extends Asset implements FileResource {
 	public void resetFilePath() {
 		this.set("FilePath", LuaValue.valueOf(""));
 	}
+	
+	public static String getFileTypes() {
+		return "";
+	}
 }

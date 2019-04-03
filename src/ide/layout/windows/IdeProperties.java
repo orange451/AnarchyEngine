@@ -1,6 +1,7 @@
 package ide.layout.windows;
 
 import java.io.File;
+import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -21,6 +22,7 @@ import engine.lua.type.LuaValuetype;
 import engine.lua.type.NumberClamp;
 import engine.lua.type.NumberClampPreferred;
 import engine.lua.type.data.Color3;
+import engine.lua.type.object.AssetLoadable;
 import engine.lua.type.object.Instance;
 import engine.lua.type.object.InstancePropertySubscriber;
 import ide.IDEFilePath;
@@ -486,7 +488,14 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 						String pp = IDEFilePath.convertToSystem(initialValue.toString());
 						if ( !new File(pp).exists() )
 							pp = "";
-						int result = NativeFileDialog.NFD_OpenDialog(null, pp, outPath);
+						String types = null;
+						if ( instance instanceof AssetLoadable ) {
+							Class<?> clazz = ((AssetLoadable)instance).getClass();
+							
+							Method m = clazz.getMethod("getFileTypes");
+							types = (String) m.invoke(null);
+						}
+						int result = NativeFileDialog.NFD_OpenDialog(types, pp, outPath);
 						if ( result == NativeFileDialog.NFD_OKAY ) {
 							String path = IDEFilePath.convertToIDE(outPath.getStringUTF8(0));
 							try {

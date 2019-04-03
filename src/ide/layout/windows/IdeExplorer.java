@@ -16,7 +16,9 @@ import engine.lua.type.object.ScriptBase;
 import engine.lua.type.object.TreeInvisible;
 import engine.lua.type.object.TreeViewable;
 import engine.lua.type.object.insts.GameObject;
+import engine.lua.type.object.insts.Mesh;
 import engine.lua.type.object.insts.Prefab;
+import engine.lua.type.object.insts.Texture;
 import engine.lua.type.object.services.Assets;
 import engine.util.FileUtils;
 import ide.IDE;
@@ -254,7 +256,7 @@ public class IdeExplorer extends IdePane implements GameSubscriber {
 			prefi.setOnAction(event -> {
 				String path = "";
 				PointerBuffer outPath = MemoryUtil.memAllocPointer(1);
-				int result = NativeFileDialog.NFD_OpenDialog("obj,fbx,md5mesh", new File("").getAbsolutePath(), outPath);
+				int result = NativeFileDialog.NFD_OpenDialog(Mesh.getFileTypes(), new File("").getAbsolutePath(), outPath);
 				if ( result == NativeFileDialog.NFD_OKAY ) {
 					path = outPath.getStringUTF8(0);
 					Game.assets().importPrefab(path);
@@ -268,7 +270,7 @@ public class IdeExplorer extends IdePane implements GameSubscriber {
 			MenuItem texi = new MenuItem("Import Texture", Icons.icon_texture.getView());
 			texi.setOnAction(event -> {
 				NFDPathSet outPaths = NFDPathSet.calloc();
-				int result = NativeFileDialog.NFD_OpenDialogMultiple("png,bmp,tga,jpg,jpeg,hdr", new File("").getAbsolutePath(), outPaths);
+				int result = NativeFileDialog.NFD_OpenDialogMultiple(Texture.getFileTypes(), new File("").getAbsolutePath(), outPaths);
 				if ( result == NativeFileDialog.NFD_OKAY ) {
 					long count = NativeFileDialog.NFD_PathSet_GetCount(outPaths);
 					for (long i = 0; i < count; i++) {

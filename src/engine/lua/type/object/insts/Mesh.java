@@ -153,4 +153,8 @@ public class Mesh extends AssetLoadable implements TreeViewable,FileResource {
 		
 		return assets.findFirstChild("Meshes");
 	}
+
+	public static String getFileTypes() {
+		return "obj,fbx,3ds,md5mesh";
+	}
 }

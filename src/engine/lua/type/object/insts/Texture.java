@@ -137,4 +137,8 @@ public class Texture extends AssetLoadable implements TreeViewable,FileResource 
 		
 		return assets.findFirstChild("Textures");
 	}
+	
+	public static String getFileTypes() {
+		return "png,bmp,tga,jpg,jpeg,hdr";
+	}
 }
