@@ -160,34 +160,42 @@ public class UserInputService extends Service implements TreeViewable {
 	public void onKeyPressed(int key) {
 		if ( !keysDown.containsKey(key) )
 			keysDown.put(key, true);
-		((LuaEvent)this.rawget("InputBegan")).fire(new InputObject(key));
+		((LuaEvent)this.rawget("InputBegan")).fire(new InputObjectKey(key));
 	}
 	
 	public void onKeyReleased(int key) {
 		keysDown.remove(key);
-		((LuaEvent)this.rawget("InputEnded")).fire(new InputObject(key));
+		((LuaEvent)this.rawget("InputEnded")).fire(new InputObjectKey(key));
 	}
 
 	public void onMousePress(int key) {
 		if ( !mouseDown.containsKey(key) )
 			mouseDown.put(key, true);
-		((LuaEvent)this.rawget("MousePressed")).fire(new MouseInputObject(key));
+		((LuaEvent)this.rawget("MousePressed")).fire(new InputObjectMouse(key));
+		((LuaEvent)this.rawget("InputBegan")).fire(new InputObjectMouse(key));
 	}
 	
 	public void onMouseRelease(int key) {
 		mouseDown.remove(key);
-		((LuaEvent)this.rawget("MouseReleased")).fire(new MouseInputObject(key));
+		((LuaEvent)this.rawget("MouseReleased")).fire(new InputObjectMouse(key));
+		((LuaEvent)this.rawget("InputEnded")).fire(new InputObjectMouse(key));
+	}
+	
+	public void onMouseScroll(int key) {
+		((LuaEvent)this.rawget("InputBegan")).fire(new InputObjectMouse(key));
 	}
 }
 
-class InputObject extends LuaTableReadOnly {
-	public InputObject(int keyCode) {
+class InputObjectKey extends LuaTableReadOnly {
+	public InputObjectKey(int keyCode) {
 		this.rawset("KeyCode", keyCode);
+		this.rawset("UserInputType", "Keyboard");
 	}
 }
 
-class MouseInputObject extends LuaTableReadOnly {
-	public MouseInputObject(int button) {
-		this.rawset("Button", button);
+class InputObjectMouse extends LuaTableReadOnly {
+	public InputObjectMouse(int keyCode) {
+		this.rawset("Button", keyCode);
+		this.rawset("UserInputType", "Mouse");
 	}
 }

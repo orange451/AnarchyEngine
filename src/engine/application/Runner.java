@@ -9,6 +9,7 @@ import engine.InternalRenderThread;
 import engine.gl.Pipeline;
 import engine.lua.type.object.services.UserInputService;
 import lwjgui.LWJGUI;
+import lwjgui.event.ScrollEvent;
 import lwjgui.geometry.Insets;
 import lwjgui.geometry.Pos;
 import lwjgui.scene.Window;
@@ -54,6 +55,10 @@ public abstract class Runner extends RenderableApplication {
 		rootPane.setOnMouseReleased(event -> {
 			UserInputService uis = (UserInputService) Game.getService("UserInputService");
 			uis.onMouseRelease(event.button);
+		});
+		rootPane.setOnMouseScrolled(event ->{
+			UserInputService uis = (UserInputService) Game.getService("UserInputService");
+			uis.onMouseScroll(((ScrollEvent)event).y > 0 ? 3 : 4 );
 		});
 		
 		// Load the scene

@@ -120,8 +120,15 @@ public class Vector3 extends LuaValuetype {
 		return mag;
 	}
 
-	protected Vector3 getUnit() {
+	public Vector3 getUnit() {
+		if ( unit.isnil() || !(unit instanceof Vector3) || ((Vector3)unit).isZero() )
+			get("Unit");
+		
 		return (Vector3) unit;
+	}
+
+	private boolean isZero() {
+		return getX() == 0 && getY() == 0 && getZ() == 0;
 	}
 
 	protected LuaValue newInstanceFunction() {
@@ -146,6 +153,10 @@ public class Vector3 extends LuaValuetype {
 
 	public static Vector3 newInstance(Vector3f vector) {
 		return newInstance( vector.x, vector.y, vector.z );
+	}
+
+	public static Vector3 newInstance(Vector3 vector) {
+		return newInstance( vector.getX(), vector.getY(), vector.getZ() );
 	}
 
 	public static Vector3 getVector(LuaValue value) {

@@ -8,6 +8,7 @@ import engine.lua.type.object.services.UserInputService;
 import ide.IDE;
 import ide.layout.IdePane;
 import lwjgui.paint.Color;
+import lwjgui.event.ScrollEvent;
 import lwjgui.geometry.Insets;
 import lwjgui.geometry.Pos;
 import lwjgui.gl.GenericShader;
@@ -70,6 +71,10 @@ public class IdeGameView extends IdePane {
 		internal.setOnMouseReleased(event -> {
 			UserInputService uis = (UserInputService) Game.getService("UserInputService");
 			uis.onMouseRelease(event.button);
+		});
+		internal.setOnMouseScrolled(event ->{
+			UserInputService uis = (UserInputService) Game.getService("UserInputService");
+			uis.onMouseScroll(((ScrollEvent)event).y > 0 ? 3 : 4 );
 		});
 		
 		this.fps = new Label("fps");

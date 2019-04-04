@@ -1,11 +1,10 @@
 -- Declare constants
 local CAMERA_SENSITIVITY = 500
-local CAMERA_SPEED = 8
+local CAMERA_SPEED = 10
 
 -- Declare varialbes
 local UserInputService = nil
 local RunService = nil
-local camera = nil
 local inputDirection = Vector2.new(0,0)
 
 -- Initialize
@@ -16,9 +15,34 @@ RunService = game:GetService("RunService")
 ------------- Main Functionality Below -----------------
 --------------------------------------------------------
 
+UserInputService.InputBegan:Connect(function(InputData)
+	-- Disable if no camera
+	local camera = game.Workspace.CurrentCamera
+	if ( camera == nil ) then
+		return
+	end
+	
+	-- Disable if camera is not in freecam
+	if ( camera.CameraType ~= Enum.CameraType.Free ) then
+		return
+	end
+
+	-- Get the look vector
+	local LookVector = camera:GetLookVector()
+
+	-- Scroll zooming
+	if ( InputData.UserInputType == Enum.UserInputType.Mouse ) then
+		if ( InputData.Button == Enum.Mouse.WheelUp ) then
+			camera:Translate(LookVector)
+		elseif ( InputData.Button == Enum.Mouse.WheelDown ) then
+			camera:Translate(LookVector*-1)
+		end
+	end
+end)
+
 RunService.RenderStepped:Connect(function(delta)	
 	-- Disable if no camera
-	camera = game.Workspace.CurrentCamera
+	local camera = game.Workspace.CurrentCamera
 	if ( camera == nil ) then
 		return
 	end
@@ -28,9 +52,22 @@ RunService.RenderStepped:Connect(function(delta)
 		return
 	end
 	
+	-- Get Camera speed
+	local CameraSpeed = CAMERA_SPEED * (UserInputService:IsKeyDown(Enum.KeyCode.LeftShift) and 0.25 or 1)
+	
+	-- Vertical UP moving
+	if ( UserInputService:IsKeyDown(Enum.KeyCode.Q) ) then
+		camera:Translate(Vector3.new(0, 0, 1)*delta*CameraSpeed*0.5)
+	end
+	
+	-- Vertical DOWN moving
+	if ( UserInputService:IsKeyDown(Enum.KeyCode.E) ) then
+		camera:Translate(Vector3.new(0, 0, -1)*delta*CameraSpeed*0.5)
+	end
+	
+	
 	-- Handle mouse grabbing
-	local rightDown = UserInputService:IsMouseButtonDown(Enum.Mouse.Right)
-	if ( rightDown ) then
+	if ( UserInputService:IsMouseButtonDown(Enum.Mouse.Right) ) then
 		if ( not UserInputService.LockMouse ) then
 			UserInputService.LockMouse = true
 		end
@@ -47,6 +84,6 @@ RunService.RenderStepped:Connect(function(delta)
 	end
 	
 	-- Translate camera from keyboard input
-	local cameraOffset = UserInputService:GetMovementVector(true)*delta*CAMERA_SPEED
+	local cameraOffset = UserInputService:GetMovementVector(true)*delta*CameraSpeed
 	camera:Translate(cameraOffset)
 end)

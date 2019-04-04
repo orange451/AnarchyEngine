@@ -4,6 +4,7 @@ import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.TwoArgFunction;
+import org.luaj.vm2.lib.ZeroArgFunction;
 
 import engine.Game;
 import engine.lua.lib.EnumType;
@@ -35,6 +36,15 @@ public class Camera extends Instance implements TreeViewable {
 		this.set("LookAt", Vector3.newInstance(0, 0, 0));
 		this.set("Position", Vector3.newInstance(4, 4, 4));
 		
+		this.getmetatable().set("GetLookVector", new ZeroArgFunction() {
+			@Override
+			public LuaValue call() {
+				Vector3 ret = Vector3.newInstance(getLookAt());
+				ret = (Vector3) ret.sub(getPosition());
+				return ret.getUnit();
+			}
+		});
+		
 		this.getmetatable().set("Translate", new TwoArgFunction() {
 			@Override
 			public LuaValue call(LuaValue myself, LuaValue arg2) {
@@ -44,8 +54,8 @@ public class Camera extends Instance implements TreeViewable {
 				Vector3 t1 = (Vector3) current1.add(offset);
 				Vector3 t2 = (Vector3) current2.add(offset);
 				
-				Camera.this.setPosition(Vector3.newInstance(t1.getX(), t1.getY(), t1.getZ()));
-				Camera.this.setLookAt(Vector3.newInstance(t2.getX(), t2.getY(), t2.getZ()));
+				Camera.this.setPosition(Vector3.newInstance(t1));
+				Camera.this.setLookAt(Vector3.newInstance(t2));
 				return null;
 			}
 		});

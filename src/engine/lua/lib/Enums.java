@@ -28,6 +28,14 @@ public class Enums extends TwoArgFunction {
 				}
 			});
 			
+			// User Input Types Enum
+			this.rawset("UserInputType", new LuaTableReadOnly() {
+				{
+					this.rawset("Keyboard", "Keyboard");
+					this.rawset("Mouse", "Mouse");
+				}
+			});
+			
 			// Mouse Enum
 			this.rawset("CameraType", new LuaTableReadOnly() {
 				{
