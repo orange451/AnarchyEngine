@@ -18,6 +18,7 @@ import engine.lua.type.ScriptData;
 import engine.lua.type.object.Instance;
 import engine.lua.type.object.Service;
 import engine.lua.type.object.insts.Camera;
+import engine.lua.type.object.insts.GlobalScript;
 import engine.lua.type.object.insts.Player;
 import engine.lua.type.object.insts.PlayerScripts;
 import engine.lua.type.object.insts.PlayerScriptsStart;
@@ -127,11 +128,13 @@ public class Game implements Tickable {
 		if ( Game.getService("Core") == null )
 			new Core();
 		
-		if ( Game.getService("Core").findFirstChildOfClass("Script") == null ) {
-			Script camera = new Script();
+		if ( Game.getService("Core").findFirstChild("CameraController") == null ) {
+			GlobalScript camera = new GlobalScript();
 			camera.setName("CameraController");
 			camera.setSourceFromFile("engine/camera.lua");
+			camera.setArchivable(false);
 			camera.setParent(Game.getService("Core"));
+			camera.setLocked(true);
 		}
 	}
 

@@ -326,8 +326,11 @@ public abstract class PhysicsBase extends Instance implements GameSubscriber {
 			if ( value.checkboolean() ) {
 				this.defineField("CustomMesh", LuaValue.NIL, false);
 				this.set("CustomMesh", LuaValue.NIL);
+				
+				this.getField("Shape").setLocked(true);
 			} else {
 				this.undefineField("CustomMesh");
+				this.getField("Shape").setLocked(false);
 			}
 
 			return value;
@@ -350,11 +353,7 @@ public abstract class PhysicsBase extends Instance implements GameSubscriber {
 			}
 			
 			if ( physics != null ) {
-				if ( value.isnil() ) {
-					physics.setShapeFromType(this.get("Shape").toString());
-				} else {
-					physics.setShapeFromMesh(((Mesh)value).getMesh());
-				}
+				physics.setShapeFromMesh(value);
 			}
 		}
 		return value;

@@ -80,6 +80,14 @@ public abstract class DataModel extends LuaDatatype {
 		this.rawset("DescendantRemoved",	new LuaEvent());
 	}
 	
+	public boolean isArhivable() {
+		return this.get("Archivable").toboolean();
+	}
+	
+	public void setArchivable(boolean archivable) {
+		this.set("Archivable", LuaValue.valueOf(archivable));
+	}
+	
 	public String getFullName() {
 		String ret = "";
 		LuaValue p = this;

@@ -28,6 +28,14 @@ public class Enums extends TwoArgFunction {
 				}
 			});
 			
+			// Mouse Enum
+			this.rawset("CameraType", new LuaTableReadOnly() {
+				{
+					this.rawset("Free", "Free");
+					this.rawset("Scriptable", "Scriptable");
+				}
+			});
+			
 			// Shape Enum
 			this.rawset("Shape", new LuaTableReadOnly() {
 				{

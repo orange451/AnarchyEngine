@@ -234,8 +234,8 @@ public class PhysicsObjectInternal {
 			
 			// Shape
 			if ( desiredShape == null ) {
-				if ( luaFrontEnd.rawget("UseCustomMesh").checkboolean() && !luaFrontEnd.rawget("CustomMesh").isnil() ) {
-					setShapeFromMesh(((Mesh)luaFrontEnd.rawget("CustomMesh")).getMesh());
+				if ( luaFrontEnd.rawget("UseCustomMesh").checkboolean() ) {
+					setShapeFromMesh(luaFrontEnd.rawget("CustomMesh"));
 				} else {
 					setShapeFromType(luaFrontEnd.rawget("Shape").toString());
 				}
@@ -285,7 +285,7 @@ public class PhysicsObjectInternal {
 		}
 	}
 	
-	public void setShapeFromMesh(BufferedMesh mesh) {
+	public void setShapeFromMesh(LuaValue customMesh) {
 		if ( luaFrontEnd == null )
 			return;
 		
@@ -295,9 +295,16 @@ public class PhysicsObjectInternal {
 		}
 		
 		float scale = 1.0f;
-		LuaValue prefab = luaFrontEnd.get("Linked").get("Prefab");
+		Prefab prefab = (Prefab) luaFrontEnd.get("Linked").get("Prefab");
 		if ( !prefab.isnil() ) {
-			scale = ((Prefab)prefab).get("Scale").tofloat();
+			scale = prefab.get("Scale").tofloat();
+		}
+		
+		BufferedMesh mesh = null;
+		if ( customMesh.isnil() ) {
+			mesh = prefab.getPrefab().getCombinedMesh();
+		} else {
+			mesh = ((Mesh)customMesh).getMesh();
 		}
 		
 		if ( desiredMass == 0 ) {

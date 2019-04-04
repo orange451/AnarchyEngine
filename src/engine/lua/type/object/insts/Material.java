@@ -35,13 +35,13 @@ public class Material extends Asset implements TreeViewable {
 		this.defineField("MetallicTexture", LuaValue.NIL, false);
 		this.defineField("RoughnessTexture", LuaValue.NIL, false);
 		
-		this.defineField("Metalness", LuaValue.valueOf(0.3f), false);
+		this.defineField("Metalness", LuaValue.valueOf(0.0f), false);
 		this.getField("Metalness").setClamp(new NumberClamp(0, 1));
 		
-		this.defineField("Roughness", LuaValue.valueOf(0.3f), false);
+		this.defineField("Roughness", LuaValue.valueOf(0.4f), false);
 		this.getField("Roughness").setClamp(new NumberClamp(0, 1));
 		
-		this.defineField("Reflective", LuaValue.valueOf(0.3f), false);
+		this.defineField("Reflective", LuaValue.valueOf(0.05f), false);
 		this.getField("Reflective").setClamp(new NumberClamp(0, 1));
 		
 		this.defineField("Color", Color3.newInstance(255, 255, 255), false);

@@ -85,6 +85,7 @@ public class LuaEngine {
 		new Prefab();
 		new Script();
 		new LocalScript();
+		new GlobalScript();
 		new Texture();
 		new PlayerScripts();
 		new PointLight();

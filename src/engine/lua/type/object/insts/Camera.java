@@ -6,6 +6,7 @@ import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.TwoArgFunction;
 
 import engine.Game;
+import engine.lua.lib.EnumType;
 import engine.lua.type.NumberClamp;
 import engine.lua.type.data.Matrix4;
 import engine.lua.type.data.Vector3;
@@ -18,6 +19,9 @@ public class Camera extends Instance implements TreeViewable {
 	public Camera() {
 		super("Camera");
 
+		this.defineField("CameraType",  LuaValue.valueOf("Free"), false);
+		this.getField("CameraType").setEnum(new EnumType("CameraType"));
+		
 		this.defineField("Position",	Vector3.newInstance(0, 0, 0), false);
 		this.defineField("LookAt",		Vector3.newInstance(0, 0, 0), false);
 		this.defineField("Pitch",		LuaValue.valueOf(0), false);

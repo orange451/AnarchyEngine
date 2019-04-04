@@ -16,15 +16,15 @@ RunService = game:GetService("RunService")
 ------------- Main Functionality Below -----------------
 --------------------------------------------------------
 
-RunService.RenderStepped:Connect(function(delta)
-	-- Disable if game is running
-	if ( game.Running and not game.IsServer ) then
-		return
-	end
-	
+RunService.RenderStepped:Connect(function(delta)	
 	-- Disable if no camera
 	camera = game.Workspace.CurrentCamera
 	if ( camera == nil ) then
+		return
+	end
+	
+	-- Disable if camera is not in freecam
+	if ( camera.CameraType ~= Enum.CameraType.Free ) then
 		return
 	end
 	
