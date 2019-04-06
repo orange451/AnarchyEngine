@@ -1,6 +1,7 @@
 -- Declare constants
 local CAMERA_SENSITIVITY = 500
 local CAMERA_SPEED = 10
+local EPSILON = 1/64
 
 -- Declare varialbes
 local UserInputService = nil
@@ -65,7 +66,6 @@ RunService.RenderStepped:Connect(function(delta)
 		camera:Translate(Vector3.new(0, 0, -1)*delta*CameraSpeed*0.5)
 	end
 	
-	
 	-- Handle mouse grabbing
 	if ( UserInputService:IsMouseButtonDown(Enum.Mouse.Right) ) then
 		if ( not UserInputService.LockMouse ) then
@@ -76,7 +76,7 @@ RunService.RenderStepped:Connect(function(delta)
 		
 		-- Adjust Yaw and Pitch based on mouse delta
 		camera.Yaw = camera.Yaw - mouseDelta.X/CAMERA_SENSITIVITY
-		camera.Pitch = camera.Pitch - mouseDelta.Y/CAMERA_SENSITIVITY
+		camera.Pitch = math.min( math.pi/2-EPSILON, math.max( -math.pi/2+EPSILON, camera.Pitch - mouseDelta.Y/CAMERA_SENSITIVITY ) )
 	else
 		if ( UserInputService.LockMouse ) then
 			UserInputService.LockMouse = false

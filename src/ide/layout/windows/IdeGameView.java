@@ -74,6 +74,10 @@ public class IdeGameView extends IdePane {
 		});
 		internal.setOnMouseScrolled(event ->{
 			UserInputService uis = (UserInputService) Game.getService("UserInputService");
+			
+			if ( !internal.isDescendentHovered() && !this.cached_context.isHovered(internal) )
+				return;
+			
 			uis.onMouseScroll(((ScrollEvent)event).y > 0 ? 3 : 4 );
 		});
 		

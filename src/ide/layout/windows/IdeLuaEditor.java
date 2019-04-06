@@ -60,6 +60,7 @@ public class IdeLuaEditor extends IdePane {
 				"print",
 				"tick",
 				"spawn",
+				"Enum",
 				
 				// Datatypes
 				"Vector3",

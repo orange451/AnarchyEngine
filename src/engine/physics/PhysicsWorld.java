@@ -35,7 +35,7 @@ public class PhysicsWorld {
 	}
 
 	public void tick() {
-		float dt = InternalGameThread.delta;
+		float dt = 1/(float)InternalGameThread.desiredTPS;
 		
 		if ( Game.isRunning() && !Game.isServer() ) {
 			//System.out.println("CLIENT PHYSICS! " + objects.size() + " / " + this.dynamicsWorld.getNumCollisionObjects());
@@ -44,10 +44,10 @@ public class PhysicsWorld {
 		synchronized(dynamicsWorld) {
 			dynamicsWorld.setGravity(new Vector3f(0, 0, -(Game.workspace()).get("Gravity").tofloat()));
 			try{
-				int reps = 2;
+				int reps = 4;
+				float ndt = dt/(float)reps;
 				
 				for (int i = 0; i < reps; i++) {
-					float ndt = dt/(float)reps;
 					Game.runService().physicsSteppedEvent().fire(LuaValue.valueOf(ndt));
 					dynamicsWorld.stepSimulation(ndt,1);
 				}
