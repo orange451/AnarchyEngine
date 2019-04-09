@@ -97,7 +97,7 @@ public class InternalGameThread extends Observable implements Runnable {
 						while ( runnables.size() > 0 ) {
 							Runnable r = runnables.get(0);
 							r.run();
-							runnables.remove(r);
+							runnables.remove(0);
 						}
 					}
 				}

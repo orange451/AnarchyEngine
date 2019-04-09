@@ -74,6 +74,7 @@ public abstract class DataModel extends LuaDatatype {
 		this.defineField("Archivable",		LuaValue.valueOf(true), false);
 
 		this.rawset("Changed",		new LuaEvent());
+		this.rawset("Destroyed",	new LuaEvent());
 		this.rawset("ChildAdded",	new LuaEvent());
 		this.rawset("ChildRemoved",	new LuaEvent());
 		this.rawset("DescendantAdded",		new LuaEvent());
@@ -111,6 +112,10 @@ public abstract class DataModel extends LuaDatatype {
 	
 	public LuaEvent changedEvent() {
 		return (LuaEvent)this.rawget("Changed");
+	}
+	
+	public LuaEvent destroyedEvent() {
+		return (LuaEvent)this.rawget("Destroyed");
 	}
 	
 	public LuaEvent childAddedEvent() {

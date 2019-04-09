@@ -551,6 +551,7 @@ public abstract class Instance extends DataModel {
 
 		// Call destroy function
 		this.onDestroy();
+		this.destroyedEvent().fire();
 
 		// Destroy all values
 		this.cleanup();

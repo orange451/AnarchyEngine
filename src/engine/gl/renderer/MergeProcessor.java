@@ -39,7 +39,7 @@ public class MergeProcessor implements PostProcessor {
 		TextureUtils.autoResize = true;
 		skyBoxRotation.rotateX((float) (-Math.PI/2f));
 		
-		skyBoxBackup = new SkySphereIBL(new Image(Color.GRAY,4,3));
+		skyBoxBackup = new SkySphereIBL(new Image(Color.DARK_GRAY,4,3));
 		skyBoxBackup.setLightMultiplier(1/255f);
 		skyBoxBackup.setLightPower(1f);
 		this.skyBox = skyBoxBackup;

@@ -30,7 +30,7 @@ public class PlayerPhysics extends PhysicsBase implements TreeViewable {
 		this.defineField("StepHeight", LuaValue.valueOf(0.1f), false);
 		this.getField("StepHeight").setClamp(new NumberClamp(0.1f, 512));
 		
-		// No bounciness
+		// No bounciness by default
 		this.rawset("Bounciness", LuaValue.valueOf(0));
 		
 		// Force to capsule

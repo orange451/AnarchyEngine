@@ -38,6 +38,9 @@ public abstract class PhysicsBase extends Instance implements GameSubscriber {
 		
 		this.defineField("Linked", LuaValue.NIL, true);
 		
+		this.defineField("Velocity", Vector3.newInstance(0, 0, 0), false);
+		this.defineField("WorldMatrix", new Matrix4(), false);
+		
 		this.defineField("Mass", LuaValue.valueOf(0.5f), false);
 		this.getField("Mass").setClamp(new NumberClamp(0, 1));
 		
@@ -57,9 +60,6 @@ public abstract class PhysicsBase extends Instance implements GameSubscriber {
 		this.getField("Shape").setEnum(new EnumType("Shape"));
 		
 		this.defineField("UseCustomMesh", LuaValue.valueOf(false), false);
-		
-		this.defineField("Velocity", Vector3.newInstance(0, 0, 0), false);
-		this.defineField("WorldMatrix", new Matrix4(), false);
 		
 		Game.getGame().subscribe(this);
 	}
