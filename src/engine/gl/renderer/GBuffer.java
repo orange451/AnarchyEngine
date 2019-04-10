@@ -195,7 +195,10 @@ public class GBuffer {
 			this.exposure = Game.getService("Lighting").get("Exposure").tofloat();
 			this.gamma = Game.getService("Lighting").get("Gamma").tofloat();
 			Color color = ((Color3)Game.getService("Lighting").get("Ambient")).toColor();
-			this.ambient = new Vector3f( color.getRed()/255f, color.getGreen()/255f, color.getBlue()/255f );
+			this.ambient = new Vector3f( 
+					Math.max(1/255f, color.getRed()/255f),
+					Math.max(1/255f, color.getGreen()/255f),
+					Math.max(1/255f, color.getBlue()/255f) );
 		}
 		
 		for (int i = 0; i < processors.size(); i++) {

@@ -60,6 +60,7 @@ public class IdeLuaEditor extends IdePane {
 				"print",
 				"tick",
 				"spawn",
+				"tostring",
 				"Enum",
 				
 				// Datatypes
@@ -77,13 +78,13 @@ public class IdeLuaEditor extends IdePane {
 		final String COMMENT_PATTERN = "--(\\[\\[)(.|\\R)*?(\\]\\])" + "|" + "--[^\n]*";
 		
 		Pattern PATTERN = Pattern.compile(
-				"(?<KEYWORD>" + KEYWORD_PATTERN + ")"
-						+ "|(?<COMMENT>" + COMMENT_PATTERN + ")"
-						+ "|(?<STRING>" + STRING_PATTERN + ")"
-						+ "|(?<LOGIC>" + LOGIC_PATTERN + ")"
-						+ "|(?<NUMBER>" + NUMBER_PATTERN + ")"
-						+ "|(?<PAREN>" + PAREN_PATTERN + ")"
-						+ "|(?<BRACKET>" + BRACKET_PATTERN + ")"
+						"(?<KEYWORD>" + KEYWORD_PATTERN + ")"
+					 + "|(?<COMMENT>" + COMMENT_PATTERN + ")"
+					 + "|(?<STRING>" + STRING_PATTERN + ")"
+					 + "|(?<LOGIC>" + LOGIC_PATTERN + ")"
+					 + "|(?<NUMBER>" + NUMBER_PATTERN + ")"
+					 + "|(?<PAREN>" + PAREN_PATTERN + ")"
+					 + "|(?<BRACKET>" + BRACKET_PATTERN + ")"
 				);
 		
 		// Do syntax highlighting
