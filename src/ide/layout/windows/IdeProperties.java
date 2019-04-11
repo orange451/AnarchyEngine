@@ -5,6 +5,7 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.luaj.vm2.LuaValue;
 import org.lwjgl.PointerBuffer;
@@ -77,17 +78,36 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 		this.scroller.setContent(grid);
 		
 		update(true);
+		
+		AtomicLong last = new AtomicLong();
+		Game.runService().renderSteppedEvent().connect((args)->{
+			long now = System.currentTimeMillis();
+			long then = last.get();
+			long elapsed = now-then;
+			
+			if ( elapsed > 20 ) {
+				if ( requiresUpdate ) {
+					update(true);
+				}
+				last.set(System.currentTimeMillis());
+			}
+		});
 	}
 	
 	private long lastUpdate = -1;
+	private boolean requiresUpdate; // TODO Maybe check in game logic thread if this is true and then force update if lastUpdate hasn't updated in more than 5 ms?
 
 	private void update(boolean important) {
 		if ( !Game.isLoaded() )
 			return;
-		
-		if ( System.currentTimeMillis()-lastUpdate < 50 && !important )
+
+		if (System.currentTimeMillis()-lastUpdate < 50 && !important ) {
+			requiresUpdate = true;
 			return;
+		}
+		
 		lastUpdate = System.currentTimeMillis();
+		requiresUpdate = false;
 		
 		List<Instance> selected = Game.selected();
 		
@@ -127,7 +147,7 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 
 	@Override
 	public void gameUpdateEvent(boolean important) {
-		update(important);
+		update(false);
 	}
 	
 	@Override

@@ -25,7 +25,7 @@ public class TestSimple extends ClientApplication {
 		
 		// Make a sphere
 		Mesh mesh = Game.assets().newMesh();
-		mesh.setFilePath("Resources/Testing/Sphere.mesh");
+		mesh.sphere(1);
 		
 		// MATERIAL PATH
 		String materialPath = "Resources/Testing/PBR/iron/";
@@ -100,6 +100,9 @@ public class TestSimple extends ClientApplication {
 			l5.setIntensity(b/2);
 			l5.setParent(Game.workspace());
 		}
+		
+		// Mark the camera as scriptable (no built-in camera controls)
+		Game.workspace().getCurrentCamera().setCameraType("Scriptable");
 		
 		// Camera controller
 		Game.runService().renderSteppedEvent().connect( new RunnableArgs() {

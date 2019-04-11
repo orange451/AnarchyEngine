@@ -386,6 +386,8 @@ public class Save {
 					}
 				}
 			} else {
+				
+				// Mesh without being backed by a file. Save its data to a file!
 				if ( a instanceof Mesh ) {
 					Mesh mesh = (Mesh) a;
 					BufferedMesh bufferedMesh = mesh.getMesh();

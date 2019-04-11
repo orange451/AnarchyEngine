@@ -103,8 +103,9 @@ public class Mesh extends AssetLoadable implements TreeViewable,FileResource {
 	}
 	
 	public void setMesh(BufferedMesh mesh) {
+		this.set("FilePath", LuaValue.valueOf(""));
 		this.mesh = mesh;
-		this.changed = false;
+		this.changed = true;
 	}
 	
 	public BufferedMesh getMesh() {

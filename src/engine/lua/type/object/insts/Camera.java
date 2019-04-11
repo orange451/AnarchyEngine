@@ -214,4 +214,8 @@ public class Camera extends Instance implements TreeViewable {
 	public Icons getIcon() {
 		return Icons.icon_camera;
 	}
+
+	public void setCameraType(String type) {
+		this.set("CameraType", LuaValue.valueOf(type));
+	}
 }

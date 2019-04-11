@@ -2,6 +2,7 @@ package ide.layout.windows;
 
 import java.io.File;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.luaj.vm2.LuaValue;
 import org.lwjgl.PointerBuffer;
@@ -69,6 +70,20 @@ public class IdeExplorer extends IdePane implements GameSubscriber {
 		cache2 = new ObservableList<TreeItem<Instance>>();
 
 		update(true);
+		
+		AtomicLong last = new AtomicLong();
+		Game.runService().renderSteppedEvent().connect((args)->{
+			long now = System.currentTimeMillis();
+			long then = last.get();
+			long elapsed = now-then;
+			
+			if ( elapsed > 20 ) {
+				if ( requiresUpdate ) {
+					update(true);
+				}
+				last.set(System.currentTimeMillis());
+			}
+		});
 	}
 
 	private long lastUpdate = -1;
@@ -355,9 +370,6 @@ public class IdeExplorer extends IdePane implements GameSubscriber {
 
 	@Override
 	public void gameUpdateEvent(boolean important) {
-		if ( !important )
-			return;
-		
-		update(important);
+		update(false);
 	}
 }
