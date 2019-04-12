@@ -1,8 +1,20 @@
 package engine.lua;
 
+import java.io.File;
 import java.io.IOException;
+import java.io.Serializable;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.net.URLDecoder;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.Enumeration;
+import java.util.List;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
+
 import org.luaj.vm2.Globals;
 import org.luaj.vm2.LoadState;
 import org.luaj.vm2.LuaError;
@@ -16,8 +28,11 @@ import engine.lua.lib.GameEngineLib;
 import engine.lua.lib.PreventInfiniteInstructions;
 import engine.lua.type.*;
 import engine.lua.type.data.*;
+import engine.lua.type.object.Instance;
 import engine.lua.type.object.ScriptBase;
 import engine.lua.type.object.insts.*;
+import engine.util.ClassFinder;
+import ide.ClasspathInspector;
 
 public class LuaEngine {
 	public static Globals globals;
@@ -43,74 +58,23 @@ public class LuaEngine {
 		LoadState.install(globals);
 		LuaC.install(globals);
 		
-		
-		// Load in all the datatypes/instances
-		loadDataTypesTEMP();
-		
-		// MUST BE FIXED. ABOVE IS TEMP
+		// Preload object types. They run code to attach themselves to the lua engine.
 		{
 			// load Data types (color/vector/ect)
-			//loadDataTypes("luaengine.type.data");
+			loadDataTypes("engine.lua.type.data");
 			
 			// Register instance types
-			//loadDataTypes("luaengine.type.object.insts");
+			loadDataTypes("engine.lua.type.object.insts");
 		}
 	}
 	
 	/**
 	 * Every object inside engine.lua.type.objects.insts needs to be instantiated ONCE at run-time.
-	 * <br>
-	 * Ideally we should have a function that finds all these objects and creates them for us...
 	 */
-	private static void loadDataTypesTEMP() {
-		
-		// Vars
-		new Color3();
-		new Matrix4();
-		new Vector2();
-		new Vector3();
-		
-		// Objects
-		new AssetFolder();
-		new Camera();
-		new Connection();
-		new Folder();
-		new GameObject();
-		new Material();
-		new Mesh();
-		new Model();
-		new PhysicsObject();
-		new Player();
-		new PlayerPhysics();
-		new Prefab();
-		new Script();
-		new LocalScript();
-		new GlobalScript();
-		new Texture();
-		new PlayerScripts();
-		new PointLight();
-		new Skybox();
-		
-		// Animation objects
-		new AnimationData();
-		new Animation();
-		new AnimationKeyframe();
-		new AnimationKeyframeSequence();
-		new Animations();
-		new Bone();
-		new Bones();
-		new BoneTree();
-		new BoneTreeNode();
-		new BoneWeight();
-	}
-	
-	/*private static void loadDataTypes(String packageName) {
+	private static void loadDataTypes(String packageName) {
 		// Get classes in subpackage
-		Reflections reflections = new Reflections(new ConfigurationBuilder()
-				.setUrls(ClasspathHelper.forPackage(packageName))
-				.setScanners(new ResourcesScanner()));
-		Set<Class<? extends Object>> subTypes = reflections.getSubTypesOf(Object.class);
-		Class<?>[] claz = subTypes.toArray(new Class[subTypes.size()]);
+		ArrayList<Class<?>> cls = ClassFinder.getClassesFromPackage(packageName);
+		Class<?>[] claz = cls.toArray(new Class[cls.size()]);
 		
 		// Load them in
 		System.out.println("Loading classes for: " + claz + " ("+claz.length+")");
@@ -122,6 +86,9 @@ public class LuaEngine {
 					continue;
 				}
 				
+				if ( c.toString().contains("$") )
+					continue;
+				
 				System.out.println("\tLoaded: " + c);
 				LuaDatatype v = (LuaDatatype) c.getDeclaredConstructor().newInstance();
 				if ( v instanceof Instance ) {
@@ -131,11 +98,9 @@ public class LuaEngine {
 				}
 			} catch (Exception e) {
 				System.out.println("\t\tError");
-				//System.err.println("\t\t" + c);
-				//e.printStackTrace();
 			}
 		}
-	}*/
+	}
 	
 	public static ScriptData runLua(String source) {
 		return runLua(source, null);
