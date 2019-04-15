@@ -14,6 +14,7 @@ import engine.lua.type.object.insts.Material;
 import engine.lua.type.object.insts.Mesh;
 import engine.lua.type.object.insts.PointLight;
 import engine.lua.type.object.insts.Prefab;
+import engine.lua.type.object.insts.Skybox;
 import engine.lua.type.object.insts.Texture;
 
 public class TestPBR extends ClientApplication {
@@ -58,17 +59,25 @@ public class TestPBR extends ClientApplication {
 		mesh.setParent(Game.assets().meshes());
 		
 		// Textures
-		Texture texture1 = new Texture();
+		Texture texture1 = Game.assets().newTexture();
 		texture1.setFilePath("Resources/Testing/PBR/scratch/normal.png");
-		texture1.setParent(Game.assets().textures());
 		
-		Texture texture2 = new Texture();
+		Texture texture2 = Game.assets().newTexture();
 		texture2.setFilePath("Resources/Testing/PBR/scratch/roughness.png");
-		texture2.setParent(Game.assets().textures());
 		
-		Texture texture3 = new Texture();
+		Texture texture3 = Game.assets().newTexture();
 		texture3.setFilePath("Resources/Testing/PBR/scratch/metallic.png");
-		texture3.setParent(Game.assets().textures());
+		
+		Texture envmap = Game.assets().newTexture();
+		envmap.setFilePath("Resources/Testing/IBL/office.hdr");
+		
+		// Skybox
+		Skybox skybox = new Skybox();
+		skybox.setImage(envmap);
+		skybox.setBrightness(0.66f);
+		skybox.setPower(1.5f);
+		skybox.setParent(Game.lighting());
+		Game.lighting().setSkybox(skybox);
 		
 		// Base material
 		Material mat = new Material();

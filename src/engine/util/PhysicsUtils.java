@@ -103,20 +103,20 @@ public class PhysicsUtils {
 		if ( bufferedMesh == null )
 			return null;
 		
-		return new BvhTriangleMeshShape(meshVertexArray(bufferedMesh), true);
+		return new BvhTriangleMeshShape(meshVertexArray(bufferedMesh, scale), true);
 	}
 	
 	public static CollisionShape meshShapeDynamic( BufferedMesh bufferedMesh, float scale ) {
 		if ( bufferedMesh == null )
 			return null;
 
-		GImpactMeshShape meshShape = new GImpactMeshShape(meshVertexArray(bufferedMesh));
+		GImpactMeshShape meshShape = new GImpactMeshShape(meshVertexArray(bufferedMesh, scale));
 		meshShape.updateBound();
 		
 		return meshShape;
 	}
 	
-	private static TriangleIndexVertexArray meshVertexArray( BufferedMesh bufferedMesh ) {
+	private static TriangleIndexVertexArray meshVertexArray( BufferedMesh bufferedMesh, float scale ) {
 		if ( bufferedMesh == null )
 			return null;
 		
@@ -139,7 +139,7 @@ public class PhysicsUtils {
 		}
 		gVertices.rewind();
 		gIndices.rewind();
-
+		
 		// Create mesh
 		IndexedMesh indexedMesh = new IndexedMesh();
 		indexedMesh.numVertices = totalVerts;
