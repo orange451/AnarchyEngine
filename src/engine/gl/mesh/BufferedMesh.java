@@ -431,6 +431,7 @@ public class BufferedMesh implements RenderableMesh {
 				ret.setVertex(i, v);
 			}
 			
+			bin.close();
 		} catch(Exception e ) {
 			e.printStackTrace();
 			System.out.println("Could not load mesh: " + filepath);

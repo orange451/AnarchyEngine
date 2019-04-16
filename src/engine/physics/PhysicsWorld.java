@@ -4,30 +4,31 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import javax.vecmath.Vector3f;
-
 import org.luaj.vm2.LuaValue;
 
-import com.bulletphysics.collision.broadphase.AxisSweep3;
-import com.bulletphysics.collision.dispatch.CollisionConfiguration;
-import com.bulletphysics.collision.dispatch.CollisionDispatcher;
-import com.bulletphysics.collision.dispatch.CollisionWorld;
-import com.bulletphysics.collision.dispatch.CollisionWorld.ClosestRayResultCallback;
-import com.bulletphysics.collision.dispatch.CollisionWorld.RayResultCallback;
-import com.bulletphysics.collision.dispatch.DefaultCollisionConfiguration;
-import com.bulletphysics.dynamics.DiscreteDynamicsWorld;
-import com.bulletphysics.dynamics.DynamicsWorld;
-import com.bulletphysics.dynamics.RigidBody;
-import com.bulletphysics.dynamics.constraintsolver.ConstraintSolver;
-import com.bulletphysics.dynamics.constraintsolver.SequentialImpulseConstraintSolver;
-import com.bulletphysics.extras.gimpact.GImpactCollisionAlgorithm;
-import com.bulletphysics.linearmath.Transform;
+import com.badlogic.gdx.math.Matrix4;
+import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.physics.bullet.Bullet;
+import com.badlogic.gdx.physics.bullet.collision.ClosestRayResultCallback;
+import com.badlogic.gdx.physics.bullet.collision.RayResultCallback;
+import com.badlogic.gdx.physics.bullet.collision.btAxisSweep3;
+import com.badlogic.gdx.physics.bullet.collision.btCollisionConfiguration;
+import com.badlogic.gdx.physics.bullet.collision.btCollisionDispatcher;
+import com.badlogic.gdx.physics.bullet.collision.btCollisionWorld;
+import com.badlogic.gdx.physics.bullet.collision.btDefaultCollisionConfiguration;
+import com.badlogic.gdx.physics.bullet.collision.btDispatcher;
+import com.badlogic.gdx.physics.bullet.collision.btGImpactCollisionAlgorithm;
+import com.badlogic.gdx.physics.bullet.dynamics.btConstraintSolver;
+import com.badlogic.gdx.physics.bullet.dynamics.btDiscreteDynamicsWorld;
+import com.badlogic.gdx.physics.bullet.dynamics.btDynamicsWorld;
+import com.badlogic.gdx.physics.bullet.dynamics.btRigidBody;
+import com.badlogic.gdx.physics.bullet.dynamics.btSequentialImpulseConstraintSolver;
 
 import engine.Game;
 import engine.InternalGameThread;
 
 public class PhysicsWorld {
-	public DynamicsWorld dynamicsWorld;
+	public btDynamicsWorld dynamicsWorld;
 	private List<PhysicsObjectInternal> objects = Collections.synchronizedList(new ArrayList<PhysicsObjectInternal>());
 
 	public PhysicsWorld() {
@@ -42,7 +43,7 @@ public class PhysicsWorld {
 		}
 
 		synchronized(dynamicsWorld) {
-			dynamicsWorld.setGravity(new Vector3f(0, 0, -(Game.workspace()).get("Gravity").tofloat()));
+			dynamicsWorld.setGravity(new Vector3(0, 0, -(Game.workspace()).get("Gravity").tofloat()));
 			try{
 				int reps = 4;
 				float ndt = dt/(float)reps;
@@ -73,7 +74,7 @@ public class PhysicsWorld {
 		}
 	}
 
-	public PhysicsObjectInternal find( RigidBody body ) {
+	public PhysicsObjectInternal find( btRigidBody body ) {
 		synchronized(objects) {
 			for (int i = 0; i < objects.size(); i++) {
 				PhysicsObjectInternal obj = objects.get(i);
@@ -85,7 +86,13 @@ public class PhysicsWorld {
 		return null;
 	}
 
+	private static boolean initialized;
 	public void refresh() {
+		if (!initialized) {
+			initialized = true;
+			Bullet.init();
+		}
+		
 		// Create clone of objects list
 		List<PhysicsObjectInternal> temp = Collections.synchronizedList(new ArrayList<PhysicsObjectInternal>());
 		for (int i = 0; i < objects.size(); i++) {
@@ -114,14 +121,14 @@ public class PhysicsWorld {
 		}
 	}
 
-	public DynamicsWorld getDynamicsWorld() {
+	public btDynamicsWorld getDynamicsWorld() {
 		return dynamicsWorld;
 	}
 
 	public ClosestRayResultCallback rayTestClosest(org.joml.Vector3f origin, org.joml.Vector3f direction) {
-		javax.vecmath.Vector3f from = new javax.vecmath.Vector3f( origin.x, origin.y, origin.z );
-		javax.vecmath.Vector3f to   = new javax.vecmath.Vector3f( origin.x + (direction.x * 1024), origin.y + (direction.y * 1024), origin.z + (direction.z * 1024) );
-		RayResultCallback callback  = new CollisionWorld.ClosestRayResultCallback( from, to );
+		Vector3 from = new Vector3( origin.x, origin.y, origin.z );
+		Vector3 to   = new Vector3( origin.x + (direction.x * 1024), origin.y + (direction.y * 1024), origin.z + (direction.z * 1024) );
+		RayResultCallback callback  = new ClosestRayResultCallback( from, to );
 		dynamicsWorld.rayTest(from, to, callback);
 
 		return (ClosestRayResultCallback) callback;
@@ -136,22 +143,22 @@ public class PhysicsWorld {
 	 */
 	public ClosestRayResultCallback rayTest( org.joml.Vector3f origin, org.joml.Vector3f direction, PhysicsObjectInternal physObj ) {
 
-		RigidBody collisionObject = physObj.body;
-		javax.vecmath.Vector3f from = new javax.vecmath.Vector3f( origin.x, origin.y, origin.z );
-		javax.vecmath.Vector3f to   = new javax.vecmath.Vector3f( origin.x + direction.x, origin.y + direction.y, origin.z + direction.z );
+		btRigidBody collisionObject = physObj.body;
+		Vector3 from = new Vector3( origin.x, origin.y, origin.z );
+		Vector3 to   = new Vector3( origin.x + direction.x, origin.y + direction.y, origin.z + direction.z );
 
 		// Calculate ray transforms
-		Transform start = new Transform();
-		start.setIdentity();
-		start.origin.set( from );
-		Transform finish = new Transform();
-		finish.setIdentity();
-		finish.origin.set( to );
-		ClosestRayResultCallback callback = new CollisionWorld.ClosestRayResultCallback( from, to );
+		Matrix4 start = new Matrix4();
+		start.idt();
+		start.setTranslation(from);
+		Matrix4 finish = new Matrix4();
+		finish.idt();
+		finish.setTranslation(to);
+		ClosestRayResultCallback callback = new ClosestRayResultCallback( from, to );
 
 		// Get AABB
-		Vector3f minBound = new javax.vecmath.Vector3f();
-		Vector3f maxBound = new javax.vecmath.Vector3f();
+		Vector3 minBound = new Vector3();
+		Vector3 maxBound = new Vector3();
 		collisionObject.getAabb(minBound, maxBound);
 
 		// Test if inside AABB
@@ -159,13 +166,13 @@ public class PhysicsWorld {
 
 		// Perform more intensive ray test now
 		if ( aabb ) {
-			CollisionWorld.rayTestSingle(start, finish, collisionObject, collisionObject.getCollisionShape(), collisionObject.getWorldTransform(new Transform()), callback);
+			btCollisionWorld.rayTestSingle(start, finish, collisionObject, collisionObject.getCollisionShape(), collisionObject.getWorldTransform(), callback);
 		}
 
 		return (ClosestRayResultCallback) callback;
 	}
 
-	private boolean aabbTest(org.joml.Vector3f from, org.joml.Vector3f to, Vector3f lb, Vector3f rt) {
+	private boolean aabbTest(org.joml.Vector3f from, org.joml.Vector3f to, Vector3 lb, Vector3 rt) {
 		org.joml.Vector3f direction = new org.joml.Vector3f(to).normalize();
 		// r.dir is unit direction vector of ray
 		float dirfracx = 1.0f / direction.x;
@@ -206,7 +213,7 @@ public class PhysicsWorld {
 	public ClosestRayResultCallback rayTestExcluding( org.joml.Vector3f origin, org.joml.Vector3f direction, PhysicsObjectInternal... excluding ) {
 		//ArrayList<ClosestRayResultCallback> callbacks = new ArrayList<ClosestRayResultCallback>();
 		float maxDist = Float.MAX_VALUE;
-		ClosestRayResultCallback ret = new ClosestRayResultCallback(new Vector3f(origin.x, origin.y, origin.z), new Vector3f(origin.x, origin.y, origin.z));
+		ClosestRayResultCallback ret = new ClosestRayResultCallback(new Vector3(origin.x, origin.y, origin.z), new Vector3(origin.x, origin.y, origin.z));
 		synchronized(objects) {
 			for (int i = 0; i < objects.size(); i++) {
 				PhysicsObjectInternal obj = objects.get(i);
@@ -227,16 +234,22 @@ public class PhysicsWorld {
 				// Raytest
 				ClosestRayResultCallback c = rayTest( origin, direction, obj );
 				if ( c.hasHit() ) {
-					if ( find((RigidBody) c.collisionObject) != null ) {
-						Vector3f vec = new Vector3f(c.rayFromWorld);
-						vec.sub(c.hitPointWorld);
-						float dist = vec.length();
+					if ( find((btRigidBody) c.getCollisionObject()) != null ) {
+						Vector3 vec = new Vector3();
+						c.getRayFromWorld(new Vector3());
+						
+						Vector3 hit = new Vector3();
+						c.getHitPointWorld(hit);
+						
+						vec.sub(hit);
+						
+						float dist = vec.len();
 						if ( dist < maxDist ) {
 							maxDist = dist;
 							ret = c;
 						}
 					} else {
-						((RigidBody)c.collisionObject).destroy();
+						((btRigidBody)c.getCollisionObject()).dispose();
 					}
 				}
 			}
@@ -250,7 +263,7 @@ public class PhysicsWorld {
 		try {
 			synchronized(dynamicsWorld) {
 				dynamicsWorld.removeRigidBody(object.getBody());
-				object.getBody().destroy();
+				object.getBody().dispose();
 			}
 		}catch(Exception e ) {
 			e.printStackTrace();
@@ -270,7 +283,7 @@ public class PhysicsWorld {
 		
 		// Destroy old dynamics world
 		if ( dynamicsWorld != null )
-			dynamicsWorld.destroy();
+			dynamicsWorld.dispose();
 		
 		// Make sure objects list is clear
 		objects.clear();
@@ -280,17 +293,13 @@ public class PhysicsWorld {
 		destroy();
 
 		// Create new Dynamics World
-		CollisionConfiguration collisionConfiguration = new DefaultCollisionConfiguration();
-		CollisionDispatcher dispatcher = new CollisionDispatcher(collisionConfiguration);
-		ConstraintSolver solver = new SequentialImpulseConstraintSolver();
-		Vector3f worldMin = new Vector3f(-1000f,-1000f,-1000f);
-		Vector3f worldMax = new Vector3f(1000f,1000f,1000f);
-		AxisSweep3 sweepBP = new AxisSweep3(worldMin, worldMax);
-		dynamicsWorld = new DiscreteDynamicsWorld(dispatcher, sweepBP, solver, collisionConfiguration);
-		GImpactCollisionAlgorithm.registerAlgorithm( getDispatcher() );
-	}
-
-	public CollisionDispatcher getDispatcher() {
-		return (CollisionDispatcher) this.dynamicsWorld.getDispatcher();
+		btCollisionConfiguration collisionConfiguration = new btDefaultCollisionConfiguration();
+		btCollisionDispatcher dispatcher = new btCollisionDispatcher(collisionConfiguration);
+		btConstraintSolver solver = new btSequentialImpulseConstraintSolver();
+		Vector3 worldMin = new Vector3(-1000f,-1000f,-1000f);
+		Vector3 worldMax = new Vector3(1000f,1000f,1000f);
+		btAxisSweep3 sweepBP = new btAxisSweep3(worldMin, worldMax);
+		dynamicsWorld = new btDiscreteDynamicsWorld(dispatcher, sweepBP, solver, collisionConfiguration);
+		btGImpactCollisionAlgorithm.registerAlgorithm( dispatcher );
 	}
 }

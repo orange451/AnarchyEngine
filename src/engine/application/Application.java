@@ -35,7 +35,7 @@ public abstract class Application extends GameEngine implements Tickable {
 			Application application = (Application) app;
 			application.onStart((String[]) o);
 		} catch(Exception e) {
-			//
+			e.printStackTrace();
 		}
 	}
 

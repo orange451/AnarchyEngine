@@ -137,6 +137,10 @@ public final class BinaryInputStream {
 			System.err.println("Could not open " + name);
 		}
 	}
+	
+	public void close() throws IOException {
+		in.close();
+	}
 
 	private void fillBuffer() {
 		try {
