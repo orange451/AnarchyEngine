@@ -3,78 +3,79 @@ package engine.util;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
-import org.lwjgl.system.MemoryUtil;
+import javax.vecmath.Matrix4f;
+import javax.vecmath.Quat4f;
+import javax.vecmath.Vector3f;
 
-import com.badlogic.gdx.math.Matrix4;
-import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.physics.bullet.collision.btBoxShape;
-import com.badlogic.gdx.physics.bullet.collision.btBvhTriangleMeshShape;
-import com.badlogic.gdx.physics.bullet.collision.btCapsuleShapeZ;
-import com.badlogic.gdx.physics.bullet.collision.btCollisionObject;
-import com.badlogic.gdx.physics.bullet.collision.btCollisionShape;
-import com.badlogic.gdx.physics.bullet.collision.btConvexHullShape;
-import com.badlogic.gdx.physics.bullet.collision.btConvexShape;
-import com.badlogic.gdx.physics.bullet.collision.btCylinderShapeZ;
-import com.badlogic.gdx.physics.bullet.collision.btGImpactMeshShape;
-import com.badlogic.gdx.physics.bullet.collision.btIndexedMesh;
-import com.badlogic.gdx.physics.bullet.collision.btShapeHull;
-import com.badlogic.gdx.physics.bullet.collision.btSphereShape;
-import com.badlogic.gdx.physics.bullet.collision.btTriangleIndexVertexArray;
-import com.badlogic.gdx.physics.bullet.collision.btTriangleMesh;
-import com.badlogic.gdx.physics.bullet.dynamics.btRigidBody;
-import com.badlogic.gdx.physics.bullet.dynamics.btRigidBody.btRigidBodyConstructionInfo;
-import com.badlogic.gdx.physics.bullet.linearmath.btDefaultMotionState;
-import com.badlogic.gdx.physics.bullet.linearmath.btMotionState;
+import com.bulletphysics.collision.dispatch.CollisionObject;
+import com.bulletphysics.collision.shapes.BoxShape;
+import com.bulletphysics.collision.shapes.BvhTriangleMeshShape;
+import com.bulletphysics.collision.shapes.CapsuleShapeZ;
+import com.bulletphysics.collision.shapes.CollisionShape;
+import com.bulletphysics.collision.shapes.ConvexHullShape;
+import com.bulletphysics.collision.shapes.ConvexShape;
+import com.bulletphysics.collision.shapes.CylinderShapeZ;
+import com.bulletphysics.collision.shapes.IndexedMesh;
+import com.bulletphysics.collision.shapes.ShapeHull;
+import com.bulletphysics.collision.shapes.SphereShape;
+import com.bulletphysics.collision.shapes.TriangleIndexVertexArray;
+import com.bulletphysics.dynamics.RigidBody;
+import com.bulletphysics.dynamics.RigidBodyConstructionInfo;
+import com.bulletphysics.extras.gimpact.GImpactMeshShape;
+import com.bulletphysics.linearmath.DefaultMotionState;
+import com.bulletphysics.linearmath.MotionState;
+import com.bulletphysics.linearmath.Transform;
+import com.bulletphysics.util.ObjectArrayList;
 
 import engine.gl.mesh.BufferedMesh;
 import engine.gl.mesh.Vertex;
 
 public class PhysicsUtils {
-	private static Matrix4 DEFAULT_TRANSFORM = new Matrix4().idt();
+	private static Transform DEFAULT_TRANSFORM = new Transform(new Matrix4f(new Quat4f(0, 0, 0, 1), new Vector3f(0, 0, 0), 1.0f));
 	
-	public static btRigidBody box( float mass, float bouncyness, float width, float length, float height ) {
-		btConvexShape boxShape = new btBoxShape(new Vector3(width/2f, length/2f, height/2f));
+	public static RigidBody box( float mass, float bouncyness, float width, float length, float height ) {
+		ConvexShape boxShape = new BoxShape(new Vector3f(width/2f, length/2f, height/2f));
 		return getBody( mass, bouncyness, 0.5f, boxShape );
 	}
 
-	public static btRigidBody cube( float mass, float bouncyness, float length ) {
+	public static RigidBody cube( float mass, float bouncyness, float length ) {
 		return box( mass, bouncyness, length, length, length );
 	}
 
-	public static btRigidBody sphere( float mass, float bouncyness, float radius ) {
-		btConvexShape ballShape = new btSphereShape(radius);
+	public static RigidBody sphere( float mass, float bouncyness, float radius ) {
+		ConvexShape ballShape = new SphereShape(radius);
 		return getBody( mass, bouncyness, 0.5f, ballShape );
 	}
 
-	public static btRigidBody capsule( float mass, float bouncyness, float radius, float height ) {
-		btConvexShape shape = new btCapsuleShapeZ( radius, (height*0.99f) - radius*2 );
+	public static RigidBody capsule( float mass, float bouncyness, float radius, float height ) {
+		ConvexShape shape = new CapsuleShapeZ( radius, (height*0.99f) - radius*2 );
 		return getBody( mass, bouncyness, 0.5f, shape );
 	}
 
-	public static btRigidBody cylinder( float mass, float bouncyness, float radius, float height ) {
-		btConvexShape shape = new btCylinderShapeZ( new Vector3(radius, radius, height ) );
+	public static RigidBody cylinder( float mass, float bouncyness, float radius, float height ) {
+		ConvexShape shape = new CylinderShapeZ( new Vector3f(radius, radius, height ) );
 		return getBody( mass, bouncyness, 0.5f, shape );
 	}
 
-	public static btRigidBody shape( float mass, float bouncyness, btConvexShape shape ) {
+	public static RigidBody shape( float mass, float bouncyness, ConvexShape shape ) {
 		return getBody( mass, bouncyness, 0.5f, shape );
 	}
 
-	public static btRigidBody getBody( float mass, float bouncyness, float friction, btCollisionShape shape ) {
-		btMotionState bodyMotionState = new btDefaultMotionState(DEFAULT_TRANSFORM);
-		Vector3 ballInertia = new Vector3();
+	public static RigidBody getBody( float mass, float bouncyness, float friction, CollisionShape shape ) {
+		MotionState bodyMotionState = new DefaultMotionState(DEFAULT_TRANSFORM);
+		Vector3f ballInertia = new Vector3f();
 		if ( mass != 0 )
 			shape.calculateLocalInertia(mass, ballInertia);
 		
-		btRigidBodyConstructionInfo bodyInfo = new btRigidBodyConstructionInfo(mass, bodyMotionState, shape, ballInertia);
-		bodyInfo.setRestitution(bouncyness);
-		bodyInfo.setFriction(friction);
-		bodyInfo.setAngularDamping(0.3f);
-		bodyInfo.setLinearDamping(0.1f);
+		RigidBodyConstructionInfo bodyInfo = new RigidBodyConstructionInfo(mass, bodyMotionState, shape, ballInertia);
+		bodyInfo.restitution = bouncyness;
+		bodyInfo.friction = friction;
+		bodyInfo.angularDamping = 0.3f;
+		bodyInfo.linearDamping = 0.1f;
 
-		btRigidBody body = new btRigidBody(bodyInfo);
+		RigidBody body = new RigidBody(bodyInfo);
 		if ( mass == 0 )
-			body.setActivationState(4); // DISABLE_DEACTIVATION
+			body.setActivationState(CollisionObject.DISABLE_DEACTIVATION);
 		body.activate(true);
 
 		return body;
@@ -90,7 +91,7 @@ public class PhysicsUtils {
 	 * @param bufferedMesh
 	 * @return
 	 */
-	public static btRigidBody mesh(float mass, float bouncyness, float friction, BufferedMesh bufferedMesh) {
+	public static RigidBody mesh(float mass, float bouncyness, float friction, BufferedMesh bufferedMesh) {
 		if ( mass == 0 ) {
 			return getBody( mass, bouncyness, friction, meshShapeStatic( bufferedMesh, 1.0f ) );
 		} else {
@@ -98,51 +99,64 @@ public class PhysicsUtils {
 		}
 	}
 	
-	public static btCollisionShape meshShapeStatic( BufferedMesh bufferedMesh, float scale ) {
+	public static CollisionShape meshShapeStatic( BufferedMesh bufferedMesh, float scale ) {
 		if ( bufferedMesh == null )
 			return null;
 		
-		return new btBvhTriangleMeshShape(meshVertexArray(bufferedMesh), false);
+		return new BvhTriangleMeshShape(meshVertexArray(bufferedMesh, scale), true);
 	}
 	
-	public static btCollisionShape meshShapeDynamic( BufferedMesh bufferedMesh, float scale ) {
+	public static CollisionShape meshShapeDynamic( BufferedMesh bufferedMesh, float scale ) {
 		if ( bufferedMesh == null )
 			return null;
 
-		btGImpactMeshShape meshShape = new btGImpactMeshShape(meshVertexArray(bufferedMesh));
+		GImpactMeshShape meshShape = new GImpactMeshShape(meshVertexArray(bufferedMesh, scale));
 		meshShape.updateBound();
 		
 		return meshShape;
 	}
 	
-	private static btTriangleIndexVertexArray meshVertexArray( BufferedMesh bufferedMesh ) {
+	private static TriangleIndexVertexArray meshVertexArray( BufferedMesh bufferedMesh, float scale ) {
 		if ( bufferedMesh == null )
 			return null;
 		
-		btTriangleMesh mesh = new btTriangleMesh();
-		Vertex[] vertices = bufferedMesh.getVertices();
-		int totalVerts = vertices.length;
+		//System.out.println(bufferedMesh.getSize());
+		int totalVerts = bufferedMesh.getSize();
 		int totalTris = totalVerts / 3;
-		
-		int a = 0;
-		for (int i = 0; i < totalTris; i++) {
-			float[] v0 = vertices[a++].getXYZ();
-			Vector3 vertex0 = new Vector3(v0[0], v0[1], v0[2]);
-	
-			float[] v1 = vertices[a++].getXYZ();
-			Vector3 vertex1 = new Vector3(v1[0], v1[1], v1[2]);
-	
-			float[] v2 = vertices[a++].getXYZ();
-			Vector3 vertex2 = new Vector3(v2[0], v2[1], v2[2]);
-			
-			mesh.addTriangle(vertex0, vertex1, vertex2);
+		ByteBuffer gVertices = ByteBuffer.allocateDirect(totalVerts * 3 * 4).order(ByteOrder.nativeOrder());
+		ByteBuffer gIndices = ByteBuffer.allocateDirect(totalTris * 3 * 4).order(ByteOrder.nativeOrder());
+
+		// FILL VERTEX AND INDEX DATA
+		Vertex[] vertices = bufferedMesh.getVertices();
+		for (int i = 0; i < vertices.length; i++) {
+			Vertex vertex = vertices[i];
+			float[] pos = vertex.getXYZ();
+			gVertices.putFloat(pos[0]);
+			gVertices.putFloat(pos[1]);
+			gVertices.putFloat(pos[2]);
+
+			gIndices.putInt(i);
 		}
+		gVertices.rewind();
+		gIndices.rewind();
 		
-		return mesh;
+		// Create mesh
+		IndexedMesh indexedMesh = new IndexedMesh();
+		indexedMesh.numVertices = totalVerts;
+		indexedMesh.vertexBase = gVertices;
+		indexedMesh.vertexStride = 3 * 4;
+		indexedMesh.numTriangles = totalTris;
+		indexedMesh.triangleIndexBase = gIndices;
+		indexedMesh.triangleIndexStride = 3 * 4;
+
+		TriangleIndexVertexArray vertArray = new TriangleIndexVertexArray();
+		vertArray.addIndexedMesh(indexedMesh);
+		
+		return vertArray;
 	}
 
 	/**
-	 * Returns a btRigidBody based on a simplified version of the supplied mesh. It is automatically added to the physics world.
+	 * Returns a rigidbody based on a simplified version of the supplied mesh. It is automatically added to the physics world.
 	 * <br>
 	 * <br>
 	 * Can be used with dynamic physics objects.
@@ -151,31 +165,31 @@ public class PhysicsUtils {
 	 * @param mesh
 	 * @return
 	 */
-	public static btRigidBody hull( float mass, float bouncyness, float friction, float scalar, BufferedMesh mesh, boolean simplified ) {
+	public static RigidBody hull( float mass, float bouncyness, float friction, float scalar, BufferedMesh mesh, boolean simplified ) {
 		// REturn rigid body
 		return getBody( mass, bouncyness, friction, hullShape(mesh, scalar, simplified) );
 	}
 	
-	public static btConvexShape hullShape( BufferedMesh mesh, float scale, boolean simplified ) {
+	public static ConvexShape hullShape( BufferedMesh mesh, float scale, boolean simplified ) {
 		if ( mesh == null ) {
-			return new btBoxShape( new Vector3(0.5f, 0.5f, 0.5f) );
+			return new BoxShape( new Vector3f(0.5f, 0.5f, 0.5f) );
 		}
-
-		// Create original hull
-		btConvexHullShape shape = new btConvexHullShape();
-		
 		// Populate vertex list
+		ObjectArrayList<Vector3f> vertices = new ObjectArrayList<Vector3f>();
 		for (int i = 0; i < mesh.getSize(); i++) {
 			Vertex vert = mesh.getVertex(i);
 			float[] xyz = vert.getXYZ();
-			shape.addPoint( new Vector3( xyz[0] * scale, xyz[1] * scale, xyz[2] * scale ) );
+			vertices.add( new Vector3f( xyz[0] * scale, xyz[1] * scale, xyz[2] * scale ) );
 		}
+
+		// Create original hull from vertex list
+		ConvexShape shape = new ConvexHullShape(vertices);
 
 		// Create simplified hull
 		if ( simplified ) {
-			btShapeHull hull = new btShapeHull(shape);
+			ShapeHull hull = new ShapeHull(shape);
 			hull.buildHull(shape.getMargin());
-			shape = new btConvexHullShape(hull);
+			shape = new ConvexHullShape(hull.getVertexPointer());
 		}
 		
 		return shape;

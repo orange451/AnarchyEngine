@@ -3,8 +3,8 @@ package engine.lua.type.object.insts;
 import org.joml.Vector3f;
 import org.luaj.vm2.LuaValue;
 
-import com.badlogic.gdx.physics.bullet.collision.ClosestRayResultCallback;
-import com.badlogic.gdx.physics.bullet.dynamics.btRigidBody;
+import com.bulletphysics.collision.dispatch.CollisionWorld.ClosestRayResultCallback;
+import com.bulletphysics.dynamics.RigidBody;
 
 import engine.Game;
 import engine.InternalGameThread;
@@ -59,7 +59,7 @@ public class PlayerPhysics extends PhysicsBase implements TreeViewable {
 		
 		// Force up
 		if ( this.physics != null ) {
-			btRigidBody body = this.physics.getBody();
+			RigidBody body = this.physics.getBody();
 			if ( body != null ) {
 				body.setSleepingThresholds( 0.0f, 0.0f );
 				body.setFriction(0);

@@ -281,7 +281,8 @@ public abstract class PhysicsBase extends Instance implements GameSubscriber {
 		if ( key.toString().equals("Velocity") ) {
 			if ( physics != null ) {
 				Vector3 vec = (Vector3)value;
-				physics.setVelocity(new com.badlogic.gdx.math.Vector3(vec.getX(), vec.getY(), vec.getZ()));
+				javax.vecmath.Vector3f newVel = new javax.vecmath.Vector3f( vec.getX(), vec.getY(), vec.getZ() );
+				physics.setVelocity(newVel);
 			}
 		}
 		

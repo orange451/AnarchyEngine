@@ -196,4 +196,11 @@ public class Lighting extends Service implements TreeViewable {
 		LuaValue ret = this.get("Skybox");
 		return ret.isnil()?null:(Skybox)ret;
 	}
+
+	public void setSkybox(Skybox skybox) {
+		if ( skybox == null )
+			this.set("Skybox", LuaValue.NIL);
+		else
+			this.set("Skybox", skybox);
+	}
 }
