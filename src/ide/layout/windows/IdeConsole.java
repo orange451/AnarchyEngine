@@ -8,9 +8,13 @@ import org.lwjgl.glfw.GLFW;
 
 import engine.lua.LuaEngine;
 import ide.layout.IdePane;
+import ide.layout.windows.icons.Icons;
 import lwjgui.LWJGUI;
 import lwjgui.font.Font;
 import lwjgui.geometry.Pos;
+import lwjgui.scene.control.ContextMenu;
+import lwjgui.scene.control.MenuItem;
+import lwjgui.scene.control.SeparatorMenuItem;
 import lwjgui.scene.control.text_input.TextArea;
 import lwjgui.scene.control.text_input.TextField;
 import lwjgui.scene.layout.BorderPane;
@@ -35,6 +39,64 @@ public class IdeConsole extends IdePane {
 		luaInput.setPrompt("Lua Command Line");
 		luaInput.setFillToParentWidth(true);
 		editBox.setBottom(luaInput);
+		
+		// Console context menu
+		{
+			ContextMenu menu = new ContextMenu();
+			console.setContextMenu(menu);
+			
+			MenuItem cut = new MenuItem("Cut", Icons.icon_cut.getView());
+			cut.setOnAction((event)->{
+				if ( console.isEditing() )
+					console.cut();
+			});
+			menu.getItems().add(cut);
+			
+			MenuItem copy = new MenuItem("Copy", Icons.icon_copy.getView());
+			copy.setOnAction((event)->{
+				console.copy();
+			});
+			menu.getItems().add(copy);
+
+			MenuItem paste = new MenuItem("Paste", Icons.icon_paste.getView());
+			paste.setOnAction((event)->{
+				console.paste();
+			});
+			menu.getItems().add(paste);
+			
+			menu.getItems().add(new SeparatorMenuItem());
+			
+			MenuItem clear = new MenuItem("Clear Console");
+			clear.setOnAction((event)->{
+				console.clear();
+			});
+			menu.getItems().add(clear);
+		}
+		
+		// Command line context menu
+		{
+			ContextMenu menu = new ContextMenu();
+			luaInput.setContextMenu(menu);
+			
+			MenuItem cut = new MenuItem("Cut", Icons.icon_cut.getView());
+			cut.setOnAction((event)->{
+				if ( luaInput.isEditing() )
+					luaInput.cut();
+			});
+			menu.getItems().add(cut);
+			
+			MenuItem copy = new MenuItem("Copy", Icons.icon_copy.getView());
+			copy.setOnAction((event)->{
+				luaInput.copy();
+			});
+			menu.getItems().add(copy);
+
+			MenuItem paste = new MenuItem("Paste", Icons.icon_paste.getView());
+			paste.setOnAction((event)->{
+				luaInput.paste();
+			});
+			menu.getItems().add(paste);
+		}
 
 		this.setOnKeyPressed(event -> {
 			if ( event.getKey() != GLFW.GLFW_KEY_ENTER )

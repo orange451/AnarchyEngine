@@ -18,7 +18,7 @@ in vec4 passColor;
 
 out vec4 outColor;
 
-const float MAX_REFLECTION_LOD = 14.0;
+const float MAX_REFLECTION_LOD = 18.0;
 
 vec3 reflectEnv( vec3 viewSpacePos, vec3 surfaceNormal );
 
@@ -51,7 +51,8 @@ void main(void) {
 	radiance = radiance * uSkyBoxLightMultiplier;
 	
 	// Calculate final IBL based on reflectiveness
-	vec3 final = mix( kD + radiance, (kD * radiance) + radiance * reflectiveness, roughness );
+	vec3 radianceBoost = radiance * (reflectiveness*2);
+	vec3 final = mix( kD + radiance, (kD * radiance) + radianceBoost, roughness );
 	
 	// Scale based on ambient
 	final = final*uAmbient;

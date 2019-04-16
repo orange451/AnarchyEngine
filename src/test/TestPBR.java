@@ -4,6 +4,7 @@ import org.luaj.vm2.LuaValue;
 import org.lwjgl.glfw.GLFW;
 
 import engine.Game;
+import engine.InternalRenderThread;
 import engine.application.impl.ClientApplication;
 import engine.lua.RunnableArgs;
 import engine.lua.type.data.Color3;
@@ -22,6 +23,8 @@ public class TestPBR extends ClientApplication {
 	@Override
 	public void loadScene(String[] args) {
 		super.loadScene(args);
+		
+		InternalRenderThread.desiredFPS = 1000;
 		
 		// Move camera script
 		Game.runService().renderSteppedEvent().connect( new RunnableArgs() {

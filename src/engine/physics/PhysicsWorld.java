@@ -300,6 +300,7 @@ public class PhysicsWorld {
 		Vector3 worldMax = new Vector3(1000f,1000f,1000f);
 		btAxisSweep3 sweepBP = new btAxisSweep3(worldMin, worldMax);
 		dynamicsWorld = new btDiscreteDynamicsWorld(dispatcher, sweepBP, solver, collisionConfiguration);
-		btGImpactCollisionAlgorithm.registerAlgorithm( dispatcher );
+		
+		//btGImpactCollisionAlgorithm.registerAlgorithm( dispatcher );
 	}
 }

@@ -1,20 +1,9 @@
 package engine.lua;
 
-import java.io.File;
 import java.io.IOException;
-import java.io.Serializable;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.net.URLDecoder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.jar.JarEntry;
-import java.util.jar.JarFile;
-
 import org.luaj.vm2.Globals;
 import org.luaj.vm2.LoadState;
 import org.luaj.vm2.LuaError;
@@ -27,12 +16,9 @@ import engine.lua.lib.Enums;
 import engine.lua.lib.GameEngineLib;
 import engine.lua.lib.PreventInfiniteInstructions;
 import engine.lua.type.*;
-import engine.lua.type.data.*;
 import engine.lua.type.object.Instance;
 import engine.lua.type.object.ScriptBase;
-import engine.lua.type.object.insts.*;
 import engine.util.ClassFinder;
-import ide.ClasspathInspector;
 
 public class LuaEngine {
 	public static Globals globals;

@@ -125,10 +125,12 @@ void main(void) {
 		vec3 radiance = max( cubemapSample, 0.0 );
 		radiance = pow( radiance, vec3(uSkyBoxLightPower) );
 		radiance = radiance * uSkyBoxLightMultiplier;
-		radiance = mix( kD + radiance, (kD * radiance) + radiance * uReflective, fRoughness );
-		radiance = radiance*uAmbient;
 		
-		finalColor += radiance;
+		vec3 radianceBoost = radiance * (uReflective+(1.0-alpha))*2;
+		vec3 ibl = mix( kD + radiance, (kD * radiance) + radianceBoost, fRoughness );
+		ibl = ibl*uAmbient;
+		
+		finalColor += ibl;
 	}
 
 	// Write
