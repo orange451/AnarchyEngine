@@ -5,16 +5,18 @@ import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import org.luaj.vm2.LuaValue;
 
-import com.bulletphysics.collision.dispatch.CollisionObject;
-import com.bulletphysics.collision.shapes.BoxShape;
-import com.bulletphysics.collision.shapes.CollisionShape;
-import com.bulletphysics.dynamics.RigidBody;
-import com.bulletphysics.linearmath.Transform;
+import com.badlogic.gdx.math.Matrix4;
+import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.physics.bullet.collision.btBoxShape;
+import com.badlogic.gdx.physics.bullet.collision.btCapsuleShapeZ;
+import com.badlogic.gdx.physics.bullet.collision.btCollisionShape;
+import com.badlogic.gdx.physics.bullet.collision.btCylinderShapeZ;
+import com.badlogic.gdx.physics.bullet.collision.btSphereShape;
+import com.badlogic.gdx.physics.bullet.dynamics.btRigidBody;
 
 import engine.Game;
 import engine.InternalGameThread;
 import engine.gl.mesh.BufferedMesh;
-import engine.lua.type.data.Matrix4;
 import engine.lua.type.object.PhysicsBase;
 import engine.lua.type.object.insts.Mesh;
 import engine.lua.type.object.insts.Prefab;
@@ -23,7 +25,7 @@ import engine.util.Pair;
 import engine.util.PhysicsUtils;
 
 public class PhysicsObjectInternal {
-	protected RigidBody body;
+	protected btRigidBody body;
 	protected PhysicsWorld world;
 	protected boolean destroyed;
 	protected SoundMaterial soundMaterial;
@@ -32,11 +34,11 @@ public class PhysicsObjectInternal {
 	private float desiredFriction = 0.5f;
 	private float desiredAngularFactor = 1.0f;
 	private float desiredLinearDamping = 0.1f;
-	private CollisionShape desiredShape;
+	private btCollisionShape desiredShape;
 	private boolean refresh = false;
 	private PhysicsBase luaFrontEnd;
 	
-	private javax.vecmath.Vector3f forceVelocity;
+	private Vector3 forceVelocity;
 	
 	public PhysicsObjectInternal( PhysicsBase physicsObject ) {
 		this.luaFrontEnd = physicsObject;
@@ -65,35 +67,35 @@ public class PhysicsObjectInternal {
 		return soundMaterial;
 	}
 
-	public RigidBody getBody() {
+	public btRigidBody getBody() {
 		return this.body;
 	}
 
 	public Vector3f getVelocity() {
-		javax.vecmath.Vector3f vel = getVelocityInternal();
+		Vector3 vel = getVelocityInternal();
 		return new Vector3f( vel.x, vel.y, vel.z );
 	}
 
-	public javax.vecmath.Vector3f getVelocityInternal() {
+	public Vector3 getVelocityInternal() {
 		if (this.destroyed || body == null)
-			return new javax.vecmath.Vector3f();
+			return new Vector3();
 		
-		return body.getLinearVelocity(new javax.vecmath.Vector3f());
+		return body.getLinearVelocity();
 	}
 
 	public Vector3f getLocation() {
 		if (this.destroyed)
 			return new Vector3f(0,0,0);
-		Transform transform = body.getWorldTransform(new Transform());
-		javax.vecmath.Vector3f capPos = transform.origin;
+		com.badlogic.gdx.math.Matrix4 transform = body.getWorldTransform();
+		Vector3 capPos = transform.getTranslation(new Vector3());
 		return new Vector3f( capPos.x, capPos.y, capPos.z );
 	}
 
 	public void setVelocity( Vector3f vector ) {
-		this.setVelocity( new javax.vecmath.Vector3f( vector.x, vector.y, vector.z ) );
+		this.setVelocity( new Vector3( vector.x, vector.y, vector.z ) );
 	}
 
-	public void setVelocity( javax.vecmath.Vector3f vector ) {
+	public void setVelocity( Vector3 vector ) {
 		if (this.destroyed)
 			return;
 		
@@ -102,11 +104,11 @@ public class PhysicsObjectInternal {
 			return;
 		}
 		
-		javax.vecmath.Vector3f oldVel = body.getLinearVelocity(new javax.vecmath.Vector3f());
+		Vector3 oldVel = body.getLinearVelocity();
 		oldVel.sub(vector);
-		float distSqr = oldVel.lengthSquared();
+		float distSqr = oldVel.len2();
 		
-		if ( distSqr > 0.1 )
+		if ( distSqr > 0.05 )
 			this.wakeup();
 		
 		body.setLinearVelocity( vector );
@@ -115,14 +117,15 @@ public class PhysicsObjectInternal {
 	public void applyImpulse( Vector3f impulse, Vector3f location ) {
 		if (this.destroyed)
 			return;
-		body.applyImpulse( new javax.vecmath.Vector3f( impulse.x, impulse.y, impulse.z ), new javax.vecmath.Vector3f( location.x, location.y, location.z ));
+		body.applyImpulse( new Vector3( impulse.x, impulse.y, impulse.z ), new Vector3( location.x, location.y, location.z ));
 	}
 
-	private Transform transform = new Transform();
+	private Matrix4 transform = new Matrix4();
 	public void setWorldMatrix( Matrix4f worldMatrix ) {
 		if (this.destroyed || body == null)
 			return;
-		transform.setFromOpenGLMatrix(worldMatrix.get(new float[16]));
+		transform.set(worldMatrix.get(new float[16]));
+		//transform.setFromOpenGLMatrix(worldMatrix.get(new float[16]));
 		body.setWorldTransform(transform);
 		this.wakeup();
 	}
@@ -131,10 +134,8 @@ public class PhysicsObjectInternal {
 		if (this.destroyed)
 			return;
 
-		Transform transform = body.getWorldTransform(new Transform());
-		transform.origin.x = pos.x;
-		transform.origin.y = pos.y;
-		transform.origin.z = pos.z;
+		Matrix4 transform = body.getWorldTransform();
+		transform.setTranslation(pos.x, pos.y, pos.z);
 		body.setWorldTransform(transform);
 	}
 
@@ -151,15 +152,14 @@ public class PhysicsObjectInternal {
 			if ( wMat.isnil() )
 				return new Matrix4f();
 			
-			return ((Matrix4)wMat).toJoml();
+			return ((engine.lua.type.data.Matrix4)wMat).toJoml();
 		}
 
-		Transform transform = body.getWorldTransform(new Transform());
+		Matrix4 transform = body.getWorldTransform();
 
-		float[] fMat = new float[16];
-		transform.getOpenGLMatrix(fMat);
+		//float[] fMat = new float[16];
 		org.joml.Matrix4f worldMatrix = new org.joml.Matrix4f();
-		worldMatrix.set(fMat);
+		worldMatrix.set(transform.val);
 
 		return worldMatrix;
 	}
@@ -224,9 +224,9 @@ public class PhysicsObjectInternal {
 		refresh = false;
 		
 		Matrix4f worldMat = this.getWorldMatrix();
-		final javax.vecmath.Vector3f vel = this.getVelocityInternal();
+		final Vector3 vel = this.getVelocityInternal();
 		final float newMass = desiredMass;
-		RigidBody old = body;
+		btRigidBody old = body;
 		
 		InternalGameThread.runLater(() -> {
 			if ( luaFrontEnd.isDestroyed() )
@@ -244,11 +244,11 @@ public class PhysicsObjectInternal {
 			// Destroy old
 			if ( old != null && world != null ) {
 				world.dynamicsWorld.removeRigidBody(old);
-				old.destroy();
+				old.dispose();
 			}
 			
 			// Create new
-			RigidBody newBody = PhysicsUtils.getBody(newMass, desiredBounce, desiredFriction, desiredShape);
+			btRigidBody newBody = PhysicsUtils.getBody(newMass, desiredBounce, desiredFriction, desiredShape);
 			newBody.setAngularFactor(desiredAngularFactor);
 			newBody.setDamping(desiredLinearDamping, 0.3f);
 			
@@ -331,24 +331,24 @@ public class PhysicsObjectInternal {
 		}
 		float minlen = Math.min(width, Math.min(length, height));
 		float minrad = Math.min(width, length);
-		javax.vecmath.Vector3f halfExtents = new javax.vecmath.Vector3f(width/2f, length/2f, height/2f);
+		Vector3 halfExtents = new Vector3(width/2f, length/2f, height/2f);
 		
 		// Fallback shape
-		CollisionShape shape = new BoxShape(halfExtents);
+		btCollisionShape shape = new btBoxShape(halfExtents);
 		
 		// Sphere
 		if ( type.equals("Sphere") ) {
-			shape = new com.bulletphysics.collision.shapes.SphereShape(minlen/2f);
+			shape = new btSphereShape(minlen/2f);
 		}
 		
 		// Capsule
 		if ( type.equals("Capsule") ) {
-			shape = new com.bulletphysics.collision.shapes.CapsuleShapeZ(minrad/2f, height-minrad);
+			shape = new btCapsuleShapeZ(minrad/2f, height-minrad);
 		}
 		
 		// Cylinder
 		if ( type.equals("Cylinder") ) {
-			shape = new com.bulletphysics.collision.shapes.CylinderShapeZ(halfExtents);
+			shape = new btCylinderShapeZ(halfExtents);
 		}
 		
 		// Hull
@@ -370,7 +370,7 @@ public class PhysicsObjectInternal {
 		if ( this.body == null || this.destroyed )
 			return;
 		
-		this.body.setActivationState(CollisionObject.ACTIVE_TAG);
+		this.body.setActivationState(1); // ACTIVE_TAG
 		this.body.activate();
 		this.body.activate(true);
 	}

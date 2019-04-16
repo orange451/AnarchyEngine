@@ -18,7 +18,7 @@ in vec4 passColor;
 
 out vec4 outColor;
 
-const float MAX_REFLECTION_LOD = 18.0;
+const float MAX_REFLECTION_LOD = 14.0;
 
 vec3 reflectEnv( vec3 viewSpacePos, vec3 surfaceNormal );
 

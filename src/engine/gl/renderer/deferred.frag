@@ -22,7 +22,7 @@ in vec3 passNormal;
 in vec3 vViewSpacePos;
 in vec3 vViewSpaceNor;
 
-const float MAX_REFLECTION_LOD = 18.0;
+const float MAX_REFLECTION_LOD = 14.0;
 
 void write(vec3 diffuse, vec3 normal, float metalness, float roughness, float reflective, vec3 emissive);
 vec3 normalmap(vec3 normalSample, vec3 vNormal, vec3 vViewSpacePos, vec2 vTexCoords );

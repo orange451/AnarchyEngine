@@ -119,7 +119,7 @@ public class Assets extends Service implements TreeViewable {
 		return t;
 	}
 
-	public Prefab importPrefab(String filePath) {
+	public LuaValue importPrefab(String filePath) {
 		return importPrefab(filePath, 1, -1);
 	}
 

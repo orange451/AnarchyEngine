@@ -29,7 +29,7 @@ in vec4 passColor;
 in vec3 passNormal;
 in vec4 vViewSpacePos;
 in vec3 vViewSpaceNor;
-const float MAX_REFLECTION_LOD = 18.0;
+const float MAX_REFLECTION_LOD = 14.0;
 
 struct PointLight {
 	vec3 Position;
