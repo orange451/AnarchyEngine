@@ -11,7 +11,6 @@ import org.luaj.vm2.Varargs;
 
 import engine.lua.LuaEngine;
 import engine.lua.type.object.ScriptBase;
-import engine.lua.type.object.insts.Script;
 
 public class ScriptData extends LuaValue implements Runnable {
 	private static ScheduledExecutorService THREAD_POOL;
@@ -66,7 +65,7 @@ public class ScriptData extends LuaValue implements Runnable {
 	
 	public void interrupt() {
 		interruptedClosures.put(ScriptData.this, true);
-		System.out.println("Attempting to interrupt closure: " + function);
+		System.out.println("Attempting to interrupt closure: " + script+"/"+function);
 	}
 
 	@Override

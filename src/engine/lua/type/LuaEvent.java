@@ -59,7 +59,7 @@ public class LuaEvent extends LuaDatatype {
 			}
 			
 			ScriptBase runningScript = ScriptData.getScript(Thread.currentThread());
-			if ( runningScript != null ) {
+			if ( runningScript != null && runningScript.isRunning() ) {
 				runningScript.connections.put(LuaEvent.this,cnt);
 			}
 			//cnt.script = ScriptData.getScript(Thread.currentThread());

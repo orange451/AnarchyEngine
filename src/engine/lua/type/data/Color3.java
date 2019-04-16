@@ -19,7 +19,7 @@ public class Color3 extends LuaValuetype {
 		this.getmetatable().set("ToString", new ZeroArgFunction() {
 			@Override
 			public LuaValue call() {
-				return LuaValue.valueOf("( " + getR() + ", " + getG() + ", " + getB() + " )");
+				return LuaValue.valueOf(Color3.this.toString());
 			}
 		});
 		
@@ -133,7 +133,7 @@ public class Color3 extends LuaValuetype {
 	}
 	
 	public String toString() {
-		return getR() + ", " + getG() + ", " + getB();
+		return typename()+":("+getR() + ", " + getG() + ", " + getB()+")";
 	}
 	
 	public LuaValuetype fromString(String input) {
@@ -157,6 +157,7 @@ public class Color3 extends LuaValuetype {
 		return true;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public JSONObject toJSON() {
 		JSONObject j = new JSONObject();

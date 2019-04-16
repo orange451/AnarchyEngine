@@ -10,7 +10,6 @@ import org.luaj.vm2.lib.jse.CoerceJavaToLua;
 
 import engine.Game;
 import engine.lua.LuaEngine;
-import engine.lua.lib.Enums;
 import engine.lua.type.object.Instance;
 
 public abstract class LuaDatatype extends LuaTable {
@@ -230,11 +229,18 @@ public abstract class LuaDatatype extends LuaTable {
 	}
 	
 	public void cleanup() {
-		this.setLocked(false);
+		
+		// Lock it, can no longer be modified.
+		this.setLocked(true);
 		fields.clear();
+		
+		// Delete all its keys
 		LuaValue[] keys = keys();
 		for (int i = keys.length-1; i >= 0; i--) {
 			this.rawset(keys[i], LuaValue.NIL);
 		}
+		
+		// Force it to be weak (garbage collection)
+		this.getmetatable().set( LuaValue.MODE, LuaValue.valueOf("kv") );
 	}
 }

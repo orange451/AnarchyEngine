@@ -31,6 +31,10 @@ public abstract class LuaValuetype extends LuaDatatype {
 		DATA_TYPES.put(type.typename(), type.getClass());
 	}
 	
+	public LuaValue tostring() {
+		return LuaValue.valueOf(this.toString());
+	}
+	
 	protected abstract void onRegister(LuaTable table);
 	protected abstract LuaValue newInstanceFunction();
 	public abstract JSONObject toJSON();

@@ -31,7 +31,7 @@ public class Vector2 extends LuaValuetype {
 		this.getmetatable().set("ToString", new ZeroArgFunction() {
 			@Override
 			public LuaValue call() {
-				return LuaValue.valueOf("( " + getX() + ", " + getY() + " )");
+				return LuaValue.valueOf(Vector2.this.toString());
 			}
 		});
 
@@ -158,7 +158,7 @@ public class Vector2 extends LuaValuetype {
 	}
 	
 	public String toString() {
-		return Misc.truncateDecimal(getX(), 2) + ", " + Misc.truncateDecimal(getY(), 2);
+		return typename()+":("+Misc.truncateDecimal(getX(), 2) + ", " + Misc.truncateDecimal(getY(), 2)+")";
 	}
 	
 	@Override
@@ -200,6 +200,7 @@ public class Vector2 extends LuaValuetype {
 	
 
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public JSONObject toJSON() {
 		JSONObject j = new JSONObject();

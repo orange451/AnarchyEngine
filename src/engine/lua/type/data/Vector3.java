@@ -28,7 +28,7 @@ public class Vector3 extends LuaValuetype {
 		this.getmetatable().set("ToString", new ZeroArgFunction() {
 			@Override
 			public LuaValue call() {
-				return LuaValue.valueOf("( " + getX() + ", " + getY() + ", " + getZ() + " )");
+				return LuaValue.valueOf(Vector3.this.toString());
 			}
 		});
 
@@ -220,7 +220,7 @@ public class Vector3 extends LuaValuetype {
 	}
 	
 	public String toString() {
-		return Misc.truncateDecimal(getX(), 2) + ", " + Misc.truncateDecimal(getY(), 2) + ", " + Misc.truncateDecimal(getZ(), 2);
+		return typename()+":("+Misc.truncateDecimal(getX(), 2) + ", " + Misc.truncateDecimal(getY(), 2) + ", " + Misc.truncateDecimal(getZ(), 2)+")";
 	}
 	
 	public LuaValuetype fromString(String input) {
@@ -235,6 +235,7 @@ public class Vector3 extends LuaValuetype {
 		return this;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public JSONObject toJSON() {
 		JSONObject j = new JSONObject();

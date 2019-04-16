@@ -156,4 +156,8 @@ public abstract class ScriptBase extends Instance implements GameSubscriber {
 		setSource(FileIO.file_text_read_line_all(out));
 		FileIO.file_text_close(out);
 	}
+
+	public boolean isRunning() {
+		return running.get();
+	}
 }
