@@ -220,7 +220,11 @@ public class Vector3 extends LuaValuetype {
 	}
 	
 	public String toString() {
-		return typename()+":("+Misc.truncateDecimal(getX(), 2) + ", " + Misc.truncateDecimal(getY(), 2) + ", " + Misc.truncateDecimal(getZ(), 2)+")";
+		return Misc.truncateDecimal(getX(), 2) + ", " + Misc.truncateDecimal(getY(), 2) + ", " + Misc.truncateDecimal(getZ(), 2);
+	}
+	
+	public LuaValue tostring() {
+		return LuaValue.valueOf(typename()+":("+toString()+")");
 	}
 	
 	public LuaValuetype fromString(String input) {

@@ -133,7 +133,12 @@ public class Color3 extends LuaValuetype {
 	}
 	
 	public String toString() {
-		return typename()+":("+getR() + ", " + getG() + ", " + getB()+")";
+		return getR() + ", " + getG() + ", " + getB();
+	}
+
+	
+	public LuaValue tostring() {
+		return LuaValue.valueOf(typename()+":("+toString()+")");
 	}
 	
 	public LuaValuetype fromString(String input) {

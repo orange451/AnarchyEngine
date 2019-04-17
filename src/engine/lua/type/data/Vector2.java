@@ -158,7 +158,11 @@ public class Vector2 extends LuaValuetype {
 	}
 	
 	public String toString() {
-		return typename()+":("+Misc.truncateDecimal(getX(), 2) + ", " + Misc.truncateDecimal(getY(), 2)+")";
+		return Misc.truncateDecimal(getX(), 2) + ", " + Misc.truncateDecimal(getY(), 2);
+	}
+	
+	public LuaValue tostring() {
+		return LuaValue.valueOf(typename()+":("+toString()+")");
 	}
 	
 	@Override

@@ -21,7 +21,10 @@ public class PhysicsObject extends PhysicsBase implements TreeViewable {
 
 	@Override
 	public Pair<Vector3f, Vector3f> getAABB() {
-		Pair<Vector3f, Vector3f>  aabb = null;
+		Pair<Vector3f, Vector3f>  aabb = new Pair<Vector3f, Vector3f>(getPosition().toJoml(), getPosition().toJoml());
+		
+		if ( linked == null )
+			return aabb;
 		
 		LuaValue p = linked.get("Prefab");
 		if ( !p.isnil() && p instanceof Prefab ) {

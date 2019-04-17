@@ -82,6 +82,33 @@ public class PhysicsObjectInternal {
 		
 		return body.getLinearVelocity();
 	}
+	
+	public Vector3f getAngularVelocity() {
+		Vector3 vel = this.getAngularVelocityInternal();
+		return new Vector3f( vel.x, vel.y, vel.z );
+	}
+	
+	public Vector3 getAngularVelocityInternal() {
+		if ( this.destroyed || body == null )
+			return new Vector3();
+		
+		return body.getAngularVelocity();
+	}
+	
+	public void setAngularVelocity(Vector3f vector) {
+		setAngularVelocity( new Vector3(vector.x, vector.y, vector.z) );
+	}
+	
+	public void setAngularVelocity(Vector3 vector) {
+		if ( this.destroyed )
+			return;
+		
+		if ( body == null )
+			return;
+		
+		body.activate(true);
+		body.setAngularVelocity(vector);
+	}
 
 	public Vector3f getLocation() {
 		if (this.destroyed)
@@ -110,7 +137,8 @@ public class PhysicsObjectInternal {
 		
 		if ( distSqr > 0.05 )
 			this.wakeup();
-		
+
+		body.activate(true);
 		body.setLinearVelocity( vector );
 	}
 
@@ -155,13 +183,18 @@ public class PhysicsObjectInternal {
 			return ((engine.lua.type.data.Matrix4)wMat).toJoml();
 		}
 
-		Matrix4 transform = body.getWorldTransform();
-
-		//float[] fMat = new float[16];
+		Matrix4 transform = getWorldMatrixInternal();
 		org.joml.Matrix4f worldMatrix = new org.joml.Matrix4f();
 		worldMatrix.set(transform.val);
 
 		return worldMatrix;
+	}
+	
+	public Matrix4 getWorldMatrixInternal() {
+		if ( this.destroyed || body == null )
+			return new Matrix4();
+		
+		return this.body.getWorldTransform();
 	}
 
 	public Quaternionf getRotation() {
@@ -177,7 +210,12 @@ public class PhysicsObjectInternal {
 
 	public void setMass(float mass) {
 		this.desiredShape = null;
-		this.refresh = true;
+		
+		if ( this.body != null ) {
+			this.body.setMassProps(mass, this.body.getLocalInertia());
+		} else {
+			this.refresh = true;
+		}
 	}
 	
 	public void setFriction(float friction) {
@@ -225,6 +263,7 @@ public class PhysicsObjectInternal {
 		
 		Matrix4f worldMat = this.getWorldMatrix();
 		final Vector3 vel = this.getVelocityInternal();
+		Vector3 angVel = this.getAngularVelocityInternal();
 		final float newMass = desiredMass;
 		btRigidBody old = body;
 		
@@ -259,11 +298,13 @@ public class PhysicsObjectInternal {
 			if ( forceVelocity != null ) {
 				vel.set(forceVelocity);
 				forceVelocity = null;
+			} else {
+				engine.lua.type.data.Vector3 v = luaFrontEnd.getVelocity();
+				vel.set(new Vector3(v.getX(), v.getY(), v.getZ()));
 			}
 			
 			// Set some vars
 			setWorldMatrix(worldMat);
-			setVelocity(vel);
 			newBody.setHitFraction(0);
 			newBody.setCcdMotionThreshold((float) 1e-7);
 			newBody.setCcdSweptSphereRadius((float) 1e-2);
@@ -276,11 +317,18 @@ public class PhysicsObjectInternal {
 			} else {
 				this.world.dynamicsWorld.addRigidBody(newBody);
 			}
+
+			newBody.activate(true);
+			newBody.setLinearVelocity(vel);
+			newBody.setAngularVelocity(angVel);
 		});
 	}
 
 	public void internalTick() {
-		if ( this.refresh ) {
+		if ( luaFrontEnd == null )
+			return;
+		
+		if ( this.refresh && luaFrontEnd.isDescendantOf(Game.workspace()) ) {
 			refreshBody();
 		}
 	}

@@ -39,6 +39,7 @@ public abstract class PhysicsBase extends Instance implements GameSubscriber {
 		this.defineField("Linked", LuaValue.NIL, true);
 		
 		this.defineField("Velocity", Vector3.newInstance(0, 0, 0), false);
+		this.defineField("AngularVelocity", Vector3.newInstance(0,0,0), false);
 		this.defineField("WorldMatrix", new Matrix4(), false);
 		
 		this.defineField("Mass", LuaValue.valueOf(0.5f), false);
@@ -124,6 +125,16 @@ public abstract class PhysicsBase extends Instance implements GameSubscriber {
 			this.rawset("Velocity", vel);
 			this.notifyPropertySubscribers("Velocity", vel);
 		}
+		
+		// Update our angular velocity to the physics objets angular velocity
+		Vector3 angvel = (Vector3)this.get("AngularVelocity");
+		Vector3f tav = angvel.toJoml();
+		Vector3f pav = internalPhys.getAngularVelocity();
+		if ( !tav.equals(pav) ) {
+			angvel.setInternal(pav);
+			this.rawset("AngularVelocity", angvel);
+			this.notifyPropertySubscribers("AngularVelocity", angvel);
+		}
 	}
 	
 	/**
@@ -199,11 +210,10 @@ public abstract class PhysicsBase extends Instance implements GameSubscriber {
 		
 		// Check for changes within parented physics object
 		connection = linked.changedEvent().connect((args)->{
-			LuaValue property = args[0];
-			LuaValue svalue = args[1];
+			String property = args[0].toString();
 			
 			// Game object had its own matrix changed. Replicate to physics.
-			if ( property.toString().equals("WorldMatrix") || property.toString().equals("Position") ) {
+			if ( property.equals("WorldMatrix") || property.equals("Position") ) {
 				if ( physics == null )
 					return;
 				
@@ -211,16 +221,12 @@ public abstract class PhysicsBase extends Instance implements GameSubscriber {
 			}
 			
 			// Game object had its model changed. Replicate to physics object.
-			if ( property.toString().equals("Prefab") ) {
+			if ( property.equals("Prefab") ) {
 				physics.refresh();
 				setupPrefabChanged();
 			}
 		});
 		
-		/*InternalGameThread.runLater(()->{
-			if ( this.physics != null )
-				this.physics.refresh();
-		});*/
 		checkNetworkOwnership();
 	}
 	
@@ -282,6 +288,13 @@ public abstract class PhysicsBase extends Instance implements GameSubscriber {
 			if ( physics != null ) {
 				Vector3 vec = (Vector3)value;
 				physics.setVelocity(new com.badlogic.gdx.math.Vector3(vec.getX(), vec.getY(), vec.getZ()));
+			}
+		}
+		
+		if ( key.toString().equals("AngularVelocity") ) {
+			if ( physics != null ) {
+				Vector3 vec = (Vector3)value;
+				physics.setAngularVelocity(vec.toJoml());
 			}
 		}
 		
@@ -461,8 +474,20 @@ public abstract class PhysicsBase extends Instance implements GameSubscriber {
 	}
 	
 	public Vector3 getPosition() {
-		return ((Matrix4)this.get("WorldMatrix")).getPosition();
+		return this.getWorldMatrix().getPosition();
 	}
 
+	public void setPosition(Vector3 position) {
+		if ( this.linked != null ) {
+			linked.setPosition(position);
+		} else {
+			this.getWorldMatrix().setPosition(position);
+		}
+	}
+	
+	public Matrix4 getWorldMatrix() {
+		return (Matrix4) this.get("WorldMatrix");
+	}
+	
 	public abstract Pair<Vector3f, Vector3f> getAABB();
 }
