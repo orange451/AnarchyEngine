@@ -93,7 +93,7 @@ public class TestPBR extends ClientApplication {
 		// Make rows of balls
 		makeRow( mesh, mat,  1, Color3.newInstance(255, 255, 255),	Color3.newInstance(255, 255, 255),	0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f);
 		makeRow( mesh, mat,  0, Color3.newInstance(0, 128, 16),		Color3.newInstance(0, 128, 16),		0.4f, 1.0f, 0.2f, 0.2f, 0.3f, 0.0f, 0.0f, 0.0f);
-		makeRow( mesh, mat, -1, Color3.newInstance(255,220,96),		Color3.newInstance(255, 220, 96),	0.0f, 1.0f, 0.8f, 0.8f, 1.0f, 0.0f, 0.0f, 0.0f);
+		makeRow( mesh, mat, -1, Color3.newInstance(255,220,96),		Color3.newInstance(255, 220, 96),	0.0f, 1.0f, 0.8f, 0.8f, 1.0f, 0.5f, 0.0f, 0.0f);
 		makeRow( mesh, mat, -2, Color3.red(),						Color3.red(),						0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.3f, 0.0f, 0.9f);
 		
 		// Add lights
