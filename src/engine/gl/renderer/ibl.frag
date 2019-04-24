@@ -51,8 +51,7 @@ void main(void) {
 	radiance = radiance * uSkyBoxLightMultiplier;
 	
 	// Calculate final IBL based on reflectiveness
-	vec3 radianceBoost = radiance * (reflectiveness*2);
-	vec3 final = mix( kD + radiance, (kD * radiance) + radianceBoost, roughness );
+	vec3 final = kD + mix( radiance, kD * radiance, metallic ) * (0.1+reflectiveness);
 	
 	// Scale based on ambient
 	final = final*uAmbient;

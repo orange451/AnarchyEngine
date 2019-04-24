@@ -58,7 +58,7 @@ void main(void) {
 		vec3 cubemapSample = textureLod(texture_cubemap, reflectEnv( nViewSpacePos, normal ).xyz, MAX_REFLECTION_LOD * fRoughness).rgb;
 		
 		// Apply reflection PBR parameter
-		cubemapSample = reflectivePBR( cubemapSample, nViewSpacePos, normal, fRoughness, uReflective );
+		cubemapSample = reflectivePBR( cubemapSample, nViewSpacePos, normal, fMetalness, uReflective );
 
 		// Combine cubemap into diffuse
 		diffuseSample.rgb *= cubemapSample;

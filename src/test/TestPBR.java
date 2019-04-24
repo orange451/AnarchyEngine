@@ -77,8 +77,8 @@ public class TestPBR extends ClientApplication {
 		// Skybox
 		Skybox skybox = new Skybox();
 		skybox.setImage(envmap);
-		skybox.setBrightness(0.66f);
-		skybox.setPower(1.5f);
+		skybox.setBrightness(3f);
+		skybox.setPower(1.25f);
 		skybox.setParent(Game.lighting());
 		Game.lighting().setSkybox(skybox);
 		
@@ -91,10 +91,10 @@ public class TestPBR extends ClientApplication {
 		mat.setParent(Game.assets().materials());
 		
 		// Make rows of balls
-		makeRow( mesh, mat,  1, Color3.newInstance(255, 255, 255),	Color3.newInstance(255, 255, 255),	0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f);
+		makeRow( mesh, mat,  1, Color3.newInstance(255, 255, 255),	Color3.newInstance(255, 255, 255),	0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f);
 		makeRow( mesh, mat,  0, Color3.newInstance(0, 128, 16),		Color3.newInstance(0, 128, 16),		0.4f, 1.0f, 0.2f, 0.2f, 0.3f, 0.0f, 0.0f, 0.0f);
 		makeRow( mesh, mat, -1, Color3.newInstance(255,220,96),		Color3.newInstance(255, 220, 96),	0.0f, 1.0f, 0.8f, 0.8f, 1.0f, 0.5f, 0.0f, 0.0f);
-		makeRow( mesh, mat, -2, Color3.red(),						Color3.red(),						0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.3f, 0.0f, 0.9f);
+		makeRow( mesh, mat, -2, Color3.red(),						Color3.red(),						0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.9f);
 		
 		// Add lights
 		int close = 8;

@@ -48,7 +48,7 @@ vec3 normalmap(vec3 normalSample, vec3 vNormal, vec3 vViewSpacePos, vec2 vTexCoo
 vec3 calculateFresnel( vec3 viewSpacePos, vec3 surfaceNormal, float roughness, float metalness );
 vec3 reflectEnv( vec3 viewSpacePos, vec3 surfaceNormal );
 vec3 reflectivePBR( vec3 cubemapSample, vec3 viewSpacePos, vec3 surfaceNormal, float roughness, float reflective );
-float getReflectionIndex( vec3 viewSpacePos, vec3 surfaceNormal, float reflective );
+float getReflectionIndex( vec3 viewSpacePos, vec3 surfaceNormal );
 
 out vec4 outColor;
 
@@ -81,7 +81,7 @@ void main(void) {
 		cubemapSample = textureLod(texture_cubemap, reflectEnv( nViewSpacePos, normal ).xyz, MAX_REFLECTION_LOD * fRoughness).rgb;
 		
 		// Apply reflection PBR parameter
-		vec3 pbrCubemapSample = reflectivePBR( cubemapSample, nViewSpacePos, normal, fRoughness, uReflective );
+		vec3 pbrCubemapSample = reflectivePBR( cubemapSample, nViewSpacePos, normal, fMetalness, uReflective );
 
 		// Combine cubemap into diffuse
 		diffuseSample.rgb *= pbrCubemapSample;
@@ -112,10 +112,6 @@ void main(void) {
 	// Alpha
 	float alpha = (1.0 - uTransparencyObject) * (1.0 - uTransparencyMaterial);
 	
-	// make non reflective parts more transparent
-	float ri = 1.0 - (getReflectionIndex( nViewSpacePos, normal, uReflective + alpha*0.5 ) );
-	alpha *= ri;
-	
 	// IBL
 	if ( enableSkybox == 1.0 ) {
 		vec3 kD = diffuseSample.rgb;
@@ -126,8 +122,7 @@ void main(void) {
 		radiance = pow( radiance, vec3(uSkyBoxLightPower) );
 		radiance = radiance * uSkyBoxLightMultiplier;
 		
-		vec3 radianceBoost = radiance * (uReflective+(1.0-alpha))*2;
-		vec3 ibl = mix( kD + radiance, (kD * radiance) + radianceBoost, fRoughness );
+		vec3 ibl = kD + mix( radiance, kD * radiance, fMetalness ) * (0.1+uReflective);
 		ibl = ibl*uAmbient;
 		
 		finalColor += ibl;

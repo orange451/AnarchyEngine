@@ -1,24 +1,22 @@
 #version 330
 
-float getReflectionIndex( vec3 viewSpacePos, vec3 surfaceNormal, float reflective ) {
+float getReflectionIndex( vec3 viewSpacePos, vec3 surfaceNormal ) {
 	// Calculate dot from surface->light from range [0-1]
 	float f = abs( dot( viewSpacePos, surfaceNormal ) );
-
-	// Limit reflectiveness and apply user-defined reflective value
-	f = clamp( f - reflective, 0.0, 1.0 );
-
-	// Apply power
-	f = 1.0 - pow( 1.0 - f, 1.5 - reflective );
 	
 	// Return
 	return f;
 }
 
-vec3 reflectivePBR( vec3 cubemapSample, vec3 viewSpacePos, vec3 surfaceNormal, float roughness, float reflective ) {
-
+vec3 reflectivePBR( vec3 cubemapSample, vec3 viewSpacePos, vec3 surfaceNormal, float metalness, float reflective ) {
 	// Get reflection index [0-1]
-	float f = getReflectionIndex( viewSpacePos, surfaceNormal, reflective );
+	float refractIndex = 1.0-getReflectionIndex( viewSpacePos, surfaceNormal );
+	
+	// Compute reflective amount
+	float f = mix(0.04, 1.0, (1.0-metalness)*(1.0-metalness));
+	f = (f*f) - (refractIndex*0.2);
+	f = clamp( f, 0.0, 1.0 );
 
 	// Combine reflective with cubemap sample
-	return mix( cubemapSample, vec3(1.0), clamp( f, 0.0, 1.0 ) );
+	return mix( cubemapSample, vec3(1.0), f );
 }
