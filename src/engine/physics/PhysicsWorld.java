@@ -48,7 +48,7 @@ public class PhysicsWorld {
 				
 				for (int i = 0; i < reps; i++) {
 					Game.runService().physicsSteppedEvent().fire(LuaValue.valueOf(ndt));
-					dynamicsWorld.stepSimulation(ndt,1);
+					dynamicsWorld.stepSimulation(ndt,1,ndt);
 				}
 			}catch(Exception e) {
 				System.err.println("Error Stepping Physics");

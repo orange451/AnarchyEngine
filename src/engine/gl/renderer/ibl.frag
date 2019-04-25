@@ -21,6 +21,7 @@ out vec4 outColor;
 const float MAX_REFLECTION_LOD = 18.0;
 
 vec3 reflectEnv( vec3 viewSpacePos, vec3 surfaceNormal );
+float calculateFresnel( vec3 viewSpacePos, vec3 surfaceNormal, float roughness, float metalness, float reflectiveness );
 
 void main(void) {
 	float depth = texture( texture_depth, passTexCoord ).r;
@@ -51,10 +52,14 @@ void main(void) {
 	radiance = radiance * uSkyBoxLightMultiplier;
 	
 	// Calculate final IBL based on reflectiveness
-	vec3 final = kD + mix( radiance, kD * radiance, metallic ) * (0.1+reflectiveness);
+	vec3 final = kD + mix( radiance, kD * radiance, metallic ) * (0.05+reflectiveness);
 	
 	// Scale based on ambient
 	final = final*uAmbient;
+	
+	// Fresnel
+	float fresnel = calculateFresnel( L, N, roughness, metallic, reflectiveness );
+	final += (radiance*fresnel)*(uAmbient*uSkyBoxLightMultiplier);
 
 	// Write
 	outColor = vec4( final, 1.0 );

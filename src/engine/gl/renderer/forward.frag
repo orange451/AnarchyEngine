@@ -45,9 +45,9 @@ vec3 pointLight( vec3 N, vec3 eyeSpace, vec3 lightPosition, vec3 albedo, float m
 
 void write(vec3 diffuse, vec3 normal, float metalness, float roughness, float reflective, vec3 emissive);
 vec3 normalmap(vec3 normalSample, vec3 vNormal, vec3 vViewSpacePos, vec2 vTexCoords );
-vec3 calculateFresnel( vec3 viewSpacePos, vec3 surfaceNormal, float roughness, float metalness );
 vec3 reflectEnv( vec3 viewSpacePos, vec3 surfaceNormal );
 vec3 reflectivePBR( vec3 cubemapSample, vec3 viewSpacePos, vec3 surfaceNormal, float roughness, float reflective );
+float calculateFresnel( vec3 viewSpacePos, vec3 surfaceNormal, float roughness, float metalness, float reflectiveness );
 float getReflectionIndex( vec3 viewSpacePos, vec3 surfaceNormal );
 
 out vec4 outColor;
@@ -87,9 +87,8 @@ void main(void) {
 		diffuseSample.rgb *= pbrCubemapSample;
     }
 	
-	// Calculate fresnel
-	vec3 fresnel = calculateFresnel( nViewSpacePos, normal, fRoughness, fMetalness ) * uReflective;
-	vec3 emissive = uMaterialEmissive+fresnel;
+	// Emissive
+	vec3 emissive = uMaterialEmissive;
 	
 	// Initial color
 	vec3 finalColor = diffuseSample.rgb;
@@ -122,10 +121,13 @@ void main(void) {
 		radiance = pow( radiance, vec3(uSkyBoxLightPower) );
 		radiance = radiance * uSkyBoxLightMultiplier;
 		
-		vec3 ibl = kD + mix( radiance, kD * radiance, fMetalness ) * (0.1+uReflective);
+		vec3 ibl = kD + mix( radiance, kD * radiance, fMetalness ) * (0.05+uReflective);
 		ibl = ibl*uAmbient;
-		
 		finalColor += ibl;
+			
+		// Fresnel
+		float fresnel = calculateFresnel( nViewSpacePos, normal, fRoughness, fMetalness, uReflective );
+		finalColor += (radiance*fresnel)*(uAmbient*uSkyBoxLightMultiplier);
 	}
 
 	// Write

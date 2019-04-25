@@ -54,7 +54,7 @@ public class TestPBR extends ClientApplication {
 		Game.workspace().getCurrentCamera().setFov(2.5f);
 		
 		// Set ambient
-		Game.lighting().setAmbient(Color3.newInstance(64, 64, 64));
+		Game.lighting().setAmbient(Color3.newInstance(8,8,8));
 		
 		// Mesh
 		Mesh mesh = new Mesh();
@@ -92,14 +92,14 @@ public class TestPBR extends ClientApplication {
 		
 		// Make rows of balls
 		makeRow( mesh, mat,  1, Color3.newInstance(255, 255, 255),	Color3.newInstance(255, 255, 255),	0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f);
-		makeRow( mesh, mat,  0, Color3.newInstance(0, 128, 16),		Color3.newInstance(0, 128, 16),		0.4f, 1.0f, 0.2f, 0.2f, 0.3f, 0.0f, 0.0f, 0.0f);
+		makeRow( mesh, mat,  0, Color3.newInstance(0, 128, 16),		Color3.newInstance(0, 128, 16),		0.4f, 1.0f, 0.2f, 0.0f, 0.4f, 0.1f, 0.0f, 0.0f);
 		makeRow( mesh, mat, -1, Color3.newInstance(255,220,96),		Color3.newInstance(255, 220, 96),	0.0f, 1.0f, 0.8f, 0.8f, 1.0f, 0.5f, 0.0f, 0.0f);
 		makeRow( mesh, mat, -2, Color3.red(),						Color3.red(),						0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.9f);
 		
 		// Add lights
 		int close = 8;
 		int r = 48;
-		int b = 10;
+		int b = 5;
 		int xx = 8;
 		PointLight l1 = new PointLight();
 		l1.setPosition(-xx, close, xx);

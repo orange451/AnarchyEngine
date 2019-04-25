@@ -26,7 +26,6 @@ const float MAX_REFLECTION_LOD = 18.0;
 
 void write(vec3 diffuse, vec3 normal, float metalness, float roughness, float reflective, vec3 emissive);
 vec3 normalmap(vec3 normalSample, vec3 vNormal, vec3 vViewSpacePos, vec2 vTexCoords );
-vec3 calculateFresnel( vec3 viewSpacePos, vec3 surfaceNormal, float roughness, float metalness );
 vec3 reflectEnv( vec3 viewSpacePos, vec3 surfaceNormal );
 vec3 reflectivePBR( vec3 cubemapSample, vec3 viewSpacePos, vec3 surfaceNormal, float roughness, float reflective );
 
@@ -64,9 +63,8 @@ void main(void) {
 		diffuseSample.rgb *= cubemapSample;
     }
 	
-	// Calculate fresnel
-	vec3 fresnel = calculateFresnel( nViewSpacePos, normal, fRoughness, fMetalness ) * uReflective;
-	vec3 emissive = uMaterialEmissive+fresnel;
+	// Emissive
+	vec3 emissive = uMaterialEmissive;
 
 	// Write to GBuffer
 	write( diffuseSample.rgb, normal, fMetalness, fRoughness, uReflective, emissive );

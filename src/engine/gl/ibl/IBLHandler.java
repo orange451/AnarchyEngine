@@ -38,6 +38,7 @@ public class IBLHandler {
 				},
 				new URL[] {
 					LightProcessor.class.getResource("reflect.frag"),
+					LightProcessor.class.getResource("fresnel.frag"),
 					LightProcessor.class.getResource("ibl.frag")
 				}
 			);
