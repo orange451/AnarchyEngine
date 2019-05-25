@@ -10,7 +10,7 @@ import lwjgui.font.FontMetaData;
 import lwjgui.font.FontStyle;
 import lwjgui.paint.Color;
 import lwjgui.scene.Node;
-import lwjgui.scene.control.text_input.CodeArea;
+import lwjgui.scene.control.CodeArea;
 
 public class IdeLuaEditor extends IdePane {
 	private ScriptBase inst;

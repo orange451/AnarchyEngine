@@ -1,7 +1,6 @@
 package ide.layout;
 
 import engine.Game;
-import engine.InternalGameThread;
 import engine.application.impl.ClientApplication;
 import engine.application.impl.ServerApplication;
 import engine.io.Load;
@@ -10,14 +9,13 @@ import engine.util.JVMUtil;
 import ide.IDE;
 import ide.layout.windows.IdeConsole;
 import ide.layout.windows.IdeExplorer;
+import ide.layout.windows.IdeExplorerNew;
 import ide.layout.windows.IdeGameView;
 import ide.layout.windows.IdeProperties;
 import ide.layout.windows.icons.Icons;
 import lwjgui.LWJGUI;
-import lwjgui.collections.ObservableList;
 import lwjgui.geometry.Orientation;
 import lwjgui.geometry.Pos;
-import lwjgui.scene.Region;
 import lwjgui.scene.control.Menu;
 import lwjgui.scene.control.MenuBar;
 import lwjgui.scene.control.MenuItem;
@@ -64,6 +62,7 @@ public class IdeLayout {
 		
 		// Add left
 		west = new IdeVerticalDock();
+		//west.dockNorth(new IdeExplorerNew());
 		//west.dockNorth(new IdeExplorer());
 		split.getItems().add(west);
 		
@@ -72,7 +71,7 @@ public class IdeLayout {
 		
 		// Add right
 		east = new IdeVerticalDock();
-		east.dockNorth(new IdeExplorer());
+		east.dockNorth(new IdeExplorerNew());
 		east.dockSouth(new IdeProperties());
 		split.getItems().add(east);
 		

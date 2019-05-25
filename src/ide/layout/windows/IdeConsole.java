@@ -15,8 +15,8 @@ import lwjgui.geometry.Pos;
 import lwjgui.scene.control.ContextMenu;
 import lwjgui.scene.control.MenuItem;
 import lwjgui.scene.control.SeparatorMenuItem;
-import lwjgui.scene.control.text_input.TextArea;
-import lwjgui.scene.control.text_input.TextField;
+import lwjgui.scene.control.TextArea;
+import lwjgui.scene.control.TextField;
 import lwjgui.scene.layout.BorderPane;
 
 public class IdeConsole extends IdePane {
