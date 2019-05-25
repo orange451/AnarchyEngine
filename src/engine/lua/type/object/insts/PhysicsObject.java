@@ -26,7 +26,7 @@ public class PhysicsObject extends PhysicsBase implements TreeViewable {
 		if ( linked == null )
 			return aabb;
 		
-		LuaValue p = linked.get("Prefab");
+		LuaValue p = linked.get(C_PREFAB);
 		if ( !p.isnil() && p instanceof Prefab ) {
 			Prefab p2 = (Prefab) p;
 			aabb = p2.getPrefab().getAABB();

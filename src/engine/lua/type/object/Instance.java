@@ -25,6 +25,12 @@ public abstract class Instance extends DataModel {
 	private HashSet<Instance> descendents = new HashSet<Instance>();
 	private List<InstancePropertySubscriber> propertySubscribers = Collections.synchronizedList(new ArrayList<InstancePropertySubscriber>());
 	protected boolean destroyed;
+
+	protected static final LuaValue C_PARENT = LuaValue.valueOf("Parent");
+	protected static final LuaValue C_CLASSNAME = LuaValue.valueOf("ClassName");
+	protected static final LuaValue C_NAME = LuaValue.valueOf("Name");
+	protected static final LuaValue C_ARCHIVABLE = LuaValue.valueOf("Archivable");
+	protected static final LuaValue C_SID = LuaValue.valueOf("SID");
 	
 	public static void initialize() {
 		System.out.println("Loaded instance");
@@ -158,7 +164,7 @@ public abstract class Instance extends DataModel {
 						if ( inst == null )
 							return LuaValue.NIL;
 						
-						inst.rawset("Parent", LuaValue.NIL);
+						inst.rawset(C_PARENT, LuaValue.NIL);
 						return inst;
 					} catch (Exception e) {
 						e.printStackTrace();
@@ -179,7 +185,7 @@ public abstract class Instance extends DataModel {
 	 */
 	protected static HashMap<String,ArrayList<String>> extends_cache = new HashMap<String,ArrayList<String>>();
 	protected static LuaValue AExtendsB(Instance instance1, String class2) {
-		String class1 = instance1.rawget("ClassName").toString();
+		String class1 = instance1.rawget(C_CLASSNAME).toString();
 		if ( class1.equals(class2) )
 			return LuaValue.TRUE;
 		
@@ -234,7 +240,7 @@ public abstract class Instance extends DataModel {
 	public Instance clone() {
 		try {
 			// You need to be archivable to be cloned.
-			if ( !this.get("Archivable").checkboolean() )
+			if ( !this.get(C_ARCHIVABLE).checkboolean() )
 				return null;
 			
 			// Create a new instance of this type
@@ -250,11 +256,11 @@ public abstract class Instance extends DataModel {
 					continue;
 				
 				// Parent is special and gets set later
-				if ( key.toString().equals("Parent") )
+				if ( key.eq_b(C_PARENT) )
 					continue;
 				
 				// SID is special. Do not save
-				if ( key.toString().equals("SID") )
+				if ( key.eq_b(C_SID) )
 					continue;
 				
 				// Set
@@ -298,7 +304,7 @@ public abstract class Instance extends DataModel {
 			if ( current.equals(arg) ) {
 				return true;
 			}
-			current = current.get("Parent");
+			current = current.get(C_PARENT);
 		}
 
 		return false;
@@ -356,8 +362,8 @@ public abstract class Instance extends DataModel {
 	}
 
 	private void checkSetName(LuaValue key, LuaValue oldValue, LuaValue newValue) {
-		if ( key.toString().equals("Name") ) {
-			LuaValue currentParent = get("Parent");
+		if ( key.eq_b(C_NAME) ) {
+			LuaValue currentParent = this.get(C_PARENT);
 			if ( !currentParent.equals(LuaValue.NIL) && currentParent instanceof Instance ) {
 				String oldName = oldValue.toString();
 				String newName = newValue.toString();
@@ -382,7 +388,7 @@ public abstract class Instance extends DataModel {
 	}
 
 	private void checkSetParent(LuaValue key, LuaValue oldParent, LuaValue newParent) {
-		if ( key.toString().equals("Parent") ) {
+		if ( key.eq_b(C_PARENT) ) {
 			
 			// If the parent hasen't changed, don't run code.
 			if ( oldParent.equals(newParent) ) {
@@ -478,11 +484,11 @@ public abstract class Instance extends DataModel {
 	}
 
 	public LuaValue getParent() {
-		return this.get("Parent");
+		return this.get(C_PARENT);
 	}
 	
 	public void setParent(LuaValue parent) {
-		this.set("Parent", parent);
+		this.set(C_PARENT, parent);
 	}
 	
 	public void forceSetParent(LuaValue parent) {
@@ -492,7 +498,7 @@ public abstract class Instance extends DataModel {
 		boolean l = this.locked;
 		boolean l2 = !this.getField("Parent").canModify();
 
-		LuaValue oldParent = this.get("Parent");
+		LuaValue oldParent = this.get(C_PARENT);
 		
 		LuaField pField = this.getField("Parent");
 		if ( pField == null )
@@ -500,19 +506,19 @@ public abstract class Instance extends DataModel {
 		
 		pField.setLocked(false);
 		this.setLocked(false);
-		this.set("Parent", parent);
+		this.set(C_PARENT, parent);
 		this.setLocked(l);
 		pField.setLocked(l2);
 		
-		this.checkSetParent(this.get(LuaValue.valueOf("Parent")), oldParent, parent);
+		this.checkSetParent(this.get(C_PARENT), oldParent, parent);
 	}
 
 	public String getName() {
-		return get("Name").toString();
+		return get(C_NAME).toString();
 	}
 	
 	public void setName(String name) {
-		this.set("Name", name);
+		this.set(C_NAME, LuaValue.valueOf(name));
 	}
 	
 	public void forceSetName(String name) {
@@ -521,7 +527,7 @@ public abstract class Instance extends DataModel {
 		
 		this.getField("Name").setLocked(false);
 		this.setLocked(false);
-		this.set("Name", name);
+		this.set(C_NAME, LuaValue.valueOf(name));
 		//this.rawset("Name", name);
 		this.setLocked(l);
 		this.getField("Name").setLocked(l2);
@@ -586,7 +592,7 @@ public abstract class Instance extends DataModel {
 			synchronized(children) {
 				for (int i = 0; i < children.size(); i++) {
 					Instance child = children.get(i);
-					if ( child.get("Name").toString().equals(name) ) {
+					if ( child.get(C_NAME).toString().equals(name) ) {
 						return child;
 					}
 				}
@@ -604,7 +610,7 @@ public abstract class Instance extends DataModel {
 		synchronized(children) {
 			for (int i = 0; i < children.size(); i++) {
 				Instance child = children.get(i);
-				if ( child.get("ClassName").toString().equals(name) ) {
+				if ( child.get(C_CLASSNAME).toString().equals(name) ) {
 					return child;
 				}
 			}
@@ -617,7 +623,7 @@ public abstract class Instance extends DataModel {
 		synchronized(children) {
 			for (int i = 0; i < children.size(); i++) {
 				Instance child = children.get(i);
-				String cName = child.get("ClassName").toString();
+				String cName = child.get(C_CLASSNAME).toString();
 				if ( cName.equals(className) ) {
 					ret.add(child);
 				}
@@ -637,7 +643,7 @@ public abstract class Instance extends DataModel {
 			if ( child == null )
 				continue;
 			
-			String cName = child.get("Name").toString();
+			String cName = child.get(C_NAME).toString();
 			if ( cName.equals(name) ) {
 				ret.add(child);
 			}			

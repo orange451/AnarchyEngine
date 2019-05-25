@@ -24,6 +24,17 @@ public class Material extends Asset implements TreeViewable {
 	private boolean changed = true;
 
 	private HashMap<String,LuaConnection> textureLoadsConnections = new HashMap<String,LuaConnection>();
+
+	protected static final LuaValue C_DIFFUSETEXTURE = LuaValue.valueOf("DiffuseTexture");
+	protected static final LuaValue C_NORMALTEXTURE = LuaValue.valueOf("NormalTexture");
+	protected static final LuaValue C_METALLICTEXTURE = LuaValue.valueOf("MetallicTexture");
+	protected static final LuaValue C_ROUGHNESSTEXTURE = LuaValue.valueOf("RoughnessTexture");
+	
+	protected static final LuaValue C_ROUGHNESS = LuaValue.valueOf("Roughness");
+	protected static final LuaValue C_REFLECTIVE = LuaValue.valueOf("Reflective");
+	protected static final LuaValue C_COLOR = LuaValue.valueOf("Color");
+	protected static final LuaValue C_EMISSIVE = LuaValue.valueOf("Emissive");
+	protected static final LuaValue C_TRANSPARENCY = LuaValue.valueOf("Transparency");
 	
 	public Material() {
 		super("Material");
@@ -58,27 +69,27 @@ public class Material extends Asset implements TreeViewable {
 	}
 	
 	public float getRoughness() {
-		return this.get("Roughness").tofloat();
+		return this.get(C_ROUGHNESS).tofloat();
 	}
 	
 	public float getReflectivness() {
-		return this.get("Reflective").tofloat();
+		return this.get(C_REFLECTIVE).tofloat();
 	}
 	
 	public float getTransparency() {
-		return this.get("Transparency").tofloat();
+		return this.get(C_TRANSPARENCY).tofloat();
 	}
 	
 	public void setTransparency(float f) {
-		this.set("Transparency", LuaValue.valueOf(f));
+		this.set(C_TRANSPARENCY, LuaValue.valueOf(f));
 	}
 	
 	public Color3 getColor() {
-		return (Color3)this.get("Color");
+		return (Color3)this.get(C_COLOR);
 	}
 	
 	public void setColor(Color3 color) {
-		this.set("Color", color);
+		this.set(C_COLOR, color);
 	}
 	
 	public void setColor(Color color) {
@@ -86,7 +97,7 @@ public class Material extends Asset implements TreeViewable {
 	}
 	
 	public void setEmissive(Vector3 emissive) {
-		this.set("Emissive", emissive);
+		this.set(C_EMISSIVE, emissive);
 	}
 	
 	public void setEmissive(Vector3f emissive) {
@@ -94,35 +105,35 @@ public class Material extends Asset implements TreeViewable {
 	}
 	
 	public Vector3 getEmissive() {
-		return (Vector3) this.get("Emissive");
+		return (Vector3) this.get(C_EMISSIVE);
 	}
 	
 	public void setMetalness(float f) {
-		this.set("Metalness", f);
+		this.set("Metalness", LuaValue.valueOf(f));
 	}
 	
 	public void setReflective(float f) {
-		this.set("Reflective", f);
+		this.set(C_REFLECTIVE, LuaValue.valueOf(f));
 	}
 	
 	public void setRoughness(float f) {
-		this.set("Roughness", f);
+		this.set(C_ROUGHNESS, LuaValue.valueOf(f));
 	}
 	
 	public void setDiffuseMap(LuaValue texture) {
-		this.set("DiffuseTexture", texture);
+		this.set(C_DIFFUSETEXTURE, texture);
 	}
 	
 	public void setNormalMap(LuaValue texture) {
-		this.set("NormalTexture", texture);
+		this.set(C_NORMALTEXTURE, texture);
 	}
 	
 	public void setMetalMap(LuaValue texture) {
-		this.set("MetallicTexture", texture);
+		this.set(C_METALLICTEXTURE, texture);
 	}
 	
 	public void setRoughMap(LuaValue texture) {
-		this.set("RoughnessTexture", texture);
+		this.set(C_ROUGHNESSTEXTURE, texture);
 	}
 
 	@Override
@@ -130,10 +141,10 @@ public class Material extends Asset implements TreeViewable {
 		if ( this.containsField(key.toString()) )
 			changed = true;
 		
-		if ( key.toString().equals("DiffuseTexture")
-				|| key.toString().equals("NormalTexture")
-				|| key.toString().equals("MetallicTexture")
-				|| key.toString().equals("RoughnessTexture")) {
+		if ( key.eq_b(C_DIFFUSETEXTURE)
+				|| key.eq_b(C_NORMALTEXTURE)
+				|| key.eq_b(C_METALLICTEXTURE)
+				|| key.eq_b(C_ROUGHNESSTEXTURE)) {
 			if ( !value.isnil() && !(value instanceof Texture) ) {
 				return null;
 			}
@@ -189,27 +200,27 @@ public class Material extends Asset implements TreeViewable {
 			changed = false;
 			
 			Texture2D dt = null;
-			if ( !this.rawget("DiffuseTexture").isnil() ) {
-				dt = ((Texture)this.rawget("DiffuseTexture")).getTexture();
+			if ( !this.rawget(C_DIFFUSETEXTURE).isnil() ) {
+				dt = ((Texture)this.rawget(C_DIFFUSETEXTURE)).getTexture();
 			}
 			material.setDiffuseTexture(dt);
 
 			Texture2D nt = null;
-			if ( !this.rawget("NormalTexture").isnil() ) {
-				nt = ((Texture)this.rawget("NormalTexture")).getTexture();
+			if ( !this.rawget(C_NORMALTEXTURE).isnil() ) {
+				nt = ((Texture)this.rawget(C_NORMALTEXTURE)).getTexture();
 				if ( nt.equals(Resources.TEXTURE_WHITE_RGBA) || nt.equals(Resources.TEXTURE_WHITE_SRGB) )
 					nt = null;
 			}
 			material.setNormalTexture(nt);
 			
 			Texture2D mt = null;
-			if ( !this.rawget("MetallicTexture").isnil() )
-				mt = ((Texture)this.rawget("MetallicTexture")).getTexture();
+			if ( !this.rawget(C_METALLICTEXTURE).isnil() )
+				mt = ((Texture)this.rawget(C_METALLICTEXTURE)).getTexture();
 			material.setMetalnessTexture(mt);
 			
 			Texture2D rt = null;
-			if ( !this.rawget("RoughnessTexture").isnil() )
-				rt = ((Texture)this.rawget("RoughnessTexture")).getTexture();
+			if ( !this.rawget(C_ROUGHNESSTEXTURE).isnil() )
+				rt = ((Texture)this.rawget(C_ROUGHNESSTEXTURE)).getTexture();
 			material.setRoughnessTexture(rt);
 
 			material.setMetalness(this.getMetalness());

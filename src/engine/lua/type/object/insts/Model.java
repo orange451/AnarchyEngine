@@ -6,6 +6,10 @@ import engine.gl.mesh.BufferedMesh;
 import engine.lua.type.object.Instance;
 
 public class Model extends Instance {
+
+	protected final static LuaValue C_MESH = LuaValue.valueOf("Mesh");
+	protected final static LuaValue C_MATERIAL = LuaValue.valueOf("Material");
+	
 	public Model() {
 		super("Model");
 
@@ -27,12 +31,12 @@ public class Model extends Instance {
 				return null;
 		}
 		
-		if ( key.toString().equals("Mesh") ) {
+		if ( key.eq_b(C_MESH)) {
 			if ( !value.isnil() && !(value instanceof Mesh) )
 				return null;
 		}
 		
-		if ( key.toString().equals("Material") ) {
+		if ( key.eq_b(C_MATERIAL) ) {
 			if ( !value.isnil() && !(value instanceof Material) )
 				return null;
 		}
@@ -51,10 +55,10 @@ public class Model extends Instance {
 	}
 	
 	public BufferedMesh getMesh() {
-		return this.get("Mesh") instanceof Mesh ? ((Mesh)this.get("Mesh")).getMesh() : null;
+		return this.get(C_MESH) instanceof Mesh ? ((Mesh)this.get(C_MESH)).getMesh() : null;
 	}
 	
 	public engine.gl.MaterialGL getMaterial() {
-		return this.get("Material") instanceof Material ? ((Material)this.get("Material")).getMaterial() : null;
+		return this.get(C_MATERIAL) instanceof Material ? ((Material)this.get(C_MATERIAL)).getMaterial() : null;
 	}
 }

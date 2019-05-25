@@ -15,6 +15,8 @@ import engine.lua.type.LuaValuetype;
 public class Matrix4 extends LuaValuetype {
 	
 	private Matrix4f internal;
+	
+	protected static final LuaValue C_P = LuaValue.valueOf("P");
 
 	public Matrix4() {
 		this(0, 0, 0);
@@ -122,11 +124,9 @@ public class Matrix4 extends LuaValuetype {
 	}
 
 	private void update() {
-		Vector3 pos = (Vector3) this.rawget("P");
+		Vector3 pos = (Vector3) this.rawget(C_P);
 		Vector3f translation = internal.getTranslation(new Vector3f());
-		pos.rawset("X", translation.x);
-		pos.rawset("Y", translation.y);
-		pos.rawset("Z", translation.z);
+		pos.setInternal(translation);
 	}
 
 	@Override
@@ -166,7 +166,7 @@ public class Matrix4 extends LuaValuetype {
 	 * @return
 	 */
 	public Vector3 getPosition() { 
-		return (Vector3) this.get("P");
+		return (Vector3) this.get(C_P);
 	}
 	
 	/**
@@ -174,8 +174,8 @@ public class Matrix4 extends LuaValuetype {
 	 * @param value
 	 */
 	public void setPosition(Vector3 value) {
-		this.rawset("P", value);
-		this.set("P", value);
+		this.rawset(C_P, value);
+		this.set(C_P, value);
 	}
 	
 	/**
@@ -224,7 +224,7 @@ public class Matrix4 extends LuaValuetype {
 
 	@Override
 	protected LuaValue onValueSet(LuaValue key, LuaValue value) {
-		if ( key.toString().equals("P") ) {
+		if ( key.eq_b(C_P) ) {
 			if ( value instanceof Vector3 ) {
 				//this.setLocked(false);
 				Vector3 vector = (Vector3)value;

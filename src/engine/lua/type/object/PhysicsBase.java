@@ -32,6 +32,11 @@ public abstract class PhysicsBase extends Instance implements GameSubscriber {
 	private LuaConnection prefabChanged;
 	
 	public Player playerOwns;
+
+	protected static final LuaValue C_WORLDMATRIX = LuaValue.valueOf("WorldMatrix");
+	protected static final LuaValue C_VELOCITY = LuaValue.valueOf("Velocity");
+	protected static final LuaValue C_ANGULARVELOCITY = LuaValue.valueOf("AngularVelocity");
+	protected static final LuaValue C_PREFAB = LuaValue.valueOf("Prefab");
 	
 	public PhysicsBase(String typename) {
 		super(typename);
@@ -91,7 +96,7 @@ public abstract class PhysicsBase extends Instance implements GameSubscriber {
 			return;
 		if ( internalPhys == null )
 			return;
-		linked.rawset("WorldMatrix", this.get("WorldMatrix"));
+		linked.rawset(C_WORLDMATRIX, this.get(C_WORLDMATRIX));
 		
 		// Ownership stuff
 		checkNetworkOwnership();
@@ -99,40 +104,40 @@ public abstract class PhysicsBase extends Instance implements GameSubscriber {
 		if ( internalPhys.getBody() != null ) {
 			if ( Game.isServer() && internalPhys.getBody().isActive() && this.getMass() > 0 ) {
 				if ( playerOwns == null ) {
-					InternalServer.sendAllUDP(new InstanceUpdateUDP(this, LuaValue.valueOf("WorldMatrix")));
-					InternalServer.sendAllUDP(new InstanceUpdateUDP(this, LuaValue.valueOf("Velocity")));
+					InternalServer.sendAllUDP(new InstanceUpdateUDP(this, C_WORLDMATRIX));
+					InternalServer.sendAllUDP(new InstanceUpdateUDP(this, C_VELOCITY));
 				} else {
-					InternalServer.sendAllUDPExcept(new InstanceUpdateUDP(this, LuaValue.valueOf("WorldMatrix")), playerOwns.getConnection());
-					InternalServer.sendAllUDPExcept(new InstanceUpdateUDP(this, LuaValue.valueOf("Velocity")), playerOwns.getConnection());					
+					InternalServer.sendAllUDPExcept(new InstanceUpdateUDP(this, C_WORLDMATRIX), playerOwns.getConnection());
+					InternalServer.sendAllUDPExcept(new InstanceUpdateUDP(this, C_VELOCITY), playerOwns.getConnection());					
 				}
 			}
 			
 			boolean isClient = !Game.isServer();
 			if ( isClient && Game.players().getLocalPlayer() != null ) {
 				if (Game.players().getLocalPlayer().equals(playerOwns)) {
-					InternalClient.sendServerUDP(new InstanceUpdateUDP(this, LuaValue.valueOf("WorldMatrix"), true));
-					InternalClient.sendServerUDP(new InstanceUpdateUDP(this, LuaValue.valueOf("Velocity"), true));
+					InternalClient.sendServerUDP(new InstanceUpdateUDP(this, C_WORLDMATRIX, true));
+					InternalClient.sendServerUDP(new InstanceUpdateUDP(this, C_VELOCITY, true));
 				}
 			}
 		}
 		
 		// Update our velocity to the physics objects velocity (if its different).
-		Vector3 vel = (Vector3)this.get("Velocity");
+		Vector3 vel = (Vector3)this.get(C_VELOCITY);
 		Vector3f tv = vel.toJoml();
 		Vector3f pv = internalPhys.getVelocity();
 		if ( !tv.equals(pv) ) {
 			vel.setInternal(pv);
-			this.rawset("Velocity", vel);
+			this.rawset(C_VELOCITY, vel);
 			this.notifyPropertySubscribers("Velocity", vel);
 		}
 		
 		// Update our angular velocity to the physics objets angular velocity
-		Vector3 angvel = (Vector3)this.get("AngularVelocity");
+		Vector3 angvel = (Vector3)this.get(C_ANGULARVELOCITY);
 		Vector3f tav = angvel.toJoml();
 		Vector3f pav = internalPhys.getAngularVelocity();
 		if ( !tav.equals(pav) ) {
 			angvel.setInternal(pav);
-			this.rawset("AngularVelocity", angvel);
+			this.rawset(C_ANGULARVELOCITY, angvel);
 			this.notifyPropertySubscribers("AngularVelocity", angvel);
 		}
 	}
@@ -185,7 +190,7 @@ public abstract class PhysicsBase extends Instance implements GameSubscriber {
 		}
 
 		// Linked object must have a prefab
-		LuaValue prefab = value.get("Prefab");
+		LuaValue prefab = value.get(C_PREFAB);
 		if ( prefab.isnil() )
 			return;
 		
@@ -257,7 +262,7 @@ public abstract class PhysicsBase extends Instance implements GameSubscriber {
 	}
 	
 	public void setVelocity(Vector3 velocity) {
-		this.set("Velocity", velocity);
+		this.set(C_VELOCITY, velocity);
 	}
 	
 	public float getFriction() {
@@ -265,7 +270,7 @@ public abstract class PhysicsBase extends Instance implements GameSubscriber {
 	}
 	
 	public Vector3 getVelocity() {
-		return (Vector3) ((Vector3)this.get("Velocity")).clone();
+		return (Vector3) ((Vector3)this.get(C_VELOCITY)).clone();
 	}
 	
 	public LuaValue updatePhysics(LuaValue key, LuaValue value) {
@@ -284,14 +289,14 @@ public abstract class PhysicsBase extends Instance implements GameSubscriber {
 		}
 		
 		// User updated the velocity
-		if ( key.toString().equals("Velocity") ) {
+		if ( key.eq_b(C_VELOCITY) ) {
 			if ( physics != null ) {
 				Vector3 vec = (Vector3)value;
 				physics.setVelocity(new com.badlogic.gdx.math.Vector3(vec.getX(), vec.getY(), vec.getZ()));
 			}
 		}
 		
-		if ( key.toString().equals("AngularVelocity") ) {
+		if ( key.eq_b(C_ANGULARVELOCITY) ) {
 			if ( physics != null ) {
 				Vector3 vec = (Vector3)value;
 				physics.setAngularVelocity(vec.toJoml());

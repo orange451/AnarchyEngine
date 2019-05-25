@@ -18,7 +18,6 @@ import engine.Game;
 import engine.gl.Resources;
 import engine.gl.mesh.BufferedMesh;
 import engine.gl.mesh.Vertex;
-import engine.io.FileResource;
 import engine.lua.lib.FourArgFunction;
 import engine.lua.type.object.AssetLoadable;
 import engine.lua.type.object.Instance;
@@ -28,7 +27,7 @@ import engine.util.MeshUtils;
 import ide.IDEFilePath;
 import ide.layout.windows.icons.Icons;
 
-public class Mesh extends AssetLoadable implements TreeViewable,FileResource {
+public class Mesh extends AssetLoadable implements TreeViewable {
 	private BufferedMesh mesh;
 	private boolean changed;
 	
@@ -120,7 +119,8 @@ public class Mesh extends AssetLoadable implements TreeViewable,FileResource {
 	}
 	
 	public BufferedMesh getMesh() {
-		LuaValue filePath = this.get("FilePath");
+		LuaValue filePath = this.get(C_FILEPATH);
+		
 		if ( changed && !filePath.isnil() && filePath.toString().length()>3 && !filePath.toString().equals("nil") ) {
 			String path = this.get("FilePath").toString();
 			String realPath = IDEFilePath.convertToSystem(path);

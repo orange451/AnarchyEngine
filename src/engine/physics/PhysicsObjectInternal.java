@@ -149,10 +149,11 @@ public class PhysicsObjectInternal {
 	}
 
 	private Matrix4 transform = new Matrix4();
+	private float[] transformTemp = new float[16];
 	public void setWorldMatrix( Matrix4f worldMatrix ) {
 		if (this.destroyed || body == null)
 			return;
-		transform.set(worldMatrix.get(new float[16]));
+		transform.set(worldMatrix.get(transformTemp));
 		//transform.setFromOpenGLMatrix(worldMatrix.get(new float[16]));
 		body.setWorldTransform(transform);
 		this.wakeup();
@@ -167,16 +168,20 @@ public class PhysicsObjectInternal {
 		body.setWorldTransform(transform);
 	}
 
+	private static final LuaValue C_LINKED = LuaValue.valueOf("Linked");
+	private static final LuaValue C_WORLDMATRIX = LuaValue.valueOf("WorldMatrix");
+	private static final LuaValue C_PREFAB = LuaValue.valueOf("Prefab");
+
 	public Matrix4f getWorldMatrix() {
 		if (this.destroyed || body == null) {
 			if ( luaFrontEnd == null )
 				return new Matrix4f();
 			
-			LuaValue linked = luaFrontEnd.get("Linked");
+			LuaValue linked = luaFrontEnd.get(C_LINKED);
 			if ( linked.isnil() )
 				return new Matrix4f();
 			
-			LuaValue wMat = linked.get("WorldMatrix");
+			LuaValue wMat = linked.get(C_WORLDMATRIX);
 			if ( wMat.isnil() )
 				return new Matrix4f();
 			
@@ -337,13 +342,13 @@ public class PhysicsObjectInternal {
 		if ( luaFrontEnd == null )
 			return;
 		
-		if ( luaFrontEnd.get("Linked").isnil() || luaFrontEnd.get("Linked").get("Prefab").isnil() ) {
+		if ( luaFrontEnd.get(C_LINKED).isnil() || luaFrontEnd.get(C_LINKED).get(C_PREFAB).isnil() ) {
 			setShapeFromType("Box");
 			return;
 		}
 		
 		float scale = 1.0f;
-		Prefab prefab = (Prefab) luaFrontEnd.get("Linked").get("Prefab");
+		Prefab prefab = (Prefab) luaFrontEnd.get(C_LINKED).get(C_PREFAB);
 		if ( !prefab.isnil() ) {
 			scale = prefab.get("Scale").tofloat();
 		}
@@ -400,8 +405,8 @@ public class PhysicsObjectInternal {
 		}
 		
 		// Hull
-		if ( type.equals("Hull") && !luaFrontEnd.get("Linked").get("Prefab").isnil() ) {
-			Prefab prefab = (Prefab) luaFrontEnd.get("Linked").get("Prefab");
+		if ( type.equals("Hull") && !luaFrontEnd.get(C_LINKED).get(C_PREFAB).isnil() ) {
+			Prefab prefab = (Prefab) luaFrontEnd.get(C_LINKED).get(C_PREFAB);
 			BufferedMesh mesh = prefab.getPrefab().getCombinedMesh();
 			shape = PhysicsUtils.hullShape(mesh, 1.0f, mesh.getSize() > 64);
 		}

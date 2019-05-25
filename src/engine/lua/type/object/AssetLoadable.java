@@ -6,6 +6,8 @@ import engine.io.FileResource;
 
 public abstract class AssetLoadable extends Asset implements FileResource {
 
+	protected final static LuaValue C_FILEPATH = LuaValue.valueOf("FilePath");
+	
 	public AssetLoadable(String type) {
 		super(type);
 		this.defineField("FilePath", LuaValue.valueOf(""), false);
@@ -13,19 +15,19 @@ public abstract class AssetLoadable extends Asset implements FileResource {
 	
 	public void setFilePath(String path) {
 		if ( path == null ) {
-			this.set("FilePath", LuaValue.NIL);
+			this.set(C_FILEPATH, LuaValue.NIL);
 		} else {
-			this.set("FilePath", LuaValue.valueOf(path));
+			this.set(C_FILEPATH, LuaValue.valueOf(path));
 		}
 	}
 	
 	@Override
 	public String getFilePath() {
-		return this.get("FilePath").toString();
+		return this.get(C_FILEPATH).toString();
 	}
 	
 	public void resetFilePath() {
-		this.set("FilePath", LuaValue.valueOf(""));
+		this.set(C_FILEPATH, LuaValue.valueOf(""));
 	}
 	
 	public static String getFileTypes() {

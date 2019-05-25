@@ -16,12 +16,18 @@ public class Vector3 extends LuaValuetype {
 	private double mag = 0;
 	private LuaValue unit;
 	private boolean modified = true;
+	private Vector3f internal;
+
+	protected static final LuaValue C_X = LuaValue.valueOf("X");
+	protected static final LuaValue C_Y = LuaValue.valueOf("Y");
+	protected static final LuaValue C_Z = LuaValue.valueOf("Z"); 
 	
 	public Vector3() {
 		this(new Vector3(null));
 	}
 
 	public Vector3(Vector3 unitVec) {
+		this.internal = new Vector3f();
 		this.unit = unitVec;
 
 		// Create ToString function
@@ -97,23 +103,24 @@ public class Vector3 extends LuaValuetype {
 	}
 	
 	public Vector3 setInternal(Vector3f vector) {
-		this.rawset("X", LuaValue.valueOf(vector.x));
-		this.rawset("Y", LuaValue.valueOf(vector.y));
-		this.rawset("Z", LuaValue.valueOf(vector.z));
+		this.rawset(C_X, LuaValue.valueOf(vector.x));
+		this.rawset(C_Y, LuaValue.valueOf(vector.y));
+		this.rawset(C_Z, LuaValue.valueOf(vector.z));
 		this.modified = true;
+		this.internal.set(vector);
 		return this;
 	}
 
 	public float getX() {
-		return this.get("X").tofloat();
+		return this.internal.x;
 	}
 
 	public float getY() {
-		return this.get("Y").tofloat();
+		return this.internal.y;
 	}
 
 	public float getZ() {
-		return this.get("Z").tofloat();
+		return this.internal.z;
 	}
 
 	protected double getMag() {
@@ -147,6 +154,7 @@ public class Vector3 extends LuaValuetype {
 		inst.defineField("Z", LuaValue.valueOf(z), true);
 		inst.defineField("Magnitude", LuaValue.valueOf(inst.mag), true);
 		inst.defineField("Unit", inst.unit, true);
+		inst.internal.set(x,y,z);
 		inst.modified = true;
 		return inst;
 	}
@@ -184,7 +192,7 @@ public class Vector3 extends LuaValuetype {
 		}
 
 		// If X or Y is changed. Update the Unit Vector
-		if ( key.toString().equals("X") || key.toString().equals("Y") || key.toString().equals("Z") ) {
+		if ( key.eq_b(C_X) || key.eq_b(C_Y) || key.eq_b(C_Z) ) {
 			modified = true;
 		}
 
@@ -203,9 +211,9 @@ public class Vector3 extends LuaValuetype {
 				mag = Math.sqrt(X*X+Y*Y+Z*Z);
 				this.rawset("Magnitude", LuaValue.valueOf(mag));
 				if ( unit != null ) {
-					unit.rawset("X", LuaValue.valueOf(X / mag));
-					unit.rawset("Y", LuaValue.valueOf(Y / mag));
-					unit.rawset("Z", LuaValue.valueOf(Z / mag));
+					unit.rawset(C_X, LuaValue.valueOf(X / mag));
+					unit.rawset(C_Y, LuaValue.valueOf(Y / mag));
+					unit.rawset(C_Z, LuaValue.valueOf(Z / mag));
 					this.rawset("Unit", unit);
 				} else {
 					this.rawset("Unit", this);
@@ -232,10 +240,12 @@ public class Vector3 extends LuaValuetype {
 		if ( t.length != 3 )
 			return this;
 		
-		this.rawset("X", LuaValue.valueOf(Double.parseDouble(t[0])));
-		this.rawset("Y", LuaValue.valueOf(Double.parseDouble(t[1])));
-		this.rawset("Z", LuaValue.valueOf(Double.parseDouble(t[2])));
-		modified = true;
+		Vector3f vec = new Vector3f();
+		vec.x = (float) Double.parseDouble(t[0]);
+		vec.y = (float) Double.parseDouble(t[1]);
+		vec.z = (float) Double.parseDouble(t[2]);
+		
+		this.setInternal(vec);
 		return this;
 	}
 
