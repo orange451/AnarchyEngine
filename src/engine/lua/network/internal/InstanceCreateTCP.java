@@ -18,6 +18,7 @@ public class InstanceCreateTCP implements ClientProcessable {
 		this.instanceData = "";
 	}
 	
+	@SuppressWarnings("unchecked")
 	public InstanceCreateTCP(Instance instance) {
 		this.instanceType = instance.get("ClassName").toString();
 		

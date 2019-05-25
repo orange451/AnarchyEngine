@@ -39,4 +39,12 @@ public class Animation extends Instance implements TreeViewable {
 	public Icons getIcon() {
 		return Icons.icon_film;
 	}
+
+	public float getSpeed() {
+		return this.get("Speed").tofloat();
+	}
+
+	public boolean isLooped() {
+		return this.get("Looped").toboolean();
+	}
 }

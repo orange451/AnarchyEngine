@@ -10,6 +10,7 @@ import engine.lua.type.LuaValuetype;
 import engine.lua.type.object.Instance;
 
 public class PacketUtility {
+	@SuppressWarnings("unchecked")
 	protected static Object fieldToJSON(LuaValue luaValue) {
 		if ( luaValue.isstring() )
 			return luaValue.toString();
@@ -27,7 +28,7 @@ public class PacketUtility {
 			return j;
 		}
 
-		// Vectorx/Colors/etc
+		// Vector3/Colors/etc
 		if ( luaValue instanceof LuaValuetype ) {
 			JSONObject t = new JSONObject();
 			t.put("ClassName", ((LuaValuetype)luaValue).typename());

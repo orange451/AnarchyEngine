@@ -27,6 +27,7 @@ public class InstanceUpdateUDP implements ClientProcessable,ServerProcessable {
 		this( instance, field, false );
 	}
 	
+	@SuppressWarnings("unchecked")
 	public InstanceUpdateUDP(Instance instance, LuaValue field, boolean rawOnly) {
 		this.instanceId = instance.getSID();
 
