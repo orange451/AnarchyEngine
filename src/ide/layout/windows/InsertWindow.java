@@ -61,7 +61,7 @@ public class InsertWindow {
 				Label t = new Label(temp.getName()) {
 					@Override
 					public void render(Context context) {
-						this.setBackground(context.isSelected(this)?Theme.current().getSelection():null);
+						//this.setBackground(context.isSelected(this)?Theme.current().getSelection():null);
 						super.render(context);
 					}
 				};

@@ -15,7 +15,6 @@ import org.lwjgl.util.nfd.NativeFileDialog;
 
 import engine.Game;
 import engine.GameSubscriber;
-import engine.InternalGameThread;
 import engine.InternalRenderThread;
 import engine.lua.LuaEngine;
 import engine.lua.lib.LuaTableReadOnly;
@@ -45,7 +44,7 @@ import lwjgui.scene.control.Label;
 import lwjgui.scene.control.ScrollPane;
 import lwjgui.scene.control.ScrollPane.ScrollBarPolicy;
 import lwjgui.scene.control.Slider;
-import lwjgui.scene.control.text_input.TextField;
+import lwjgui.scene.control.TextField;
 import lwjgui.scene.layout.ColumnConstraint;
 import lwjgui.scene.layout.GridPane;
 import lwjgui.scene.layout.HBox;
@@ -68,7 +67,7 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 		this.scroller = new ScrollPane();
 		this.scroller.setFillToParentHeight(true);
 		this.scroller.setFillToParentWidth(true);
-		this.scroller.setHbarPolicy(ScrollBarPolicy.NEVER);
+		this.scroller.setHbarPolicy(ScrollBarPolicy.AS_NEEDED);
 		this.getChildren().add(scroller);
 		
 		
@@ -623,7 +622,7 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 		}
 	}
 	
-	static class PropertyGrid extends VBox {
+	class PropertyGrid extends VBox {
 		private Label l;
 		private GridPane internal;
 		private Instance inst;
@@ -633,7 +632,6 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 		public PropertyGrid() {
 			// Create main underneath pane
 			// It's gray so that the spacing in the grid cells look like there's an outline.
-			this.setFillToParentWidth(true);
 			this.setPrefSize(0, 0);
 			this.setAlignment(Pos.TOP_LEFT);
 			
@@ -667,6 +665,12 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 			internal.setColumnConstraint(1, const2);
 
 			this.getChildren().add(internal);
+		}
+		
+		@Override
+		public void resize() {
+			this.setPrefSize(scroller.getViewportWidth(), scroller.getViewportHeight());
+			super.resize();
 		}
 		
 		private void fill() {
