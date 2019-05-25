@@ -22,7 +22,6 @@ import engine.lua.type.object.insts.GlobalScript;
 import engine.lua.type.object.insts.Player;
 import engine.lua.type.object.insts.PlayerScripts;
 import engine.lua.type.object.insts.PlayerScriptsStart;
-import engine.lua.type.object.insts.Script;
 import engine.lua.type.object.services.Assets;
 import engine.lua.type.object.services.Connections;
 import engine.lua.type.object.services.Core;
@@ -431,12 +430,12 @@ public class Game implements Tickable {
 		
 		boolean r = false;
 		
-		synchronized(selectedInstances) {
+		//synchronized(selectedInstances) {
 			while( selectedInstances.contains(inst) ) {
 				r = true;
 				selectedInstances.remove(inst);
 			}
-		}
+		//}
 
 		if ( r ) {
 			game.gameUpdate(false);
@@ -445,7 +444,7 @@ public class Game implements Tickable {
 	
 	public static void deselectAll() {
 		selectedInstances.clear();
-		game.gameUpdate(true);
+		game.gameUpdate(false);
 	}
 	
 	public static boolean isSelected(Instance inst) {

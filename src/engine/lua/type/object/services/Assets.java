@@ -369,7 +369,6 @@ public class Assets extends Service implements TreeViewable {
 			if ( propertyKey.contains("mat.name") ) {
 				String name = byteBufferAsString(prop.mData());
 				tm.setName(name);
-				System.out.println(name);
 			}
 			if ( propertyKey.contains("clr.diffuse") ) {
 				AIColor4D mDiffuseColor = AIColor4D.create();

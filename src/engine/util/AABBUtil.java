@@ -7,7 +7,6 @@ import engine.gl.mesh.BufferedMesh;
 import engine.lua.type.object.Instance;
 import engine.lua.type.object.Positionable;
 import engine.lua.type.object.insts.Model;
-import engine.lua.type.object.insts.Prefab;
 
 public class AABBUtil {
 

@@ -377,7 +377,7 @@ public abstract class Instance extends DataModel {
 				}
 			}
 			
-			Game.getGame().gameUpdate(true);
+			Game.getGame().gameUpdate(false);
 		}
 	}
 
