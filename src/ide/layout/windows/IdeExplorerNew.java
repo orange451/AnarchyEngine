@@ -87,10 +87,14 @@ public class IdeExplorerNew extends IdePane implements GameSubscriber {
 	private void update(boolean b) {
 		if ( updating )
 			return;
-		
-		if (System.currentTimeMillis()-lastUpdate < 50 && !b ) {
+
+		if (System.currentTimeMillis()-lastUpdate < 50 && !b )
+			return;
+		if (System.currentTimeMillis()-lastUpdate < 4 && b ) {
+			lastUpdate = System.currentTimeMillis();
 			return;
 		}
+		
 		lastUpdate = System.currentTimeMillis();
 		updating = true;
 		
