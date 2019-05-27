@@ -321,10 +321,9 @@ public class Pipeline implements Renderable {
 	}
 	
 	private void perspective() {
-		LuaValue cam = Game.workspace().get("CurrentCamera");
-		if ( !cam.isnil() ) {
-			Camera camera = (Camera)cam;
-			float fov = camera.get("Fov").tofloat();
+		Camera camera = Game.workspace().getCurrentCamera();
+		if ( camera != null ) {
+			float fov = camera.getFov();
 			float aspect = (float)size.x/(float)size.y;
 			
 			// Set matrices

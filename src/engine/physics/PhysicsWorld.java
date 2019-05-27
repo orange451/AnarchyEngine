@@ -41,7 +41,7 @@ public class PhysicsWorld {
 		}
 
 		synchronized(dynamicsWorld) {
-			dynamicsWorld.setGravity(new Vector3(0, 0, -(Game.workspace()).get("Gravity").tofloat()));
+			dynamicsWorld.setGravity(new Vector3(0, 0, -Game.workspace().getGravity()));
 			try{
 				int reps = 4;
 				float ndt = dt/(float)reps;

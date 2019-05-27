@@ -17,24 +17,32 @@ import ide.layout.windows.icons.Icons;
 
 public class Camera extends Instance implements TreeViewable {
 
+	private static final LuaValue C_VIEWMATRIX = LuaValue.valueOf("ViewMatrix");
+	private static final LuaValue C_FOV = LuaValue.valueOf("Fov");
+	private static final LuaValue C_YAW = LuaValue.valueOf("Yaw");
+	private static final LuaValue C_PITCH = LuaValue.valueOf("Pitch");
+	private static final LuaValue C_POSITION = LuaValue.valueOf("Position");
+	private static final LuaValue C_LOOKAT = LuaValue.valueOf("LookAt");
+	
 	public Camera() {
 		super("Camera");
 
 		this.defineField("CameraType",  LuaValue.valueOf("Free"), false);
 		this.getField("CameraType").setEnum(new EnumType("CameraType"));
 		
-		this.defineField("Position",	Vector3.newInstance(0, 0, 0), false);
-		this.defineField("LookAt",		Vector3.newInstance(0, 0, 0), false);
-		this.defineField("Pitch",		LuaValue.valueOf(0), false);
-		this.defineField("Yaw",			LuaValue.valueOf(0), false);
+		this.defineField(C_POSITION.toString(),	Vector3.newInstance(0, 0, 0), false);
+		this.defineField(C_LOOKAT.toString(),	Vector3.newInstance(0, 0, 0), false);
+		this.defineField(C_PITCH.toString(),	LuaValue.valueOf(0), false);
+		this.defineField(C_YAW.toString(),		LuaValue.valueOf(0), false);
 		
-		this.defineField("Fov",			LuaValue.valueOf(70), false);
-		this.getField("Fov").setClamp(new NumberClamp(1, 120));
+		this.defineField(C_FOV.toString(),LuaValue.valueOf(70), false);
+		this.getField(C_FOV.toString()).setClamp(new NumberClamp(1, 120));
 		
-		this.defineField("ViewMatrix",	new Matrix4(), false);
+		this.defineField(C_VIEWMATRIX.toString(),	new Matrix4(), false);
 		
-		this.set("LookAt", Vector3.newInstance(0, 0, 0));
-		this.set("Position", Vector3.newInstance(4, 4, 4));
+		// Default override
+		this.set(C_LOOKAT, Vector3.newInstance(0, 0, 0));
+		this.set(C_POSITION, Vector3.newInstance(4, 4, 4));
 		
 		this.getmetatable().set("GetLookVector", new ZeroArgFunction() {
 			@Override
@@ -71,8 +79,8 @@ public class Camera extends Instance implements TreeViewable {
 				float yaw = Camera.this.getYaw();
 				float pitch = Camera.this.getPitch();
 				
-				Camera.this.rawset("Position",position);
-				Camera.this.rawset("LookAt",t2.clone());
+				Camera.this.rawset(C_POSITION,position);
+				Camera.this.rawset(C_LOOKAT,t2.clone());
 				Camera.this.setPosition(position);
 				Camera.this.setYaw(yaw);
 				Camera.this.setPitch(pitch);
@@ -96,51 +104,51 @@ public class Camera extends Instance implements TreeViewable {
 		if ( matrix == null || matrix.isnil() )
 			return;
 		
-		this.set("ViewMatrix", matrix);
+		this.set(C_VIEWMATRIX, matrix);
 	}
 	
 	public Matrix4 getViewMatrix() {
-		return (Matrix4)this.get("ViewMatrix");
+		return (Matrix4)this.get(C_VIEWMATRIX);
 	}
 
 	public void setYaw( float yaw ) {
-		this.set("Yaw", yaw);
+		this.set(C_YAW, LuaValue.valueOf(yaw));
 	}
 	
 	public void setPitch( float pitch ) {
-		this.set("Pitch", pitch);
+		this.set(C_PITCH, LuaValue.valueOf(pitch));
 	}
 
 	public float getYaw() {
-		return this.get("Yaw").tofloat();
+		return this.get(C_YAW).tofloat();
 	}
 	
 	public float getPitch() {
-		return this.get("Pitch").tofloat();
+		return this.get(C_PITCH).tofloat();
 	}
 	
 	public void setFov( float f ) {
-		this.set("Fov", f);
+		this.set(C_FOV, LuaValue.valueOf(f));
 	}
 	
 	public float getFov() {
-		return this.get("Fov").tofloat();
+		return this.get(C_FOV).tofloat();
 	}
 	
 	public void setPosition( Vector3 position ) {
-		this.set("Position", position.clone());
+		this.set(C_POSITION, position.clone());
 	}
 	
 	public Vector3 getPosition() {
-		return (Vector3)this.get("Position");
+		return (Vector3)this.get(C_POSITION);
 	}
 	
 	public void setLookAt( Vector3 lookat ) {
-		this.set("LookAt", lookat.clone());
+		this.set(C_LOOKAT, lookat.clone());
 	}
 	
 	public Vector3 getLookAt() {
-		return (Vector3)this.get("LookAt");
+		return (Vector3)this.get(C_LOOKAT);
 	}
 
 	@Override
@@ -148,27 +156,27 @@ public class Camera extends Instance implements TreeViewable {
 		if ( !Game.isLoaded() )
 			return;
 		
-		if ( !Game.workspace().get("CurrentCamera").equals(this) )
+		if ( !this.equals(Game.workspace().getCurrentCamera()) )
 			return;
 
 		// If viewmatrix is directly changed, change sub variables
 		// Directly updates position and lookat
 		// Indirectly updates pitch and yaw
-		if ( key.toString().equals("ViewMatrix") ) {
-			float dist = ((Vector3)this.get("LookAt")).toJoml().distance(((Vector3)this.get("Position")).toJoml());
+		if ( key.eq_b(C_VIEWMATRIX) ) {
+			float dist = ((Vector3)this.get(C_LOOKAT)).toJoml().distance(((Vector3)this.get(C_POSITION)).toJoml());
 			
 			Matrix4f view = ((Matrix4)this.get("ViewMatrix")).toJoml();
 			Vector3f t = view.invert(new Matrix4f()).getTranslation(new Vector3f());
 			Vector3f l = new Vector3f(0,0,dist).mulProject(view);
 
-			this.rawset("Position", Vector3.newInstance(t.x, t.x, t.z));
-			this.set("LookAt", Vector3.newInstance(l.x, l.y, l.z));
+			this.rawset(C_POSITION, Vector3.newInstance(t.x, t.x, t.z));
+			this.set(C_LOOKAT, Vector3.newInstance(l.x, l.y, l.z));
 		}
 		
 		// If lookat/position is changed, recalculate view matrix
-		if ( key.toString().equals("LookAt") || key.toString().equals("Position") ) {
-			Vector3f eye = ((Vector3)this.get("Position")).toJoml();
-			Vector3f look = ((Vector3)this.get("LookAt")).toJoml();
+		if ( key.eq_b(C_LOOKAT) || key.eq_b(C_POSITION) ) {
+			Vector3f eye = ((Vector3)this.get(C_POSITION)).toJoml();
+			Vector3f look = ((Vector3)this.get(C_LOOKAT)).toJoml();
 			look = eye.sub(look, look);
 			look.normalize();
 
@@ -177,32 +185,32 @@ public class Camera extends Instance implements TreeViewable {
 				pitch = 0.000001f;
 			float yaw = (float) (-Math.atan2(look.x, look.y));
 
-			this.rawset("Pitch", pitch);
-			this.rawset("Yaw", yaw);
+			this.rawset(C_PITCH, LuaValue.valueOf(pitch));
+			this.rawset(C_YAW, LuaValue.valueOf(yaw));
 			updateMatrix();
 		}
 
 		// Recalculate Look At Matrix if yaw/pitch are changed.
-		if ( key.toString().equals("Yaw") || key.toString().equals("Pitch") ) {
-			float dist = ((Vector3)this.get("LookAt")).toJoml().distance(((Vector3)this.get("Position")).toJoml());
+		if ( key.eq_b(C_YAW) || key.eq_b(C_PITCH) ) {
+			float dist = ((Vector3)this.get(C_LOOKAT)).toJoml().distance(((Vector3)this.get(C_POSITION)).toJoml());
 			
-			float yaw = (float) this.get("Yaw").checkdouble() - (float)Math.PI/2f;
-			float pitch = (float) this.get("Pitch").checkdouble();
-			Vector3f position = ((Vector3)this.get("Position")).toJoml();
+			float yaw = (float) this.get(C_YAW).checkdouble() - (float)Math.PI/2f;
+			float pitch = (float) this.get(C_PITCH).checkdouble();
+			Vector3f position = ((Vector3)this.get(C_POSITION)).toJoml();
 
 			float lookX = position.x + (float) (Math.cos(yaw) * Math.cos(pitch)) * dist;
 			float lookY = position.y + (float) (Math.sin(yaw) * Math.cos(pitch)) * dist;
 			float lookZ = position.z + (float) Math.sin(pitch) * dist;
 
-			this.rawset("LookAt", Vector3.newInstance(lookX, lookY, lookZ));
+			this.rawset(C_LOOKAT, Vector3.newInstance(lookX, lookY, lookZ));
 			updateMatrix();
 		}
 	}
 
 	private void updateMatrix() {
 		Matrix4f mat = new Matrix4f();
-		mat.lookAt(((Vector3)this.rawget("Position")).toJoml(), ((Vector3)this.rawget("LookAt")).toJoml(), new Vector3f(0,0,1));
-		this.rawset("ViewMatrix", new Matrix4(mat));
+		mat.lookAt(((Vector3)this.rawget(C_POSITION)).toJoml(), ((Vector3)this.rawget(C_LOOKAT)).toJoml(), new Vector3f(0,0,1));
+		this.rawset(C_VIEWMATRIX, new Matrix4(mat));
 	}
 
 	@Override

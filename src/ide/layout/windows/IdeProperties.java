@@ -340,6 +340,8 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 		}
 	}
 	
+	private final static LuaValue C_ENUM = LuaValue.valueOf("Enum");
+	
 	static class EnumPropertyModifier extends PropertyModifier {
 		public EnumPropertyModifier(Instance instance, String field, LuaValue value, boolean editable) {
 			super(instance, field, value, editable);
@@ -356,7 +358,7 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 				}
 			};
 			String enumName = instance.getField(field).getEnumType().getType();
-			LuaTableReadOnly enm = (LuaTableReadOnly) LuaEngine.globals.get("Enum").rawget(enumName);
+			LuaTableReadOnly enm = (LuaTableReadOnly) LuaEngine.globals.get(C_ENUM).rawget(enumName);
 			LuaValue[] keys = enm.keys();
 			for (int i = 0; i < keys.length; i++) {
 				String type = keys[i].toString();

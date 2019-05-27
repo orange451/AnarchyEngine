@@ -18,53 +18,59 @@ import ide.layout.windows.icons.Icons;
 
 public class Lighting extends Service implements TreeViewable {
 
+	private static final LuaValue C_AMBIENT = LuaValue.valueOf("Ambient");
+	private static final LuaValue C_EXPOSURE = LuaValue.valueOf("Exposure");
+	private static final LuaValue C_SATURATION = LuaValue.valueOf("Saturation");
+	private static final LuaValue C_GAMMA = LuaValue.valueOf("Gamma");
+	private static final LuaValue C_SKYBOX = LuaValue.valueOf("Skybox");
+
 	public Lighting() {
 		super("Lighting");
 		
-		this.defineField("Ambient", Color3.newInstance(128, 128, 128), false);
+		this.defineField(C_AMBIENT.toString(), Color3.newInstance(128, 128, 128), false);
 		
-		this.defineField("Skybox", LuaValue.NIL, false);
+		this.defineField(C_SKYBOX.toString(), LuaValue.NIL, false);
 		
-		this.defineField("Exposure", LuaValue.valueOf(1.0f), false);
-		this.getField("Exposure").setClamp(new NumberClampPreferred(0, 25, 0, 2));
+		this.defineField(C_EXPOSURE.toString(), LuaValue.valueOf(1.0f), false);
+		this.getField(C_EXPOSURE.toString()).setClamp(new NumberClampPreferred(0, 25, 0, 2));
 		
-		this.defineField("Saturation", LuaValue.valueOf(1.2f), false);
-		this.getField("Saturation").setClamp(new NumberClampPreferred(0, 100, 0, 2));
+		this.defineField(C_SATURATION.toString(), LuaValue.valueOf(1.2f), false);
+		this.getField(C_SATURATION.toString()).setClamp(new NumberClampPreferred(0, 100, 0, 2));
 		
-		this.defineField("Gamma", LuaValue.valueOf(2.2f), false);
-		this.getField("Gamma").setClamp(new NumberClampPreferred(0, 10, 0, 4));
+		this.defineField(C_GAMMA.toString(), LuaValue.valueOf(2.2f), false);
+		this.getField(C_GAMMA.toString()).setClamp(new NumberClampPreferred(0, 10, 0, 4));
 	}
 	
 	public Color3 getAmbient() {
-		return (Color3) this.get("Ambient");
+		return (Color3) this.get(C_AMBIENT);
 	}
 	
 	public void setAmbient(Color3 color) {
-		this.set("Ambient", color);
+		this.set(C_AMBIENT, color);
 	}
 	
 	public float getExposure() {
-		return this.get("Exposure").tofloat();
+		return this.get(C_EXPOSURE).tofloat();
 	}
 	
 	public void setExposure(float value) {
-		this.set("Exposure", value);
+		this.set(C_EXPOSURE, LuaValue.valueOf(value));
 	}
 	
 	public float getSaturation() {
-		return this.get("Saturation").tofloat();
+		return this.get(C_SATURATION).tofloat();
 	}
 	
 	public void setSaturation(float value) {
-		this.set("Saturation", value);
+		this.set(C_SATURATION, LuaValue.valueOf(value));
 	}
 	
 	public float getGamma() {
-		return this.get("Gamma").tofloat();
+		return this.get(C_GAMMA).tofloat();
 	}
 	
 	public void setGamma(float value) {
-		this.set("Gamma", value);
+		this.set(C_GAMMA, LuaValue.valueOf(value));
 	}
 
 	private LuaConnection skyboxDestroyed;
@@ -76,7 +82,7 @@ public class Lighting extends Service implements TreeViewable {
 	@Override
 	protected LuaValue onValueSet(LuaValue key, LuaValue value) {
 		
-		if ( key.toString().equals("Skybox") ) {
+		if ( key.eq_b(C_SKYBOX) ) {
 			return onSetSkybox(value);
 		}
 		
@@ -193,14 +199,14 @@ public class Lighting extends Service implements TreeViewable {
 	}
 	
 	public Skybox getSkybox() {
-		LuaValue ret = this.get("Skybox");
+		LuaValue ret = this.get(C_SKYBOX);
 		return ret.isnil()?null:(Skybox)ret;
 	}
 
 	public void setSkybox(Skybox skybox) {
 		if ( skybox == null )
-			this.set("Skybox", LuaValue.NIL);
+			this.set(C_SKYBOX, LuaValue.NIL);
 		else
-			this.set("Skybox", skybox);
+			this.set(C_SKYBOX, skybox);
 	}
 }

@@ -7,12 +7,16 @@ import engine.lua.type.object.Service;
 
 public class RunService extends Service {
 
+	private static final LuaValue C_HEARTBEAT = LuaValue.valueOf("Heartbeat");
+	private static final LuaValue C_RENDERSTEPPED = LuaValue.valueOf("RenderStepped");
+	private static final LuaValue C_PHYSICSSTEPPED = LuaValue.valueOf("PhysicsStepped");
+
 	public RunService() {
 		super("RunService");
 		
-		this.rawset("Heartbeat", new LuaEvent());
-		this.rawset("RenderStepped", new LuaEvent());
-		this.rawset("PhysicsStepped", new LuaEvent());
+		this.rawset(C_HEARTBEAT, new LuaEvent());
+		this.rawset(C_RENDERSTEPPED, new LuaEvent());
+		this.rawset(C_PHYSICSSTEPPED, new LuaEvent());
 		this.setLocked(true);
 	}
 
@@ -27,14 +31,14 @@ public class RunService extends Service {
 	}
 	
 	public LuaEvent heartbeatEvent() {
-		return (LuaEvent) this.get("Heartbeat");
+		return (LuaEvent) this.get(C_HEARTBEAT);
 	}
 	
 	public LuaEvent renderSteppedEvent() {
-		return (LuaEvent) this.get("RenderStepped");
+		return (LuaEvent) this.get(C_RENDERSTEPPED);
 	}
 	
 	public LuaEvent physicsSteppedEvent() {
-		return (LuaEvent) this.get("PhysicsStepped");
+		return (LuaEvent) this.get(C_PHYSICSSTEPPED);
 	}
 }

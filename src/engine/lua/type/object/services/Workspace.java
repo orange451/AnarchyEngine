@@ -22,12 +22,15 @@ public class Workspace extends Service implements TreeViewable,Tickable,RunScrip
 	private static PhysicsWorld physicsWorld;
 	private List<Instance> descendants = Collections.synchronizedList(new ArrayList<Instance>());
 
+	private static final LuaValue C_GRAVITY = LuaValue.valueOf("Gravity");
+	private static final LuaValue C_CURRENTCAMERA = LuaValue.valueOf("CurrentCamera");
+
 	public Workspace() {
 		super("Workspace");
 		LuaEngine.globals.set("workspace", this);
 
-		this.defineField("CurrentCamera", new Camera(), false);
-		this.defineField("Gravity", LuaValue.valueOf(16), false);
+		this.defineField(C_CURRENTCAMERA.toString(), new Camera(), false);
+		this.defineField(C_GRAVITY.toString(), LuaValue.valueOf(16), false);
 		
 		if ( physicsWorld == null )
 			physicsWorld = new PhysicsWorld();
@@ -53,17 +56,17 @@ public class Workspace extends Service implements TreeViewable,Tickable,RunScrip
 	}
 	
 	public Camera getCurrentCamera() {
-		if ( this.get("CurrentCamera").isnil() )
+		if ( this.get(C_CURRENTCAMERA).isnil() )
 			return null;
 		
-		return (Camera)this.get("CurrentCamera");
+		return (Camera)this.get(C_CURRENTCAMERA);
 	}
 	
 	public void setCurrentCamera(Camera camera) {
 		if ( camera == null || camera.isnil() )
 			return;
 		
-		this.set("CurrentCamera", camera);
+		this.set(C_CURRENTCAMERA, camera);
 	}
 
 	public void tick() {
@@ -114,5 +117,20 @@ public class Workspace extends Service implements TreeViewable,Tickable,RunScrip
 
 	public PhysicsWorld getPhysicsWorld() {
 		return Workspace.physicsWorld;
+	}
+
+	/**
+	 * Returns the current gravity in the workspace.
+	 * @return
+	 */
+	public float getGravity() {
+		return this.get(C_GRAVITY).tofloat();
+	}
+	
+	/**
+	 * Sets the current gravity in the workspace
+	 */
+	public void setGravity(float gravity) {
+		this.set(C_GRAVITY, LuaValue.valueOf(gravity));
 	}
 }
