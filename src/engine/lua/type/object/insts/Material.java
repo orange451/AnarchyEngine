@@ -29,7 +29,8 @@ public class Material extends Asset implements TreeViewable {
 	protected static final LuaValue C_NORMALTEXTURE = LuaValue.valueOf("NormalTexture");
 	protected static final LuaValue C_METALLICTEXTURE = LuaValue.valueOf("MetallicTexture");
 	protected static final LuaValue C_ROUGHNESSTEXTURE = LuaValue.valueOf("RoughnessTexture");
-	
+
+	protected static final LuaValue C_METALNESS = LuaValue.valueOf("Metalness");
 	protected static final LuaValue C_ROUGHNESS = LuaValue.valueOf("Roughness");
 	protected static final LuaValue C_REFLECTIVE = LuaValue.valueOf("Reflective");
 	protected static final LuaValue C_COLOR = LuaValue.valueOf("Color");
@@ -41,31 +42,31 @@ public class Material extends Asset implements TreeViewable {
 		
 		this.setLocked(false);
 
-		this.defineField("DiffuseTexture", LuaValue.NIL, false);
-		this.defineField("NormalTexture", LuaValue.NIL, false);
-		this.defineField("MetallicTexture", LuaValue.NIL, false);
-		this.defineField("RoughnessTexture", LuaValue.NIL, false);
+		this.defineField(C_DIFFUSETEXTURE.toString(), LuaValue.NIL, false);
+		this.defineField(C_NORMALTEXTURE.toString(), LuaValue.NIL, false);
+		this.defineField(C_METALLICTEXTURE.toString(), LuaValue.NIL, false);
+		this.defineField(C_ROUGHNESSTEXTURE.toString(), LuaValue.NIL, false);
 		
-		this.defineField("Metalness", LuaValue.valueOf(0.0f), false);
-		this.getField("Metalness").setClamp(new NumberClamp(0, 1));
+		this.defineField(C_METALNESS.toString(), LuaValue.valueOf(0.0f), false);
+		this.getField(C_METALNESS.toString()).setClamp(new NumberClamp(0, 1));
 		
-		this.defineField("Roughness", LuaValue.valueOf(0.4f), false);
-		this.getField("Roughness").setClamp(new NumberClamp(0, 1));
+		this.defineField(C_ROUGHNESS.toString(), LuaValue.valueOf(0.4f), false);
+		this.getField(C_ROUGHNESS.toString()).setClamp(new NumberClamp(0, 1));
 		
-		this.defineField("Reflective", LuaValue.valueOf(0.05f), false);
-		this.getField("Reflective").setClamp(new NumberClamp(0, 1));
+		this.defineField(C_REFLECTIVE.toString(), LuaValue.valueOf(0.05f), false);
+		this.getField(C_REFLECTIVE.toString()).setClamp(new NumberClamp(0, 1));
 		
-		this.defineField("Color", Color3.newInstance(255, 255, 255), false);
-		this.defineField("Emissive", Vector3.newInstance(0,0,0), false);
+		this.defineField(C_COLOR.toString(), Color3.newInstance(255, 255, 255), false);
+		this.defineField(C_EMISSIVE.toString(), Vector3.newInstance(0,0,0), false);
 		
-		this.defineField("Transparency", LuaValue.ZERO, false);
-		this.getField("Transparency").setClamp(new NumberClamp(0, 1));
+		this.defineField(C_TRANSPARENCY.toString(), LuaValue.ZERO, false);
+		this.getField(C_TRANSPARENCY.toString()).setClamp(new NumberClamp(0, 1));
 		
 		this.material = new engine.gl.MaterialGL();
 	}
 	
 	public float getMetalness() {
-		return this.get("Metalness").tofloat();
+		return this.get(C_METALNESS).tofloat();
 	}
 	
 	public float getRoughness() {
@@ -109,7 +110,7 @@ public class Material extends Asset implements TreeViewable {
 	}
 	
 	public void setMetalness(float f) {
-		this.set("Metalness", LuaValue.valueOf(f));
+		this.set(C_METALNESS, LuaValue.valueOf(f));
 	}
 	
 	public void setReflective(float f) {

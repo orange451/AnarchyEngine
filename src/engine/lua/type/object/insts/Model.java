@@ -13,8 +13,8 @@ public class Model extends Instance {
 	public Model() {
 		super("Model");
 
-		this.defineField("Mesh", LuaValue.NIL, false);
-		this.defineField("Material", LuaValue.NIL, false);
+		this.defineField(C_MESH.toString(), LuaValue.NIL, false);
+		this.defineField(C_MATERIAL.toString(), LuaValue.NIL, false);
 		
 		this.setInstanceable(true);
 		this.getField("Name").setLocked(false);

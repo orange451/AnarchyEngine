@@ -65,7 +65,7 @@ public class InternalGameThread extends Observable implements Runnable {
 		while(running) {
 
 			// Limit TPS to desiredTPS max
-			float cvtps = Math.max(Math.min(120, desiredTPS), 4);
+			float cvtps = Math.max(Math.min(120, desiredTPS), 2);
 
 			// Get approximate delta time
 			double ticksPerSecond = nanoSecond/cvtps;

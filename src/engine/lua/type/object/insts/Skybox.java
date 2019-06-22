@@ -9,16 +9,20 @@ import ide.layout.windows.icons.Icons;
 
 public class Skybox extends Instance implements TreeViewable {
 
+	private static final LuaValue C_BRIGHTNESS = LuaValue.valueOf("Brightness");
+	private static final LuaValue C_POWER = LuaValue.valueOf("Power");
+	private static final LuaValue C_IMAGE = LuaValue.valueOf("Image");
+
 	public Skybox() {
 		super("Skybox");
 		
-		this.defineField("Image", LuaValue.NIL, false);
+		this.defineField(C_IMAGE.toString(), LuaValue.NIL, false);
 		
-		this.defineField("Brightness", LuaValue.valueOf(2), false);
-		this.getField("Brightness").setClamp(new NumberClampPreferred(0, 10, 0, 5));
+		this.defineField(C_BRIGHTNESS.toString(), LuaValue.valueOf(2), false);
+		this.getField(C_BRIGHTNESS.toString()).setClamp(new NumberClampPreferred(0, 10, 0, 5));
 		
-		this.defineField("Power", LuaValue.valueOf(2), false);
-		this.getField("Power").setClamp(new NumberClampPreferred(0, 10, 0, 5));
+		this.defineField(C_POWER.toString(), LuaValue.valueOf(2), false);
+		this.getField(C_POWER.toString()).setClamp(new NumberClampPreferred(0, 10, 0, 5));
 	}
 
 	@Override
@@ -42,30 +46,30 @@ public class Skybox extends Instance implements TreeViewable {
 	}
 	
 	public void setBrightness( float brightness ) {
-		this.set("Brightness", brightness);
+		this.set(C_BRIGHTNESS, LuaValue.valueOf(brightness));
 	}
 	
 	public void setPower( float power ) {
-		this.set("Power", power);
+		this.set(C_POWER, LuaValue.valueOf(power));
 	}
 	
 	public void setImage( Texture texture ) {
 		if ( texture == null )
-			this.set("Image", LuaValue.NIL);
+			this.set(C_IMAGE, LuaValue.NIL);
 		else
-			this.set("Image", texture);
+			this.set(C_IMAGE, texture);
 	}
 
 	public Texture getImage() {
-		LuaValue ret = this.rawget("Image");
+		LuaValue ret = this.rawget(C_IMAGE);
 		return ret.isnil()?null:(Texture)ret;
 	}
 
 	public float getPower() {
-		return this.rawget("Power").tofloat();
+		return this.rawget(C_POWER).tofloat();
 	}
 
 	public float getBrightness() {
-		return this.rawget("Brightness").tofloat();
+		return this.rawget(C_BRIGHTNESS).tofloat();
 	}
 }

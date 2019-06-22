@@ -121,8 +121,9 @@ public class Mesh extends AssetLoadable implements TreeViewable {
 	public BufferedMesh getMesh() {
 		LuaValue filePath = this.get(C_FILEPATH);
 		
+		// Load new mesh
 		if ( changed && !filePath.isnil() && filePath.toString().length()>3 && !filePath.toString().equals("nil") ) {
-			String path = this.get("FilePath").toString();
+			String path = filePath.toString();
 			String realPath = IDEFilePath.convertToSystem(path);
 			if ( realPath.contains(".mesh") ) {
 				mesh = BufferedMesh.Import(realPath);

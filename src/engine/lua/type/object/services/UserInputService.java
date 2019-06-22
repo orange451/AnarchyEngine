@@ -23,16 +23,21 @@ public class UserInputService extends Service implements TreeViewable {
 
 	private HashMap<Integer,Boolean> keysDown = new HashMap<Integer,Boolean>();
 	private HashMap<Integer,Boolean> mouseDown = new HashMap<Integer,Boolean>();
+
+	public static final LuaValue C_INPUTBEGAN = LuaValue.valueOf("InputBegan");
+	public static final LuaValue C_INPUTENDED = LuaValue.valueOf("InputEnded");
+	public static final LuaValue C_MOUSEPRESSED = LuaValue.valueOf("MousePressed");
+	public static final LuaValue C_MOUSERELEASED = LuaValue.valueOf("MouseReleased");
 	
 	public UserInputService() {
 		super("UserInputService");
 		
 		this.defineField("LockMouse", LuaValue.valueOf(false), false);
 
-		this.rawset("InputBegan", new LuaEvent());
-		this.rawset("InputEnded", new LuaEvent());
-		this.rawset("MousePressed", new LuaEvent());
-		this.rawset("MouseReleased", new LuaEvent());
+		this.rawset(C_INPUTBEGAN, new LuaEvent());
+		this.rawset(C_INPUTENDED, new LuaEvent());
+		this.rawset(C_MOUSEPRESSED, new LuaEvent());
+		this.rawset(C_MOUSERELEASED, new LuaEvent());
 		
 		this.getmetatable().set("GetMovementVector", new TwoArgFunction() {
 			@Override
@@ -63,6 +68,14 @@ public class UserInputService extends Service implements TreeViewable {
 		});
 		
 		this.setLocked(false);
+	}
+	
+	public LuaEvent inputBeganEvent() {
+		return (LuaEvent) this.get(C_INPUTBEGAN);
+	}
+	
+	public LuaEvent inputEndedEvent() {
+		return (LuaEvent) this.get(C_INPUTENDED);
 	}
 	
 	public Vector3 getMovementVector(boolean freeCam) {
@@ -114,14 +127,6 @@ public class UserInputService extends Service implements TreeViewable {
 		
 		return new Vector3f( x, y, z );
 	}
-
-	public LuaEvent getInputBeganEvent() {
-		return (LuaEvent)this.rawget("InputBegan");
-	}
-
-	public LuaEvent getInputEndedEvent() {
-		return (LuaEvent)this.rawget("InputEnded");
-	}
 	
 	@Override
 	protected LuaValue onValueSet(LuaValue key, LuaValue value) {
@@ -160,29 +165,29 @@ public class UserInputService extends Service implements TreeViewable {
 	public void onKeyPressed(int key) {
 		if ( !keysDown.containsKey(key) )
 			keysDown.put(key, true);
-		((LuaEvent)this.rawget("InputBegan")).fire(new InputObjectKey(key));
+		((LuaEvent)this.rawget(C_INPUTBEGAN)).fire(new InputObjectKey(key));
 	}
 	
 	public void onKeyReleased(int key) {
 		keysDown.remove(key);
-		((LuaEvent)this.rawget("InputEnded")).fire(new InputObjectKey(key));
+		((LuaEvent)this.rawget(C_INPUTENDED)).fire(new InputObjectKey(key));
 	}
 
 	public void onMousePress(int key) {
 		if ( !mouseDown.containsKey(key) )
 			mouseDown.put(key, true);
-		((LuaEvent)this.rawget("MousePressed")).fire(new InputObjectMouse(key));
-		((LuaEvent)this.rawget("InputBegan")).fire(new InputObjectMouse(key));
+		((LuaEvent)this.rawget(C_MOUSEPRESSED)).fire(new InputObjectMouse(key));
+		((LuaEvent)this.rawget(C_INPUTBEGAN)).fire(new InputObjectMouse(key));
 	}
 	
 	public void onMouseRelease(int key) {
 		mouseDown.remove(key);
-		((LuaEvent)this.rawget("MouseReleased")).fire(new InputObjectMouse(key));
-		((LuaEvent)this.rawget("InputEnded")).fire(new InputObjectMouse(key));
+		((LuaEvent)this.rawget(C_MOUSERELEASED)).fire(new InputObjectMouse(key));
+		((LuaEvent)this.rawget(C_INPUTENDED)).fire(new InputObjectMouse(key));
 	}
 	
 	public void onMouseScroll(int key) {
-		((LuaEvent)this.rawget("InputBegan")).fire(new InputObjectMouse(key));
+		((LuaEvent)this.rawget(C_INPUTBEGAN)).fire(new InputObjectMouse(key));
 	}
 }
 

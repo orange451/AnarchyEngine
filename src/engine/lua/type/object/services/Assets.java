@@ -201,7 +201,7 @@ public class Assets extends Service implements TreeViewable {
 			}
 	
 			// Get scene
-			int flags = aiProcess_JoinIdenticalVertices | aiProcess_Triangulate | Assimp.aiProcess_GenSmoothNormals;
+			int flags = aiProcess_JoinIdenticalVertices | aiProcess_Triangulate;
 			if ( extraFlags > 0 )
 				flags = flags | extraFlags;
 			AIScene scene = Assimp.aiImportFile(file.getAbsolutePath(), flags);

@@ -7,14 +7,18 @@ import org.lwjgl.glfw.GLFW;
 public class Enums extends TwoArgFunction {
 
 	public LuaValue call(LuaValue modname, LuaValue env) {
-		env.set("Enum", new EnumTable());
+		env.set("Enum", get());
 		return env;
+	}
+	
+	public static EnumTable get() {
+		return new EnumTable();
 	}
 
 	/** --------------------- */
 	/** The global Enum table */
 	/** --------------------- */
-	static class EnumTable extends LuaTableReadOnly {
+	public static class EnumTable extends LuaTableReadOnly {
 		public EnumTable() {
 			
 			// Mouse Enum

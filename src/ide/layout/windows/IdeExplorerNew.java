@@ -4,15 +4,18 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.luaj.vm2.LuaValue;
 import org.lwjgl.PointerBuffer;
+import org.lwjgl.glfw.GLFW;
 import org.lwjgl.system.MemoryUtil;
 import org.lwjgl.util.nfd.NFDPathSet;
 import org.lwjgl.util.nfd.NativeFileDialog;
 
 import engine.Game;
 import engine.GameSubscriber;
+import engine.lua.lib.Enums;
 import engine.lua.type.object.Instance;
 import engine.lua.type.object.ScriptBase;
 import engine.lua.type.object.TreeViewable;
@@ -80,18 +83,56 @@ public class IdeExplorerNew extends IdePane implements GameSubscriber {
 		
 		Game.getGame().subscribe(this);
 		update(true);
+
+		AtomicLong last = new AtomicLong();
+		AtomicLong bigUpdate = new AtomicLong();
+		Game.runService().renderSteppedEvent().connect((args)->{
+			long now = System.currentTimeMillis();
+			
+			// Little update
+			if ( now-last.get() > 200 ) {
+				last.set(System.currentTimeMillis());
+				update(false);
+			}
+			
+			// Big update
+			if ( now-bigUpdate.get() > 1000 ) {
+				bigUpdate.set(System.currentTimeMillis());
+				update(true);
+			}
+			
+			// Forced update
+			if ( requiresUpdate ) {
+				updating = false;
+				lastUpdate = -1;
+				update(false);
+			}
+		});
+		
+		Game.userInputService().inputBeganEvent().connect((args)->{
+			if ( args[0].get("KeyCode").eq_b(LuaValue.valueOf(GLFW.GLFW_KEY_Q))) {
+				System.out.println("Pressed Q");
+				update(false);
+			}
+		});
 	}
 
 	private long lastUpdate = -1;
+	private boolean requiresUpdate;
 
 	private void update(boolean b) {
 		if ( updating )
 			return;
 
-		if (System.currentTimeMillis()-lastUpdate < 50 && !b )
+		// Non important updates only happen at MOST every 50 ms
+		if (System.currentTimeMillis()-lastUpdate < 50 && !b ) {
+			//System.out.println("Blocked excess unimportant update.");
 			return;
-		if (System.currentTimeMillis()-lastUpdate < 4 && b ) {
-			lastUpdate = System.currentTimeMillis();
+		}
+		
+		if ( b ) {
+			requiresUpdate = true;
+			//System.out.println("Deferring explorer update until next frame.");
 			return;
 		}
 		
@@ -99,7 +140,7 @@ public class IdeExplorerNew extends IdePane implements GameSubscriber {
 		updating = true;
 		
 		// Refresh the tree
-		if ( b ) {
+		if ( b || treeItems.size() == 0 || requiresUpdate ) {
 			instanceMapTemp.clear();
 			instanceMapTemp.putAll(instanceMap);
 			instanceMap.clear();
@@ -116,7 +157,8 @@ public class IdeExplorerNew extends IdePane implements GameSubscriber {
 
 			// Update names
 			TreeItem<Instance> item = treeItems.get(i);
-			item.setText(item.getRoot().getName());
+			String name = item.getRoot().getName();
+			item.setText(name);
 		}
 		List<Instance> selected = Game.selected();
 		for (int i = 0; i < selected.size(); i++) {
@@ -126,7 +168,8 @@ public class IdeExplorerNew extends IdePane implements GameSubscriber {
 				tree.selectItem(t);
 			}
 		}
-		
+
+		requiresUpdate = false;
 		updating = false;
 	}
 	
@@ -173,19 +216,17 @@ public class IdeExplorerNew extends IdePane implements GameSubscriber {
 						}
 					}
 				});
-				
-				// Add it to the tree
+			}
+			
+			// Add this item in if it was reparented.
+			Instance obj = newTreeItem.getRoot();
+			if ( obj == inst && !treeItem.getItems().contains(newTreeItem) ) {
 				treeItem.getItems().add(newTreeItem);
-			} else {
-				// Add this item in if it was reparented.
-				Instance obj = newTreeItem.getRoot();
-				if ( obj == inst && !treeItem.getItems().contains(newTreeItem) ) {
-					treeItem.getItems().add(newTreeItem);
-				}
 			}
 			
 			// Update name
-			newTreeItem.setText(inst.getName());
+			String name = newTreeItem.getRoot().getName();
+			newTreeItem.setText(name);
 			
 			// cache it for easier lookups
 			instanceMap.put(inst, newTreeItem);

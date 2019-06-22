@@ -18,26 +18,31 @@ import engine.util.Pair;
 import ide.layout.windows.icons.Icons;
 
 public class GameObject extends Instance implements RenderableInstance,TreeViewable,Positionable {
+
+	private final static LuaValue C_PREFAB = LuaValue.valueOf("Prefab");
+	private final static LuaValue C_WORLDMATRIX = LuaValue.valueOf("WorldMatrix");
+	private final static LuaValue C_POSITION = LuaValue.valueOf("Position");
+	private final static LuaValue C_TRANSPARENCY = LuaValue.valueOf("Transparency");
 	
 	public GameObject() {
 		super("GameObject");
 		
-		this.defineField("Prefab", LuaValue.NIL, false);
-		this.defineField("WorldMatrix", new Matrix4(), false);
-		this.defineField("Position", Vector3.newInstance(0, 0, 0), false );
-		this.defineField("Transparency", LuaValue.valueOf(0), false);
-		this.getField("Transparency").setClamp(new NumberClamp(0, 1));
+		this.defineField(C_PREFAB.toString(), LuaValue.NIL, false);
+		this.defineField(C_WORLDMATRIX.toString(), new Matrix4(), false);
+		this.defineField(C_POSITION.toString(), Vector3.newInstance(0, 0, 0), false );
+		this.defineField(C_TRANSPARENCY.toString(), LuaValue.valueOf(0), false);
+		this.getField(C_TRANSPARENCY.toString()).setClamp(new NumberClamp(0, 1));
 	}
 	
 	public void render(BaseShader shader) {
 		if ( this.getParent().isnil() )
 			return;
 		
-		if ( this.get("Prefab").isnil() )
+		if ( this.get(C_PREFAB).isnil() )
 			return;
 		
-		Prefab luaPrefab = (Prefab) this.rawget("Prefab");
-		Matrix4 matrix = (Matrix4) this.rawget("WorldMatrix");
+		Prefab luaPrefab = (Prefab) this.rawget(C_PREFAB);
+		Matrix4 matrix = (Matrix4) this.rawget(C_WORLDMATRIX);
 		PrefabRenderer prefab = luaPrefab.getPrefab();
 		
 		prefab.render(shader, matrix.toJoml());
@@ -51,7 +56,7 @@ public class GameObject extends Instance implements RenderableInstance,TreeViewa
 		if ( matrix == null )
 			matrix = new Matrix4();
 		
-		this.set("WorldMatrix", matrix);
+		this.set(C_WORLDMATRIX, matrix);
 	}
 	
 	/**
@@ -67,7 +72,7 @@ public class GameObject extends Instance implements RenderableInstance,TreeViewa
 	 * @return
 	 */
 	public Matrix4 getWorldMatrix() {
-		return (Matrix4) this.get("WorldMatrix");
+		return (Matrix4) this.get(C_WORLDMATRIX);
 	}
 	
 	/**
@@ -103,14 +108,14 @@ public class GameObject extends Instance implements RenderableInstance,TreeViewa
 	
 	@Override
 	protected LuaValue onValueSet(LuaValue key, LuaValue value) {
-		if ( key.toString().equals("Position") && value instanceof Vector3 ) {
-			Matrix4 mat = ((Matrix4)this.rawget("WorldMatrix"));
+		if ( key.eq_b(C_POSITION) && value instanceof Vector3 ) {
+			Matrix4 mat = ((Matrix4)this.rawget(C_WORLDMATRIX));
 			mat.setPosition((Vector3) value);
 			
 			// This is just to trigger Physics object (if it exists)
-			this.set("WorldMatrix", mat);
+			this.set(C_WORLDMATRIX, mat);
 		}
-		if ( key.toString().equals("Prefab") ) {
+		if ( key.eq_b(C_PREFAB) ) {
 			if ( !value.isnil() && !(value instanceof Prefab) )
 				return null;
 		}
@@ -119,8 +124,8 @@ public class GameObject extends Instance implements RenderableInstance,TreeViewa
 	
 	@Override
 	protected boolean onValueGet(LuaValue key) {
-		if ( key.toString().equals("Position") ) {
-			this.rawset("Position", ((Matrix4)this.rawget("WorldMatrix")).getPosition());
+		if ( key.eq_b(C_POSITION) ) {
+			this.rawset(C_POSITION, ((Matrix4)this.rawget(C_WORLDMATRIX)).getPosition());
 		}
 		return true;
 	}
@@ -139,9 +144,9 @@ public class GameObject extends Instance implements RenderableInstance,TreeViewa
 	 */
 	public void setPrefab(Prefab p) {
 		if ( p == null ) {
-			this.set("Prefab", LuaValue.NIL);
+			this.set(C_PREFAB, LuaValue.NIL);
 		} else {
-			this.set("Prefab", p);
+			this.set(C_PREFAB, p);
 		}
 	}
 
@@ -150,7 +155,7 @@ public class GameObject extends Instance implements RenderableInstance,TreeViewa
 	 * @return
 	 */
 	public Prefab getPrefab() {
-		LuaValue p = this.get("Prefab");
+		LuaValue p = this.get(C_PREFAB);
 		return p.equals(LuaValue.NIL)?null:(Prefab)p;
 	}
 
@@ -158,7 +163,7 @@ public class GameObject extends Instance implements RenderableInstance,TreeViewa
 	 * Returns the vector3 position of this object.
 	 */
 	public Vector3 getPosition() {
-		return (Vector3) this.get("Position");
+		return (Vector3) this.get(C_POSITION);
 	}
 
 	/**
@@ -166,7 +171,7 @@ public class GameObject extends Instance implements RenderableInstance,TreeViewa
 	 * If there is a physics object inside this object, that will be updated as well.
 	 */
 	public void setPosition(Vector3 pos) {
-		this.set("Position", pos);
+		this.set(C_POSITION, pos);
 	}
 
 	@Override
@@ -182,7 +187,7 @@ public class GameObject extends Instance implements RenderableInstance,TreeViewa
 	 * @return
 	 */
 	public float getTransparency() {
-		return this.get("Transparency").tofloat();
+		return this.get(C_TRANSPARENCY).tofloat();
 	}
 	
 	/**
@@ -190,6 +195,6 @@ public class GameObject extends Instance implements RenderableInstance,TreeViewa
 	 * @param f
 	 */
 	public void setTransparency(float f) {
-		this.set("Transparency", LuaValue.valueOf(f));
+		this.set(C_TRANSPARENCY, LuaValue.valueOf(f));
 	}
 }
