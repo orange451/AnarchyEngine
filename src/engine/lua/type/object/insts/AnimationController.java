@@ -5,18 +5,21 @@ import java.util.ArrayList;
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.TwoArgFunction;
 
+import engine.Game;
+import engine.lua.type.LuaConnection;
 import engine.lua.type.object.Instance;
 
 public class AnimationController extends Instance {
 	
-	protected ArrayList<Animation> playingAnimations;
+	protected ArrayList<AnimationTrack> playingAnimations;
+	protected LuaConnection animationUpdator;
 	
 	public AnimationController() {
 		super("AnimationController");
 		
 		this.defineField("Linked", LuaValue.NIL, true);
 		
-		this.playingAnimations = new ArrayList<Animation>();
+		this.playingAnimations = new ArrayList<AnimationTrack>();
 		
 		this.getmetatable().set("LoadAnimation", new TwoArgFunction() {
 			@Override
@@ -28,11 +31,18 @@ public class AnimationController extends Instance {
 				return track;
 			}
 		});
+		
+		// Handle animations
+		Game.loadEvent().connect((a)->{
+			animationUpdator = Game.runService().heartbeatEvent().connect((args)->{
+				animate(args[0].checkdouble());
+			});
+		});
 	}
 
 	@Override
 	public void onDestroy() {
-		//
+		animationUpdator.disconnect();
 	}
 
 	@Override
@@ -54,6 +64,30 @@ public class AnimationController extends Instance {
 	@Override
 	protected boolean onValueGet(LuaValue key) {
 		return true;
+	}
+	
+	private void animate(double delta) {
+		for (int i = 0; i < playingAnimations.size(); i++) {
+			if ( i >= playingAnimations.size() )
+				continue;
+			
+			AnimationTrack track = playingAnimations.get(i);
+			if ( track == null )
+				continue;
+			
+			track.update(delta);
+		}
+	}
+
+	/**
+	 * Plays an animation track
+	 * @param track
+	 */
+	public void playAnimation(AnimationTrack track) {
+		while ( playingAnimations.contains(track) )
+			playingAnimations.remove(track);
+		
+		playingAnimations.add(track);
 	}
 
 }

@@ -1,8 +1,5 @@
 package engine.lua.type.object.services;
 
-import static org.lwjgl.assimp.Assimp.aiProcess_JoinIdenticalVertices;
-import static org.lwjgl.assimp.Assimp.aiProcess_Triangulate;
-
 import java.io.File;
 import java.net.URL;
 import java.nio.ByteBuffer;
@@ -201,7 +198,7 @@ public class Assets extends Service implements TreeViewable {
 			}
 	
 			// Get scene
-			int flags = aiProcess_JoinIdenticalVertices | aiProcess_Triangulate;
+			int flags = Assimp.aiProcess_JoinIdenticalVertices | Assimp.aiProcess_Triangulate;
 			if ( extraFlags > 0 )
 				flags = flags | extraFlags;
 			AIScene scene = Assimp.aiImportFile(file.getAbsolutePath(), flags);

@@ -21,7 +21,7 @@ import engine.lua.type.LuaField;
 import engine.lua.type.LuaValuetype;
 
 public abstract class Instance extends DataModel {
-	private List<Instance> children = Collections.synchronizedList(new ArrayList<Instance>());
+	protected List<Instance> children = Collections.synchronizedList(new ArrayList<Instance>());
 	private HashSet<Instance> descendents = new HashSet<Instance>();
 	private List<InstancePropertySubscriber> propertySubscribers = Collections.synchronizedList(new ArrayList<InstancePropertySubscriber>());
 	protected boolean destroyed;

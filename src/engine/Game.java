@@ -246,6 +246,7 @@ public class Game implements Tickable {
 			
 			// On load event
 			this.rawset("Loaded", new LuaEvent());
+			this.rawset("Started", new LuaEvent());
 			
 			// Fields
 			this.defineField("Running", LuaValue.valueOf(false), true);
@@ -389,6 +390,8 @@ public class Game implements Tickable {
 			Instance c = children.get(i);
 			createdInstances.put( c.getSID(), c);
 		}
+		
+		loadEvent().fire();
 	}
 
 	public static void runLater(Runnable object) {
@@ -509,7 +512,7 @@ public class Game implements Tickable {
 			}
 			
 			Game.runLater(()->{
-				loadEvent().fire();
+				startEvent().fire();
 			});
 		}
 	}
@@ -542,5 +545,9 @@ public class Game implements Tickable {
 
 	public static LuaEvent loadEvent() {
 		return ((LuaEvent)LuaEngine.globals.get("game").get("Loaded"));
+	}
+	
+	public static LuaEvent startEvent() {
+		return ((LuaEvent)LuaEngine.globals.get("game").get("Started"));
 	}
 }

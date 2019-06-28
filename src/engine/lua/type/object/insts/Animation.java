@@ -47,4 +47,51 @@ public class Animation extends Instance implements TreeViewable {
 	public boolean isLooped() {
 		return this.get("Looped").toboolean();
 	}
+
+	/**
+	 * Calculates the max time of the animation.
+	 * @return
+	 */
+	public double getMaxTime() {
+		double len = 0;
+		for (int i = 0; i < children.size(); i++) {
+			Instance child = children.get(i);
+			if ( child instanceof AnimationKeyframeSequence ) {
+				AnimationKeyframeSequence seq = (AnimationKeyframeSequence)child;
+				if ( seq.getTime() > len )
+					len = seq.getTime();
+			}
+		}
+		
+		return len;
+	}
+	
+	/**
+	 * Returns the AnimationKeyframeSequence with the time closest to the specified time, but not greater than the specified time.
+	 * @param time
+	 * @return
+	 */
+	public AnimationKeyframeSequence getNearestSequence(double time) {
+		double minTime = 0;
+		AnimationKeyframeSequence ret = null;
+		
+		if ( children == null || children.size() == 0 )
+			return null;
+		
+		for (int i = 0; i < children.size(); i++) {
+			Instance child = children.get(i);
+			if ( child instanceof AnimationKeyframeSequence ) {
+				AnimationKeyframeSequence seq = (AnimationKeyframeSequence)child;
+				double seqTime = seq.getTime();
+				if ( seqTime < time ) {
+					if ( seqTime > minTime ) {
+						minTime = seqTime;
+						ret = seq;
+					}
+				}
+			}
+		}
+		
+		return ret;
+	}
 }
