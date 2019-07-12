@@ -14,6 +14,7 @@ public class AnimationTrack extends Instance {
 	private static LuaValue C_TIMEPOSITION = LuaValue.valueOf("TimePosition");
 	private static LuaValue C_CURRENTKEYFRAME = LuaValue.valueOf("CurrentKeyframe");
 	private static LuaValue C_LENGTH = LuaValue.valueOf("Length");
+	private static LuaValue C_SPEED = LuaValue.valueOf("Speed");
 	
 	public AnimationTrack(AnimationController animationController, Animation animation) {
 		super("AnimationTrack");
@@ -22,11 +23,11 @@ public class AnimationTrack extends Instance {
 		AnimationKeyframeSequence current = animation.getNearestSequence(t);
 		
 		this.defineField(C_ANIMATION.toString(), animation, true);
-		this.defineField("Speed", animation.getSpeed(), false);
-		this.defineField("Looped", animation.isLooped(), false);
+		this.defineField(C_SPEED.toString(), LuaValue.valueOf(animation.getSpeed()), false);
+		this.defineField("Looped", LuaValue.valueOf(animation.isLooped()), false);
 		this.defineField(C_TIMEPOSITION.toString(), LuaValue.valueOf(t), false);
 		this.defineField(C_CURRENTKEYFRAME.toString(), current==null?LuaValue.NIL:current, true);
-		this.defineField(C_LENGTH.toString(), animation.getMaxTime(), true);
+		this.defineField(C_LENGTH.toString(), LuaValue.valueOf(animation.getMaxTime()), true);
 		
 		this.setArchivable(false);
 		this.setInstanceable(false);
@@ -47,7 +48,7 @@ public class AnimationTrack extends Instance {
 	
 	protected void update(double delta) {
 		// Update the time
-		this.forceset(C_TIMEPOSITION, this.rawget(C_TIMEPOSITION).add(delta));
+		this.forceset(C_TIMEPOSITION, this.rawget(C_TIMEPOSITION).add(delta*this.getSpeed()));
 		
 		// Get the current frame
 		AnimationKeyframeSequence frame = this.getAnimation().getNearestSequence(this.getTimePosition());
@@ -62,6 +63,10 @@ public class AnimationTrack extends Instance {
 			this.forceset(C_TIMEPOSITION, LuaValue.valueOf(0));
 			update(0);
 		}
+	}
+	
+	public double getSpeed() {
+		return this.rawget(C_SPEED).checkdouble();
 	}
 	
 	/**

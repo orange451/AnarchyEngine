@@ -1,5 +1,6 @@
 package engine.lua.type.object.insts;
 
+import org.joml.Matrix4f;
 import org.luaj.vm2.LuaValue;
 
 import engine.lua.type.data.Matrix4;
@@ -39,5 +40,18 @@ public class AnimationKeyframe extends Instance implements TreeViewable {
 	@Override
 	public Icons getIcon() {
 		return Icons.icon_film;
+	}
+
+	public Matrix4 getMatrix() {
+		LuaValue ret = this.get("Matrix");
+		return ret==null?null:(Matrix4)ret;
+	}
+	
+	public Matrix4f getMatrixJOML() {
+		Matrix4 mat = getMatrix();
+		if ( mat == null )
+			return null;
+		
+		return mat.getInternal();
 	}
 }

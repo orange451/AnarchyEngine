@@ -13,6 +13,8 @@ public class AnimationKeyframeSequence extends Instance implements TreeViewable 
 
 	protected List<AnimationKeyframe> keyframes;
 	
+	private static LuaValue C_TIME = LuaValue.valueOf("Time");
+	
 	public AnimationKeyframeSequence() {
 		super("AnimationKeyframeSequence");
 		
@@ -21,7 +23,7 @@ public class AnimationKeyframeSequence extends Instance implements TreeViewable 
 		
 		this.getField("Archivable").setLocked(true);
 		
-		this.defineField("Time", LuaValue.valueOf(0), true);
+		this.defineField(C_TIME.toString(), LuaValue.valueOf(0), true);
 		
 		keyframes = new ArrayList<AnimationKeyframe>();
 		this.childAddedEvent().connect((args)->{
@@ -58,6 +60,6 @@ public class AnimationKeyframeSequence extends Instance implements TreeViewable 
 	}
 
 	public double getTime() {
-		return this.get("Time").todouble();
+		return this.get(C_TIME).todouble();
 	}
 }

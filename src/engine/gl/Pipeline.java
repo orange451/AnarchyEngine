@@ -25,6 +25,7 @@ import engine.gl.renderer.TransparencyRenderer;
 import engine.gl.shader.BaseShader;
 import engine.lua.type.object.Instance;
 import engine.lua.type.object.PrefabRenderer;
+import engine.lua.type.object.insts.AnimationController;
 import engine.lua.type.object.insts.Camera;
 import engine.lua.type.object.insts.GameObject;
 import engine.lua.type.object.insts.Model;
@@ -123,7 +124,7 @@ public class Pipeline implements Renderable {
 		// Draw to GBuffer
 		gbuffer.bind();
 		{
-			// Render workspace into gbuffer
+			// Render workspace into gbuffer (also seperates out special renderables)
 			synchronized(transparencies) {
 				transparencies.clear();
 				renderInstancesRecursive(gbuffer.getShader(), Game.workspace());
@@ -302,6 +303,12 @@ public class Pipeline implements Renderable {
 			if ( root instanceof GameObject ) {
 				GameObject g = ((GameObject)root);
 				transparency = g.getTransparency();
+			}
+			
+			// Replace shader with animatable shader
+			Instance animationController = root.findFirstChildOfClass(AnimationController.class.getSimpleName());
+			if ( animationController != null ) {
+				((AnimationController)animationController).debugRender(shader);
 			}
 			
 			if ( transparency == 0 ) { // Solid

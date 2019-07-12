@@ -161,6 +161,9 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 	private static PropertyModifier getPropertyModifier( Instance instance, String field, LuaValue value ) {
 		LuaField luaField = instance.getField(field);
 		
+		if ( luaField == null )
+			return null;
+		
 		// Calculate editable
 		boolean editable = luaField.canModify();
 		if ( (field.equals("Name") || field.equals("Parent")) && instance.isLocked() )
@@ -695,6 +698,9 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 				
 				// Cell 2
 				PropertyModifier t2 = getPropertyModifier( inst, field, value );
+				if ( t2 == null )
+					return;
+				
 				if ( i % 2 == 1 )
 					t2.setBackground(alt);
 				

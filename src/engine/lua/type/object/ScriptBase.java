@@ -120,7 +120,7 @@ public abstract class ScriptBase extends Instance implements GameSubscriber {
 				break;
 			}
 			
-			parent = parent.get("Parent");
+			parent = ((Instance)parent).getParent();
 			a++;
 		}
 		

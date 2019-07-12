@@ -1,11 +1,15 @@
 package engine.lua.type.object.insts;
 
 import java.util.ArrayList;
+import java.util.List;
 
+import org.joml.Matrix4f;
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.TwoArgFunction;
 
 import engine.Game;
+import engine.gl.Resources;
+import engine.gl.shader.BaseShader;
 import engine.lua.type.LuaConnection;
 import engine.lua.type.object.Instance;
 
@@ -42,7 +46,8 @@ public class AnimationController extends Instance {
 
 	@Override
 	public void onDestroy() {
-		animationUpdator.disconnect();
+		if ( animationUpdator != null )
+			animationUpdator.disconnect();
 	}
 
 	@Override
@@ -78,6 +83,15 @@ public class AnimationController extends Instance {
 			track.update(delta);
 		}
 	}
+	
+	/**
+	 * Returns the Game Object this controller is linked to. Should be the same as the parent.
+	 * @return
+	 */
+	public GameObject getLinkedInstance() {
+		LuaValue linked = this.get("Linked");
+		return linked.isnil()?null:(GameObject)linked;
+	}
 
 	/**
 	 * Plays an animation track
@@ -88,6 +102,70 @@ public class AnimationController extends Instance {
 			playingAnimations.remove(track);
 		
 		playingAnimations.add(track);
+	}
+
+	/**
+	 * Debug render
+	 * @param shader
+	 */
+	public void debugRender(BaseShader shader) {
+		
+		GameObject linked = this.getLinkedInstance();
+		if ( linked == null )
+			return;
+		
+		Prefab prefab = linked.getPrefab();
+		if ( prefab == null )
+			return;
+		
+		Instance animationData = prefab.findFirstChildOfClass(AnimationData.class.getSimpleName());
+		if ( animationData == null )
+			return;
+		
+		Instance boneStructure = animationData.findFirstChildOfClass(BoneTree.class.getSimpleName());
+		if ( boneStructure == null )
+			return;
+		
+		Instance animations = animationData.findFirstChildOfClass(Animations.class.getSimpleName());
+		if ( animations == null )
+			return;
+		
+		Instance bones = animationData.findFirstChildOfClass(Bones.class.getSimpleName());
+		if ( bones == null )
+			return;
+		
+		for (int i = 0; i < playingAnimations.size(); i++) {
+			AnimationTrack track = playingAnimations.get(i);
+			AnimationKeyframeSequence keyframe = track.getCurrentKeyframe();
+			
+			if ( keyframe == null )
+				continue;
+			
+			debugRenderRecursive( shader, keyframe, boneStructure, linked.getWorldMatrix().getInternal());
+		}
+	}
+
+	private void debugRenderRecursive(BaseShader shader, AnimationKeyframeSequence keyframe, Instance root, Matrix4f worldMatrix) {
+		// Do rendering
+		if ( root instanceof BoneTreeNode ) {
+			Instance keyframeBone = keyframe.findFirstChild(root.getName());
+			if ( keyframeBone != null && keyframeBone instanceof AnimationKeyframe ) {
+				Instance bone = ((Instance)((Instance)((Instance)keyframe.getParent()).getParent()).getParent()).findFirstChild("Bones").findFirstChild(keyframeBone.getName());
+				if ( bone != null && bone instanceof Bone ) {
+					worldMatrix = new Matrix4f(worldMatrix);
+					worldMatrix.mul(((AnimationKeyframe)keyframeBone).getMatrixJOML());
+					worldMatrix.mul(((Bone)bone).getOffsetMatrix().getInternal());
+					Resources.MESH_CUBE.render(shader, worldMatrix, Resources.MATERIAL_BLANK);
+				}
+			}
+		}
+		
+		// Render children
+		List<Instance> bones = root.getChildren();
+		for (int i = 0; i < bones.size(); i++) {
+			Instance newRoot = bones.get(i);
+			debugRenderRecursive( shader, keyframe, newRoot, worldMatrix );
+		}
 	}
 
 }

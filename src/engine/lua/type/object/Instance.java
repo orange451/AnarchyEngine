@@ -521,6 +521,10 @@ public abstract class Instance extends DataModel {
 		this.set(C_NAME, LuaValue.valueOf(name));
 	}
 	
+	public String getClassName() {
+		return this.get(C_CLASSNAME).toString();
+	}
+	
 	public void forceSetName(String name) {
 		boolean l = this.locked;
 		boolean l2 = !this.getField("Name").canModify();
@@ -610,7 +614,7 @@ public abstract class Instance extends DataModel {
 		synchronized(children) {
 			for (int i = 0; i < children.size(); i++) {
 				Instance child = children.get(i);
-				if ( child.get(C_CLASSNAME).toString().equals(name) ) {
+				if ( child.getClassName().equals(name) ) {
 					return child;
 				}
 			}
@@ -623,7 +627,7 @@ public abstract class Instance extends DataModel {
 		synchronized(children) {
 			for (int i = 0; i < children.size(); i++) {
 				Instance child = children.get(i);
-				String cName = child.get(C_CLASSNAME).toString();
+				String cName = child.getClassName();
 				if ( cName.equals(className) ) {
 					ret.add(child);
 				}

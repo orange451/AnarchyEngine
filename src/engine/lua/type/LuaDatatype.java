@@ -191,6 +191,7 @@ public abstract class LuaDatatype extends LuaTable {
 				
 				// Type mismatch? Or missing field
 				if ( typeMismatch ) {
+					System.out.println(f.getType() + " / " + value.getClass());
 					LuaValue.error("Cannot set field " + key.toString() + ". Type mismatch.");
 					return;
 				}

@@ -40,4 +40,8 @@ public class Bone extends Instance implements TreeViewable {
 	public Icons getIcon() {
 		return Icons.icon_film;
 	}
+
+	public Matrix4 getOffsetMatrix() {
+		return (Matrix4) this.get("OffsetMatrix");
+	}
 }

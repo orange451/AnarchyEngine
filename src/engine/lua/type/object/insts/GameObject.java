@@ -41,10 +41,12 @@ public class GameObject extends Instance implements RenderableInstance,TreeViewa
 		if ( this.get(C_PREFAB).isnil() )
 			return;
 		
+		// Get prefab/matrix
 		Prefab luaPrefab = (Prefab) this.rawget(C_PREFAB);
 		Matrix4 matrix = (Matrix4) this.rawget(C_WORLDMATRIX);
-		PrefabRenderer prefab = luaPrefab.getPrefab();
 		
+		// Render
+		PrefabRenderer prefab = luaPrefab.getPrefab();
 		prefab.render(shader, matrix.toJoml());
 	}
 	

@@ -67,6 +67,7 @@ public class AnimationData extends Instance implements TreeViewable {
 					mOff.c1(), mOff.c2(), mOff.c3(), mOff.c4(),
 					mOff.d1(), mOff.d2(), mOff.d3(), mOff.d4()
 				);
+			offsetMat.transpose();
 
 			Bone b = new Bone();
 			b.rawset("Mesh", mesh);
