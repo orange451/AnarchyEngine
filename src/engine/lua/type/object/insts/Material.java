@@ -57,7 +57,7 @@ public class Material extends Asset implements TreeViewable {
 		this.getField(C_REFLECTIVE.toString()).setClamp(new NumberClamp(0, 1));
 		
 		this.defineField(C_COLOR.toString(), Color3.newInstance(255, 255, 255), false);
-		this.defineField(C_EMISSIVE.toString(), Vector3.newInstance(0,0,0), false);
+		this.defineField(C_EMISSIVE.toString(), new Vector3(), false);
 		
 		this.defineField(C_TRANSPARENCY.toString(), LuaValue.ZERO, false);
 		this.getField(C_TRANSPARENCY.toString()).setClamp(new NumberClamp(0, 1));
@@ -102,7 +102,7 @@ public class Material extends Asset implements TreeViewable {
 	}
 	
 	public void setEmissive(Vector3f emissive) {
-		this.setEmissive(Vector3.newInstance(emissive));
+		this.setEmissive(new Vector3(emissive));
 	}
 	
 	public Vector3 getEmissive() {

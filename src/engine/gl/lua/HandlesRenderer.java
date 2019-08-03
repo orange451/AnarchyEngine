@@ -114,7 +114,7 @@ public class HandlesRenderer {
 						Vector3f cPos = g.getPosition().toJoml();
 						Vector3f offset = cPos.sub(origin, new Vector3f());
 						
-						g.setPosition(Vector3.newInstance(offset.add(reprojectedOffset)));
+						g.setPosition(new Vector3(offset.add(reprojectedOffset)));
 					}
 				}
 			}

@@ -29,7 +29,7 @@ public class GameObject extends Instance implements RenderableInstance,TreeViewa
 		
 		this.defineField(C_PREFAB.toString(), LuaValue.NIL, false);
 		this.defineField(C_WORLDMATRIX.toString(), new Matrix4(), false);
-		this.defineField(C_POSITION.toString(), Vector3.newInstance(0, 0, 0), false );
+		this.defineField(C_POSITION.toString(), new Vector3(), false );
 		this.defineField(C_TRANSPARENCY.toString(), LuaValue.valueOf(0), false);
 		this.getField(C_TRANSPARENCY.toString()).setClamp(new NumberClamp(0, 1));
 	}

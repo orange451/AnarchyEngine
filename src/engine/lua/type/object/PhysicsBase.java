@@ -43,8 +43,8 @@ public abstract class PhysicsBase extends Instance implements GameSubscriber {
 		
 		this.defineField("Linked", LuaValue.NIL, true);
 		
-		this.defineField("Velocity", Vector3.newInstance(0, 0, 0), false);
-		this.defineField("AngularVelocity", Vector3.newInstance(0,0,0), false);
+		this.defineField("Velocity", new Vector3(), false);
+		this.defineField("AngularVelocity", new Vector3(), false);
 		this.defineField("WorldMatrix", new Matrix4(), false);
 		
 		this.defineField("Mass", LuaValue.valueOf(0.5f), false);
@@ -106,9 +106,11 @@ public abstract class PhysicsBase extends Instance implements GameSubscriber {
 				if ( playerOwns == null ) {
 					InternalServer.sendAllUDP(new InstanceUpdateUDP(this, C_WORLDMATRIX));
 					InternalServer.sendAllUDP(new InstanceUpdateUDP(this, C_VELOCITY));
+					InternalServer.sendAllUDP(new InstanceUpdateUDP(this, C_ANGULARVELOCITY));
 				} else {
 					InternalServer.sendAllUDPExcept(new InstanceUpdateUDP(this, C_WORLDMATRIX), playerOwns.getConnection());
-					InternalServer.sendAllUDPExcept(new InstanceUpdateUDP(this, C_VELOCITY), playerOwns.getConnection());					
+					InternalServer.sendAllUDPExcept(new InstanceUpdateUDP(this, C_VELOCITY), playerOwns.getConnection());
+					InternalServer.sendAllUDPExcept(new InstanceUpdateUDP(this, C_ANGULARVELOCITY), playerOwns.getConnection());
 				}
 			}
 			
@@ -117,6 +119,7 @@ public abstract class PhysicsBase extends Instance implements GameSubscriber {
 				if (Game.players().getLocalPlayer().equals(playerOwns)) {
 					InternalClient.sendServerUDP(new InstanceUpdateUDP(this, C_WORLDMATRIX, true));
 					InternalClient.sendServerUDP(new InstanceUpdateUDP(this, C_VELOCITY, true));
+					InternalClient.sendServerUDP(new InstanceUpdateUDP(this, C_ANGULARVELOCITY, true));
 				}
 			}
 		}
@@ -257,7 +260,7 @@ public abstract class PhysicsBase extends Instance implements GameSubscriber {
 	}
 	
 	public void setVelocity(Vector3f velocity) {
-		Vector3 vel = Vector3.newInstance(velocity);
+		Vector3 vel = new Vector3(velocity);
 		this.setVelocity(vel);
 	}
 	

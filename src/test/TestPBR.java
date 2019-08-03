@@ -47,14 +47,14 @@ public class TestPBR extends ClientApplication {
 				float xx = (float) (Math.cos(t) * CAMERA_DIST);
 				float yy = (float) (Math.sin(t) * CAMERA_DIST);
 
-				Game.workspace().getCurrentCamera().setPosition(Vector3.newInstance(xx,yy,0));
-				Game.workspace().getCurrentCamera().setLookAt(Vector3.newInstance(0, 0, 0));
+				Game.workspace().getCurrentCamera().setPosition(new Vector3(xx,yy,0));
+				Game.workspace().getCurrentCamera().setLookAt(new Vector3(0, 0, 0));
 			}
 		});
 		Game.workspace().getCurrentCamera().setFov(2.5f);
 		
 		// Set ambient
-		Game.lighting().setAmbient(Color3.newInstance(8,8,8));
+		Game.lighting().setAmbient(Color3.newInstance(64, 64, 64));
 		
 		// Mesh
 		Mesh mesh = new Mesh();
@@ -77,8 +77,8 @@ public class TestPBR extends ClientApplication {
 		// Skybox
 		Skybox skybox = new Skybox();
 		skybox.setImage(envmap);
-		skybox.setBrightness(3f);
-		skybox.setPower(1.25f);
+		skybox.setBrightness(1f);
+		skybox.setPower(1.0f);
 		skybox.setParent(Game.lighting());
 		Game.lighting().setSkybox(skybox);
 		
@@ -91,7 +91,7 @@ public class TestPBR extends ClientApplication {
 		mat.setParent(Game.assets().materials());
 		
 		// Make rows of balls
-		makeRow( mesh, mat,  1, Color3.newInstance(255, 255, 255),	Color3.newInstance(255, 255, 255),	0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f);
+		makeRow( mesh, mat,  1, Color3.newInstance(255, 255, 255),	Color3.newInstance(255, 255, 255),	0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f);
 		makeRow( mesh, mat,  0, Color3.newInstance(0, 128, 16),		Color3.newInstance(0, 128, 16),		0.4f, 1.0f, 0.2f, 0.0f, 0.4f, 0.1f, 0.0f, 0.0f);
 		makeRow( mesh, mat, -1, Color3.newInstance(255,220,96),		Color3.newInstance(255, 220, 96),	0.0f, 1.0f, 0.8f, 0.8f, 1.0f, 0.5f, 0.0f, 0.0f);
 		makeRow( mesh, mat, -2, Color3.red(),						Color3.red(),						0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.9f);
@@ -99,7 +99,7 @@ public class TestPBR extends ClientApplication {
 		// Add lights
 		int close = 8;
 		int r = 48;
-		int b = 5;
+		int b = 10;
 		int xx = 8;
 		PointLight l1 = new PointLight();
 		l1.setPosition(-xx, close, xx);
@@ -158,7 +158,7 @@ public class TestPBR extends ClientApplication {
 			
 			// Calculate matrix
 			float t = ((balls-1)/2f)-i;
-			Vector3 pos = Vector3.newInstance(t*2.2f, 0, y*2.2f);
+			Vector3 pos = new Vector3(t*2.2f, 0, y*2.2f);
 			Matrix4 matrix = new Matrix4(pos);
 			
 			// Create game object

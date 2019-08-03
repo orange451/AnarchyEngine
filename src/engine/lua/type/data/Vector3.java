@@ -12,24 +12,36 @@ import engine.lua.type.LuaValuetype;
 import engine.util.Misc;
 
 public class Vector3 extends LuaValuetype {
-
-	private double mag = 0;
-	private LuaValue unit;
-	private boolean modified = true;
-	private Vector3f internal;
-
 	protected static final LuaValue C_X = LuaValue.valueOf("X");
 	protected static final LuaValue C_Y = LuaValue.valueOf("Y");
 	protected static final LuaValue C_Z = LuaValue.valueOf("Z"); 
+	protected static final LuaValue C_UNIT = LuaValue.valueOf("Unit");
+	protected static final LuaValue C_MAGNITUDE = LuaValue.valueOf("Magnitude");
 	
-	public Vector3() {
-		this(new Vector3(null));
+	private Vector3f internal;
+	private boolean modified;
+	
+	@Override
+	public String typename() {
+		return "Vector3";
 	}
-
-	public Vector3(Vector3 unitVec) {
+	
+	public Vector3(float x, float y, float z) {
+		this(new Vector3f(x, y, z));
+	}
+	
+	public Vector3(Vector3f internal) {
+		this();
+		setInternal(internal);
+	}
+	
+	public Vector3() {		
+		// Define fields
+		defineField(C_X.toString(), LuaValue.valueOf(0), true);
+		defineField(C_Y.toString(), LuaValue.valueOf(0), true);
+		defineField(C_Z.toString(), LuaValue.valueOf(0), true);
 		this.internal = new Vector3f();
-		this.unit = unitVec;
-
+		
 		// Create ToString function
 		this.getmetatable().set("ToString", new ZeroArgFunction() {
 			@Override
@@ -96,78 +108,8 @@ public class Vector3 extends LuaValuetype {
 			}
 		});
 	}
-
-	@Override
-	protected void onRegister(LuaTable table) {
-		//
-	}
 	
-	public Vector3 setInternal(Vector3f vector) {
-		this.rawset(C_X, LuaValue.valueOf(vector.x));
-		this.rawset(C_Y, LuaValue.valueOf(vector.y));
-		this.rawset(C_Z, LuaValue.valueOf(vector.z));
-		this.modified = true;
-		this.internal.set(vector);
-		return this;
-	}
-
-	public float getX() {
-		return this.internal.x;
-	}
-
-	public float getY() {
-		return this.internal.y;
-	}
-
-	public float getZ() {
-		return this.internal.z;
-	}
-
-	protected double getMag() {
-		return mag;
-	}
-
-	public Vector3 getUnit() {
-		if ( unit.isnil() || !(unit instanceof Vector3) || ((Vector3)unit).isZero() )
-			get("Unit");
-		
-		return (Vector3) unit;
-	}
-
-	private boolean isZero() {
-		return getX() == 0 && getY() == 0 && getZ() == 0;
-	}
-
-	protected LuaValue newInstanceFunction() {
-		return new ThreeArgFunction() {
-			@Override
-			public LuaValue call(LuaValue arg1, LuaValue arg2, LuaValue arg3) {
-				return newInstance(arg1.tofloat(), arg2.tofloat(), arg3.tofloat());
-			}
-		};
-	}
-
-	public static Vector3 newInstance(float x, float y, float z) {
-		Vector3 inst = new Vector3(new Vector3(null));
-		inst.defineField("X", LuaValue.valueOf(x), true);
-		inst.defineField("Y", LuaValue.valueOf(y), true);
-		inst.defineField("Z", LuaValue.valueOf(z), true);
-		inst.defineField("Magnitude", LuaValue.valueOf(inst.mag), true);
-		inst.defineField("Unit", inst.unit, true);
-		inst.internal.set(x,y,z);
-		inst.modified = true;
-		return inst;
-	}
-
-	public static Vector3 newInstance(Vector3f vector) {
-		return newInstance( vector.x, vector.y, vector.z );
-	}
-
-	public static Vector3 newInstance(Vector3 vector) {
-		return newInstance( vector.getX(), vector.getY(), vector.getZ() );
-	}
-
-	public static Vector3 getVector(LuaValue value) {
+	protected Vector3 getVector(LuaValue value) {
 		if ( value instanceof Vector3 ) {
 			return (Vector3)value;
 		} else {
@@ -180,51 +122,40 @@ public class Vector3 extends LuaValuetype {
 		}
 	}
 
-	@Override
-	public String typename() {
-		return "Vector3";
+	public static Vector3 up() {
+		return Vector3.newInstance(0, 0, 1);
+	}
+	
+	public static Vector3 down() {
+		return Vector3.newInstance(0, 0, -1);
+	}
+	
+	public static Vector3 left() {
+		return Vector3.newInstance(-1, 0, 0);
+	}
+	
+	public static Vector3 right() {
+		return Vector3.newInstance(1, 0, 0);
+	}
+	
+	public static Vector3 forward() {
+		return Vector3.newInstance(0, 1, 0);
+	}
+	
+	public static Vector3 backward() {
+		return Vector3.newInstance(0, -1, 0);
+	}
+	
+	public float getX() {
+		return internal.x;
 	}
 
-	@Override
-	protected LuaValue onValueSet(LuaValue key, LuaValue value) {
-		if ( unit == null ) {
-			return null;
-		}
-
-		// If X or Y is changed. Update the Unit Vector
-		if ( key.eq_b(C_X) || key.eq_b(C_Y) || key.eq_b(C_Z) ) {
-			modified = true;
-		}
-
-		return value;
+	public float getY() {
+		return internal.y;
 	}
 
-	@Override
-	protected boolean onValueGet(LuaValue key) {
-		String keyName = key.toString();
-		if ( keyName.equals("Unit") || keyName.equals("Magnitude") ) {
-			if ( modified ) {
-				modified = false;
-				float X = getX();
-				float Y = getY();
-				float Z = getZ();
-				mag = Math.sqrt(X*X+Y*Y+Z*Z);
-				this.rawset("Magnitude", LuaValue.valueOf(mag));
-				if ( unit != null ) {
-					unit.rawset(C_X, LuaValue.valueOf(X / mag));
-					unit.rawset(C_Y, LuaValue.valueOf(Y / mag));
-					unit.rawset(C_Z, LuaValue.valueOf(Z / mag));
-					this.rawset("Unit", unit);
-				} else {
-					this.rawset("Unit", this);
-				}
-			}
-		}
-		return true;
-	}
-
-	public Vector3f toJoml() {
-		return new Vector3f(getX(), getY(), getZ());
+	public float getZ() {
+		return internal.z;
 	}
 	
 	public String toString() {
@@ -234,19 +165,60 @@ public class Vector3 extends LuaValuetype {
 	public LuaValue tostring() {
 		return LuaValue.valueOf(typename()+":("+toString()+")");
 	}
-	
-	public LuaValuetype fromString(String input) {
-		String[] t = input.replace(" ", "").split(",");
-		if ( t.length != 3 )
-			return this;
-		
-		Vector3f vec = new Vector3f();
-		vec.x = (float) Double.parseDouble(t[0]);
-		vec.y = (float) Double.parseDouble(t[1]);
-		vec.z = (float) Double.parseDouble(t[2]);
-		
-		this.setInternal(vec);
-		return this;
+
+	private static Vector3 newInstance(double x, double y, double z) {
+		Vector3f internal = new Vector3f((float)x, (float)y, (float)z);
+		return new Vector3(internal);
+	}
+
+	@Override
+	protected void onRegister(LuaTable table) {
+		table.set("up", new ZeroArgFunction() {
+			@Override
+			public LuaValue call() {
+				return up();
+			}
+		});
+		table.set("down", new ZeroArgFunction() {
+			@Override
+			public LuaValue call() {
+				return down();
+			}
+		});
+		table.set("left", new ZeroArgFunction() {
+			@Override
+			public LuaValue call() {
+				return left();
+			}
+		});
+		table.set("right", new ZeroArgFunction() {
+			@Override
+			public LuaValue call() {
+				return right();
+			}
+		});
+		table.set("forward", new ZeroArgFunction() {
+			@Override
+			public LuaValue call() {
+				return forward();
+			}
+		});
+		table.set("backward", new ZeroArgFunction() {
+			@Override
+			public LuaValue call() {
+				return backward();
+			}
+		});
+	}
+
+	@Override
+	protected LuaValue newInstanceFunction() {
+		return new ThreeArgFunction() {
+			@Override
+			public LuaValue call(LuaValue arg1, LuaValue arg2, LuaValue arg3) {
+				return newInstance(arg1.todouble(), arg2.todouble(), arg3.todouble());
+			}
+		};
 	}
 
 	@SuppressWarnings("unchecked")
@@ -261,14 +233,72 @@ public class Vector3 extends LuaValuetype {
 	
 	public static Vector3 fromJSON(JSONObject json) {
 		return newInstance(
-				(float)((Double)json.get("X")).doubleValue(),
-				(float)((Double)json.get("Y")).doubleValue(),
-				(float)((Double)json.get("Z")).doubleValue()
-				);
+			((Double)json.get("X")).doubleValue(),
+			((Double)json.get("Y")).doubleValue(),
+			((Double)json.get("Z")).doubleValue()
+		);
+	}
+	
+	@Override
+	public LuaValuetype fromString(String input) {
+		String[] t = input.replace(" ", "").split(",");
+		if ( t.length != 3 )
+			return this;
+		
+		Vector3 vec = new Vector3(new Vector3f(
+				(float) Double.parseDouble(t[0]),
+				(float) Double.parseDouble(t[1]),
+				(float) Double.parseDouble(t[2])
+		));
+		return vec;
 	}
 
 	@Override
 	public LuaValuetype clone() {
 		return newInstance(getX(), getY(), getZ());
+	}
+
+	@Override
+	protected LuaValue onValueSet(LuaValue key, LuaValue value) {
+		return null; // Unmodifiable
+	}
+
+	@Override
+	protected boolean onValueGet(LuaValue key) {
+		String keyName = key.toString();
+		if ( keyName.equals(C_UNIT.toString()) || keyName.equals(C_MAGNITUDE.toString()) ) {
+			if ( modified ) {
+				modified = false;
+				
+				// Compute magnitude
+				float magnitude = internal.length();
+				this.rawset(C_MAGNITUDE, LuaValue.valueOf(magnitude));
+				
+				// Compute unit vector
+				this.rawset(C_UNIT, new Vector3(new Vector3f(
+						getX() / magnitude,
+						getY() / magnitude,
+						getZ() / magnitude
+				)));
+			}
+		}
+		
+		return true;
+	}
+
+	public Vector3f toJoml() {
+		return new Vector3f(internal);
+	}
+
+	public void setInternal(Vector3f internal) {
+		this.rawset(C_X, LuaValue.valueOf(internal.x));
+		this.rawset(C_Y, LuaValue.valueOf(internal.y));
+		this.rawset(C_Z, LuaValue.valueOf(internal.z));
+		this.internal.set(internal);
+		modified = true;
+	}
+
+	public Vector3 getUnit() {
+		return (Vector3)this.get(C_UNIT);
 	}
 }

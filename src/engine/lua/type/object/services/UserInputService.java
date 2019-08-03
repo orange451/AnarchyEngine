@@ -117,7 +117,7 @@ public class UserInputService extends Service implements TreeViewable {
 			backward.add(right, newVelocity).normalize();
 		}
 
-		return new Vector3().setInternal(newVelocity);
+		return new Vector3(newVelocity);
 	}
 	
 	private Vector3f calculateDirectionVector( float yaw, float pitch ) {

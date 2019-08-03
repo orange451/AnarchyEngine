@@ -53,6 +53,8 @@ public class Game implements Tickable {
 	
 	private static HashMap<Long,Instance> createdInstances = new HashMap<Long,Instance>();
 	private static AtomicLong instanceCounter = new AtomicLong(0);
+	
+	public static final String VERSION = "0.5a";
 
 	protected boolean isServer = true;
 	
@@ -540,7 +542,7 @@ public class Game implements Tickable {
 	}
 	
 	public static String version() {
-		return "0.5a";
+		return VERSION;
 	}
 
 	public static LuaEvent loadEvent() {

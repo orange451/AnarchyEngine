@@ -30,8 +30,8 @@ public class Camera extends Instance implements TreeViewable {
 		this.defineField("CameraType",  LuaValue.valueOf("Free"), false);
 		this.getField("CameraType").setEnum(new EnumType("CameraType"));
 		
-		this.defineField(C_POSITION.toString(),	Vector3.newInstance(0, 0, 0), false);
-		this.defineField(C_LOOKAT.toString(),	Vector3.newInstance(0, 0, 0), false);
+		this.defineField(C_POSITION.toString(),	new Vector3(), false);
+		this.defineField(C_LOOKAT.toString(),	new Vector3(), false);
 		this.defineField(C_PITCH.toString(),	LuaValue.valueOf(0), false);
 		this.defineField(C_YAW.toString(),		LuaValue.valueOf(0), false);
 		
@@ -41,15 +41,13 @@ public class Camera extends Instance implements TreeViewable {
 		this.defineField(C_VIEWMATRIX.toString(),	new Matrix4(), false);
 		
 		// Default override
-		this.set(C_LOOKAT, Vector3.newInstance(0, 0, 0));
-		this.set(C_POSITION, Vector3.newInstance(4, 4, 4));
+		this.set(C_LOOKAT, new Vector3(0, 0, 0));
+		this.set(C_POSITION, new Vector3(4, 4, 4));
 		
 		this.getmetatable().set("GetLookVector", new ZeroArgFunction() {
 			@Override
 			public LuaValue call() {
-				Vector3 ret = Vector3.newInstance(getLookAt());
-				ret = (Vector3) ret.sub(getPosition());
-				return ret.getUnit();
+				return ((Vector3) getLookAt().sub(getPosition())).getUnit();
 			}
 		});
 		
@@ -62,8 +60,8 @@ public class Camera extends Instance implements TreeViewable {
 				Vector3 t1 = (Vector3) current1.add(offset);
 				Vector3 t2 = (Vector3) current2.add(offset);
 				
-				Camera.this.setPosition(Vector3.newInstance(t1));
-				Camera.this.setLookAt(Vector3.newInstance(t2));
+				Camera.this.setPosition(t1);
+				Camera.this.setLookAt(t2);
 				return null;
 			}
 		});
@@ -169,8 +167,8 @@ public class Camera extends Instance implements TreeViewable {
 			Vector3f t = view.invert(new Matrix4f()).getTranslation(new Vector3f());
 			Vector3f l = new Vector3f(0,0,dist).mulProject(view);
 
-			this.rawset(C_POSITION, Vector3.newInstance(t.x, t.x, t.z));
-			this.set(C_LOOKAT, Vector3.newInstance(l.x, l.y, l.z));
+			this.rawset(C_POSITION, new Vector3(t));
+			this.set(C_LOOKAT, new Vector3(l));
 		}
 		
 		// If lookat/position is changed, recalculate view matrix
@@ -202,7 +200,7 @@ public class Camera extends Instance implements TreeViewable {
 			float lookY = position.y + (float) (Math.sin(yaw) * Math.cos(pitch)) * dist;
 			float lookZ = position.z + (float) Math.sin(pitch) * dist;
 
-			this.rawset(C_LOOKAT, Vector3.newInstance(lookX, lookY, lookZ));
+			this.rawset(C_LOOKAT, new Vector3(lookX, lookY, lookZ));
 			updateMatrix();
 		}
 	}

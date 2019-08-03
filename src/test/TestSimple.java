@@ -125,8 +125,8 @@ public class TestSimple extends ClientApplication {
 				float xx = (float) (Math.cos(t) * CAMERA_DIST);
 				float yy = (float) (Math.sin(t) * CAMERA_DIST);
 
-				Game.workspace().getCurrentCamera().setPosition(Vector3.newInstance(xx,yy,CAMERA_DIST*0.75f));
-				Game.workspace().getCurrentCamera().setLookAt(Vector3.newInstance(0, 0, 0));
+				Game.workspace().getCurrentCamera().setPosition(new Vector3(xx,yy,CAMERA_DIST*0.75f));
+				Game.workspace().getCurrentCamera().setLookAt(new Vector3(0, 0, 0));
 			}
 		});
 	}

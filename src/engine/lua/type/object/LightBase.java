@@ -16,7 +16,7 @@ public abstract class LightBase extends Instance implements Positionable {
 	public LightBase(String typename) {
 		super(typename);
 
-		this.defineField("Position", Vector3.newInstance(0, 0, 0), false);
+		this.defineField("Position", new Vector3(), false);
 		
 		this.defineField("Intensity", LuaValue.valueOf(1), false);
 		this.getField("Intensity").setClamp(new NumberClampPreferred(0, 100, 0, 8));
@@ -61,7 +61,7 @@ public abstract class LightBase extends Instance implements Positionable {
 	}
 
 	public void setPosition(int x, int y, int z) {
-		this.set("Position", Vector3.newInstance(x, y, z));
+		this.set("Position", new Vector3(x, y, z));
 	}
 	
 	public void setPosition(Vector3 position) {

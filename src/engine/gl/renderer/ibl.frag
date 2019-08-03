@@ -55,7 +55,7 @@ void main(void) {
 	vec3 final = kD + mix( radiance, kD * radiance, metallic ) * (0.05+reflectiveness);
 	
 	// Scale based on ambient
-	final = final*uAmbient;
+	final = final*((1.0+uAmbient)/8.0);
 	
 	// Fresnel
 	float fresnel = calculateFresnel( L, N, roughness, metallic, reflectiveness );

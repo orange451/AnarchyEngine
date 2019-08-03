@@ -41,7 +41,7 @@ public class Matrix4 extends LuaValuetype {
 	public Matrix4(Matrix4f internal) {
 		this.internal = new Matrix4f(internal);
 		
-		this.defineField("P", Vector3.newInstance(0,0,0), false);
+		this.defineField("P", new Vector3(), false);
 		update();
 
 		// Create ToString function
@@ -74,7 +74,7 @@ public class Matrix4 extends LuaValuetype {
 					Vector3 right2 = (Vector3)right;
 					
 					Vector3f vec = new Vector3f(right2.toJoml()).mulProject(left2.internal);
-					Vector3 newVec = Vector3.newInstance(vec.x,vec.y,vec.z);
+					Vector3 newVec = new Vector3(vec);
 					return newVec;
 				}
 				LuaValue.error("Cannot multiply");
