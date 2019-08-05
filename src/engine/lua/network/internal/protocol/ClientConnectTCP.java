@@ -1,4 +1,4 @@
-package engine.lua.network.internal;
+package engine.lua.network.internal.protocol;
 
 public class ClientConnectTCP {
 	public final String username;

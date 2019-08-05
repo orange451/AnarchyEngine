@@ -1,4 +1,6 @@
-package engine.lua.network.internal;
+package engine.lua.network.internal.protocol;
+
+import engine.lua.network.internal.ClientProcessable;
 
 public class TestProtocol implements ClientProcessable {
 	public String var = "Yay!";

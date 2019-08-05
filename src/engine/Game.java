@@ -510,7 +510,7 @@ public class Game implements Tickable {
 				sc.forceSetParent(p);
 				
 				// Set him as local
-				new engine.lua.network.internal.ClientConnectFinishTCP().clientProcess();
+				new engine.lua.network.internal.protocol.ClientConnectFinishTCP().clientProcess();
 			}
 			
 			Game.runLater(()->{

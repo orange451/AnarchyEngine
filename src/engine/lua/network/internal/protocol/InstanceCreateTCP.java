@@ -1,4 +1,4 @@
-package engine.lua.network.internal;
+package engine.lua.network.internal.protocol;
 
 import java.util.Set;
 
@@ -7,6 +7,8 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.luaj.vm2.LuaValue;
 
+import engine.lua.network.internal.ClientProcessable;
+import engine.lua.network.internal.PacketUtility;
 import engine.lua.type.object.Instance;
 
 public class InstanceCreateTCP implements ClientProcessable {

@@ -10,8 +10,13 @@ import engine.lua.type.LuaValuetype;
 import engine.lua.type.object.Instance;
 
 public class PacketUtility {
+	/**
+	 * Serializes a field to a JSON value.
+	 * @param luaValue
+	 * @return
+	 */
 	@SuppressWarnings("unchecked")
-	protected static Object fieldToJSON(LuaValue luaValue) {
+	public static Object fieldToJSON(LuaValue luaValue) {
 		if ( luaValue.isstring() )
 			return luaValue.toString();
 		if ( luaValue.isboolean() )
@@ -43,7 +48,12 @@ public class PacketUtility {
 		return null;
 	}
 	
-	protected static LuaValue JSONToField(Object t) {
+	/**
+	 * Deserializes a field from a JSON value.
+	 * @param t
+	 * @return
+	 */
+	public static LuaValue JSONToField(Object t) {
 		if ( t == null ) {
 			return LuaValue.NIL;
 		}

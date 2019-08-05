@@ -1,6 +1,7 @@
-package engine.lua.network.internal;
+package engine.lua.network.internal.protocol;
 
 import engine.Game;
+import engine.lua.network.internal.ClientProcessable;
 import engine.lua.type.object.Instance;
 
 public class InstanceDestroyTCP implements ClientProcessable {

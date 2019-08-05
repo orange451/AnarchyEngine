@@ -1,21 +1,18 @@
 package engine.lua.network;
 
 import com.esotericsoftware.kryo.Kryo;
-import com.esotericsoftware.minlog.Log;
 
-import engine.lua.network.internal.ClientConnectFinishTCP;
-import engine.lua.network.internal.ClientConnectTCP;
-import engine.lua.network.internal.ClientLoadMapTCP;
-import engine.lua.network.internal.InstanceCreateTCP;
-import engine.lua.network.internal.InstanceDestroyTCP;
-import engine.lua.network.internal.InstanceUpdateUDP;
 import engine.lua.network.internal.PingRequest;
-import engine.lua.network.internal.TestProtocol;
+import engine.lua.network.internal.protocol.ClientConnectFinishTCP;
+import engine.lua.network.internal.protocol.ClientConnectTCP;
+import engine.lua.network.internal.protocol.ClientLoadMapTCP;
+import engine.lua.network.internal.protocol.InstanceCreateTCP;
+import engine.lua.network.internal.protocol.InstanceDestroyTCP;
+import engine.lua.network.internal.protocol.InstanceUpdateUDP;
+import engine.lua.network.internal.protocol.TestProtocol;
 
 public class InternalRegister {
 	public static void register(Kryo kryo) {
-		Log.set(Log.LEVEL_WARN);
-		
 		kryo.register(String.class);
 		
 		kryo.register(ClientConnectTCP.class);

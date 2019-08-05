@@ -15,11 +15,11 @@ import engine.Game;
 import engine.InternalGameThread;
 import engine.InternalRenderThread;
 import engine.io.Load;
-import engine.lua.network.internal.ClientConnectFinishTCP;
-import engine.lua.network.internal.ClientConnectTCP;
-import engine.lua.network.internal.ClientLoadMapTCP;
 import engine.lua.network.internal.ClientProcessable;
 import engine.lua.network.internal.PingRequest;
+import engine.lua.network.internal.protocol.ClientConnectFinishTCP;
+import engine.lua.network.internal.protocol.ClientConnectTCP;
+import engine.lua.network.internal.protocol.ClientLoadMapTCP;
 import engine.lua.type.object.services.Connections;
 import ide.layout.windows.ErrorWindow;
 

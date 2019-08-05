@@ -1,4 +1,4 @@
-package engine.lua.network.internal;
+package engine.lua.network.internal.protocol;
 
 public class ClientLoadMapTCP {
 	public String data;

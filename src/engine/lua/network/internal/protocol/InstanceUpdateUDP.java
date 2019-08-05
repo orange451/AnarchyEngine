@@ -1,4 +1,4 @@
-package engine.lua.network.internal;
+package engine.lua.network.internal.protocol;
 
 import java.util.List;
 
@@ -8,6 +8,9 @@ import org.json.simple.parser.ParseException;
 import org.luaj.vm2.LuaValue;
 
 import engine.Game;
+import engine.lua.network.internal.ClientProcessable;
+import engine.lua.network.internal.PacketUtility;
+import engine.lua.network.internal.ServerProcessable;
 import engine.lua.type.object.Instance;
 import engine.lua.type.object.insts.GameObject;
 import engine.lua.type.object.insts.PhysicsObject;

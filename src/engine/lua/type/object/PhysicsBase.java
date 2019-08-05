@@ -10,7 +10,7 @@ import engine.GameSubscriber;
 import engine.lua.lib.EnumType;
 import engine.lua.network.InternalClient;
 import engine.lua.network.InternalServer;
-import engine.lua.network.internal.InstanceUpdateUDP;
+import engine.lua.network.internal.protocol.InstanceUpdateUDP;
 import engine.lua.type.LuaConnection;
 import engine.lua.type.NumberClamp;
 import engine.lua.type.NumberClampPreferred;
