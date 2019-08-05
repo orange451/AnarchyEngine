@@ -191,13 +191,13 @@ public class AnimationData extends Instance implements TreeViewable {
 							entryK.getValue().position.mValue().x(),
 							entryK.getValue().position.mValue().y(),
 							entryK.getValue().position.mValue().z()
-						);
+					);
 					offsetMatrix.rotate(
 							entryK.getValue().rotation.mValue().w(),
 							entryK.getValue().rotation.mValue().x(),
 							entryK.getValue().rotation.mValue().y(),
 							entryK.getValue().rotation.mValue().z()
-						);
+					);
 					
 					AnimationKeyframe keyframe = new AnimationKeyframe();
 					keyframe.forceset("Bone", entryK.getKey());

@@ -37,11 +37,17 @@ public class AnimationController extends Instance {
 		});
 		
 		// Handle animations
-		Game.loadEvent().connect((a)->{
+		if ( !Game.isLoaded() ) {
+			Game.startEvent().connect((a)->{
+				animationUpdator = Game.runService().heartbeatEvent().connect((args)->{
+					animate(args[0].checkdouble());
+				});
+			});
+		} else {
 			animationUpdator = Game.runService().heartbeatEvent().connect((args)->{
 				animate(args[0].checkdouble());
 			});
-		});
+		}
 	}
 
 	@Override
@@ -152,9 +158,9 @@ public class AnimationController extends Instance {
 			if ( keyframeBone != null && keyframeBone instanceof AnimationKeyframe ) {
 				Instance bone = ((Instance)((Instance)((Instance)keyframe.getParent()).getParent()).getParent()).findFirstChild("Bones").findFirstChild(keyframeBone.getName());
 				if ( bone != null && bone instanceof Bone ) {
-					worldMatrix = new Matrix4f(worldMatrix);
-					worldMatrix.mul(((AnimationKeyframe)keyframeBone).getMatrixJOML());
+					worldMatrix = new Matrix4f();
 					worldMatrix.mul(((Bone)bone).getOffsetMatrix().getInternal());
+					worldMatrix.mul(((AnimationKeyframe)keyframeBone).getMatrixJOML());
 					Resources.MESH_CUBE.render(shader, worldMatrix, Resources.MATERIAL_BLANK);
 				}
 			}
