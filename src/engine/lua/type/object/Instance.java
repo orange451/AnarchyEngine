@@ -112,6 +112,28 @@ public abstract class Instance extends DataModel {
 			}
 		});
 		
+		this.getmetatable().set("WaitForChildOfClass", new ThreeArgFunction() {
+			@Override
+			public LuaValue call(LuaValue root, LuaValue child, LuaValue time) {
+				long start = System.currentTimeMillis();
+				int t = (int) (time.isnil()?5000:(time.checkdouble()*1000));
+				while ( System.currentTimeMillis()-start < t ) {
+					Instance c = findFirstChildOfClass(child.toString());
+					if ( c == null ) {
+						try {
+							Thread.sleep(5);
+						} catch (InterruptedException e) {
+							//
+						}
+					} else {
+						return c;
+					}
+				}
+				LuaEngine.error("Cancelling wait for child loop. Time not specified & taking too long.");
+				return LuaValue.NIL;
+			}
+		});
+		
 		this.getmetatable().set("FindFirstChild", new TwoArgFunction() {
 			@Override
 			public LuaValue call(LuaValue root, LuaValue arg) {
