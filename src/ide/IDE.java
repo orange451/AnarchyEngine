@@ -21,7 +21,7 @@ public class IDE extends RenderableApplication {
 	public static IdeLayout layout;
 	public static Window win;
 	
-	public static final String TITLE = "Anarchy Engine - Build 0.4";
+	public static final String TITLE = "Anarchy Engine - Build " + Game.version();
 	
 	@Override
 	public void initialize(String[] args) {

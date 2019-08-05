@@ -63,6 +63,7 @@ public class PlayerPhysics extends PhysicsBase implements TreeViewable {
 			if ( body != null ) {
 				body.setSleepingThresholds( 0.0f, 0.0f );
 				body.setFriction(0);
+				body.setAngularFactor(0);
 			}
 			
 			float zOff = (this.getHeight()/2f) - this.getStepHeight();
@@ -76,7 +77,6 @@ public class PlayerPhysics extends PhysicsBase implements TreeViewable {
 			
 			if ( this.isOnGround() ) {
 				float scale = (float)Math.pow(1f - this.getFriction(), InternalGameThread.delta);
-				//System.out.println(scale);
 				Vector3f newVel = this.physics.getVelocity().mul(scale, scale, 1);
 				this.setVelocity(newVel);
 			}
