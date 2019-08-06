@@ -122,6 +122,10 @@ public class Vector3 extends LuaValuetype {
 		}
 	}
 
+	public static Vector3 zero() {
+		return Vector3.newInstance(0, 0, 0);
+	}
+	
 	public static Vector3 up() {
 		return Vector3.newInstance(0, 0, 1);
 	}

@@ -3,7 +3,9 @@ package engine.lua.type.object.insts;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.luaj.vm2.LuaValue;
+import org.luaj.vm2.Varargs;
 import org.luaj.vm2.lib.TwoArgFunction;
+import org.luaj.vm2.lib.VarArgFunction;
 import org.luaj.vm2.lib.ZeroArgFunction;
 
 import engine.Game;
@@ -54,14 +56,7 @@ public class Camera extends Instance implements TreeViewable {
 		this.getmetatable().set("Translate", new TwoArgFunction() {
 			@Override
 			public LuaValue call(LuaValue myself, LuaValue arg2) {
-				Vector3 offset = (Vector3)arg2;
-				Vector3 current1 = Camera.this.getPosition();
-				Vector3 current2 = Camera.this.getLookAt();
-				Vector3 t1 = (Vector3) current1.add(offset);
-				Vector3 t2 = (Vector3) current2.add(offset);
-				
-				Camera.this.setPosition(t1);
-				Camera.this.setLookAt(t2);
+				Camera.this.translate((Vector3)arg2);
 				return null;
 			}
 		});
@@ -69,23 +64,69 @@ public class Camera extends Instance implements TreeViewable {
 		this.getmetatable().set("MoveTo", new TwoArgFunction() {
 			@Override
 			public LuaValue call(LuaValue myself, LuaValue arg2) {
-				Vector3 position = (Vector3)arg2;
-				Vector3 lookAt = Camera.this.getLookAt();
-				Vector3 offset = (Vector3) Camera.this.getPosition().sub(position);
-				Vector3 t2 = (Vector3) lookAt.add(offset);
-				
-				float yaw = Camera.this.getYaw();
-				float pitch = Camera.this.getPitch();
-				
-				Camera.this.rawset(C_POSITION,position);
-				Camera.this.rawset(C_LOOKAT,t2.clone());
-				Camera.this.setPosition(position);
-				Camera.this.setYaw(yaw);
-				Camera.this.setPitch(pitch);
+				moveTo((Vector3)arg2);
+				return null;
+			}
+		});
+		
+		this.getmetatable().set("Orbit", new VarArgFunction() {
+			@Override
+			public LuaValue invoke(Varargs args) {
+				Camera.this.orbit((Vector3)args.arg(2), (float)args.arg(3).checkdouble(), (float)args.arg(4).checkdouble(), (float)args.arg(5).checkdouble());
 				return null;
 			}
 		});
 		updateMatrix();
+	}
+	
+	/**
+	 * Moves the camera to the specified absolute position. Keeps the look-at vector relatively the same.
+	 * @param position
+	 */
+	public void moveTo(Vector3 position) {
+		Vector3 lookAt = Camera.this.getLookAt();
+		Vector3 offset = (Vector3) Camera.this.getPosition().sub(position);
+		Vector3 t2 = (Vector3) lookAt.add(offset);
+		
+		float yaw = Camera.this.getYaw();
+		float pitch = Camera.this.getPitch();
+		
+		Camera.this.rawset(C_POSITION,position);
+		Camera.this.rawset(C_LOOKAT,t2.clone());
+		Camera.this.setPosition(position);
+		Camera.this.setYaw(yaw);
+		Camera.this.setPitch(pitch);
+	}
+
+	/**
+	 * Translates both the camera position and look at by the specified amount.
+	 * @param offset
+	 */
+	public void translate(Vector3 offset) {
+		Vector3 current1 = Camera.this.getPosition();
+		Vector3 current2 = Camera.this.getLookAt();
+		Vector3 t1 = (Vector3) current1.add(offset);
+		Vector3 t2 = (Vector3) current2.add(offset);
+		
+		Camera.this.setPosition(t1);
+		Camera.this.setLookAt(t2);
+	}
+	
+	/**
+	 * Orbits the camera around the origin by a supplied distance, pitch, and yaw.
+	 * @param origin
+	 * @param distance
+	 * @param yaw
+	 * @param f
+	 */
+	public void orbit(Vector3 origin, float distance, float yaw, float pitch) {
+		yaw += Math.PI/2f;
+		float xx = (float) (Math.cos(yaw) * Math.cos(pitch) * distance);
+		float yy = (float) (Math.sin(yaw) * Math.cos(pitch) * distance);
+		float zz = (float) (Math.sin(pitch) * distance);
+		
+		this.setPosition(new Vector3(xx, yy, zz));
+		this.setLookAt(Vector3.zero());
 	}
 
 	@Override
