@@ -70,7 +70,9 @@ public class InternalClient extends Client {
 								InternalRenderThread.runLater(()->{
 									// Load new game data
 									Game.unload();
-									Load.parseJSON(obj);
+									if ( !Load.parseJSON(obj) )
+										return;
+									Game.load();
 									
 									// Create connection object
 									connectionInstance = new engine.lua.type.object.insts.Connection(connection);

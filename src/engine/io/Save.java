@@ -40,7 +40,7 @@ import lwjgui.scene.layout.StackPane;
 import lwjgui.theme.Theme;
 
 public class Save {
-	private static int REFID = 0;
+	private static long REFID = Integer.MAX_VALUE;
 	private static ArrayList<SavedInstance> inst;
 
 	public static void requestSave(Runnable after) {
@@ -183,12 +183,44 @@ public class Save {
 		return true;
 	}
 	
+	/**
+	 * Returns the entire game represented as a JSON Object.
+	 * @return
+	 */
 	public static JSONObject getGameJSON() {
+		return getInstanceJSONRecursive(Game.game());
+	}
+	
+	/**
+	 * Returns the instance and all of its children represented as JSON Objects.
+	 * @param instance
+	 * @return
+	 */
+	public static JSONObject getInstanceJSONRecursive(Instance instance) {
 		JSONObject ret = null;
 		try {
-			Instance game = (Instance)Game.game();
-			inst = getSavedInstances(game);
+			inst = getSavedInstances(instance);
 			ret = inst.get(0).toJSON();
+		} catch(Exception e ) {
+			e.printStackTrace();
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 * Returns the instance represented as a JSON Object.
+	 * @param instance
+	 * @return
+	 */
+	public static JSONObject getInstanceJSON(Instance instance) {
+		JSONObject ret = null;
+		try {
+			
+			if ( !instance.isArhivable() )
+				return ret;
+
+			ret = new SavedInstance(instance).toJSON();
 		} catch(Exception e ) {
 			e.printStackTrace();
 		}
@@ -222,7 +254,11 @@ public class Save {
 
 		public SavedInstance(Instance child) {
 			this.instance = child;
-			this.reference = new SavedReference(REFID++);
+			long refId = child.getSID();
+			if ( child.getSID() == -1 )
+				refId = REFID++;
+			
+			this.reference = new SavedReference(refId);
 		}
 
 		@SuppressWarnings("unchecked")
@@ -277,7 +313,7 @@ public class Save {
 	@SuppressWarnings("serial")
 	static class SavedReference extends JSONObject {
 		@SuppressWarnings("unchecked")
-		public SavedReference(int ref) {
+		public SavedReference(long ref) {
 			this.put("Type", "Reference");
 			this.put("Value", ref);
 		}

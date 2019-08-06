@@ -69,13 +69,23 @@ public class Load {
 		Game.unload();
 		
 		// Load the json
-		parseJSON(obj);
+		if ( !parseJSON(obj) )
+			return;
+		
+		// Tell game we're loaded
+		Game.load();
 	}
 	
-	public static void parseJSON(JSONObject obj) {
+	/**
+	 * Desearializes a JSONObject into Instances.
+	 * @param obj
+	 */
+	public static boolean parseJSON(JSONObject... obj) {
 		// Read in the objects from JSON
 		instances = new ArrayList<LoadedInstance>();
-		readObjects(obj);
+		for ( int i = 0; i < obj.length; i++) {
+			readObjects(obj[i]);
+		}
 		
 		try {
 			// Load in services first
@@ -99,20 +109,21 @@ public class Load {
 				int parent = inst.Parent;
 
 				if ( parent != -1 && inst.loaded ) {
-					LoadedInstance p = getInstanceFromReference(parent);
-					if ( !inst.instance.getParent().equals(p.instance) ) {
-						inst.instance.forceSetParent(p.instance);
+					Instance p = getInstanceFromReference(parent);
+					//if ( !inst.instance.getParent().equals(p) ) {
+						inst.instance.forceSetParent(p);
 						//System.out.println("Setting parent of: " + inst.instance + "\tto\t" + p.instance);
-					}
+					//}
 				}
 			}
 			
-			// Tell game we're loaded
-			Game.load();
+			return true;
 		} catch(Exception e ) {
 			e.printStackTrace();
 			new ErrorWindow("There was a problem reading this file. 002");
 		}
+		
+		return false;
 	}
 
 	private static void loadObject(LoadedInstance inst) {
@@ -135,7 +146,7 @@ public class Load {
 			Object value = p.getValue();
 			if ( p.pointer ) {
 				int pointer = ((Integer) value).intValue();
-				value = getInstanceFromReference(pointer).instance;
+				value = getInstanceFromReference(pointer);
 			}
 			
 			if ( value != null ) {
@@ -194,14 +205,16 @@ public class Load {
 		return -1;
 	}
 	
-	protected static LoadedInstance getInstanceFromReference(int ref) {
+	protected static Instance getInstanceFromReference(int ref) {
+		// First search "temporary" instances
 		for (int i = 0; i < instances.size(); i++) {
 			if ( instances.get(i).Reference == ref ) {
-				return instances.get(i);
+				return instances.get(i).instance;
 			}
 		}
 		
-		return null;
+		// Now search for instance by SID if it wasn't found before.
+		return Game.getInstanceFromSID(ref);
 	}
 	
 	static class LoadedInstance {
