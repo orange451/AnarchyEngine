@@ -29,8 +29,6 @@ public class ServerApplication extends Runner {
 		// Load the desired scene file
 		if ( args.length == 1 ) {
 			Load.load(args[0]);
-		} else {
-			//Game.load();
 		}
 	}
 

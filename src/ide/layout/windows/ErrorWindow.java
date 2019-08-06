@@ -40,6 +40,8 @@ public class ErrorWindow {
 	public ErrorWindow(String string, boolean fatal) {
 		fatalError = fatal;
 		
+		System.out.println("Creating error window ("+RenderableApplication.GLFW_INITIALIZED+") " + string);
+		
 		if ( RenderableApplication.GLFW_INITIALIZED ) {
 			errorLWJGUI(string);
 		} else {

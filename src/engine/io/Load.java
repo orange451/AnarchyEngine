@@ -52,7 +52,7 @@ public class Load {
 			obj = (JSONObject) parser.parse(new FileReader(path));
 			loadedJSON = true;
 		} catch (Exception e) {
-			e.printStackTrace();
+			//e.printStackTrace();
 			new ErrorWindow("There was a problem reading this file. 001");
 		}
 		

@@ -213,10 +213,10 @@ public abstract class RenderableApplication extends Application implements Rende
 
 		// Start thread
 		try {
+			GLFW_INITIALIZED = true;
 			internalInitialize();
 			initialize(args);
 			initialized = true;
-			GLFW_INITIALIZED = true;
 			Resources.initialize();
 		} catch(Exception e) {
 			e.printStackTrace();

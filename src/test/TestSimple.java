@@ -8,6 +8,7 @@ import engine.application.impl.ClientApplication;
 import engine.lua.RunnableArgs;
 import engine.lua.type.data.Color3;
 import engine.lua.type.data.Vector3;
+import engine.lua.type.object.insts.Camera;
 import engine.lua.type.object.insts.GameObject;
 import engine.lua.type.object.insts.Material;
 import engine.lua.type.object.insts.Mesh;
@@ -104,30 +105,26 @@ public class TestSimple extends ClientApplication {
 		// Mark the camera as scriptable (no built-in camera controls)
 		Game.workspace().getCurrentCamera().setCameraType("Scriptable");
 		
-		// Camera controller
-		Game.runService().renderSteppedEvent().connect( new RunnableArgs() {
+		// Camera controller new
+		Game.runService().renderSteppedEvent().connect( (params) -> {
+			double delta = params[0].todouble();
 			final int CAMERA_DIST = 2;
-			double t = Math.PI/2f;
 			
-			@Override
-			public void run(LuaValue[] args) {
-				double delta = args[0].todouble();
-				
-				// Get direction value
-				int d = 0;
-				if ( Game.userInputService().isKeyDown(GLFW.GLFW_KEY_E) )
-					d++;
-				if ( Game.userInputService().isKeyDown(GLFW.GLFW_KEY_Q) )
-					d--;
-				t += d*delta;
-				
-				// Rotate the camera based on the direction
-				float xx = (float) (Math.cos(t) * CAMERA_DIST);
-				float yy = (float) (Math.sin(t) * CAMERA_DIST);
-
-				Game.workspace().getCurrentCamera().setPosition(new Vector3(xx,yy,CAMERA_DIST*0.75f));
-				Game.workspace().getCurrentCamera().setLookAt(new Vector3(0, 0, 0));
-			}
+			// Get turn direction
+			int d = 0;
+			if ( Game.userInputService().isKeyDown(GLFW.GLFW_KEY_E) )
+				d++;
+			if ( Game.userInputService().isKeyDown(GLFW.GLFW_KEY_Q) )
+				d--;
+			
+			// Get the camera
+			Camera camera = Game.workspace().getCurrentCamera();
+			float yaw = camera.getYaw();
+			
+			// Rotate camera
+			yaw += (d) * delta;
+			camera.orbit( Vector3.zero(), CAMERA_DIST, yaw, 0.25f );
+			
 		});
 	}
 	
