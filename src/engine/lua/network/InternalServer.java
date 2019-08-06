@@ -10,6 +10,7 @@ import com.esotericsoftware.kryonet.Server;
 import engine.Game;
 import engine.InternalGameThread;
 import engine.io.Save;
+import engine.lua.network.internal.GZIPUtil;
 import engine.lua.network.internal.PingRequest;
 import engine.lua.network.internal.ServerProcessable;
 import engine.lua.network.internal.protocol.ClientConnectFinishTCP;
@@ -64,6 +65,7 @@ public class InternalServer extends Server {
 					
 					// Stream game to client
 					String gameJSON = Save.getGameJSON().toJSONString();
+					gameJSON = GZIPUtil.compress(gameJSON);
 					String[] strings = gameJSON.split("(?<=\\G.{"+CHUNK_SIZE+"})");
 					connection.sendTCP(new ClientLoadMapTCP()); // Mark client as "loading map" state.
 					new Thread(new Runnable() {

@@ -16,6 +16,7 @@ import engine.InternalGameThread;
 import engine.InternalRenderThread;
 import engine.io.Load;
 import engine.lua.network.internal.ClientProcessable;
+import engine.lua.network.internal.GZIPUtil;
 import engine.lua.network.internal.PingRequest;
 import engine.lua.network.internal.protocol.ClientConnectFinishTCP;
 import engine.lua.network.internal.protocol.ClientConnectTCP;
@@ -60,6 +61,9 @@ public class InternalClient extends Client {
 						if ( !loadPacket.finished ) {
 							blockUpdates = true;
 						} else if ( loadPacket.finished && worldJSON != null ) {
+							
+							// Decompress...
+							worldJSON = GZIPUtil.decompress(worldJSON);
 							System.out.println("Loaded world...");
 							System.out.println(worldJSON);
 							
