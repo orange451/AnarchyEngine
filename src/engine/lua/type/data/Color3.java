@@ -48,6 +48,18 @@ public class Color3 extends LuaValuetype {
 	public static Color3 black() {
 		return Color3.newInstance(0, 0, 0);
 	}
+	
+	public static Color3 gray() {
+		return Color3.newInstance(128, 128, 128);
+	}
+	
+	public static Color3 darkgray() {
+		return Color3.newInstance(64, 64, 64);
+	}
+	
+	public static Color3 lightgray() {
+		return Color3.newInstance(192, 192, 192);
+	}
 
 	@Override
 	protected void onRegister(LuaTable table) {
@@ -79,6 +91,24 @@ public class Color3 extends LuaValuetype {
 			@Override
 			public LuaValue call() {
 				return black();
+			}
+		});
+		table.set("gray", new ZeroArgFunction() {
+			@Override
+			public LuaValue call() {
+				return gray();
+			}
+		});
+		table.set("darkgray", new ZeroArgFunction() {
+			@Override
+			public LuaValue call() {
+				return darkgray();
+			}
+		});
+		table.set("lightgray", new ZeroArgFunction() {
+			@Override
+			public LuaValue call() {
+				return lightgray();
 			}
 		});
 	}

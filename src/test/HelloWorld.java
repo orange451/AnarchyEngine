@@ -1,11 +1,9 @@
 package test;
 
-import org.luaj.vm2.LuaValue;
 import org.lwjgl.glfw.GLFW;
 
 import engine.Game;
 import engine.application.impl.ClientApplication;
-import engine.lua.RunnableArgs;
 import engine.lua.type.data.Color3;
 import engine.lua.type.data.Vector3;
 import engine.lua.type.object.insts.Camera;
@@ -84,7 +82,8 @@ public class HelloWorld extends ClientApplication {
 		// Camera controller new
 		Game.runService().renderSteppedEvent().connect( (params) -> {
 			double delta = params[0].todouble();
-			final int CAMERA_DIST = 2;
+			final float CAMERA_DIST = 2;
+			final float CAMERA_PITCH = 0.25f;
 			
 			// Get turn direction
 			int d = 0;
@@ -95,11 +94,13 @@ public class HelloWorld extends ClientApplication {
 			
 			// Get the camera
 			Camera camera = Game.workspace().getCurrentCamera();
-			float yaw = camera.getYaw();
 			
-			// Rotate camera
-			yaw += (d) * delta;
-			camera.orbit( Vector3.zero(), CAMERA_DIST, yaw, 0.25f );
+			// Compute new rotation
+			float yaw = camera.getYaw();
+			yaw += d * delta;
+			
+			// Update the camera
+			camera.orbit( Vector3.zero(), CAMERA_DIST, yaw, CAMERA_PITCH );
 			
 		});
 	}

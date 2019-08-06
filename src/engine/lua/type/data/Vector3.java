@@ -177,6 +177,12 @@ public class Vector3 extends LuaValuetype {
 
 	@Override
 	protected void onRegister(LuaTable table) {
+		table.set("zero", new ZeroArgFunction() {
+			@Override
+			public LuaValue call() {
+				return zero();
+			}
+		});
 		table.set("up", new ZeroArgFunction() {
 			@Override
 			public LuaValue call() {
