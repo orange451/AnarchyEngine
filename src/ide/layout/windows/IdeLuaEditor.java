@@ -71,7 +71,7 @@ public class IdeLuaEditor extends IdePane {
 		}) + ")\\b";
 		
 		final String LOGIC_PATTERN = "\\p{Punct}";
-		final String NUMBER_PATTERN = "^\\d*\\.\\d+|\\d+\\.\\d*$";
+		final String NUMBER_PATTERN = "^\\d*\\.\\d+" + "|" + "\\d+\\.\\d" + "|" + "\\d+";
 		final String PAREN_PATTERN = "\\(" + "|" + "\\)";
 		final String BRACKET_PATTERN = "\\[|\\]";
 		final String STRING_PATTERN = "(\\[\\[)(.|\\R)*?(\\]\\])" + "|" + "\"([^\"\\\\]|\\\\.)*\"";
@@ -82,9 +82,9 @@ public class IdeLuaEditor extends IdePane {
 					 + "|(?<COMMENT>" + COMMENT_PATTERN + ")"
 					 + "|(?<STRING>" + STRING_PATTERN + ")"
 					 + "|(?<LOGIC>" + LOGIC_PATTERN + ")"
-					 + "|(?<NUMBER>" + NUMBER_PATTERN + ")"
 					 + "|(?<PAREN>" + PAREN_PATTERN + ")"
 					 + "|(?<BRACKET>" + BRACKET_PATTERN + ")"
+					 + "|(?<NUMBER>" + NUMBER_PATTERN + ")"
 				);
 		
 		// Do syntax highlighting
