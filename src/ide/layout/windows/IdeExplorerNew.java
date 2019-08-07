@@ -15,7 +15,6 @@ import org.lwjgl.util.nfd.NativeFileDialog;
 
 import engine.Game;
 import engine.GameSubscriber;
-import engine.lua.lib.Enums;
 import engine.lua.type.object.Instance;
 import engine.lua.type.object.ScriptBase;
 import engine.lua.type.object.TreeViewable;
