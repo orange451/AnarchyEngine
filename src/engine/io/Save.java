@@ -334,7 +334,12 @@ public class Save {
 
 		// Instances in the game
 		if ( luaValue instanceof Instance ) {
-			return getSavedInstance((Instance) luaValue).reference;
+			SavedInstance svd = getSavedInstance((Instance) luaValue);
+			if ( svd != null ) {
+				return svd.reference;
+			} else {
+				return null;
+			}
 		}
 
 		// Vectorx/Colors/etc
