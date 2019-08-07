@@ -363,23 +363,23 @@ public class Assets extends Service implements TreeViewable {
 			org.lwjgl.assimp.AIMaterialProperty prop = AIMaterialProperty.create(properties.get(j));
 			String propertyKey = prop.mKey().dataString();
 			System.out.println("  -" + prop.mKey().dataString());
-			if ( propertyKey.contains(Assimp.AI_MATKEY_NAME) ) {
+			if ( propertyKey.equals(Assimp.AI_MATKEY_NAME) ) {
 				String name = byteBufferAsString(prop.mData());
 				tm.setName(name);
 			}
 			
-			if ( propertyKey.contains(Assimp.AI_MATKEY_COLOR_DIFFUSE) ) {
+			if ( propertyKey.equals(Assimp.AI_MATKEY_COLOR_DIFFUSE) ) {
 				AIColor4D mDiffuseColor = AIColor4D.create();
 				Assimp.aiGetMaterialColor(material, Assimp.AI_MATKEY_COLOR_DIFFUSE, Assimp.aiTextureType_NONE, 0, mDiffuseColor);
 				tm.setColor( Color3.newInstance((int)(mDiffuseColor.r()*255f), (int)(mDiffuseColor.g()*255f), (int)(mDiffuseColor.b()*255f)));
 			}
 			
-			if ( propertyKey.contains(Assimp.AI_MATKEY_SHININESS) ) {
+			if ( propertyKey.equals(Assimp.AI_MATKEY_SHININESS) ) {
 				float shine = prop.mData().getFloat();
 				tm.setReflective(shine / 256f);
 			}
 			
-			if ( propertyKey.contains(Assimp.AI_MATKEY_OPACITY)) {
+			if ( propertyKey.equals(Assimp.AI_MATKEY_OPACITY)) {
 				float opacity = prop.mData().getFloat();
 				tm.setTransparency(1.0f-opacity);
 			}
