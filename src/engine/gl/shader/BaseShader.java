@@ -18,7 +18,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.nio.FloatBuffer;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import org.joml.Matrix3f;
@@ -30,6 +32,7 @@ import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL20;
+import org.lwjgl.system.CallbackI.F;
 
 import engine.gl.SkyBox;
 import engine.gl.Texture2D;
@@ -54,6 +57,7 @@ public class BaseShader {
 	public int worldNormalMatLoc = -1;
 	public int normalMatLoc = -1;
 
+	public boolean debug = false;
 
 	public int diffuseTextureLoc = -1;
 	public int normalTextureLoc = -1;
@@ -335,8 +339,9 @@ public class BaseShader {
 			return;
 
 		// Check if last uniform at this handle is the same value (dont resend it to GPU)
-		if ( value.equals(lastSetUniform.get(handle)) )
+		if ( eq(value, lastSetUniform.get(handle)) ) {
 			return;
+		}
 		lastSetUniform.put(handle, value);
 		
 		int len = value.length;
@@ -360,6 +365,38 @@ public class BaseShader {
 		}
 	}
 	
+	private boolean eq(float[] a, Object object) {
+		if ( ! (object instanceof float[]) )
+			return false;
+		
+		float[] b = (float[]) object;
+		if ( a.length != b.length )
+			return false;
+		
+		for (int i = 0; i < a.length; i++) {
+			if ( b[i] != a[i] )
+				return false;
+		}
+		
+		return true;
+	}
+	
+	private boolean eq(int[] a, Object object) {
+		if ( ! (object instanceof int[]) )
+			return false;
+		
+		int[] b = (int[]) object;
+		if ( a.length != b.length )
+			return false;
+		
+		for (int i = 0; i < a.length; i++) {
+			if ( b[i] != a[i] )
+				return false;
+		}
+		
+		return true;
+	}
+	
 	/**
 	 * Set a uniform float value.
 	 * @param handle
@@ -370,8 +407,9 @@ public class BaseShader {
 			return;
 		
 		// Check if last uniform at this handle is the same value (dont resend it to GPU)
-		if ( value.equals(lastSetUniform.get(handle)) )
+		if ( eq(value, lastSetUniform.get(handle)) ) {
 			return;
+		}
 		lastSetUniform.put(handle, value);
 
 		int len = value.length;

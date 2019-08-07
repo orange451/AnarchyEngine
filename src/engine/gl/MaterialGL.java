@@ -130,6 +130,8 @@ public class MaterialGL {
 		if ( shader == null )
 			return;
 		
+		shader.debug = true;
+		
 		// Bind diffuse/albedo
 		shader.texture_set_stage(shader.diffuseTextureLoc, diffuseTexture, 0);
 		
