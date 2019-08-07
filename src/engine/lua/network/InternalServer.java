@@ -174,11 +174,6 @@ public class InternalServer extends Server {
 	}
 	
 	private void syncInstances(Instance instance) {
-		
-		// Keep cameras local
-		if ( instance instanceof Camera )
-			return;
-		
 		instance.changedEvent().connect((cargs) -> {
 			InstanceUpdateUDP updateObject = new InstanceUpdateUDP(instance, cargs[0]);
 			sendAllUDP(updateObject);

@@ -54,6 +54,9 @@ public class MergeProcessor implements PostProcessor {
 	
 	@Override
 	public void process(Pipeline pipeline) {
+		if ( Game.workspace().getCurrentCamera() == null )
+			return;
+		
 		int buffer0 = pipeline.getGBuffer().getBuffer0(); // Albedo
 		int buffer3 = pipeline.getGBuffer().getBuffer3(); // Emissive
 		int accumulation = pipeline.getGBuffer().getAccumulationBuffer().getTextureId(); // Light Accumulation buffer

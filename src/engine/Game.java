@@ -355,11 +355,6 @@ public class Game implements Tickable {
 				// Register services (new blank project)
 				Game.services();
 				
-				// Create a camera object
-				Camera c = new Camera();
-				c.set("Parent", workspace());
-				workspace().set("CurrentCamera", c);
-				
 				// Set changes to false, so we're not prompted with save dialog later.
 				InternalGameThread.runLater(()-> {
 					changes = false;
@@ -407,7 +402,19 @@ public class Game implements Tickable {
 		Game.game().rawset("Running", LuaValue.valueOf(running));
 		Game.game().rawset("IsServer", LuaValue.valueOf(Game.isServer()));
 		
-		if ( !isLoaded() || !running )
+		if ( !isLoaded() )
+			return;
+
+		// Make sure there's a camera
+		if ( Game.workspace().getCurrentCamera() == null ) {
+			Camera c = new Camera();
+			c.setArchivable(false);
+			c.setParent(Game.workspace());
+			workspace().set("CurrentCamera", c);
+			
+		}
+		
+		if ( !running )
 			return;
 		
 		synchronized(runnables) {
