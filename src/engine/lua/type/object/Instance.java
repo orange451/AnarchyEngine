@@ -23,6 +23,7 @@ import engine.lua.type.LuaValuetype;
 public abstract class Instance extends DataModel {
 	protected List<Instance> children = Collections.synchronizedList(new ArrayList<Instance>());
 	private HashSet<Instance> descendents = new HashSet<Instance>();
+	private ArrayList<Instance> descendentsList = new ArrayList<Instance>();
 	private List<InstancePropertySubscriber> propertySubscribers = Collections.synchronizedList(new ArrayList<InstancePropertySubscriber>());
 	protected boolean destroyed;
 
@@ -318,7 +319,7 @@ public abstract class Instance extends DataModel {
 		int tries = 0;
 		LuaValue current = this;
 		if ( current.equals(arg) ) {
-			return true;
+			return false;
 		}
 
 		while ( !current.isnil() && tries < 64 ) {
@@ -418,12 +419,11 @@ public abstract class Instance extends DataModel {
 			}
 			
 			String name = this.getName();
-			List<Instance> desc = this.getDescendents();
 			
 			// Check for descendant removed
 			descendantRemoved(oldParent);
-			for (int i = 0; i < desc.size(); i++) {
-				desc.get(i).descendantRemoved(oldParent);
+			for (int i = 0; i < descendentsList.size(); i++) {
+				descendentsList.get(i).descendantRemoved(oldParent);
 			}
 			
 			// Add self to new parent
@@ -441,8 +441,8 @@ public abstract class Instance extends DataModel {
 	
 				// Fire descendant added event
 				descendantAdded(newParInst);
-				for (int i = 0; i < desc.size(); i++) {
-					desc.get(i).descendantAdded(newParInst);
+				for (int i = 0; i < descendentsList.size(); i++) {
+					descendentsList.get(i).descendantAdded(newParInst);
 				}
 				
 				// Add new reference
@@ -464,6 +464,7 @@ public abstract class Instance extends DataModel {
 						Instance temp = oldParentChildren.get(i);
 						if ( temp.getName().equalsIgnoreCase(name) ) {
 							firstWithName = temp;
+							break;
 						}
 					}
 					
@@ -484,10 +485,20 @@ public abstract class Instance extends DataModel {
 		
 		Instance r = (Instance)root;
 		if ( r.descendents.contains(this) && !this.isDescendantOf(r) ) {
+			descendantRemovedForce(root);
+		}
+	}
+	
+	private void descendantRemovedForce(LuaValue root) {
+		if ( root == null || root.isnil() || !(root instanceof Instance) )
+			return;
+		
+		Instance r = (Instance)root;
+		if ( r.descendents.contains(this) ) {
 			((LuaEvent)r.rawget("DescendantRemoved")).fire(this);
 			r.descendents.remove(this);
-			//System.out.println(this.getName() + " was removed as descendent from " + r.getFullName());
-			descendantRemoved(r.getParent());
+			r.descendentsList.remove(this);
+			descendantRemovedForce(r.getParent());
 		}
 	}
 
@@ -500,6 +511,7 @@ public abstract class Instance extends DataModel {
 		if ( !r.descendents.contains(this) ) {
 			((LuaEvent)r.rawget("DescendantAdded")).fire(this);
 			r.descendents.add(this);
+			r.descendentsList.add(this);
 			//System.out.println(this.getName() + " was added as descendent to " + r.getFullName());
 		}
 		descendantAdded(r.getParent());
@@ -696,13 +708,15 @@ public abstract class Instance extends DataModel {
 	}
 
 	public List<Instance> getDescendents() {
-		ArrayList<Instance> d = new ArrayList<Instance>();
+		/*ArrayList<Instance> d = new ArrayList<Instance>();
 		synchronized(descendents) {
 			Iterator<Instance> it = descendents.iterator();
 			while ( it.hasNext() ) {
 				d.add(it.next());
 			}
 		}
-		return d;
+		return d;*/
+		
+		return new ArrayList<Instance>(descendentsList);
 	}
 }
