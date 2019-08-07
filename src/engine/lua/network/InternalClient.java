@@ -63,9 +63,11 @@ public class InternalClient extends Client {
 						} else if ( loadPacket.finished && worldJSON != null ) {
 							
 							// Decompress...
+							int len = worldJSON.length();
 							worldJSON = GZIPUtil.decompress(worldJSON);
 							System.out.println("Loaded world...");
 							System.out.println(worldJSON);
+							System.out.println("Compressed json: " + len + " Decompressed json: " + worldJSON.length());
 							
 							try {
 								JSONParser parser = new JSONParser();

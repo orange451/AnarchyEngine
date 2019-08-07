@@ -27,6 +27,7 @@ import engine.lua.type.data.Color3;
 import engine.lua.type.object.AssetLoadable;
 import engine.lua.type.object.Instance;
 import engine.lua.type.object.InstancePropertySubscriber;
+import engine.lua.type.object.ScriptBase;
 import ide.IDEFilePath;
 import ide.layout.IdePane;
 import lwjgui.LWJGUI;
@@ -111,16 +112,16 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 		List<Instance> selected = Game.selected();
 		
 		LWJGUI.runLater(() -> {
-			clear();
 			if ( selected.size() != 1 )
 				return;
 			
-			if ( grid.inst != null && currentInstance != null && currentInstance.equals(grid.inst) )
+			Instance temp = selected.get(0);
+			if ( temp == grid.inst )
 				return;
 			
-			currentInstance = selected.get(0);
+			clear();
+			currentInstance = temp;
 			currentInstance.attachPropertySubscriber(this);
-			
 			grid.setInstance(currentInstance);
 		});
 	}
@@ -168,6 +169,11 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 		boolean editable = luaField.canModify();
 		if ( (field.equals("Name") || field.equals("Parent")) && instance.isLocked() )
 			editable = false;
+		
+		// Display "Linked Source" instead of the actual source
+		if ( instance instanceof ScriptBase && field.equals("Source") ) {
+			return new StringPropertyModifier(instance, field, LuaValue.valueOf("[Linked Source]"), false);
+		}
 		
 		// Enum modifier
 		if ( luaField.getEnumType() != null ) {
@@ -756,7 +762,8 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 		}
 
 		public void setInstance(Instance inst) {
-			clear();
+			if ( inst == this.inst )
+				return;
 			
 			this.inst = inst;
 			l.setText(inst.getFullName());
