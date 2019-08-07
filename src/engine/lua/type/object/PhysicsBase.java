@@ -43,9 +43,9 @@ public abstract class PhysicsBase extends Instance implements GameSubscriber {
 		
 		this.defineField("Linked", LuaValue.NIL, true);
 		
-		this.defineField("Velocity", new Vector3(), false);
-		this.defineField("AngularVelocity", new Vector3(), false);
-		this.defineField("WorldMatrix", new Matrix4(), false);
+		this.defineField(C_VELOCITY.toString(), new Vector3(), false);
+		this.defineField(C_ANGULARVELOCITY.toString(), new Vector3(), false);
+		this.defineField(C_WORLDMATRIX.toString(), new Matrix4(), false);
 		
 		this.defineField("Mass", LuaValue.valueOf(0.5f), false);
 		this.getField("Mass").setClamp(new NumberClamp(0, 1));
@@ -174,7 +174,6 @@ public abstract class PhysicsBase extends Instance implements GameSubscriber {
 		}
 		
 		this.rawset("Linked", LuaValue.NIL);
-		
 		this.playerOwns = null;
 	}
 	
@@ -273,7 +272,11 @@ public abstract class PhysicsBase extends Instance implements GameSubscriber {
 	}
 	
 	public Vector3 getVelocity() {
-		return (Vector3) ((Vector3)this.get(C_VELOCITY)).clone();
+		return (Vector3)this.get(C_VELOCITY);
+	}
+
+	public Vector3 getAngularVelocity() {
+		return (Vector3)this.get(C_ANGULARVELOCITY);
 	}
 	
 	public LuaValue updatePhysics(LuaValue key, LuaValue value) {
@@ -299,6 +302,7 @@ public abstract class PhysicsBase extends Instance implements GameSubscriber {
 			}
 		}
 		
+		// Updated Angular Velocity
 		if ( key.eq_b(C_ANGULARVELOCITY) ) {
 			if ( physics != null ) {
 				Vector3 vec = (Vector3)value;
@@ -363,6 +367,7 @@ public abstract class PhysicsBase extends Instance implements GameSubscriber {
 			
 			if (physics != null) {
 				physics.setShapeFromType(value.toString());
+				physics.refresh();
 			}
 		}
 		
@@ -374,6 +379,7 @@ public abstract class PhysicsBase extends Instance implements GameSubscriber {
 			
 			if ( physics != null ) {
 				physics.setShapeFromMesh(value);
+				physics.refresh();
 			}
 		}
 		return value;

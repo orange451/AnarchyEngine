@@ -214,7 +214,7 @@ public class PhysicsObjectInternal {
 	}
 
 	public void setMass(float mass) {
-		this.desiredShape = null;
+		this.desiredShape = null; // Force shape to change next refresh
 		
 		if ( this.body != null ) {
 			this.body.setMassProps(mass, this.body.getLocalInertia());
@@ -275,6 +275,7 @@ public class PhysicsObjectInternal {
 		InternalGameThread.runLater(() -> {
 			if ( luaFrontEnd.isDestroyed() )
 				return;
+			refresh = false;
 			
 			// Shape
 			if ( desiredShape == null ) {
@@ -304,9 +305,13 @@ public class PhysicsObjectInternal {
 				vel.set(forceVelocity);
 				forceVelocity = null;
 			} else {
-				engine.lua.type.data.Vector3 v = luaFrontEnd.getVelocity();
-				vel.set(new Vector3(v.getX(), v.getY(), v.getZ()));
+				engine.lua.type.data.Vector3 v1 = luaFrontEnd.getVelocity();
+				vel.set(v1.getX(), v1.getY(), v1.getZ());
 			}
+			
+			// Set angular velocity
+			engine.lua.type.data.Vector3 v2 = luaFrontEnd.getAngularVelocity();
+			angVel.set(v2.getX(), v2.getY(), v2.getZ());
 			
 			// Set some vars
 			setWorldMatrix(worldMat);
@@ -323,6 +328,9 @@ public class PhysicsObjectInternal {
 				this.world.dynamicsWorld.addRigidBody(newBody);
 			}
 
+			System.out.println("Setting velocity "+ luaFrontEnd.getParent() +": " + vel);
+			
+			this.wakeup();
 			newBody.activate(true);
 			newBody.setLinearVelocity(vel);
 			newBody.setAngularVelocity(angVel);
@@ -365,8 +373,6 @@ public class PhysicsObjectInternal {
 		} else {
 			desiredShape = PhysicsUtils.meshShapeDynamic(mesh, scale);
 		}
-		
-		this.refresh = true;
 	}
 	
 	public void setShapeFromType(String type) {
@@ -412,7 +418,6 @@ public class PhysicsObjectInternal {
 		}
 		
 		this.desiredShape = shape;
-		this.refresh = true;
 	}
 
 	public boolean isDestroyed() {

@@ -3,6 +3,7 @@ package engine.lua.type.object.insts;
 import org.joml.Vector3f;
 import org.luaj.vm2.LuaValue;
 
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.bullet.collision.ClosestRayResultCallback;
 import com.badlogic.gdx.physics.bullet.dynamics.btRigidBody;
 
@@ -64,6 +65,7 @@ public class PlayerPhysics extends PhysicsBase implements TreeViewable {
 				body.setSleepingThresholds( 0.0f, 0.0f );
 				body.setFriction(0);
 				body.setAngularFactor(0);
+				body.setAngularVelocity( Vector3.Zero );
 			}
 			
 			float zOff = (this.getHeight()/2f) - this.getStepHeight();
