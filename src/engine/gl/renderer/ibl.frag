@@ -18,7 +18,7 @@ in vec4 passColor;
 
 out vec4 outColor;
 
-const float MAX_REFLECTION_LOD = 18.0;
+const float MAX_REFLECTION_LOD = 20.0;
 
 vec3 reflectEnv( vec3 viewSpacePos, vec3 surfaceNormal );
 float calculateFresnel( vec3 viewSpacePos, vec3 surfaceNormal, float roughness, float metalness, float reflectiveness );
@@ -55,7 +55,7 @@ void main(void) {
 	vec3 final = kD + mix( radiance, kD * radiance, metallic ) * (0.05+reflectiveness);
 	
 	// Scale based on ambient
-	final = final*((1.0+uAmbient)/8.0);
+	final = final*((1.0+uAmbient)/12.0);
 	
 	// Fresnel
 	float fresnel = calculateFresnel( L, N, roughness, metallic, reflectiveness );
