@@ -106,7 +106,7 @@ public class Load {
 			// Force set parents
 			for (int i = 0; i < instances.size(); i++) {
 				LoadedInstance inst = instances.get(i);
-				int parent = inst.Parent;
+				long parent = inst.Parent;
 
 				if ( parent != -1 && inst.loaded ) {
 					Instance p = getInstanceFromReference(parent);
@@ -197,15 +197,15 @@ public class Load {
 		}
 	}
 	
-	private static int loadReference(String field, JSONObject obj) {
+	private static long loadReference(String field, JSONObject obj) {
 		JSONObject r = (JSONObject) obj.get(field);
 		if ( r != null && r.get("Type").equals("Reference") ) {
-			return Integer.parseInt(""+r.get("Value"));
+			return Long.parseLong(""+r.get("Value"));
 		}
 		return -1;
 	}
 	
-	protected static Instance getInstanceFromReference(int ref) {
+	protected static Instance getInstanceFromReference(long ref) {
 		// First search "temporary" instances
 		for (int i = 0; i < instances.size(); i++) {
 			if ( instances.get(i).Reference == ref ) {
@@ -221,8 +221,8 @@ public class Load {
 		public boolean loaded;
 		public String Name;
 		public String ClassName;
-		public int Reference;
-		public int Parent;
+		public long Reference;
+		public long Parent;
 		public Instance instance;
 		
 		public HashMap<String,PropertyValue<?>> properties = new HashMap<String,PropertyValue<?>>();
