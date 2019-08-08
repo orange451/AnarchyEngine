@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.joml.Matrix4f;
+import org.joml.Quaternionf;
 import org.luaj.vm2.LuaValue;
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.assimp.AIAnimation;
@@ -87,14 +88,16 @@ public class AnimationData extends Instance implements TreeViewable {
 		}
 	}
 	
+	private Instance boneTree;
 	public void processBoneTree(AINode node, Instance parent) {
-		if ( parent == null ) {
-			Instance boneTree = this.findFirstChild("BoneTree");
-			if ( boneTree == null )
-				boneTree = new BoneTree();
-			boneTree.forceSetParent(this);
-			parent = boneTree;
+		boolean c = false;
+		if ( this.boneTree == null ) {
+			this.boneTree = new BoneTree();
+			c = true; 
 		}
+		
+		if ( parent == null )
+			parent = boneTree;
 		
 		BoneTreeNode t = new BoneTreeNode();
 		t.forceSetName(node.mName().dataString());
@@ -105,6 +108,9 @@ public class AnimationData extends Instance implements TreeViewable {
 		}
 		
 		t.forceSetParent(parent);
+		
+		if ( c )
+			this.boneTree.forceSetParent(this);
 	}
 
 	public void processAnimations(ArrayList<AIAnimation> animations) {
@@ -186,22 +192,30 @@ public class AnimationData extends Instance implements TreeViewable {
 				
 				HashMap<Bone, TempKeyframe> keyframes = entry.getValue();
 				for (Map.Entry<Bone,TempKeyframe> entryK : keyframes.entrySet()) {
+					
+					// Compute translation matrix
 					Matrix4f offsetMatrix = new Matrix4f();
 					offsetMatrix.translate(
 							entryK.getValue().position.mValue().x(),
 							entryK.getValue().position.mValue().y(),
 							entryK.getValue().position.mValue().z()
 					);
-					offsetMatrix.rotate(
-							entryK.getValue().rotation.mValue().w(),
-							entryK.getValue().rotation.mValue().x(),
-							entryK.getValue().rotation.mValue().y(),
-							entryK.getValue().rotation.mValue().z()
+					
+					// Compute rotation matrix
+					Quaternionf rotation = new Quaternionf(
+						entryK.getValue().rotation.mValue().x(),
+						entryK.getValue().rotation.mValue().y(),
+						entryK.getValue().rotation.mValue().z(),
+						entryK.getValue().rotation.mValue().w()
 					);
 					
+					// relative = offset * rotation
+					Matrix4f relativeMatrix = offsetMatrix.rotate(rotation, new Matrix4f());
+					
+					// Create keyframe
 					AnimationKeyframe keyframe = new AnimationKeyframe();
 					keyframe.forceset("Bone", entryK.getKey());
-					keyframe.forceset("Matrix", new Matrix4(offsetMatrix));
+					keyframe.forceset("Matrix", new Matrix4(relativeMatrix));
 					keyframe.forceSetName(entryK.getKey().getName());
 					keyframe.forceSetParent(seq);
 				}

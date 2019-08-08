@@ -314,7 +314,21 @@ public abstract class Instance extends DataModel {
 		return null;
 	}
 
-	public boolean isDescendantOf( LuaValue arg ) {
+	public boolean isDescendantOf( LuaValue object ) {
+		if ( object == null )
+			return false;
+		
+		if ( object.isnil() && this.getParent().isnil() )
+			return true;
+		
+		if ( object.isnil() )
+			return false;
+		
+		Instance inst = (Instance)object;
+		return inst.descendents.contains(this);
+	}
+	
+	private boolean computeDescendant( LuaValue arg ) {
 
 		int tries = 0;
 		LuaValue current = this;
@@ -332,15 +346,14 @@ public abstract class Instance extends DataModel {
 
 		return false;
 	}
-	
-	public void forceset(String key, LuaValue value) {
-		forceset(LuaValue.valueOf(key),value);
-	}
-	
 	private void onKeyChange(LuaValue key, LuaValue value) {
 		LuaEvent event = this.changedEvent();
 		event.fire(key, value);
 		notifyPropertySubscribers(key.toString(), value);
+	}
+	
+	public void forceset(String key, LuaValue value) {
+		forceset(LuaValue.valueOf(key),value);
 	}
 	
 	public void forceset(LuaValue key, LuaValue value) {
@@ -484,7 +497,7 @@ public abstract class Instance extends DataModel {
 			return;
 		
 		Instance r = (Instance)root;
-		if ( r.descendents.contains(this) && !this.isDescendantOf(r) ) {
+		if ( r.descendents.contains(this) && !this.computeDescendant(r) ) {
 			descendantRemovedForce(root);
 		}
 	}
@@ -529,22 +542,22 @@ public abstract class Instance extends DataModel {
 		if ( parent == null )
 			parent = LuaValue.NIL;
 		
-		boolean l = this.locked;
-		boolean l2 = !this.getField("Parent").canModify();
+		//boolean l = this.locked;
+		//boolean l2 = !this.getField("Parent").canModify();
 
-		LuaValue oldParent = this.get(C_PARENT);
+		LuaValue oldParent = this.rawget(C_PARENT);
 		
-		LuaField pField = this.getField("Parent");
+		/*LuaField pField = this.getField("Parent");
 		if ( pField == null )
-			return;
+			return;*/
 		
-		pField.setLocked(false);
-		this.setLocked(false);
-		this.set(C_PARENT, parent);
-		this.setLocked(l);
-		pField.setLocked(l2);
-		
-		this.checkSetParent(this.get(C_PARENT), oldParent, parent);
+		//pField.setLocked(false);
+		//this.setLocked(false);
+		this.rawset(C_PARENT, parent);
+		//this.setLocked(l);
+		//pField.setLocked(l2);
+
+		this.checkSetParent(C_PARENT, oldParent, parent);
 	}
 
 	public String getName() {

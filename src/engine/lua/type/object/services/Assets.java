@@ -215,7 +215,6 @@ public class Assets extends Service implements TreeViewable {
 			Instance boneData = null;
 			if ( animations.size() > 0 ) {
 				aData = new AnimationData();
-				aData.forceSetParent(prefab);
 				boneData = new Bones();
 			}
 			
@@ -284,6 +283,7 @@ public class Assets extends Service implements TreeViewable {
 				boneData.forceSetParent(aData);
 				aData.processAnimations(animations);
 				aData.processBoneTree(scene.mRootNode(), null);
+				aData.forceSetParent(prefab);
 			}
 			System.out.println("Loaded");
 			

@@ -285,8 +285,9 @@ public class Game implements Tickable {
 					synchronized(createdInstances) {
 						if ( object instanceof Instance ) {
 							Instance inst = (Instance)object;
-							if ( Game.isServer() ) 
+							if ( Game.isServer() ) {
 								inst.rawset("SID", Game.generateSID());
+							}
 							
 							long sid = inst.getSID();
 							
