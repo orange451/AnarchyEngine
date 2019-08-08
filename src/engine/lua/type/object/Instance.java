@@ -471,18 +471,22 @@ public abstract class Instance extends DataModel {
 				synchronized(oldParentChildren) {
 					oldParentChildren.remove(this);
 					
-					// Get first child remaining with this name
-					LuaValue firstWithName = LuaValue.NIL;
-					for (int i = 0; i < oldParentChildren.size(); i++) {
-						Instance temp = oldParentChildren.get(i);
-						if ( temp.getName().equalsIgnoreCase(name) ) {
-							firstWithName = temp;
-							break;
+					// If the parents reference by name points to this instance...
+					if ( oldParent.rawget(this.rawget(C_NAME)) == this ) {
+						
+						// Get first child remaining with the same name
+						LuaValue firstWithName = LuaValue.NIL;
+						for (int i = 0; i < oldParentChildren.size(); i++) {
+							Instance temp = oldParentChildren.get(i);
+							if ( temp.getName().equalsIgnoreCase(name) ) {
+								firstWithName = temp;
+								break;
+							}
 						}
+						
+						// Set the reference to that child. NIL if no child found.
+						((Instance)oldParent).updateChildPointer(name, firstWithName);
 					}
-					
-					// Set the reference to that child. NIL if no child found.
-					((Instance)oldParent).updateChildPointer(name, firstWithName);
 				}
 				
 				// Child has finished being removed. Fire event.
