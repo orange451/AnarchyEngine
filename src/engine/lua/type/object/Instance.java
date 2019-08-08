@@ -406,7 +406,7 @@ public abstract class Instance extends DataModel {
 				
 				// See if there's still a child pointer with our old name
 				List<Instance> children1 = ((Instance)currentParent).getChildrenWithName(oldName);
-				if ( children1.size() > 1 ) {
+				if ( children1.size() > 0 ) {
 					children1.remove(this);
 					((Instance)currentParent).updateChildPointer(oldName, children1.get(0));
 				} else {
