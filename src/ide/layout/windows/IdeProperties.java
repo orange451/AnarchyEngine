@@ -738,6 +738,9 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 				return;
 			}
 			
+			if ( instance instanceof ScriptBase && property.equals("Source") )
+				return;
+			
 			PropertyModifier p = props.get(property);
 			if ( p == null ) {
 				return;
