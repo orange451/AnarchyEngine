@@ -2,6 +2,8 @@ package ide.layout.windows;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
@@ -16,11 +18,20 @@ import org.lwjgl.util.nfd.NativeFileDialog;
 import engine.Game;
 import engine.GameSubscriber;
 import engine.lua.type.object.Instance;
+import engine.lua.type.object.PhysicsBase;
 import engine.lua.type.object.ScriptBase;
 import engine.lua.type.object.TreeViewable;
+import engine.lua.type.object.insts.AnimationController;
+import engine.lua.type.object.insts.Camera;
+import engine.lua.type.object.insts.Folder;
 import engine.lua.type.object.insts.GameObject;
+import engine.lua.type.object.insts.GlobalScript;
+import engine.lua.type.object.insts.LocalScript;
 import engine.lua.type.object.insts.Mesh;
+import engine.lua.type.object.insts.PhysicsObject;
+import engine.lua.type.object.insts.PlayerPhysics;
 import engine.lua.type.object.insts.Prefab;
+import engine.lua.type.object.insts.Script;
 import engine.lua.type.object.insts.Texture;
 import engine.lua.type.object.services.Assets;
 import engine.util.FileUtils;
@@ -35,17 +46,47 @@ import lwjgui.scene.control.ScrollPane;
 import lwjgui.scene.control.SeparatorMenuItem;
 import lwjgui.scene.control.TreeBase;
 import lwjgui.scene.control.TreeItem;
+import lwjgui.scene.control.TreeNode;
 import lwjgui.scene.control.TreeView;
 
 public class IdeExplorerNew extends IdePane implements GameSubscriber {
 	private ScrollPane scroller;
 	private TreeView<Instance> tree;
 
-	private HashMap<Instance, TreeItem<Instance>> instanceMap;
-	private HashMap<Instance, TreeItem<Instance>> instanceMapTemp;
-	private HashMap<TreeItem<Instance>, Instance> treeItemMap;
-	private ArrayList<TreeItem<Instance>> treeItems;
+	private HashMap<Instance, SortedTreeItem<Instance>> instanceMap;
+	private HashMap<Instance, SortedTreeItem<Instance>> instanceMapTemp;
+	private HashMap<SortedTreeItem<Instance>,Instance> treeItemMap;
+	private ArrayList<SortedTreeItem<Instance>> treeItems;
 	private boolean updating;
+	
+	private static HashMap<Class<? extends Instance>, Integer> priority = new HashMap<>();
+	
+	static {
+		priority.put(Folder.class, 20);
+
+		priority.put(Camera.class, 50);
+		
+		priority.put(ScriptBase.class, 35);
+		priority.put(Script.class, 35);
+		priority.put(LocalScript.class, 35);
+		priority.put(GlobalScript.class, 35);
+
+		priority.put(GameObject.class, 8);
+		
+		priority.put(AnimationController.class, 7);
+
+		priority.put(PhysicsBase.class, 6);
+		priority.put(PhysicsObject.class, 6);
+		priority.put(PlayerPhysics.class, 6);
+	}
+	
+	private static int getPriority(Class<? extends Instance> cls) {
+		Integer ret = priority.get(cls);
+		if ( ret == null )
+			return 0;
+		
+		return ret;
+	}
 	
 	public IdeExplorerNew() {
 		super("Explorer New", true);
@@ -55,7 +96,7 @@ public class IdeExplorerNew extends IdePane implements GameSubscriber {
 		this.scroller.setFillToParentWidth(true);
 		this.getChildren().add(scroller);
 
-		tree = new TreeView<Instance>();
+		tree = new SortedTreeView<Instance>();
 		this.scroller.setContent(tree);
 		
 		tree.setOnSelectItem(event -> {
@@ -78,7 +119,7 @@ public class IdeExplorerNew extends IdePane implements GameSubscriber {
 		instanceMap = new HashMap<>();
 		treeItemMap = new HashMap<>();
 		instanceMapTemp = new HashMap<>();
-		treeItems = new ArrayList<TreeItem<Instance>>();
+		treeItems = new ArrayList<SortedTreeItem<Instance>>();
 		
 		Game.getGame().subscribe(this);
 		update(true);
@@ -191,7 +232,7 @@ public class IdeExplorerNew extends IdePane implements GameSubscriber {
 			Instance inst = c.get(i);
 			
 			// Get the tree item
-			TreeItem<Instance> newTreeItem = instanceMapTemp.get(inst);
+			SortedTreeItem<Instance> newTreeItem = instanceMapTemp.get(inst);
 			if ( newTreeItem == null ) {
 				// What graphic does it need?
 				Node graphic = Icons.icon_wat.getView();
@@ -199,7 +240,7 @@ public class IdeExplorerNew extends IdePane implements GameSubscriber {
 					graphic = ((TreeViewable)inst).getIcon().getView();
 				
 				// New one
-				newTreeItem = new TreeItem<Instance>(inst, graphic);
+				newTreeItem = new SortedTreeItem<Instance>(inst, graphic);
 
 				// Create context menu
 				ContextMenu con = getContetxMenu(inst);
@@ -234,6 +275,10 @@ public class IdeExplorerNew extends IdePane implements GameSubscriber {
 			
 			// Look ma it's recursion!
 			list(newTreeItem, inst);
+		}
+		
+		if ( treeItem instanceof SortedTreeItem ) {
+			((SortedTreeItem)treeItem).sort();
 		}
 	}
 	
@@ -412,4 +457,44 @@ public class IdeExplorerNew extends IdePane implements GameSubscriber {
 		//
 	}
 
+	
+	class SortedTreeView<E> extends TreeView<E> {
+		//
+	}
+	
+	class SortedTreeItem<E> extends TreeItem<E> {
+
+		public SortedTreeItem(E root) {
+			super(root);
+		}
+		
+		public SortedTreeItem(E root, Node node) {
+			super(root, node);
+		}
+		
+		protected void sort() {
+			ArrayList<TreeNode<E>> nodules = new ArrayList<TreeNode<E>>();
+			for (int i = 0; i < nodes.size(); i++) {
+				nodules.add(nodes.get(i));
+			}
+			
+			Collections.sort(nodules, new Comparator<TreeNode<E>>() {
+
+				@SuppressWarnings("unchecked")
+				@Override
+				public int compare(TreeNode<E> o1, TreeNode<E> o2) {
+					int priority1 = getPriority((Class<? extends Instance>) o1.getItem().getRoot().getClass());
+					int priority2 = getPriority((Class<? extends Instance>) o2.getItem().getRoot().getClass());
+					
+					return (priority1<priority2)?1:((priority1==priority2)?0:-1);
+				}
+				
+			});
+			
+			this.nodes = new ObservableList<TreeNode<E>>();
+			for (int i = 0; i < nodules.size(); i++) {
+				nodes.add(nodules.get(i));
+			}
+		}
+	}
 }
