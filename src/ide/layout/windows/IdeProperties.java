@@ -727,6 +727,8 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 			this.updateChildrenLocalRecursive();
 			this.position(this.getParent());
 			this.render(this.cached_context);
+			
+			this.internal.updateChildren();
 		}
 
 		public void update(Instance instance, String property, LuaValue value) {

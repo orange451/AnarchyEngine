@@ -77,7 +77,7 @@ public class TestPBR extends ClientApplication {
 		// Skybox
 		Skybox skybox = new Skybox();
 		skybox.setImage(envmap);
-		skybox.setBrightness(1f);
+		skybox.setBrightness(3f);
 		skybox.setPower(1.0f);
 		skybox.setParent(Game.lighting());
 		Game.lighting().setSkybox(skybox);
