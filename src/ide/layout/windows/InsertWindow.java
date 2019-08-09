@@ -1,6 +1,7 @@
 package ide.layout.windows;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import engine.Game;
 import engine.lua.type.object.Instance;
@@ -21,7 +22,7 @@ import lwjgui.theme.Theme;
 
 public class InsertWindow {
 	
-	public InsertWindow(Instance parent) {
+	public InsertWindow() {
 		long handle = LWJGUIUtil.createOpenGLCoreWindow("Insert Object", 2, 2, false, true);
 		Window window = LWJGUI.initialize(handle);
 		
@@ -36,7 +37,13 @@ public class InsertWindow {
 		tempV.setSpacing(4);
 		root.getChildren().add(tempV);
 		
-		Label l = new Label("Insert object into: " + parent.getFullName());
+		Label l = new Label() {
+			@Override
+			public void position(Node parent) {
+				super.position(parent);
+				this.setText("Insert object into: " + InsertWindow.this.getParent().getFullName());
+			}
+		};
 		tempV.getChildren().add(l);
 		
 		ScrollPane scroll = new ScrollPane();
@@ -66,15 +73,16 @@ public class InsertWindow {
 					}
 				};
 				t.setGraphic(icon);
+				icon.setMouseTransparent(true);
 				items.getChildren().add(t);
 				
 				t.setOnMouseClicked((event)->{
 					try {
 						if ( event.getClickCount() == 2 ) {
 							Instance inst = (Instance) instClass.newInstance();
-							inst.forceSetParent(parent);
+							inst.forceSetParent(getParent());
 							
-							Game.select(inst);
+							//Game.select(inst);
 						}
 					} catch (Exception e) {
 						//
@@ -89,4 +97,11 @@ public class InsertWindow {
 		window.show();
 	}
 
+	private Instance getParent() {
+		List<Instance> selected = Game.selected();
+		if ( selected.size() == 0 )
+			return Game.workspace();
+		
+		return selected.get(0);
+	}
 }

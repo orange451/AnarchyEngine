@@ -435,7 +435,7 @@ public class IdeExplorerNew extends IdePane implements GameSubscriber {
 		// Cut
 		MenuItem insert = new MenuItem("Insert Object  \u25ba", Icons.icon_new.getView());
 		insert.setOnAction(event -> {
-			new InsertWindow(inst);
+			new InsertWindow();
 		});
 		c.getItems().add(insert);
 		
