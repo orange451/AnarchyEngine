@@ -12,9 +12,9 @@ For support, see: http://manta.games/
 - [STB](https://github.com/nothings/stb) (Can download with [LWJGL](https://www.lwjgl.org/customize))
 - [LWJGUI](https://github.com/orange451/LWJGUI/)
 - [LibGDX+Bullet](https://libgdx.badlogicgames.com/old-site/releases/)
-- [Kryonet](https://github.com/EsotericSoftware/kryonet)
+- [Kryonet](https://github.com/EsotericSoftware/kryonet/releases)
 - [JSON-Simple](https://code.google.com/archive/p/json-simple/downloads)
-- [luaj](https://github.com/luaj/luaj)
+- [luaj (JSE)](https://github.com/luaj/luaj/releases)
 
 # Screenshots
 ![pong](https://i.imgur.com/EBIDL8M.gif)
