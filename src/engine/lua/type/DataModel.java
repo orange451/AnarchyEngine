@@ -46,13 +46,14 @@ public abstract class DataModel extends LuaDatatype {
 		LuaEngine.globals.set("Instance", table);
 	}
 	
-	public static ArrayList<Class<?>> getInstanceableTypes() {
-		ArrayList<Class<?>> ret = new ArrayList<Class<?>>();
+	@SuppressWarnings("unchecked")
+	public static ArrayList<Class<? extends Instance>> getInstanceableTypes() {
+		ArrayList<Class<? extends Instance>> ret = new ArrayList<Class<? extends Instance>>();
 		String[] keys = TYPES.keySet().toArray(new String[TYPES.keySet().size()]);
 		for (int i = 0; i < keys.length; i++) {
 			LuaInstancetypeData datatype = TYPES.get(keys[i]);
 			if ( datatype.instanceable ) {
-				ret.add(datatype.instanceableClass);
+				ret.add((Class<? extends Instance>) datatype.instanceableClass);
 			}
 		}
 		

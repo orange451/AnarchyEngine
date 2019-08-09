@@ -1,6 +1,8 @@
 package ide.layout.windows;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import engine.Game;
@@ -54,7 +56,27 @@ public class InsertWindow {
 		VBox items = new VBox();
 		scroll.setContent(items);
 		
-		ArrayList<Class<?>> TYPES = Instance.getInstanceableTypes();
+		// Get instanceable classes
+		ArrayList<Class<? extends Instance>> TYPES = Instance.getInstanceableTypes();
+		
+		// Sort
+		Collections.sort(TYPES, new Comparator<Class<? extends Instance>>() {
+			@Override
+			public int compare(Class<? extends Instance> o1, Class<? extends Instance> o2) {
+				int priority1 = IdeExplorer.getPriority(o1);
+				int priority2 = IdeExplorer.getPriority(o2);
+				
+				if ( priority1 == priority2 )
+					return 0;
+				
+				if ( priority1 < priority2 )
+					return 1;
+				
+				return -1;
+			}
+		});
+		
+		// Display
 		for (int i = 0; i< TYPES.size(); i++) {
 			try {
 				Class<?> instClass = TYPES.get(i);

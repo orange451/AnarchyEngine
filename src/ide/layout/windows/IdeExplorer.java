@@ -80,7 +80,7 @@ public class IdeExplorer extends IdePane implements GameSubscriber {
 		priority.put(PlayerPhysics.class, 6);
 	}
 	
-	private static int getPriority(Class<? extends Instance> cls) {
+	protected static int getPriority(Class<? extends Instance> cls) {
 		Integer ret = priority.get(cls);
 		if ( ret == null )
 			return 0;

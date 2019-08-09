@@ -327,8 +327,6 @@ public class PhysicsObjectInternal {
 			} else {
 				this.world.dynamicsWorld.addRigidBody(newBody);
 			}
-
-			System.out.println("Setting velocity "+ luaFrontEnd.getParent() +": " + vel);
 			
 			this.wakeup();
 			newBody.activate(true);
