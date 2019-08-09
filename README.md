@@ -28,21 +28,20 @@ For support, see: http://manta.games/
 ```
 package test;
 
-import org.luaj.vm2.LuaValue;
 import org.lwjgl.glfw.GLFW;
 
 import engine.Game;
-import ide.RunnerClient;
-import luaengine.RunnableArgs;
-import luaengine.type.data.Color3;
-import luaengine.type.data.Vector3;
-import luaengine.type.object.insts.GameObject;
-import luaengine.type.object.insts.Material;
-import luaengine.type.object.insts.Mesh;
-import luaengine.type.object.insts.PointLight;
-import luaengine.type.object.insts.Prefab;
+import engine.application.impl.ClientApplication;
+import engine.lua.type.data.Color3;
+import engine.lua.type.data.Vector3;
+import engine.lua.type.object.insts.Camera;
+import engine.lua.type.object.insts.GameObject;
+import engine.lua.type.object.insts.Material;
+import engine.lua.type.object.insts.Mesh;
+import engine.lua.type.object.insts.PointLight;
+import engine.lua.type.object.insts.Prefab;
 
-public class HelloWorld extends RunnerClient {
+public class HelloWorld extends ClientApplication {
 	
 	@Override
 	public void loadScene(String[] args) {
@@ -52,14 +51,14 @@ public class HelloWorld extends RunnerClient {
 		
 		// Make a sphere
 		Mesh mesh = Game.assets().newMesh();
-		mesh.sphere(1);
+		mesh.teapot(1);
 		
 		// Base material
 		Material material = Game.assets().newMaterial();
-		material.setRoughness(0.1f);
-		material.setMetalness(0.0f);
-		material.setReflective(0.0f);
-		material.setColor(Color3.white());
+		material.setRoughness(0.3f);
+		material.setMetalness(0.1f);
+		material.setReflective(0.1f);
+		material.setColor(Color3.red());
 		
 		// Create prefab
 		Prefab p = Game.assets().newPrefab();
@@ -108,30 +107,29 @@ public class HelloWorld extends RunnerClient {
 			l5.setParent(Game.workspace());
 		}
 		
-		// Camera controller
-		Game.runService().renderSteppedEvent().connect( new RunnableArgs() {
-			final int CAMERA_DIST = 2;
-			double t = Math.PI/2f;
+		// Camera controller new
+		Game.runService().renderSteppedEvent().connect( (params) -> {
+			double delta = params[0].todouble();
+			final float CAMERA_DIST = 2;
+			final float CAMERA_PITCH = 0.25f;
 			
-			@Override
-			public void run(LuaValue[] args) {
-				double delta = args[0].todouble();
-				
-				// Get direction value
-				int d = 0;
-				if ( Game.userInputService().isKeyDown(GLFW.GLFW_KEY_E) )
-					d++;
-				if ( Game.userInputService().isKeyDown(GLFW.GLFW_KEY_Q) )
-					d--;
-				t += d*delta;
-				
-				// Rotate the camera based on the direction
-				float xx = (float) (Math.cos(t) * CAMERA_DIST);
-				float yy = (float) (Math.sin(t) * CAMERA_DIST);
-
-				Game.workspace().getCurrentCamera().setPosition(Vector3.newInstance(xx,yy,CAMERA_DIST*0.75f));
-				Game.workspace().getCurrentCamera().setLookAt(Vector3.newInstance(0, 0, 0));
-			}
+			// Get turn direction
+			int d = 0;
+			if ( Game.userInputService().isKeyDown(GLFW.GLFW_KEY_E) )
+				d++;
+			if ( Game.userInputService().isKeyDown(GLFW.GLFW_KEY_Q) )
+				d--;
+			
+			// Get the camera
+			Camera camera = Game.workspace().getCurrentCamera();
+			
+			// Compute new rotation
+			float yaw = camera.getYaw();
+			yaw += d * delta;
+			
+			// Update the camera
+			camera.orbit( Vector3.zero(), CAMERA_DIST, yaw, CAMERA_PITCH );
+			
 		});
 	}
 	
@@ -139,4 +137,5 @@ public class HelloWorld extends RunnerClient {
 		launch(args);
 	}
 }
+
 ```
