@@ -1,11 +1,16 @@
 package ide.layout.windows;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.luaj.vm2.LuaValue;
 import org.lwjgl.PointerBuffer;
+import org.lwjgl.glfw.GLFW;
 import org.lwjgl.system.MemoryUtil;
 import org.lwjgl.util.nfd.NFDPathSet;
 import org.lwjgl.util.nfd.NativeFileDialog;
@@ -13,151 +18,236 @@ import org.lwjgl.util.nfd.NativeFileDialog;
 import engine.Game;
 import engine.GameSubscriber;
 import engine.lua.type.object.Instance;
+import engine.lua.type.object.PhysicsBase;
 import engine.lua.type.object.ScriptBase;
-import engine.lua.type.object.TreeInvisible;
 import engine.lua.type.object.TreeViewable;
+import engine.lua.type.object.insts.AnimationController;
+import engine.lua.type.object.insts.Camera;
+import engine.lua.type.object.insts.Folder;
 import engine.lua.type.object.insts.GameObject;
+import engine.lua.type.object.insts.GlobalScript;
+import engine.lua.type.object.insts.LocalScript;
 import engine.lua.type.object.insts.Mesh;
+import engine.lua.type.object.insts.PhysicsObject;
+import engine.lua.type.object.insts.PlayerPhysics;
 import engine.lua.type.object.insts.Prefab;
+import engine.lua.type.object.insts.Script;
 import engine.lua.type.object.insts.Texture;
 import engine.lua.type.object.services.Assets;
 import engine.util.FileUtils;
 import ide.IDE;
 import ide.layout.IdePane;
 import ide.layout.windows.icons.Icons;
-import lwjgui.LWJGUI;
 import lwjgui.collections.ObservableList;
+import lwjgui.scene.Node;
 import lwjgui.scene.control.ContextMenu;
 import lwjgui.scene.control.MenuItem;
 import lwjgui.scene.control.ScrollPane;
 import lwjgui.scene.control.SeparatorMenuItem;
 import lwjgui.scene.control.TreeBase;
 import lwjgui.scene.control.TreeItem;
+import lwjgui.scene.control.TreeNode;
 import lwjgui.scene.control.TreeView;
 
 public class IdeExplorer extends IdePane implements GameSubscriber {
 	private ScrollPane scroller;
 	private TreeView<Instance> tree;
 
-	private ObservableList<TreeItem<Instance>> cache1;
-	private ObservableList<TreeItem<Instance>> cache2;
+	private HashMap<Instance, SortedTreeItem<Instance>> instanceMap;
+	private HashMap<Instance, SortedTreeItem<Instance>> instanceMapTemp;
+	private HashMap<SortedTreeItem<Instance>,Instance> treeItemMap;
+	private ArrayList<SortedTreeItem<Instance>> treeItems;
+	private boolean updating;
+	
+	private static HashMap<Class<? extends Instance>, Integer> priority = new HashMap<>();
+	
+	static {
+		priority.put(Folder.class, 20);
 
+		priority.put(Camera.class, 50);
+		
+		priority.put(ScriptBase.class, 35);
+		priority.put(Script.class, 35);
+		priority.put(LocalScript.class, 35);
+		priority.put(GlobalScript.class, 35);
+
+		priority.put(GameObject.class, 8);
+		
+		priority.put(AnimationController.class, 7);
+
+		priority.put(PhysicsBase.class, 6);
+		priority.put(PhysicsObject.class, 6);
+		priority.put(PlayerPhysics.class, 6);
+	}
+	
+	private static int getPriority(Class<? extends Instance> cls) {
+		Integer ret = priority.get(cls);
+		if ( ret == null )
+			return 0;
+		
+		return ret;
+	}
+	
 	public IdeExplorer() {
-		super("Explorer", true);
+		super("Explorer New", true);
 
 		this.scroller = new ScrollPane();
 		this.scroller.setFillToParentHeight(true);
 		this.scroller.setFillToParentWidth(true);
 		this.getChildren().add(scroller);
 
-		tree = new TreeView<Instance>();
+		tree = new SortedTreeView<Instance>();
 		this.scroller.setContent(tree);
-
+		
 		tree.setOnSelectItem(event -> {
+			if ( updating )
+				return;
+			
 			TreeItem<Instance> item = event.object;
 			Instance inst = item.getRoot();
 			Game.select(inst);
 		});
 		tree.setOnDeselectItem(event -> {
+			if ( updating )
+				return;
+			
 			TreeItem<Instance> item = event.object;
 			Instance inst = item.getRoot();
 			Game.deselect(inst);
 		});
-
-		Game.getGame().subscribe(this);
-
-		cache1 = new ObservableList<TreeItem<Instance>>();
-		cache2 = new ObservableList<TreeItem<Instance>>();
-
-		update(true);
 		
+		instanceMap = new HashMap<>();
+		treeItemMap = new HashMap<>();
+		instanceMapTemp = new HashMap<>();
+		treeItems = new ArrayList<SortedTreeItem<Instance>>();
+		
+		Game.getGame().subscribe(this);
+		update(true);
+
 		AtomicLong last = new AtomicLong();
+		AtomicLong bigUpdate = new AtomicLong();
 		Game.runService().renderSteppedEvent().connect((args)->{
 			long now = System.currentTimeMillis();
-			long then = last.get();
-			long elapsed = now-then;
 			
-			if ( elapsed > 200 ) {
-				if ( requiresUpdate ) {
-					update(true);
-				}
+			// Little update
+			if ( now-last.get() > 200 ) {
 				last.set(System.currentTimeMillis());
+				update(false);
+			}
+			
+			// Big update
+			if ( now-bigUpdate.get() > 1000 ) {
+				bigUpdate.set(System.currentTimeMillis());
+				update(true);
+			}
+			
+			// Forced update
+			if ( requiresUpdate ) {
+				updating = false;
+				lastUpdate = -1;
+				update(false);
+			}
+		});
+		
+		Game.userInputService().inputBeganEvent().connect((args)->{
+			if ( args[0].get("KeyCode").eq_b(LuaValue.valueOf(GLFW.GLFW_KEY_Q))) {
+				System.out.println("Pressed Q");
+				update(false);
 			}
 		});
 	}
 
 	private long lastUpdate = -1;
-	private boolean requiresUpdate; // TODO Maybe check in game logic thread if this is true and then force update if lastUpdate hasn't updated in more than 5 ms?
-	
-	public void update(boolean important) {
-		if (System.currentTimeMillis()-lastUpdate < 50 && !important ) {
-			requiresUpdate = true;
+	private boolean requiresUpdate;
+
+	private void update(boolean b) {
+		if ( updating )
+			return;
+
+		// Non important updates only happen at MOST every 50 ms
+		if (System.currentTimeMillis()-lastUpdate < 50 && !b ) {
+			//System.out.println("Blocked excess unimportant update.");
 			return;
 		}
 		
-		System.out.println("Updating... " + important);
+		if ( b ) {
+			requiresUpdate = true;
+			//System.out.println("Deferring explorer update until next frame.");
+			return;
+		}
 		
 		lastUpdate = System.currentTimeMillis();
-		requiresUpdate = false;
+		updating = true;
 		
-		LWJGUI.runLater(() -> {
-			cache2.clear();
-			synchronized(children) {
-				list(tree, (Instance)Game.game());
-			}
+		// Refresh the tree
+		if ( b || treeItems.size() == 0 || requiresUpdate ) {
+			instanceMapTemp.clear();
+			instanceMapTemp.putAll(instanceMap);
+			instanceMap.clear();
 
-			cache1.clear();
-			for (int i = 0; i < cache2.size(); i++) {
-				cache1.add(cache2.get(i));
-			}
-			position(getParent());
-		});
-	}
-
-	private void list(TreeBase<Instance> treeItem, Instance root) {
-		lastUpdate = System.currentTimeMillis();
-		// Remove objects whos parents are gone/changed
-		for (int i = 0; i < treeItem.getItems().size(); i++) {
-			TreeItem<Instance> t = treeItem.getItems().get(i);
-			boolean b = false;
-			Instance par = null;
-			if ( treeItem instanceof TreeItem ) {
-				par = ((TreeItem<Instance>)treeItem).getRoot();
-				if ( !par.equals(t.getRoot().getParent()) ) {
-					b = true;
-				}
-			}
+			treeItemMap.clear();
+			treeItems.clear();
 			
-			if ( t.getRoot() == null || t.getRoot().equals(LuaValue.NIL) || t.getRoot().getParent().equals(LuaValue.NIL) || b) {
-				treeItem.getItems().remove(t);
-				i--;
-				
-				if ( b ) {
-					cache2.remove(t);
-					cache1.remove(t);
-				}
+			list(tree, Game.game());
+		}
+		
+		// Handle selections
+		for (int i = 0; i < treeItems.size(); i++) {
+			tree.deselectItem(treeItems.get(i));
+
+			// Update names
+			TreeItem<Instance> item = treeItems.get(i);
+			String name = item.getRoot().getName();
+			item.setText(name);
+		}
+		List<Instance> selected = Game.selected();
+		for (int i = 0; i < selected.size(); i++) {
+			Instance sel = selected.get(i);
+			TreeItem<Instance> t = instanceMap.get(sel);
+			if ( t != null ) {
+				tree.selectItem(t);
+			}
+		}
+
+		requiresUpdate = false;
+		updating = false;
+	}
+	
+	private void list(TreeBase<Instance> treeItem, Instance root) {
+		// Remove all the items in this tree item that are no longer parented to it
+		ObservableList<TreeItem<Instance>> items = treeItem.getItems();
+		for (int i = 0; i < items.size(); i++) {
+			TreeItem<Instance> item = items.get(i);
+			Instance obj = item.getRoot();
+			LuaValue par = obj.getParent();
+			if( par == null || par.isnil() || par != root ) {
+				items.remove(item);
+				instanceMapTemp.remove(obj);
 			}
 		}
 		
-		// Put instances in explorer
-		List<Instance> instances = root.getChildren();
-		for (int i = 0; i < instances.size(); i++) {
-			Instance inst = instances.get(i);
-			if ( inst instanceof TreeInvisible )
-				continue;
+		// Start adding items to tree
+		List<Instance> c = root.getChildren();
+		for ( int i = 0; i < c.size(); i++) {
+			Instance inst = c.get(i);
 			
-			Icons icon = Icons.icon_wat;
-			if ( inst instanceof TreeViewable ) {
-				icon = ((TreeViewable)inst).getIcon();
-			}
+			// Get the tree item
+			SortedTreeItem<Instance> newTreeItem = instanceMapTemp.get(inst);
+			if ( newTreeItem == null ) {
+				// What graphic does it need?
+				Node graphic = Icons.icon_wat.getView();
+				if ( inst instanceof TreeViewable )
+					graphic = ((TreeViewable)inst).getIcon().getView();
+				
+				// New one
+				newTreeItem = new SortedTreeItem<Instance>(inst, graphic);
 
-			TreeItem<Instance> cached = getCachedInstance(inst);
-			TreeItem<Instance> item = cached;
-
-			if ( item == null ) {
-				item = new TreeItem<Instance>(inst, icon.getView());
-
-				item.setOnMouseClicked(event -> {
+				// Create context menu
+				ContextMenu con = getContetxMenu(inst);
+				newTreeItem.setContextMenu(con);
+				
+				// Open a script
+				newTreeItem.setOnMouseClicked(event -> {
 					int clicks = event.getClickCount();
 					if ( clicks == 2 ) {
 						if ( inst instanceof ScriptBase ) {
@@ -166,30 +256,32 @@ public class IdeExplorer extends IdePane implements GameSubscriber {
 						}
 					}
 				});
-
-				// Create context menu
-				ContextMenu c = getContetxMenu(inst);
-				item.setContextMenu(c);
-			} else {
-				cache1.remove(item);
 			}
 			
-			if ( !treeItem.getItems().contains(item) ) {
-				treeItem.getItems().add(item);
+			// Add this item in if it was reparented.
+			Instance obj = newTreeItem.getRoot();
+			if ( obj == inst && !treeItem.getItems().contains(newTreeItem) ) {
+				treeItem.getItems().add(newTreeItem);
 			}
-
-			if ( Game.isSelected(inst) ) {
-				tree.selectItem(item);
-			} else {
-				tree.deselectItem(item);
-			}
-
-			item.setText(inst.getName());
-			cache2.add(item);
-			list(item, inst);
+			
+			// Update name
+			String name = newTreeItem.getRoot().getName();
+			newTreeItem.setText(name);
+			
+			// cache it for easier lookups
+			instanceMap.put(inst, newTreeItem);
+			treeItemMap.put(newTreeItem, inst);
+			treeItems.add(newTreeItem);
+			
+			// Look ma it's recursion!
+			list(newTreeItem, inst);
+		}
+		
+		if ( treeItem instanceof SortedTreeItem ) {
+			((SortedTreeItem)treeItem).sort();
 		}
 	}
-
+	
 	private ContextMenu getContetxMenu(Instance inst) {
 		ContextMenu c = new ContextMenu();
 		c.setAutoHide(false);
@@ -343,21 +435,16 @@ public class IdeExplorer extends IdePane implements GameSubscriber {
 		// Cut
 		MenuItem insert = new MenuItem("Insert Object  \u25ba", Icons.icon_new.getView());
 		insert.setOnAction(event -> {
-			new InsertWindow(inst);
+			new InsertWindow();
 		});
 		c.getItems().add(insert);
 		
 		return c;
 	}
 
-	private TreeItem<Instance> getCachedInstance(Instance in) {
-		for (int i = 0; i < cache1.size(); i++) {
-			TreeItem<Instance> c = cache1.get(i);
-			if ( c.getRoot().equals(in) ) {
-				return c;
-			}
-		}
-		return null;
+	@Override
+	public void gameUpdateEvent(boolean important) {
+		update(important);
 	}
 
 	@Override
@@ -370,8 +457,44 @@ public class IdeExplorer extends IdePane implements GameSubscriber {
 		//
 	}
 
-	@Override
-	public void gameUpdateEvent(boolean important) {
-		update(false);
+	
+	class SortedTreeView<E> extends TreeView<E> {
+		//
+	}
+	
+	class SortedTreeItem<E> extends TreeItem<E> {
+
+		public SortedTreeItem(E root) {
+			super(root);
+		}
+		
+		public SortedTreeItem(E root, Node node) {
+			super(root, node);
+		}
+		
+		protected void sort() {
+			ArrayList<TreeNode<E>> nodules = new ArrayList<TreeNode<E>>();
+			for (int i = 0; i < nodes.size(); i++) {
+				nodules.add(nodes.get(i));
+			}
+			
+			Collections.sort(nodules, new Comparator<TreeNode<E>>() {
+
+				@SuppressWarnings("unchecked")
+				@Override
+				public int compare(TreeNode<E> o1, TreeNode<E> o2) {
+					int priority1 = getPriority((Class<? extends Instance>) o1.getItem().getRoot().getClass());
+					int priority2 = getPriority((Class<? extends Instance>) o2.getItem().getRoot().getClass());
+					
+					return (priority1<priority2)?1:((priority1==priority2)?0:-1);
+				}
+				
+			});
+			
+			this.nodes = new ObservableList<TreeNode<E>>();
+			for (int i = 0; i < nodules.size(); i++) {
+				nodes.add(nodules.get(i));
+			}
+		}
 	}
 }
