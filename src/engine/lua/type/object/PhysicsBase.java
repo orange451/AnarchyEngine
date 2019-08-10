@@ -39,37 +39,46 @@ public abstract class PhysicsBase extends Instance implements GameSubscriber {
 	protected static final LuaValue C_VELOCITY = LuaValue.valueOf("Velocity");
 	protected static final LuaValue C_ANGULARVELOCITY = LuaValue.valueOf("AngularVelocity");
 	protected static final LuaValue C_PREFAB = LuaValue.valueOf("Prefab");
+	protected static final LuaValue C_MASS = LuaValue.valueOf("Mass");
+	protected static final LuaValue C_LINKED = LuaValue.valueOf("Linked");
+	protected static final LuaValue C_FRICTION = LuaValue.valueOf("Friction");
+	protected static final LuaValue C_BOUNCINESS = LuaValue.valueOf("Bounciness");
+	protected static final LuaValue C_LINEARDAMPING = LuaValue.valueOf("LinearDamping");
+	protected static final LuaValue C_ANGULARFACTOR = LuaValue.valueOf("AngularFactor");
+	protected static final LuaValue C_SHAPE = LuaValue.valueOf("Shape");
+	protected static final LuaValue C_USECUSTOMMESH = LuaValue.valueOf("UseCustomMesh");
+	protected static final LuaValue C_CUSTOMMESH = LuaValue.valueOf("CustomMesh");
 	
 	private Matrix4f lastWorldMatrix = new Matrix4f();
 	
 	public PhysicsBase(String typename) {
 		super(typename);
 		
-		this.defineField("Linked", LuaValue.NIL, true);
+		this.defineField(C_LINKED.toString(), LuaValue.NIL, true);
 		
 		this.defineField(C_VELOCITY.toString(), new Vector3(), false);
 		this.defineField(C_ANGULARVELOCITY.toString(), new Vector3(), false);
 		this.defineField(C_WORLDMATRIX.toString(), new Matrix4(), false);
 		
-		this.defineField("Mass", LuaValue.valueOf(0.5f), false);
-		this.getField("Mass").setClamp(new NumberClamp(0, 1));
+		this.defineField(C_MASS.toString(), LuaValue.valueOf(0.5f), false);
+		this.getField(C_MASS.toString()).setClamp(new NumberClamp(0, 1));
 		
-		this.defineField("Friction", LuaValue.valueOf(0.1f), false);
-		this.getField("Friction").setClamp(new NumberClampPreferred(0, 10, 0, 1));
+		this.defineField(C_FRICTION.toString(), LuaValue.valueOf(0.1f), false);
+		this.getField(C_FRICTION.toString()).setClamp(new NumberClampPreferred(0, 10, 0, 1));
 		
-		this.defineField("Bounciness", LuaValue.valueOf(0.5f), false);
-		this.getField("Bounciness").setClamp(new NumberClampPreferred(0, 2, 0, 1));
+		this.defineField(C_BOUNCINESS.toString(), LuaValue.valueOf(0.5f), false);
+		this.getField(C_BOUNCINESS.toString()).setClamp(new NumberClampPreferred(0, 2, 0, 1));
 		
-		this.defineField("LinearDamping", LuaValue.valueOf(0.0f), false);
-		this.getField("LinearDamping").setClamp(new NumberClamp(0, 1));
+		this.defineField(C_LINEARDAMPING.toString(), LuaValue.valueOf(0.0f), false);
+		this.getField(C_LINEARDAMPING.toString()).setClamp(new NumberClamp(0, 1));
 		
-		this.defineField("AngularFactor", LuaValue.valueOf(1.0f), false);
-		this.getField("AngularFactor").setClamp(new NumberClamp(0, 1));
+		this.defineField(C_ANGULARFACTOR.toString(), LuaValue.valueOf(1.0f), false);
+		this.getField(C_ANGULARFACTOR.toString()).setClamp(new NumberClamp(0, 1));
 		
-		this.defineField("Shape", LuaValue.valueOf("Box"), false);
-		this.getField("Shape").setEnum(new EnumType("Shape"));
+		this.defineField(C_SHAPE.toString(), LuaValue.valueOf("Box"), false);
+		this.getField(C_SHAPE.toString()).setEnum(new EnumType("Shape"));
 		
-		this.defineField("UseCustomMesh", LuaValue.valueOf(false), false);
+		this.defineField(C_USECUSTOMMESH.toString(), LuaValue.valueOf(false), false);
 		
 		Game.getGame().subscribe(this);
 		
@@ -83,7 +92,7 @@ public abstract class PhysicsBase extends Instance implements GameSubscriber {
 					}
 					((Matrix4)this.rawget(C_WORLDMATRIX)).setInternal(lastWorldMatrix);
 				} else if ( linked != null ) {
-					this.rawset("WorldMatrix", linked.get("WorldMatrix"));
+					this.rawset(C_WORLDMATRIX, linked.get(C_WORLDMATRIX));
 				}
 			});
 		});
@@ -155,7 +164,7 @@ public abstract class PhysicsBase extends Instance implements GameSubscriber {
 		if ( !tv.equals(pv) ) {
 			vel.setInternal(pv);
 			this.rawset(C_VELOCITY, vel);
-			this.notifyPropertySubscribers("Velocity", vel);
+			this.notifyPropertySubscribers(C_VELOCITY.toString(), vel);
 		}
 		
 		// Update our angular velocity to the physics objets angular velocity
@@ -165,7 +174,7 @@ public abstract class PhysicsBase extends Instance implements GameSubscriber {
 		if ( !tav.equals(pav) ) {
 			angvel.setInternal(pav);
 			this.rawset(C_ANGULARVELOCITY, angvel);
-			this.notifyPropertySubscribers("AngularVelocity", angvel);
+			this.notifyPropertySubscribers(C_ANGULARVELOCITY.toString(), angvel);
 		}
 	}
 	
@@ -174,7 +183,7 @@ public abstract class PhysicsBase extends Instance implements GameSubscriber {
 	 * @return
 	 */
 	public double getMass() {
-		return this.get("Mass").checkdouble();
+		return this.get(C_MASS).checkdouble();
 	}
 	
 	private void cleanupPhysics() {
@@ -197,7 +206,7 @@ public abstract class PhysicsBase extends Instance implements GameSubscriber {
 			linked = null;
 		}
 		
-		this.rawset("Linked", LuaValue.NIL);
+		this.rawset(C_LINKED, LuaValue.NIL);
 		this.playerOwns = null;
 	}
 	
@@ -222,7 +231,7 @@ public abstract class PhysicsBase extends Instance implements GameSubscriber {
 		
 		// Link us to this game object
 		linked = (GameObject) value;
-		this.rawset("Linked", linked);
+		this.rawset(C_LINKED, linked);
 		
 		// Cannot continue if we're not linked.
 		if ( linked == null )
@@ -245,11 +254,11 @@ public abstract class PhysicsBase extends Instance implements GameSubscriber {
 			String property = args[0].toString();
 			
 			// Game object had its own matrix changed. Replicate to physics.
-			if ( property.equals("WorldMatrix") || property.equals("Position") ) {
+			if ( property.equals(C_WORLDMATRIX.toString()) || property.equals("Position") ) {
 				if ( physics == null )
 					return;
 				
-				PhysicsBase.this.set("WorldMatrix", new Matrix4(((Matrix4)linked.get("WorldMatrix"))));
+				PhysicsBase.this.set(C_WORLDMATRIX, new Matrix4(((Matrix4)linked.get(C_WORLDMATRIX))));
 			}
 			
 			// Game object had its model changed. Replicate to physics object.
@@ -293,7 +302,7 @@ public abstract class PhysicsBase extends Instance implements GameSubscriber {
 	}
 	
 	public float getFriction() {
-		return this.get("Friction").tofloat();
+		return this.get(C_FRICTION).tofloat();
 	}
 	
 	public Vector3 getVelocity() {
@@ -336,57 +345,57 @@ public abstract class PhysicsBase extends Instance implements GameSubscriber {
 		}
 		
 		// User updated the mass
-		if ( key.toString().equals("Mass") ) {
+		if ( key.eq_b(C_MASS) ) {
 			if ( physics != null ) {
 				physics.setMass( Math.min( Math.max( value.tofloat(), 0 ), 1 ) );
 			}
 		}
 		
 		// User updated the bounciness
-		if ( key.toString().equals("Bounciness") ) {
+		if ( key.eq_b(C_BOUNCINESS) ) {
 			if ( physics != null ) {
 				physics.setBounciness(value.tofloat());
 			}
 		}
 		
 		// User updated the friction
-		if ( key.toString().equals("Friction") ) {
+		if ( key.eq_b(C_FRICTION) ) {
 			if ( physics != null ) {
 				physics.setFriction(value.tofloat());
 			}
 		}
 		
 		// User updated the AngularFactor
-		if ( key.toString().equals("AngularFactor") ) {
+		if ( key.eq_b(C_ANGULARFACTOR) ) {
 			if ( physics != null ) {
 				physics.setAngularFactor( value.tofloat() );
 			}
 		}
 		
 		// User updated the LinearDamping
-		if ( key.toString().equals("LinearDamping") ) {
+		if ( key.eq_b(C_LINEARDAMPING) ) {
 			if ( physics != null ) {
 				physics.setLinearDamping(value.tofloat());
 			}
 		}
 		
 		// Enable custom mesh
-		if ( key.toString().equals("UseCustomMesh") ) {
+		if ( key.eq_b(C_USECUSTOMMESH) ) {
 			if ( value.checkboolean() ) {
-				this.defineField("CustomMesh", LuaValue.NIL, false);
-				this.set("CustomMesh", LuaValue.NIL);
+				this.defineField(C_CUSTOMMESH.toString(), LuaValue.NIL, false);
+				this.set(C_CUSTOMMESH, LuaValue.NIL);
 				
-				this.getField("Shape").setLocked(true);
+				this.getField(C_SHAPE.toString()).setLocked(true);
 			} else {
-				this.undefineField("CustomMesh");
-				this.getField("Shape").setLocked(false);
+				this.undefineField(C_CUSTOMMESH.toString());
+				this.getField(C_SHAPE.toString()).setLocked(false);
 			}
 
 			return value;
 		}
 		
 		// Updated shape
-		if ( key.toString().equals("Shape") ) {
+		if ( key.eq_b(C_SHAPE) ) {
 			if ( value.isnil() )
 				return null;
 			
@@ -397,7 +406,7 @@ public abstract class PhysicsBase extends Instance implements GameSubscriber {
 		}
 		
 		// If the user wants to set a custom mesh, it MUST be a mesh.
-		if ( key.toString().equals("CustomMesh") ) {
+		if ( key.eq_b(C_CUSTOMMESH) ) {
 			if ( !value.isnil() && !(value instanceof Mesh) ) {
 				return null;
 			}
@@ -417,7 +426,7 @@ public abstract class PhysicsBase extends Instance implements GameSubscriber {
 	
 	@Override
 	public void onValueUpdated(LuaValue key, LuaValue value) {
-		if ( key.toString().equals("Parent") ) {
+		if ( key.eq_b(C_PARENT) ) {
 			//System.out.println("New parent: " + value);
 			//cleanupPhysics();
 			
@@ -429,7 +438,7 @@ public abstract class PhysicsBase extends Instance implements GameSubscriber {
 	
 	@Override
 	protected boolean onValueGet(LuaValue key) {
-		if ( key.toString().equals("WorldMatrix") ) {
+		if ( key.eq_b(C_WORLDMATRIX) ) {
 			/*if ( physics != null ) {
 				((Matrix4)this.rawget("WorldMatrix")).setInternal(physics.getWorldMatrix());
 				return true;
@@ -482,8 +491,8 @@ public abstract class PhysicsBase extends Instance implements GameSubscriber {
 					}
 				}
 			} else {
-				LuaValue localPlayer = Game.getService("Players").get("LocalPlayer");
-				if ( !localPlayer.isnil() && localPlayer instanceof Player ) {
+				LuaValue localPlayer = Game.players().getLocalPlayer();
+				if ( localPlayer != null && localPlayer instanceof Player ) {
 					Player player = (Player) localPlayer;
 					
 					if (player.get("ClientOwnsPhysics").toboolean()) {
@@ -523,7 +532,7 @@ public abstract class PhysicsBase extends Instance implements GameSubscriber {
 	}
 	
 	public Matrix4 getWorldMatrix() {
-		return (Matrix4) this.get("WorldMatrix");
+		return (Matrix4) this.get(C_WORLDMATRIX);
 	}
 	
 	public abstract Pair<Vector3f, Vector3f> getAABB();

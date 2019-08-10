@@ -328,6 +328,8 @@ public class PhysicsObjectInternal {
 				this.world.dynamicsWorld.addRigidBody(newBody);
 			}
 			
+			System.out.println("Setting velocity of: " + this.luaFrontEnd.getFullName() + " -> " + vel);
+			
 			this.wakeup();
 			newBody.activate(true);
 			newBody.setLinearVelocity(vel);
