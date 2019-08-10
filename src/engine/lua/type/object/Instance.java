@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
+import org.luaj.vm2.LuaNumber;
 import org.luaj.vm2.LuaTable;
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.ThreeArgFunction;
@@ -393,18 +394,34 @@ public abstract class Instance extends DataModel {
 
 	@Override
 	public void set(LuaValue key, LuaValue value) {
-		LuaValue oldValue = this.get(key);
+		LuaValue oldValue = this.rawget(key);
 		boolean changed = !oldValue.equals(value);
+		
+		// Hacked in double comparison... Since luaJ uses == for comparing doubles :(
+		if ( value instanceof LuaNumber || oldValue instanceof LuaNumber ) {
+			double v1 = value.todouble();
+			double v2 = oldValue.todouble();
+			if (Math.abs(v1 - v2) < 0.001)
+				changed = false;
+		}
 		
 		super.set( key, value );
 		
 		checkSetParent(key, oldValue, value); // value may have changed
 		checkSetName(key, oldValue, value); // value may have changed
 
-		if ( !changed )
-			return;
-		
-		onKeyChange( key, this.get(key) );
+		// Call change event only if value changes
+		if ( changed ) {
+			//if ( key.toString().equals("Height") ) {
+				/*System.out.println();
+				System.out.println("KEY CHANGE SETTING: " + key.toString() + " from [" + oldValue.toString() + "] to [" + value.toString() + "]");
+				System.out.println(oldValue.getClass() + " / " + value.getClass());
+				System.out.println(oldValue.equals(value) + " / " + oldValue.eq(value) + " / " + oldValue.eq_b(value));
+				System.out.println();*/
+			//}
+			
+			onKeyChange( key, this.get(key) );
+		}
 	}
 	
 	public void notifyPropertySubscribers(String key, LuaValue value) {
@@ -560,6 +577,9 @@ public abstract class Instance extends DataModel {
 	}
 	
 	public void setParent(LuaValue parent) {
+		if ( parent == null )
+			parent = LuaValue.NIL;
+		
 		this.set(C_PARENT, parent);
 	}
 	

@@ -17,6 +17,8 @@ import ide.layout.windows.icons.Icons;
 
 public class PlayerPhysics extends PhysicsBase implements TreeViewable {
 
+	private static final LuaValue C_HEIGHT = LuaValue.valueOf("Height");
+	
 	public PlayerPhysics() {
 		super("PlayerPhysics");
 
@@ -25,8 +27,8 @@ public class PlayerPhysics extends PhysicsBase implements TreeViewable {
 		this.defineField("Radius", LuaValue.valueOf(0.3f), false);
 		this.getField("Radius").setClamp(new NumberClamp(0.1f, 512));
 		
-		this.defineField("Height", LuaValue.valueOf(1.0f), false);
-		this.getField("Height").setClamp(new NumberClamp(0.1f, 512));
+		this.defineField(C_HEIGHT.toString(), LuaValue.valueOf(1.0f), false);
+		this.getField(C_HEIGHT.toString()).setClamp(new NumberClamp(0.1f, 512));
 		
 		this.defineField("StepHeight", LuaValue.valueOf(0.1f), false);
 		this.getField("StepHeight").setClamp(new NumberClamp(0.1f, 512));
@@ -48,7 +50,7 @@ public class PlayerPhysics extends PhysicsBase implements TreeViewable {
 		
 		// If height changes, rebuild physics
 		this.changedEvent().connect((args)-> {
-			if ( args[0].toString().equals("Height") ) {
+			if ( args[0].eq_b(C_HEIGHT) ) {
 				PlayerPhysics.this.forceRefresh();
 			}
 		});
