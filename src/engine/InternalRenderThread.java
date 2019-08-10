@@ -125,8 +125,10 @@ public class InternalRenderThread {
 
 		// Draw event
 		if ( Game.isLoaded() ) {
+			Game.runService().renderPreEvent().fire(LuaValue.valueOf(delta));
 			Game.runService().renderSteppedEvent().fire(LuaValue.valueOf(delta));
 			observable.notifyObservers();
+			Game.runService().renderPostEvent().fire(LuaValue.valueOf(delta));
 		}
 		
 		// Run runnables

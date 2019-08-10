@@ -19,6 +19,7 @@ import engine.lua.type.DataModel;
 import engine.lua.type.LuaEvent;
 import engine.lua.type.LuaField;
 import engine.lua.type.LuaValuetype;
+import engine.lua.type.DataModel.LuaInstancetypeData;
 
 public abstract class Instance extends DataModel {
 	protected List<Instance> children = Collections.synchronizedList(new ArrayList<Instance>());
@@ -221,7 +222,7 @@ public abstract class Instance extends DataModel {
 		}
 		
 		// Create an instance of the desired class (SLOW)
-		DataModel instance2 = DataModel.instance(class2);
+		DataModel instance2 = Instance.instance(class2);
 		if ( instance2 == null )
 			return LuaValue.FALSE;
 		if ( !(instance2 instanceof Instance) )
@@ -247,6 +248,26 @@ public abstract class Instance extends DataModel {
 		instance2.cleanup();
 		
 		return LuaValue.FALSE;
+	}
+	
+	/**
+	 * Instantiate an Instance by type.
+	 * @param type
+	 * @return
+	 */
+	public static Instance instance(String type) {
+		if ( type == null )
+			return null;
+		
+		LuaInstancetypeData c = TYPES.get(type);
+		try {
+			return (Instance) c.instanceableClass.getDeclaredConstructor().newInstance();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return null;
 	}
 	
 	public void clearAllChildren() {

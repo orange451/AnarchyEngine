@@ -2,11 +2,13 @@ package engine.lua.type.object;
 
 import java.util.List;
 
+import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.luaj.vm2.LuaValue;
 
 import engine.Game;
 import engine.GameSubscriber;
+import engine.InternalRenderThread;
 import engine.lua.lib.EnumType;
 import engine.lua.network.InternalClient;
 import engine.lua.network.InternalServer;
@@ -38,6 +40,8 @@ public abstract class PhysicsBase extends Instance implements GameSubscriber {
 	protected static final LuaValue C_ANGULARVELOCITY = LuaValue.valueOf("AngularVelocity");
 	protected static final LuaValue C_PREFAB = LuaValue.valueOf("Prefab");
 	
+	private Matrix4f lastWorldMatrix = new Matrix4f();
+	
 	public PhysicsBase(String typename) {
 		super(typename);
 		
@@ -68,6 +72,21 @@ public abstract class PhysicsBase extends Instance implements GameSubscriber {
 		this.defineField("UseCustomMesh", LuaValue.valueOf(false), false);
 		
 		Game.getGame().subscribe(this);
+		
+		// Update matrices
+		InternalRenderThread.runLater(()->{
+			Game.runService().renderPreEvent().connect((args)->{
+				if ( physics != null ) {
+					
+					if ( linked != null ) {
+						((Matrix4)linked.rawget(C_WORLDMATRIX)).setInternal(lastWorldMatrix);
+					}
+					((Matrix4)this.rawget(C_WORLDMATRIX)).setInternal(lastWorldMatrix);
+				} else if ( linked != null ) {
+					this.rawset("WorldMatrix", linked.get("WorldMatrix"));
+				}
+			});
+		});
 	}
 	
 	@Override
@@ -96,12 +115,16 @@ public abstract class PhysicsBase extends Instance implements GameSubscriber {
 			return;
 		if ( internalPhys == null )
 			return;
-		linked.rawset(C_WORLDMATRIX, this.get(C_WORLDMATRIX));
+		
+		lastWorldMatrix.set(internalPhys.getWorldMatrix());
 		
 		// Ownership stuff
 		checkNetworkOwnership();
 		
+		// Send update packets
 		if ( internalPhys.getBody() != null ) {
+			
+			// Server sends physics updates to the clients (except for client-owned physics)
 			if ( Game.isServer() && internalPhys.getBody().isActive() && this.getMass() > 0 ) {
 				if ( playerOwns == null ) {
 					InternalServer.sendAllUDP(new InstanceUpdateUDP(this, C_WORLDMATRIX));
@@ -114,6 +137,7 @@ public abstract class PhysicsBase extends Instance implements GameSubscriber {
 				}
 			}
 			
+			// Client tells server where his player-owned physics are (Server can still refuse these updates)
 			boolean isClient = !Game.isServer();
 			if ( isClient && Game.players().getLocalPlayer() != null ) {
 				if (Game.players().getLocalPlayer().equals(playerOwns)) {
@@ -206,9 +230,9 @@ public abstract class PhysicsBase extends Instance implements GameSubscriber {
 		
 		
 		// Create physics object
-		this.rawset("WorldMatrix", new Matrix4((Matrix4)linked.get("WorldMatrix")));
+		this.rawset(C_WORLDMATRIX, new Matrix4((Matrix4)linked.get(C_WORLDMATRIX)));
 		physics = new PhysicsObjectInternal(this);
-		this.set("WorldMatrix", new Matrix4((Matrix4)linked.get("WorldMatrix")));
+		this.set(C_WORLDMATRIX, new Matrix4((Matrix4)linked.get(C_WORLDMATRIX)));
 		
 		// Initial prefab chnaged event
 		if ( linked != null ) {
@@ -282,9 +306,9 @@ public abstract class PhysicsBase extends Instance implements GameSubscriber {
 	public LuaValue updatePhysics(LuaValue key, LuaValue value) {
 		
 		// User updated the world matrix
-		if ( key.toString().equals("WorldMatrix") ) {
+		if ( key.eq_b(C_WORLDMATRIX)) {
 			if ( linked != null ) {
-				linked.rawset("WorldMatrix", new Matrix4((Matrix4) value));
+				linked.rawset(C_WORLDMATRIX, new Matrix4((Matrix4) value));
 			}
 			
 			if ( physics != null ) {
@@ -405,14 +429,14 @@ public abstract class PhysicsBase extends Instance implements GameSubscriber {
 	@Override
 	protected boolean onValueGet(LuaValue key) {
 		if ( key.toString().equals("WorldMatrix") ) {
-			if ( physics != null ) {
+			/*if ( physics != null ) {
 				((Matrix4)this.rawget("WorldMatrix")).setInternal(physics.getWorldMatrix());
 				return true;
 			}
 			if ( linked != null ) {
 				this.rawset("WorldMatrix", linked.get("WorldMatrix"));
 				return true;
-			}
+			}*/
 		}
 		return true;
 	}
@@ -447,7 +471,7 @@ public abstract class PhysicsBase extends Instance implements GameSubscriber {
 	private void checkNetworkOwnership() {
 		if ( playerOwns == null ) {
 			if ( Game.isServer() ) {
-				Connections connections = (Connections) Game.getService("Connections");
+				Connections connections = Game.connections();
 				List<GameObject> ownedCharacters = connections.ownedCharacters;
 				for (int i = 0; i < ownedCharacters.size(); i++) {
 					GameObject character = ownedCharacters.get(i);
@@ -465,8 +489,6 @@ public abstract class PhysicsBase extends Instance implements GameSubscriber {
 						LuaValue character = player.get("Character");
 						if ( !character.isnil() && character instanceof GameObject && this.isDescendantOf((GameObject)character) ) {
 							playerOwns = player;
-							
-							System.out.println("I OWN THIS!");
 						}
 					}
 				}

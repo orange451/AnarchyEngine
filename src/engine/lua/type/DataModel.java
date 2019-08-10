@@ -12,8 +12,9 @@ import engine.lua.type.object.Instance;
 
 public abstract class DataModel extends LuaDatatype {
 	protected static HashMap<String,LuaInstancetypeData> TYPES = new HashMap<String,LuaInstancetypeData>();
-	class LuaInstancetypeData {
-		Class<?> instanceableClass;
+	
+	public class LuaInstancetypeData {
+		public Class<?> instanceableClass;
 		boolean instanceable = true;
 
 		LuaInstancetypeData( Class<?> cls ) {
@@ -133,21 +134,6 @@ public abstract class DataModel extends LuaDatatype {
 	
 	public LuaEvent descendantRemovedEvent() {
 		return (LuaEvent)this.rawget("DescendantRemoved");
-	}
-	
-	public static DataModel instance(String type) {
-		if ( type == null )
-			return null;
-		
-		LuaInstancetypeData c = TYPES.get(type);
-		try {
-			return (DataModel) c.instanceableClass.getDeclaredConstructor().newInstance();
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		return null;
 	}
 
 	public void setInstanceable( boolean instanceable ) {
