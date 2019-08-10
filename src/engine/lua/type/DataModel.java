@@ -12,6 +12,13 @@ import engine.lua.type.object.Instance;
 
 public abstract class DataModel extends LuaDatatype {
 	protected static HashMap<String,LuaInstancetypeData> TYPES = new HashMap<String,LuaInstancetypeData>();
+
+	private static final LuaValue C_CHANGED = LuaValue.valueOf("Changed");
+	private static final LuaValue C_DESTROYED = LuaValue.valueOf("Destroyed");
+	private static final LuaValue C_CHILDADDED = LuaValue.valueOf("ChildAdded");
+	private static final LuaValue C_CHILDREMOVED = LuaValue.valueOf("ChildRemoved");
+	private static final LuaValue C_DESCENDANTADDED = LuaValue.valueOf("DescendantAdded");
+	private static final LuaValue C_DESCENDANTREMOVED = LuaValue.valueOf("DescendantRemoved");
 	
 	public class LuaInstancetypeData {
 		public Class<?> instanceableClass;
@@ -75,12 +82,12 @@ public abstract class DataModel extends LuaDatatype {
 		this.defineField("Parent",			LuaValue.NIL,			false);
 		this.defineField("Archivable",		LuaValue.valueOf(true), false);
 
-		this.rawset("Changed",		new LuaEvent());
-		this.rawset("Destroyed",	new LuaEvent());
-		this.rawset("ChildAdded",	new LuaEvent());
-		this.rawset("ChildRemoved",	new LuaEvent());
-		this.rawset("DescendantAdded",		new LuaEvent());
-		this.rawset("DescendantRemoved",	new LuaEvent());
+		this.rawset(C_CHANGED,		new LuaEvent());
+		this.rawset(C_DESTROYED,	new LuaEvent());
+		this.rawset(C_CHILDADDED,	new LuaEvent());
+		this.rawset(C_CHILDREMOVED,	new LuaEvent());
+		this.rawset(C_DESCENDANTADDED,		new LuaEvent());
+		this.rawset(C_DESCENDANTREMOVED,	new LuaEvent());
 	}
 	
 	public boolean isArhivable() {
@@ -113,27 +120,27 @@ public abstract class DataModel extends LuaDatatype {
 	}
 	
 	public LuaEvent changedEvent() {
-		return (LuaEvent)this.rawget("Changed");
+		return (LuaEvent)this.rawget(C_CHANGED);
 	}
 	
 	public LuaEvent destroyedEvent() {
-		return (LuaEvent)this.rawget("Destroyed");
+		return (LuaEvent)this.rawget(C_DESTROYED);
 	}
 	
 	public LuaEvent childAddedEvent() {
-		return (LuaEvent)this.rawget("ChildAdded");
+		return (LuaEvent)this.rawget(C_CHILDADDED);
 	}
 	
 	public LuaEvent childRemovedEvent() {
-		return (LuaEvent)this.rawget("ChildRemoved");
+		return (LuaEvent)this.rawget(C_CHILDREMOVED);
 	}
 	
 	public LuaEvent descendantAddedEvent() {
-		return (LuaEvent)this.rawget("DescendantAdded");
+		return (LuaEvent)this.rawget(C_DESCENDANTADDED);
 	}
 	
 	public LuaEvent descendantRemovedEvent() {
-		return (LuaEvent)this.rawget("DescendantRemoved");
+		return (LuaEvent)this.rawget(C_DESCENDANTREMOVED);
 	}
 
 	public void setInstanceable( boolean instanceable ) {
