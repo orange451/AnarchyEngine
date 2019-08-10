@@ -76,6 +76,14 @@ public class Vector3 extends LuaValuetype {
 			}
 		});
 
+		this.getmetatable().set(LuaValue.EQ, new TwoArgFunction() {
+			public LuaValue call(LuaValue left, LuaValue right) {
+				Vector3 left2 = getVector(left);
+				Vector3 right2 = getVector(right);
+				return LuaValue.valueOf(left2.equals(right2));
+			}
+		});
+
 		this.getmetatable().set(LuaValue.ADD, new TwoArgFunction() {
 			public LuaValue call(LuaValue left, LuaValue right) {
 				Vector3 left2 = getVector(left);
@@ -168,6 +176,26 @@ public class Vector3 extends LuaValuetype {
 	
 	public LuaValue tostring() {
 		return LuaValue.valueOf(typename()+":("+toString()+")");
+	}
+	
+	@Override
+	public boolean equals(Object vector) {
+		if ( vector == this )
+			return true;
+		
+		if ( !(vector instanceof Vector3) )
+			return false;
+		
+		if ( ((Vector3)vector).getX() != getX() )
+			return false;
+		
+		if ( ((Vector3)vector).getY() != getY() )
+			return false;
+		
+		if ( ((Vector3)vector).getZ() != getZ() )
+			return false;
+		
+		return true;
 	}
 
 	private static Vector3 newInstance(double x, double y, double z) {
