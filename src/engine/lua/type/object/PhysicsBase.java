@@ -232,6 +232,7 @@ public abstract class PhysicsBase extends Instance implements GameSubscriber {
 		// Create physics object
 		this.rawset(C_WORLDMATRIX, new Matrix4((Matrix4)linked.get(C_WORLDMATRIX)));
 		physics = new PhysicsObjectInternal(this);
+		physics.setVelocity(this.getVelocity().toJoml());
 		this.set(C_WORLDMATRIX, new Matrix4((Matrix4)linked.get(C_WORLDMATRIX)));
 		
 		// Initial prefab chnaged event
