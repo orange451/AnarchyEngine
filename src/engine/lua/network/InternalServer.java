@@ -3,6 +3,8 @@ package engine.lua.network;
 import java.io.IOException;
 import java.util.List;
 
+import org.luaj.vm2.LuaValue;
+
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 import com.esotericsoftware.kryonet.Server;
@@ -11,6 +13,7 @@ import engine.Game;
 import engine.InternalGameThread;
 import engine.io.Save;
 import engine.lua.network.internal.GZIPUtil;
+import engine.lua.network.internal.NonReplicatable;
 import engine.lua.network.internal.PingRequest;
 import engine.lua.network.internal.ServerProcessable;
 import engine.lua.network.internal.protocol.ClientConnectFinishTCP;
@@ -172,10 +175,20 @@ public class InternalServer extends Server {
 			syncInstances(objects.get(i));
 		}
 	}
+
+	private static final LuaValue C_NAME = LuaValue.valueOf("Name");
+	private static final LuaValue C_PARENT = LuaValue.valueOf("Parent");
+	private static final LuaValue C_SID = LuaValue.valueOf("SID");
 	
 	private void syncInstances(Instance instance) {
 		instance.changedEvent().connect((cargs) -> {
-			InstanceUpdateUDP updateObject = new InstanceUpdateUDP(instance, cargs[0]);
+			LuaValue key = cargs[0];
+			if ( instance instanceof NonReplicatable ) {
+				if ( !key.eq_b(C_NAME) && !key.eq_b(C_PARENT) && !key.eq_b(C_SID) ) {
+					return;
+				}
+			}
+			InstanceUpdateUDP updateObject = new InstanceUpdateUDP(instance, key);
 			sendAllUDP(updateObject);
 		});
 	}

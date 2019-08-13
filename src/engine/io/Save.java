@@ -20,6 +20,7 @@ import org.lwjgl.util.nfd.NativeFileDialog;
 import engine.Game;
 import engine.InternalRenderThread;
 import engine.gl.mesh.BufferedMesh;
+import engine.lua.network.internal.NonReplicatable;
 import engine.lua.type.LuaValuetype;
 import engine.lua.type.object.AssetLoadable;
 import engine.lua.type.object.Instance;
@@ -294,7 +295,12 @@ public class Save {
 				if ( field.equals("Name") || field.equals("ClassName") || field.equals("Parent") )
 					continue;
 
-				p.put(field, fieldToJSON(instance.get(field)));
+				if ( Game.isRunning() && instance instanceof NonReplicatable ) {
+					// Protect the fields of non replicatable objects being sent when running.
+					p.put(field, fieldToJSONBlank(instance.get(field)));
+				} else {
+					p.put(field, fieldToJSON(instance.get(field)));
+				}
 			}
 
 			JSONObject j = new JSONObject();
@@ -321,6 +327,37 @@ public class Save {
 		public int getReference() {
 			return (int) this.get("Reference");
 		}
+	}
+
+	@SuppressWarnings("unchecked")
+	protected static Object fieldToJSONBlank(LuaValue luaValue) {
+		if ( luaValue.isstring() )
+			return "";
+		if ( luaValue.isboolean() )
+			return false;
+		if ( luaValue.isnumber() )
+			return 0.0;
+		
+		if ( luaValue instanceof Instance )
+			return null;
+		
+		// Vectorx/Colors/etc
+		if ( luaValue instanceof LuaValuetype ) {
+			try {
+				JSONObject t = new JSONObject();
+				t.put("ClassName", ((LuaValuetype)luaValue).typename());
+				t.put("Data", ((LuaValuetype)luaValue).getClass().newInstance().toJSON());
+
+				JSONObject j = new JSONObject();
+				j.put("Type", "Datatype");
+				j.put("Value", t);
+				return j;
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		
+		return null;
 	}
 
 	@SuppressWarnings("unchecked")
