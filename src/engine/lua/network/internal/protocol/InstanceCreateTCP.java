@@ -15,6 +15,8 @@ public class InstanceCreateTCP implements ClientProcessable {
 	public String instanceType;
 	public String instanceData;
 	
+	private static final LuaValue C_CLASSNAME = LuaValue.valueOf("ClassName");
+	
 	public InstanceCreateTCP() {
 		this.instanceType = "";
 		this.instanceData = "";
@@ -22,15 +24,15 @@ public class InstanceCreateTCP implements ClientProcessable {
 	
 	@SuppressWarnings("unchecked")
 	public InstanceCreateTCP(Instance instance) {
-		this.instanceType = instance.get("ClassName").toString();
+		this.instanceType = instance.get(C_CLASSNAME).toString();
 		
-		String[] fields = instance.getFields();
+		LuaValue[] fields = instance.getFields();
 		
 		JSONObject j = new JSONObject();
 		for (int i = 0; i < fields.length; i++) {
-			String field = fields[i];
+			LuaValue field = fields[i];
 			
-			if ( field.equals("ClassName") )
+			if ( field.eq_b(C_CLASSNAME) )
 				continue;
 			
 			j.put(field, PacketUtility.fieldToJSON(instance.get(field)));

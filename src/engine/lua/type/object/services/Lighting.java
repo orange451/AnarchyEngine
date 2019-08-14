@@ -32,13 +32,13 @@ public class Lighting extends Service implements TreeViewable {
 		this.defineField(C_SKYBOX.toString(), LuaValue.NIL, false);
 		
 		this.defineField(C_EXPOSURE.toString(), LuaValue.valueOf(1.0f), false);
-		this.getField(C_EXPOSURE.toString()).setClamp(new NumberClampPreferred(0, 25, 0, 2));
+		this.getField(C_EXPOSURE).setClamp(new NumberClampPreferred(0, 25, 0, 2));
 		
 		this.defineField(C_SATURATION.toString(), LuaValue.valueOf(1.2f), false);
-		this.getField(C_SATURATION.toString()).setClamp(new NumberClampPreferred(0, 100, 0, 2));
+		this.getField(C_SATURATION).setClamp(new NumberClampPreferred(0, 100, 0, 2));
 		
 		this.defineField(C_GAMMA.toString(), LuaValue.valueOf(2.2f), false);
-		this.getField(C_GAMMA.toString()).setClamp(new NumberClampPreferred(0, 10, 0, 4));
+		this.getField(C_GAMMA).setClamp(new NumberClampPreferred(0, 10, 0, 4));
 	}
 	
 	public Color3 getAmbient() {

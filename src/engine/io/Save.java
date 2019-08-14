@@ -289,9 +289,9 @@ public class Save {
 			}
 
 			JSONObject p = new JSONObject();
-			String[] fields = instance.getFields();
+			LuaValue[] fields = instance.getFields();
 			for (int i = 0; i < fields.length; i++) {
-				String field = fields[i];
+				String field = fields[i].toString();
 				if ( field.equals("Name") || field.equals("ClassName") || field.equals("Parent") )
 					continue;
 

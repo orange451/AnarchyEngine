@@ -48,19 +48,19 @@ public class Material extends Asset implements TreeViewable {
 		this.defineField(C_ROUGHNESSTEXTURE.toString(), LuaValue.NIL, false);
 		
 		this.defineField(C_METALNESS.toString(), LuaValue.valueOf(0.0f), false);
-		this.getField(C_METALNESS.toString()).setClamp(new NumberClamp(0, 1));
+		this.getField(C_METALNESS).setClamp(new NumberClamp(0, 1));
 		
 		this.defineField(C_ROUGHNESS.toString(), LuaValue.valueOf(0.4f), false);
-		this.getField(C_ROUGHNESS.toString()).setClamp(new NumberClamp(0, 1));
+		this.getField(C_ROUGHNESS).setClamp(new NumberClamp(0, 1));
 		
 		this.defineField(C_REFLECTIVE.toString(), LuaValue.valueOf(0.05f), false);
-		this.getField(C_REFLECTIVE.toString()).setClamp(new NumberClamp(0, 1));
+		this.getField(C_REFLECTIVE).setClamp(new NumberClamp(0, 1));
 		
 		this.defineField(C_COLOR.toString(), Color3.newInstance(255, 255, 255), false);
 		this.defineField(C_EMISSIVE.toString(), new Vector3(), false);
 		
 		this.defineField(C_TRANSPARENCY.toString(), LuaValue.ZERO, false);
-		this.getField(C_TRANSPARENCY.toString()).setClamp(new NumberClamp(0, 1));
+		this.getField(C_TRANSPARENCY).setClamp(new NumberClamp(0, 1));
 		
 		this.material = new engine.gl.MaterialGL();
 	}
@@ -139,7 +139,7 @@ public class Material extends Asset implements TreeViewable {
 
 	@Override
 	protected LuaValue onValueSet(LuaValue key, LuaValue value) {
-		if ( this.containsField(key.toString()) )
+		if ( this.containsField(key) )
 			changed = true;
 		
 		if ( key.eq_b(C_DIFFUSETEXTURE)

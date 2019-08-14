@@ -21,7 +21,7 @@ public class AnimationKeyframeSequence extends Instance implements TreeViewable 
 		this.setLocked(true);
 		this.setInstanceable(false);
 		
-		this.getField("Archivable").setLocked(true);
+		this.getField(LuaValue.valueOf("Archivable")).setLocked(true);
 		
 		this.defineField(C_TIME.toString(), LuaValue.valueOf(0), true);
 		

@@ -11,6 +11,9 @@ public class PingRequest {
 	public long instanceId;
 	public boolean ack;
 	
+	private static final LuaValue C_PING = LuaValue.valueOf("Ping");
+			
+	
 	public PingRequest() {
 		originalSendTime = System.currentTimeMillis();
 		ack = false;
@@ -32,8 +35,8 @@ public class PingRequest {
 			if ( inst == null || !(inst instanceof Connection) )
 				return;
 			
-			((Connection)inst).rawset("Ping", ping);
-			((Connection)inst).notifyPropertySubscribers("Ping", LuaValue.valueOf(ping));
+			((Connection)inst).rawset(C_PING, LuaValue.valueOf(ping));
+			((Connection)inst).notifyPropertySubscribers(C_PING, LuaValue.valueOf(ping));
 		} else {
 			ack = true;
 			

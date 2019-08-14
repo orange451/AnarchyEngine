@@ -19,12 +19,14 @@ import lwjgui.paint.Color;
 public class PointLight extends LightBase implements TreeViewable,GameSubscriber {
 
 	private engine.gl.light.PointLightInternal light;
+	
+	private static final LuaValue C_RADIUS = LuaValue.valueOf("Radius");
 
 	public PointLight() {
 		super("PointLight");
 		
-		this.defineField("Radius", LuaValue.valueOf(8), false);
-		this.getField("Radius").setClamp(new NumberClampPreferred(0, 1024, 0, 64));
+		this.defineField(C_RADIUS.toString(), LuaValue.valueOf(8), false);
+		this.getField(C_RADIUS).setClamp(new NumberClampPreferred(0, 1024, 0, 64));
 		
 		Game.getGame().subscribe(this);
 		
@@ -38,7 +40,7 @@ public class PointLight extends LightBase implements TreeViewable,GameSubscriber
 					light.x = pos.x;
 					light.y = pos.y;
 					light.z = pos.z;
-				} else if ( key.toString().equals("Radius") ) {
+				} else if ( key.toString().equals(C_RADIUS) ) {
 					light.radius = value.tofloat();
 				} else if ( key.toString().equals("Intensity") ) {
 					light.intensity = value.tofloat();
@@ -51,7 +53,7 @@ public class PointLight extends LightBase implements TreeViewable,GameSubscriber
 	}
 	
 	public void setRadius(float radius) {
-		this.set("Radius", radius);
+		this.set(C_RADIUS, LuaValue.valueOf(radius));
 	}
 
 	@Override
@@ -85,7 +87,7 @@ public class PointLight extends LightBase implements TreeViewable,GameSubscriber
 			if ( light == null ) {
 				// Create light
 				Vector3f pos = ((Vector3)this.get("Position")).toJoml();
-				float radius = this.get("Radius").tofloat();
+				float radius = this.get(C_RADIUS).tofloat();
 				float intensity = this.get("Intensity").tofloat();
 				light = new engine.gl.light.PointLightInternal(pos, radius, intensity);
 				

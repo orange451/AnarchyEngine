@@ -13,7 +13,7 @@ public class BoneTreeNode extends Instance implements TreeViewable {
 		this.setLocked(true);
 		this.setInstanceable(false);
 
-		this.getField("Archivable").setLocked(true);
+		this.getField(LuaValue.valueOf("Archivable")).setLocked(true);
 	}
 
 	@Override

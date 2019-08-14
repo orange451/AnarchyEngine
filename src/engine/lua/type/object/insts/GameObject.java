@@ -24,6 +24,8 @@ public class GameObject extends Instance implements RenderableInstance,TreeViewa
 	private final static LuaValue C_POSITION = LuaValue.valueOf("Position");
 	private final static LuaValue C_TRANSPARENCY = LuaValue.valueOf("Transparency");
 	
+	private final static String PHYSICSOBJECT = "PhysicsObject";
+	
 	public GameObject() {
 		super("GameObject");
 		
@@ -31,7 +33,7 @@ public class GameObject extends Instance implements RenderableInstance,TreeViewa
 		this.defineField(C_WORLDMATRIX.toString(), new Matrix4(), false);
 		this.defineField(C_POSITION.toString(), new Vector3(), false );
 		this.defineField(C_TRANSPARENCY.toString(), LuaValue.valueOf(0), false);
-		this.getField(C_TRANSPARENCY.toString()).setClamp(new NumberClamp(0, 1));
+		this.getField(C_TRANSPARENCY).setClamp(new NumberClamp(0, 1));
 	}
 	
 	public void render(BaseShader shader) {
@@ -99,7 +101,7 @@ public class GameObject extends Instance implements RenderableInstance,TreeViewa
 	 * @return
 	 */
 	public PhysicsObject getPhysicsObject() {
-		Instance t = this.findFirstChildOfClass("PhysicsObject");
+		Instance t = this.findFirstChildOfClass(PHYSICSOBJECT);
 		return t != null?(PhysicsObject)t:null;
 	}
 	

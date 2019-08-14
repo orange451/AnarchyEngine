@@ -151,7 +151,7 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 	}
 	
 	@Override
-	public void onPropertyChange(Instance instance, String property, LuaValue value) {
+	public void onPropertyChange(Instance instance, LuaValue property, LuaValue value) {
 		//System.out.println(instance.getFullName() + " :: " + property + " => " + value);
 		
 		LWJGUI.runLater(()-> {
@@ -160,7 +160,7 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 	}
 	
 	private static PropertyModifier getPropertyModifier( Instance instance, String field, LuaValue value ) {
-		LuaField luaField = instance.getField(field);
+		LuaField luaField = instance.getField(LuaValue.valueOf(field));
 		
 		if ( luaField == null )
 			return null;
@@ -209,7 +209,7 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 			return new DataTypePropertyModifier(instance, field, value, editable);
 		
 		// Edit an instance pointer
-		if ( instance.getField(field).getType().equals(Instance.class) )
+		if ( luaField.getType().equals(Instance.class) )
 			return new InstancePropertyModifier(instance, field, value, editable);
 		
 		// Fallback
@@ -281,7 +281,7 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 		public SliderPropertyModifier(Instance instance, String field, LuaValue value, boolean editable) {
 			super(instance,field,value,editable);
 			
-			Clamp<?> clamp = instance.getField(field).getClamp();
+			Clamp<?> clamp = instance.getField(LuaValue.valueOf(field)).getClamp();
 			NumberClamp nc = (NumberClamp)clamp;
 			
 			float min = nc.getMin();
@@ -366,7 +366,7 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 					}
 				}
 			};
-			String enumName = instance.getField(field).getEnumType().getType();
+			String enumName = instance.getField(LuaValue.valueOf(field)).getEnumType().getType();
 			LuaTableReadOnly enm = (LuaTableReadOnly) LuaEngine.globals.get(C_ENUM).rawget(enumName);
 			LuaValue[] keys = enm.keys();
 			for (int i = 0; i < keys.length; i++) {
@@ -711,7 +711,7 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 					t2.setBackground(alt);
 				
 				// Make cell 1 text color match cell 2
-				boolean editable = inst.getField(field).canModify();
+				boolean editable = inst.getField(LuaValue.valueOf(field)).canModify();
 				if ( t2 instanceof PropertyModifierTemp )
 					fieldLabel.setTextFill(((PropertyModifierTemp) t2).label.getTextFill());
 				if ( !editable )
@@ -731,7 +731,7 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 			this.internal.updateChildren();
 		}
 
-		public void update(Instance instance, String property, LuaValue value) {
+		public void update(Instance instance, LuaValue property, LuaValue value) {
 			if ( inst != null && !instance.equals(inst))
 				return;
 			
@@ -740,7 +740,7 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 				return;
 			}
 			
-			if ( instance instanceof ScriptBase && property.equals("Source") )
+			if ( instance instanceof ScriptBase && property.toString().equals("Source") )
 				return;
 			
 			PropertyModifier p = props.get(property);

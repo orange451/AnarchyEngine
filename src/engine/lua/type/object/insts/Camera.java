@@ -25,12 +25,14 @@ public class Camera extends Instance implements TreeViewable {
 	private static final LuaValue C_PITCH = LuaValue.valueOf("Pitch");
 	private static final LuaValue C_POSITION = LuaValue.valueOf("Position");
 	private static final LuaValue C_LOOKAT = LuaValue.valueOf("LookAt");
+
+	private static final LuaValue C_CAMERATYPE = LuaValue.valueOf("CameraType");
 	
 	public Camera() {
 		super("Camera");
 
-		this.defineField("CameraType",  LuaValue.valueOf("Free"), false);
-		this.getField("CameraType").setEnum(new EnumType("CameraType"));
+		this.defineField(C_CAMERATYPE.toString(),  LuaValue.valueOf("Free"), false);
+		this.getField(C_CAMERATYPE).setEnum(new EnumType("CameraType"));
 		
 		this.defineField(C_POSITION.toString(),	new Vector3(), false);
 		this.defineField(C_LOOKAT.toString(),	new Vector3(), false);
@@ -38,7 +40,7 @@ public class Camera extends Instance implements TreeViewable {
 		this.defineField(C_YAW.toString(),		LuaValue.valueOf(0), false);
 		
 		this.defineField(C_FOV.toString(),LuaValue.valueOf(70), false);
-		this.getField(C_FOV.toString()).setClamp(new NumberClamp(1, 120));
+		this.getField(C_FOV).setClamp(new NumberClamp(1, 120));
 		
 		this.defineField(C_VIEWMATRIX.toString(),	new Matrix4(), false);
 		

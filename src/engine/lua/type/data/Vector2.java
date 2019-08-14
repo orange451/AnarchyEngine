@@ -1,8 +1,10 @@
 package engine.lua.type.data;
 
+import org.joml.Vector2f;
 import org.json.simple.JSONObject;
 import org.luaj.vm2.LuaTable;
 import org.luaj.vm2.LuaValue;
+import org.luaj.vm2.lib.ThreeArgFunction;
 import org.luaj.vm2.lib.TwoArgFunction;
 import org.luaj.vm2.lib.ZeroArgFunction;
 
@@ -10,23 +12,34 @@ import engine.lua.type.LuaValuetype;
 import engine.util.Misc;
 
 public class Vector2 extends LuaValuetype {
-
-	private float mag = 0;
-	private LuaValue unit;
-	private boolean modified = true;
+	protected static final LuaValue C_X = LuaValue.valueOf("X");
+	protected static final LuaValue C_Y = LuaValue.valueOf("Y");
+	protected static final LuaValue C_UNIT = LuaValue.valueOf("Unit");
+	protected static final LuaValue C_MAGNITUDE = LuaValue.valueOf("Magnitude");
 	
-	public Vector2() {
-		this(new Vector2(null));
+	private Vector2f internal;
+	private boolean modified;
+	
+	@Override
+	public String typename() {
+		return "Vector2";
 	}
-
-	public Vector2(Vector2 unitVec) {
-		this.unit = unitVec;
+	
+	public Vector2(float x, float y) {
+		this(new Vector2f(x, y));
+	}
+	
+	public Vector2(Vector2f internal) {
+		this();
+		setInternal(internal);
+	}
+	
+	public Vector2() {		
+		// Define fields
+		defineField(C_X.toString(), LuaValue.valueOf(0), true);
+		defineField(C_Y.toString(), LuaValue.valueOf(0), true);
+		this.internal = new Vector2f();
 		
-		defineField("X", LuaValue.valueOf(0), true);
-		defineField("Y", LuaValue.valueOf(0), true);
-		defineField("Magnitude", LuaValue.valueOf(0), true);
-		defineField("Unit", unitVec==null?LuaValue.NIL:unitVec, true);
-
 		// Create ToString function
 		this.getmetatable().set("ToString", new ZeroArgFunction() {
 			@Override
@@ -46,15 +59,11 @@ public class Vector2 extends LuaValuetype {
 				return LuaValue.valueOf(0);
 			}
 		});
-
-		// Create Cross function
-		this.getmetatable().set("Cross", new TwoArgFunction() {
-			@Override
+		this.getmetatable().set(LuaValue.EQ, new TwoArgFunction() {
 			public LuaValue call(LuaValue left, LuaValue right) {
-				if (right instanceof Vector2) {
-					return newInstance(getY(), -getX());
-				}
-				return LuaValue.NIL;
+				Vector2 left2 = getVector(left);
+				Vector2 right2 = getVector(right);
+				return LuaValue.valueOf(left2.equals(right2));
 			}
 		});
 
@@ -90,71 +99,46 @@ public class Vector2 extends LuaValuetype {
 			}
 		});
 	}
-
-	@Override
-	protected void onRegister(LuaTable table) {
-		//
-	}
-
-	protected float getX() {
-		return this.get("X").tofloat();
-	}
-
-	protected float getY() {
-		return this.get("Y").tofloat();
-	}
-
-	protected float getMag() {
-		return mag;
-	}
-
-	protected Vector2 getUnit() {
-		return (Vector2) unit;
-	}
-
-	protected LuaValue newInstanceFunction() {
-		return new TwoArgFunction() {
-			@Override
-			public LuaValue call(LuaValue arg1, LuaValue arg2) {
-				return newInstance(arg1.tofloat(), arg2.tofloat());
-			}
-		};
-	}
-
-	public static Vector2 newInstance(float x, float y) {
-		Vector2 inst = new Vector2(new Vector2(null));
-
-		inst.getField("X").setLocked(false);
-		inst.getField("Y").setLocked(false);
-		inst.set("X", x);
-		inst.set("Y", y);
-		inst.getField("X").setLocked(true);
-		inst.getField("Y").setLocked(true);
-		return inst;
-	}
-
-	public static Vector2 getVector(LuaValue value) {
+	
+	protected Vector2 getVector(LuaValue value) {
 		if ( value instanceof Vector2 ) {
 			return (Vector2)value;
 		} else {
-			return newInstance( value.tofloat(), value.tofloat() );
+			if ( value.isnumber() ) {
+				return newInstance( value.tofloat(), value.tofloat() );
+			} else {
+				LuaValue.error("Error casting value to type Vector2");
+				return null;
+			}
 		}
 	}
 
-	@Override
-	public String typename() {
-		return "Vector2";
+	public static Vector2 zero() {
+		return Vector2.newInstance(0, 0);
+	}
+	
+	public static Vector2 up() {
+		return Vector2.newInstance(0, 1);
+	}
+	
+	public static Vector2 down() {
+		return Vector2.newInstance(0, -1);
+	}
+	
+	public static Vector2 left() {
+		return Vector2.newInstance(-1, 0);
+	}
+	
+	public static Vector2 right() {
+		return Vector2.newInstance(1, 0);
+	}
+	
+	public float getX() {
+		return internal.x;
 	}
 
-	public LuaValuetype fromString(String input) {
-		String[] t = input.replace(" ", "").split(",");
-		if ( t.length != 2 )
-			return this;
-		
-		this.rawset("X", LuaValue.valueOf(Double.parseDouble(t[0])));
-		this.rawset("Y", LuaValue.valueOf(Double.parseDouble(t[1])));
-		modified = true;
-		return this;
+	public float getY() {
+		return internal.y;
 	}
 	
 	public String toString() {
@@ -166,43 +150,70 @@ public class Vector2 extends LuaValuetype {
 	}
 	
 	@Override
-	protected LuaValue onValueSet(LuaValue key, LuaValue value) {
-		if ( unit == null ) {
-			return null;
-		}
+	public boolean equals(Object vector) {
+		if ( vector == this )
+			return true;
+		
+		if ( !(vector instanceof Vector2) )
+			return false;
+		
+		if ( ((Vector2)vector).getX() != getX() )
+			return false;
+		
+		if ( ((Vector2)vector).getY() != getY() )
+			return false;
+		
+		return true;
+	}
 
-		// If X or Y is changed. Update the Unit Vector
-		if ( key.toString().equals("X") || key.toString().equals("Y") ) {
-			modified = true;
-		}
-
-		return value;
+	private static Vector2 newInstance(double x, double y) {
+		Vector2f internal = new Vector2f((float)x, (float)y);
+		return new Vector2(internal);
 	}
 
 	@Override
-	protected boolean onValueGet(LuaValue key) {
-		String keyName = key.toString();
-		if ( keyName.equals("Unit") || keyName.equals("Magnitude") ) {
-			if ( modified ) {
-				modified = false;
-				float X = getX();
-				float Y = getY();
-				mag = (float) Math.sqrt(X*X+Y*Y);
-				this.rawset("Magnitude", LuaValue.valueOf(mag));
-				if ( unit != null ) {
-					unit.rawset("X", LuaValue.valueOf(X / mag));
-					unit.rawset("Y", LuaValue.valueOf(Y / mag));
-					this.rawset("Unit", unit);
-				} else {
-					this.rawset("Unit", this);
-				}
+	protected void onRegister(LuaTable table) {
+		table.set("zero", new ZeroArgFunction() {
+			@Override
+			public LuaValue call() {
+				return zero();
 			}
-		}
-
-		return true;
+		});
+		table.set("up", new ZeroArgFunction() {
+			@Override
+			public LuaValue call() {
+				return up();
+			}
+		});
+		table.set("down", new ZeroArgFunction() {
+			@Override
+			public LuaValue call() {
+				return down();
+			}
+		});
+		table.set("left", new ZeroArgFunction() {
+			@Override
+			public LuaValue call() {
+				return left();
+			}
+		});
+		table.set("right", new ZeroArgFunction() {
+			@Override
+			public LuaValue call() {
+				return right();
+			}
+		});
 	}
-	
 
+	@Override
+	protected LuaValue newInstanceFunction() {
+		return new TwoArgFunction() {
+			@Override
+			public LuaValue call(LuaValue arg1, LuaValue arg2) {
+				return newInstance(arg1.todouble(), arg2.todouble());
+			}
+		};
+	}
 
 	@SuppressWarnings("unchecked")
 	@Override
@@ -215,13 +226,68 @@ public class Vector2 extends LuaValuetype {
 	
 	public static Vector2 fromJSON(JSONObject json) {
 		return newInstance(
-				(float)((Double)json.get("X")).doubleValue(),
-				(float)((Double)json.get("Y")).doubleValue()
-				);
+			((Double)json.get("X")).doubleValue(),
+			((Double)json.get("Y")).doubleValue()
+		);
+	}
+	
+	@Override
+	public LuaValuetype fromString(String input) {
+		String[] t = input.replace(" ", "").split(",");
+		if ( t.length != 3 )
+			return this;
+		
+		Vector2 vec = new Vector2(new Vector2f(
+				(float) Double.parseDouble(t[0]),
+				(float) Double.parseDouble(t[1])
+		));
+		return vec;
 	}
 
 	@Override
 	public LuaValuetype clone() {
-		return newInstance(this.getX(), this.getY());
+		return newInstance(getX(), getY());
+	}
+
+	@Override
+	protected LuaValue onValueSet(LuaValue key, LuaValue value) {
+		return null; // Unmodifiable
+	}
+
+	@Override
+	protected boolean onValueGet(LuaValue key) {
+		String keyName = key.toString();
+		if ( keyName.equals(C_UNIT.toString()) || keyName.equals(C_MAGNITUDE.toString()) ) {
+			if ( modified ) {
+				modified = false;
+				
+				// Compute magnitude
+				float magnitude = internal.length();
+				this.rawset(C_MAGNITUDE, LuaValue.valueOf(magnitude));
+				
+				// Compute unit vector
+				this.rawset(C_UNIT, new Vector2(new Vector2f(
+						getX() / magnitude,
+						getY() / magnitude
+				)));
+			}
+		}
+		
+		return true;
+	}
+
+	public Vector2f toJoml() {
+		return new Vector2f(internal);
+	}
+
+	public void setInternal(Vector2f internal) {
+		this.rawset(C_X, LuaValue.valueOf(internal.x));
+		this.rawset(C_Y, LuaValue.valueOf(internal.y));
+		this.internal.set(internal);
+		modified = true;
+	}
+
+	public Vector2 getUnit() {
+		return (Vector2)this.get(C_UNIT);
 	}
 }

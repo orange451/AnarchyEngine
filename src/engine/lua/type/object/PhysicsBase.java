@@ -61,22 +61,22 @@ public abstract class PhysicsBase extends Instance implements GameSubscriber {
 		this.defineField(C_WORLDMATRIX.toString(), new Matrix4(), false);
 		
 		this.defineField(C_MASS.toString(), LuaValue.valueOf(0.5f), false);
-		this.getField(C_MASS.toString()).setClamp(new NumberClamp(0, 1));
+		this.getField(C_MASS).setClamp(new NumberClamp(0, 1));
 		
 		this.defineField(C_FRICTION.toString(), LuaValue.valueOf(0.1f), false);
-		this.getField(C_FRICTION.toString()).setClamp(new NumberClampPreferred(0, 10, 0, 1));
+		this.getField(C_FRICTION).setClamp(new NumberClampPreferred(0, 10, 0, 1));
 		
 		this.defineField(C_BOUNCINESS.toString(), LuaValue.valueOf(0.5f), false);
-		this.getField(C_BOUNCINESS.toString()).setClamp(new NumberClampPreferred(0, 2, 0, 1));
+		this.getField(C_BOUNCINESS).setClamp(new NumberClampPreferred(0, 2, 0, 1));
 		
 		this.defineField(C_LINEARDAMPING.toString(), LuaValue.valueOf(0.0f), false);
-		this.getField(C_LINEARDAMPING.toString()).setClamp(new NumberClamp(0, 1));
+		this.getField(C_LINEARDAMPING).setClamp(new NumberClamp(0, 1));
 		
 		this.defineField(C_ANGULARFACTOR.toString(), LuaValue.valueOf(1.0f), false);
-		this.getField(C_ANGULARFACTOR.toString()).setClamp(new NumberClamp(0, 1));
+		this.getField(C_ANGULARFACTOR).setClamp(new NumberClamp(0, 1));
 		
 		this.defineField(C_SHAPE.toString(), LuaValue.valueOf("Box"), false);
-		this.getField(C_SHAPE.toString()).setEnum(new EnumType("Shape"));
+		this.getField(C_SHAPE).setEnum(new EnumType("Shape"));
 		
 		this.defineField(C_USECUSTOMMESH.toString(), LuaValue.valueOf(false), false);
 		
@@ -164,7 +164,7 @@ public abstract class PhysicsBase extends Instance implements GameSubscriber {
 		if ( !tv.equals(pv) ) {
 			vel.setInternal(pv);
 			this.rawset(C_VELOCITY, vel);
-			this.notifyPropertySubscribers(C_VELOCITY.toString(), vel);
+			this.notifyPropertySubscribers(C_VELOCITY, vel);
 		}
 		
 		// Update our angular velocity to the physics objets angular velocity
@@ -174,7 +174,7 @@ public abstract class PhysicsBase extends Instance implements GameSubscriber {
 		if ( !tav.equals(pav) ) {
 			angvel.setInternal(pav);
 			this.rawset(C_ANGULARVELOCITY, angvel);
-			this.notifyPropertySubscribers(C_ANGULARVELOCITY.toString(), angvel);
+			this.notifyPropertySubscribers(C_ANGULARVELOCITY, angvel);
 		}
 	}
 	
@@ -385,10 +385,10 @@ public abstract class PhysicsBase extends Instance implements GameSubscriber {
 				this.defineField(C_CUSTOMMESH.toString(), LuaValue.NIL, false);
 				this.set(C_CUSTOMMESH, LuaValue.NIL);
 				
-				this.getField(C_SHAPE.toString()).setLocked(true);
+				this.getField(C_SHAPE).setLocked(true);
 			} else {
-				this.undefineField(C_CUSTOMMESH.toString());
-				this.getField(C_SHAPE.toString()).setLocked(false);
+				this.undefineField(C_CUSTOMMESH);
+				this.getField(C_SHAPE).setLocked(false);
 			}
 
 			return value;

@@ -191,7 +191,7 @@ public class Mesh extends AssetLoadable implements TreeViewable {
 
 	@Override
 	protected LuaValue onValueSet(LuaValue key, LuaValue value) {
-		if ( this.containsField(key.toString()) ) {
+		if ( this.containsField(key) ) {
 			changed = true;
 		}
 		return value;

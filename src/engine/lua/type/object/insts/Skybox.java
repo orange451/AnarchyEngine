@@ -19,10 +19,10 @@ public class Skybox extends Instance implements TreeViewable {
 		this.defineField(C_IMAGE.toString(), LuaValue.NIL, false);
 		
 		this.defineField(C_BRIGHTNESS.toString(), LuaValue.valueOf(2), false);
-		this.getField(C_BRIGHTNESS.toString()).setClamp(new NumberClampPreferred(0, 10, 0, 5));
+		this.getField(C_BRIGHTNESS).setClamp(new NumberClampPreferred(0, 10, 0, 5));
 		
 		this.defineField(C_POWER.toString(), LuaValue.valueOf(2), false);
-		this.getField(C_POWER.toString()).setClamp(new NumberClampPreferred(0, 10, 0, 5));
+		this.getField(C_POWER).setClamp(new NumberClampPreferred(0, 10, 0, 5));
 	}
 
 	@Override

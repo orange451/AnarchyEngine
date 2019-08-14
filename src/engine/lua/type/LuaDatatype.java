@@ -13,16 +13,16 @@ import engine.lua.LuaEngine;
 import engine.lua.type.object.Instance;
 
 public abstract class LuaDatatype extends LuaTable {
-	private HashMap<String,LuaField> fields = new HashMap<String,LuaField>();
+	private HashMap<LuaValue,LuaField> fields = new HashMap<LuaValue,LuaField>();
 	private ArrayList<LuaField> fieldsOrdered = new ArrayList<LuaField>();
 	
 	protected boolean locked = false;
 
 	public void defineField(String fieldName, Object fieldValue, boolean isFinal) {
-		if ( !this.containsField(fieldName) ) {
+		if ( !this.containsField(LuaValue.valueOf(fieldName)) ) {
 			// Create new field
 			LuaField lf = new LuaField(fieldName, fieldValue.getClass(), isFinal);
-			fields.put(fieldName, lf);
+			fields.put(LuaValue.valueOf(fieldName), lf);
 			fieldsOrdered.add(lf);
 			
 			if ( fieldValue.equals(LuaValue.NIL) || fieldValue instanceof Instance ) {
@@ -40,7 +40,7 @@ public abstract class LuaDatatype extends LuaTable {
 		this.rawset(fieldName, luaValue);
 	}
 	
-	public void undefineField(String fieldName) {
+	public void undefineField(LuaValue fieldName) {
 		if ( !this.containsField(fieldName) )
 			return;
 
@@ -53,17 +53,17 @@ public abstract class LuaDatatype extends LuaTable {
 		try{ this.set(fieldName, LuaValue.NIL); }catch(Exception e) {}
 	}
 
-	public boolean containsField(String fieldName) {
-		return fields.containsKey(fieldName);
+	public boolean containsField(LuaValue key) {
+		return fields.containsKey(key);
 	}
 	
-	public LuaField getField(String fieldName) {
-		return fields.get(fieldName);
+	public LuaField getField(LuaValue key) {
+		return fields.get(key);
 	}
 	
-	public String[] getFields() {
-		Set<String> keys = fields.keySet();
-		String[] f = keys.toArray(new String[keys.size()]);
+	public LuaValue[] getFields() {
+		Set<LuaValue> keys = fields.keySet();
+		LuaValue[] f = keys.toArray(new LuaValue[keys.size()]);
 		return f;
 	}
 	
@@ -104,7 +104,7 @@ public abstract class LuaDatatype extends LuaTable {
 		return this.locked;
 	}
 
-	public boolean hasKey( String key ) {
+	public boolean hasKey( LuaValue key ) {
 		if ( key.equals("Name") || key.equals("Parent") )
 			return true;
 
@@ -139,8 +139,8 @@ public abstract class LuaDatatype extends LuaTable {
 		
 		// If you're getting an instance field, but that instance is no longer in the game, return nil
 		if ( Game.isLoaded() ) {
-			if ( this.containsField(key.toString()) ) {
-				LuaField field = this.getField(key.toString());
+			if ( this.containsField(key) ) {
+				LuaField field = this.getField(key);
 				if ( field.isInstance ) {
 					LuaValue v = super.get(key);
 					if ( v instanceof Instance ) {
@@ -169,11 +169,11 @@ public abstract class LuaDatatype extends LuaTable {
 		}
 
 		// Check for fields
-		if ( !hasKey(key.toString()) ) {
+		if ( !hasKey(key) ) {
 			LuaValue.error("Cannot create new field " + key.toString() + " in type " + this.typename());
 		} else {
 			boolean typeMismatch = true;
-			LuaField f = this.getField(key.toString());
+			LuaField f = this.getField(key);
 			
 			// Modifying a field
 			if ( f != null ) {

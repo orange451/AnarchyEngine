@@ -18,35 +18,42 @@ import ide.layout.windows.icons.Icons;
 public class PlayerPhysics extends PhysicsBase implements TreeViewable {
 
 	private static final LuaValue C_HEIGHT = LuaValue.valueOf("Height");
+	private static final LuaValue C_RADIUS = LuaValue.valueOf("Radius");
+	private static final LuaValue C_STEPHEIGHT = LuaValue.valueOf("StepHeight");
+	private static final LuaValue C_SHAPE = LuaValue.valueOf("Shape");
+	private static final LuaValue C_USECUSTOMMESH = LuaValue.valueOf("UseCustomMesh");
+	private static final LuaValue C_ANGULARFACTOR = LuaValue.valueOf("AngularFactor");
+	private static final LuaValue C_ONGROUND = LuaValue.valueOf("OnGround");
+	private static final LuaValue C_BOUNCINESS = LuaValue.valueOf("Bounciness");
 	
 	public PlayerPhysics() {
 		super("PlayerPhysics");
 
-		this.defineField("OnGround", LuaValue.valueOf(false), true);
+		this.defineField(C_ONGROUND.toString(), LuaValue.valueOf(false), true);
 		
-		this.defineField("Radius", LuaValue.valueOf(0.3f), false);
-		this.getField("Radius").setClamp(new NumberClamp(0.1f, 512));
+		this.defineField(C_RADIUS.toString(), LuaValue.valueOf(0.3f), false);
+		this.getField(C_RADIUS).setClamp(new NumberClamp(0.1f, 512));
 		
 		this.defineField(C_HEIGHT.toString(), LuaValue.valueOf(1.0f), false);
-		this.getField(C_HEIGHT.toString()).setClamp(new NumberClamp(0.1f, 512));
+		this.getField(C_HEIGHT).setClamp(new NumberClamp(0.1f, 512));
 		
-		this.defineField("StepHeight", LuaValue.valueOf(0.1f), false);
-		this.getField("StepHeight").setClamp(new NumberClamp(0.1f, 512));
+		this.defineField(C_STEPHEIGHT.toString(), LuaValue.valueOf(0.1f), false);
+		this.getField(C_STEPHEIGHT).setClamp(new NumberClamp(0.1f, 512));
 		
 		// No bounciness by default
-		this.rawset("Bounciness", LuaValue.valueOf(0));
+		this.rawset(C_BOUNCINESS, LuaValue.valueOf(0));
 		
 		// Force to capsule
-		this.set("Shape", "Capsule");
-		this.getField("Shape").setLocked(true);
+		this.set(C_SHAPE.toString(), "Capsule");
+		this.getField(C_SHAPE).setLocked(true);
 		
 		// Use shape
-		this.getField("UseCustomMesh").setLocked(true);
-		this.rawset("UseCustomMesh", LuaValue.valueOf(false));
+		this.getField(C_USECUSTOMMESH.tostring()).setLocked(true);
+		this.rawset(C_USECUSTOMMESH, LuaValue.valueOf(false));
 		
 		// Force it straight up
-		this.getField("AngularFactor").setLocked(true);
-		this.rawset("AngularFactor", LuaValue.valueOf(0.0f));
+		this.getField(C_ANGULARFACTOR).setLocked(true);
+		this.rawset(C_ANGULARFACTOR, LuaValue.valueOf(0.0f));
 		
 		// If height changes, rebuild physics
 		this.changedEvent().connect((args)-> {
@@ -74,9 +81,9 @@ public class PlayerPhysics extends PhysicsBase implements TreeViewable {
 			Vector3f origin = this.getPosition().toJoml().sub(0,0,zOff);
 			ClosestRayResultCallback ret = Game.workspace().getPhysicsWorld().rayTestExcluding(origin, new Vector3f(0,0,-this.getStepHeight()*1.1f), this.physics);
 			if ( ret.hasHit() ) {
-				this.forceset("OnGround", LuaValue.TRUE);
+				this.forceset(C_ONGROUND, LuaValue.TRUE);
 			} else {
-				this.forceset("OnGround", LuaValue.FALSE);
+				this.forceset(C_ONGROUND, LuaValue.FALSE);
 			}
 			
 			if ( this.isOnGround() ) {
@@ -88,15 +95,15 @@ public class PlayerPhysics extends PhysicsBase implements TreeViewable {
 	}
 	
 	public float getHeight() {
-		return this.get("Height").tofloat();
+		return this.get(C_HEIGHT).tofloat();
 	}
 	
 	public float getStepHeight() {
-		return this.get("StepHeight").tofloat();
+		return this.get(C_STEPHEIGHT).tofloat();
 	}
 	
 	public boolean isOnGround() {
-		return this.get("OnGround").toboolean();
+		return this.get(C_ONGROUND).toboolean();
 	}
 
 	@Override
@@ -106,9 +113,9 @@ public class PlayerPhysics extends PhysicsBase implements TreeViewable {
 
 	@Override
 	public Pair<Vector3f, Vector3f> getAABB() {
-		float xx = this.rawget("Radius").tofloat();
-		float yy = this.rawget("Radius").tofloat();
-		float zz = this.rawget("Height").tofloat()/2f;
+		float xx = this.rawget(C_RADIUS).tofloat();
+		float yy = this.rawget(C_RADIUS).tofloat();
+		float zz = this.rawget(C_HEIGHT).tofloat()/2f;
 		
 		return new Pair<Vector3f, Vector3f>(new Vector3f(-xx, -yy, -zz), new Vector3f(xx, yy, zz));
 	}

@@ -26,7 +26,7 @@ public class Prefab extends Asset implements TreeViewable {
 		super("Prefab");
 		
 		this.defineField(C_PREFAB.toString(), LuaValue.valueOf(1.0), false);
-		this.getField(C_PREFAB.toString()).setClamp(new NumberClampPreferred(0, 1024, 0, 4));
+		this.getField(C_PREFAB).setClamp(new NumberClampPreferred(0, 1024, 0, 4));
 		
 		prefab = new PrefabRenderer(this);
 		

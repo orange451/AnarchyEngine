@@ -63,7 +63,7 @@ public class UserInputService extends Service implements TreeViewable {
 		this.getmetatable().set("GetMouseDelta", new ZeroArgFunction() {
 			@Override
 			public LuaValue call() {
-				return Vector2.newInstance((float)RenderableApplication.mouseDeltaX, (float)RenderableApplication.mouseDeltaY);
+				return new Vector2((float)RenderableApplication.mouseDeltaX, (float)RenderableApplication.mouseDeltaY);
 			}
 		});
 		

@@ -16,7 +16,7 @@ public class AnimationKeyframe extends Instance implements TreeViewable {
 		this.setLocked(true);
 		this.setInstanceable(false);
 		
-		this.getField("Archivable").setLocked(true);
+		this.getField(LuaValue.valueOf("Archivable")).setLocked(true);
 		
 		this.defineField("Bone", LuaValue.NIL, true);
 		this.defineField("Matrix", new Matrix4(), false);

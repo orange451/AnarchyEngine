@@ -23,10 +23,6 @@ import engine.lua.type.LuaValuetype;
 import engine.lua.type.DataModel.LuaInstancetypeData;
 
 public abstract class Instance extends DataModel {
-	protected List<Instance> children = Collections.synchronizedList(new ArrayList<Instance>());
-	private HashSet<Instance> descendents = new HashSet<Instance>();
-	private ArrayList<Instance> descendentsList = new ArrayList<Instance>();
-	private List<InstancePropertySubscriber> propertySubscribers = Collections.synchronizedList(new ArrayList<InstancePropertySubscriber>());
 	protected boolean destroyed;
 
 	protected static final LuaValue C_PARENT = LuaValue.valueOf("Parent");
@@ -41,7 +37,7 @@ public abstract class Instance extends DataModel {
 
 	public Instance(String name) {
 		super(name);
-
+		
 		this.getmetatable().set("GetChildren", new ZeroArgFunction() {
 			@Override
 			public LuaValue call() {
@@ -297,7 +293,7 @@ public abstract class Instance extends DataModel {
 				LuaValue key = keys[i];
 				
 				// Make sure to only set the fields.
-				if ( !this.containsField(key.toString()) )
+				if ( !this.containsField(key) )
 					continue;
 				
 				// Parent is special and gets set later
@@ -335,309 +331,14 @@ public abstract class Instance extends DataModel {
 		}
 		return null;
 	}
-
-	public boolean isDescendantOf( LuaValue object ) {
-		if ( object == null )
-			return false;
-		
-		if ( object.isnil() && this.getParent().isnil() )
-			return true;
-		
-		if ( object.isnil() )
-			return false;
-		
-		Instance inst = (Instance)object;
-		return inst.descendents.contains(this);
-	}
-	
-	private boolean computeDescendant( LuaValue arg ) {
-
-		int tries = 0;
-		LuaValue current = this;
-		if ( current.equals(arg) ) {
-			return false;
-		}
-
-		while ( !current.isnil() && tries < 64 ) {
-			tries++;
-			if ( current.equals(arg) ) {
-				return true;
-			}
-			current = current.get(C_PARENT);
-		}
-
-		return false;
-	}
-	private void onKeyChange(LuaValue key, LuaValue value) {
-		LuaEvent event = this.changedEvent();
-		event.fire(key, value);
-		notifyPropertySubscribers(key.toString(), value);
-	}
-	
-	public void forceset(String key, LuaValue value) {
-		forceset(LuaValue.valueOf(key),value);
-	}
-	
-	public void forceset(LuaValue key, LuaValue value) {
-		LuaValue oldValue = this.get(key);
-		this.rawset(key, value);
-		
-		if ( !oldValue.equals(value) ) {
-			onKeyChange( key, value );
-		}
-	}
 	
 	@Override
 	public void rawset(LuaValue key, LuaValue value) {
 		super.rawset(key, value);
 	}
 
-	@Override
-	public void set(LuaValue key, LuaValue value) {
-		LuaValue oldValue = this.rawget(key);
-		boolean changed = !oldValue.equals(value);
-		
-		// Hacked in double comparison... Since luaJ uses == for comparing doubles :(
-		if ( value instanceof LuaNumber || oldValue instanceof LuaNumber ) {
-			double v1 = value.todouble();
-			double v2 = oldValue.todouble();
-			if (Math.abs(v1 - v2) < 0.001)
-				changed = false;
-		}
-		
-		super.set( key, value );
-		
-		checkSetParent(key, oldValue, value); // value may have changed
-		checkSetName(key, oldValue, value); // value may have changed
-
-		// Call change event only if value changes
-		if ( changed ) {
-			//if ( key.toString().equals("Height") ) {
-				/*System.out.println();
-				System.out.println("KEY CHANGE SETTING: " + key.toString() + " from [" + oldValue.toString() + "] to [" + value.toString() + "]");
-				System.out.println(oldValue.getClass() + " / " + value.getClass());
-				System.out.println(oldValue.equals(value) + " / " + oldValue.eq(value) + " / " + oldValue.eq_b(value));
-				System.out.println();*/
-			//}
-			
-			onKeyChange( key, this.get(key) );
-		}
-	}
-	
-	public void notifyPropertySubscribers(String key, LuaValue value) {
-		for (int i = 0; i < propertySubscribers.size(); i++) {
-			if ( i >= propertySubscribers.size() )
-				continue;
-			InstancePropertySubscriber t = propertySubscribers.get(i);
-			if ( t == null )
-				continue;
-			t.onPropertyChange(this, key, value);
-		}
-	}
-
-	private void checkSetName(LuaValue key, LuaValue oldValue, LuaValue newValue) {
-		if ( key.eq_b(C_NAME) ) {
-			LuaValue currentParent = this.get(C_PARENT);
-			if ( !currentParent.equals(LuaValue.NIL) && currentParent instanceof Instance ) {
-				String oldName = oldValue.toString();
-				String newName = newValue.toString();
-				
-				// See if there's still a child pointer with our old name
-				List<Instance> children1 = ((Instance)currentParent).getChildrenWithName(oldName);
-				if ( children1.size() > 0 ) {
-					children1.remove(this);
-					((Instance)currentParent).updateChildPointer(oldName, children1.get(0));
-				} else {
-					((Instance)currentParent).updateChildPointer(oldName, LuaValue.NIL);
-				}
-				
-				// If the parent doesn't have a pointer pointing to NEW name
-				if ( currentParent.rawget(newName).isnil() ) {
-					((Instance)currentParent).updateChildPointer(newName, this);
-				}
-			}
-			
-			Game.getGame().gameUpdate(false);
-		}
-	}
-
-	private void checkSetParent(LuaValue key, LuaValue oldParent, LuaValue newParent) {
-		if ( key.eq_b(C_PARENT) ) {
-			
-			// If the parent hasen't changed, don't run code.
-			if ( oldParent.equals(newParent) ) {
-				return;
-			}
-			
-			String name = this.getName();
-			
-			// Check for descendant removed
-			descendantRemoved(oldParent);
-			for (int i = 0; i < descendentsList.size(); i++) {
-				descendentsList.get(i).descendantRemoved(oldParent);
-			}
-			
-			// Add self to new parent
-			if ( newParent instanceof Instance ) {
-				Instance newParInst = (Instance) newParent;
-				
-				// Add to children list
-				List<Instance> newParentChildren = newParInst.getChildren();
-				//synchronized(newParentChildren) {
-					newParentChildren.add(this);
-				//}
-				
-				// Fire added event
-				((LuaEvent)newParInst.rawget("ChildAdded")).fire(this);
-	
-				// Fire descendant added event
-				descendantAdded(newParInst);
-				for (int i = 0; i < descendentsList.size(); i++) {
-					descendentsList.get(i).descendantAdded(newParInst);
-				}
-				
-				// Add new reference
-				LuaValue temp = newParInst.get(name);
-				if ( temp.equals(LuaValue.NIL) && newParInst.getField(name) == null ) {
-					newParInst.rawset(name, this);
-				}
-			}
-			
-			// Delete self from old parent reference
-			if ( oldParent instanceof Instance ) {
-				List<Instance> oldParentChildren = ((Instance)oldParent).getChildren();
-				synchronized(oldParentChildren) {
-					oldParentChildren.remove(this);
-					
-					// If the parents reference by name points to this instance...
-					if ( oldParent.rawget(this.rawget(C_NAME)) == this ) {
-						
-						// Get first child remaining with the same name
-						LuaValue firstWithName = LuaValue.NIL;
-						for (int i = 0; i < oldParentChildren.size(); i++) {
-							Instance temp = oldParentChildren.get(i);
-							if ( temp.getName().equalsIgnoreCase(name) ) {
-								firstWithName = temp;
-								break;
-							}
-						}
-						
-						// Set the reference to that child. NIL if no child found.
-						((Instance)oldParent).updateChildPointer(name, firstWithName);
-					}
-				}
-				
-				// Child has finished being removed. Fire event.
-				((LuaEvent)oldParent.rawget("ChildRemoved")).fire(this);
-			}
-			Game.getGame().gameUpdate(true);
-		}
-	}
-
-	private void descendantRemoved(LuaValue root) {
-		if ( root == null || root.isnil() || !(root instanceof Instance) )
-			return;
-		
-		Instance r = (Instance)root;
-		if ( r.descendents.contains(this) && !this.computeDescendant(r) ) {
-			descendantRemovedForce(root);
-		}
-	}
-	
-	private void descendantRemovedForce(LuaValue root) {
-		if ( root == null || root.isnil() || !(root instanceof Instance) )
-			return;
-		
-		Instance r = (Instance)root;
-		if ( r.descendents.contains(this) ) {
-			((LuaEvent)r.rawget("DescendantRemoved")).fire(this);
-			r.descendents.remove(this);
-			r.descendentsList.remove(this);
-			descendantRemovedForce(r.getParent());
-		}
-	}
-
-	private void descendantAdded(LuaValue root) {
-		if ( root == null || root.isnil() || !(root instanceof Instance) )
-			return;
-		
-		Instance r = (Instance)root;
-		
-		if ( !r.descendents.contains(this) ) {
-			((LuaEvent)r.rawget("DescendantAdded")).fire(this);
-			r.descendents.add(this);
-			r.descendentsList.add(this);
-			//System.out.println(this.getName() + " was added as descendent to " + r.getFullName());
-		}
-		descendantAdded(r.getParent());
-	}
-
-	public LuaValue getParent() {
-		return this.get(C_PARENT);
-	}
-	
-	public void setParent(LuaValue parent) {
-		if ( parent == null )
-			parent = LuaValue.NIL;
-		
-		this.set(C_PARENT, parent);
-	}
-	
-	public void forceSetParent(LuaValue parent) {
-		if ( parent == null )
-			parent = LuaValue.NIL;
-		
-		//boolean l = this.locked;
-		//boolean l2 = !this.getField("Parent").canModify();
-
-		LuaValue oldParent = this.rawget(C_PARENT);
-		
-		/*LuaField pField = this.getField("Parent");
-		if ( pField == null )
-			return;*/
-		
-		//pField.setLocked(false);
-		//this.setLocked(false);
-		this.rawset(C_PARENT, parent);
-		//this.setLocked(l);
-		//pField.setLocked(l2);
-
-		this.checkSetParent(C_PARENT, oldParent, parent);
-	}
-
-	public String getName() {
-		return get(C_NAME).toString();
-	}
-	
-	public void setName(String name) {
-		this.set(C_NAME, LuaValue.valueOf(name));
-	}
-	
-	public String getClassName() {
-		return this.get(C_CLASSNAME).toString();
-	}
-	
-	public void forceSetName(String name) {
-		boolean l = this.locked;
-		boolean l2 = !this.getField("Name").canModify();
-		
-		this.getField("Name").setLocked(false);
-		this.setLocked(false);
-		this.set(C_NAME, LuaValue.valueOf(name));
-		//this.rawset("Name", name);
-		this.setLocked(l);
-		this.getField("Name").setLocked(l2);
-	}
-
 	public void internalTick() {
 		//
-	}
-
-	private void updateChildPointer( String name, LuaValue value ) {
-		if ( this.containsField(name) ) {
-			return;
-		}
-		this.rawset(name, value);
 	}
 
 	public void destroy() {
@@ -684,7 +385,7 @@ public abstract class Instance extends DataModel {
 	 * @return
 	 */
 	public Instance findFirstChild(String name) {
-		if ( this.containsField(name) ) {
+		if ( this.containsField(LuaValue.valueOf(name)) ) {
 			synchronized(children) {
 				for (int i = 0; i < children.size(); i++) {
 					Instance child = children.get(i);
@@ -752,6 +453,11 @@ public abstract class Instance extends DataModel {
 	public String toString() {
 		return getName();
 	}
+	
+	@Override
+	public LuaValue tostring() {
+		return LuaValue.valueOf(getName());
+	}
 
 	public void detach(InstancePropertySubscriber propertySubscriber) {
 		synchronized(propertySubscribers) {
@@ -763,18 +469,5 @@ public abstract class Instance extends DataModel {
 		synchronized(propertySubscribers) {
 			propertySubscribers.add(propertySubscriber);
 		}
-	}
-
-	public List<Instance> getDescendents() {
-		/*ArrayList<Instance> d = new ArrayList<Instance>();
-		synchronized(descendents) {
-			Iterator<Instance> it = descendents.iterator();
-			while ( it.hasNext() ) {
-				d.add(it.next());
-			}
-		}
-		return d;*/
-		
-		return new ArrayList<Instance>(descendentsList);
 	}
 }

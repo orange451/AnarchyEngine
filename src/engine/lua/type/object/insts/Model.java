@@ -9,6 +9,8 @@ public class Model extends Instance {
 
 	protected final static LuaValue C_MESH = LuaValue.valueOf("Mesh");
 	protected final static LuaValue C_MATERIAL = LuaValue.valueOf("Material");
+	protected final static LuaValue C_NAME = LuaValue.valueOf("Name");
+	protected final static LuaValue C_PARENT = LuaValue.valueOf("Parent");
 	
 	public Model() {
 		super("Model");
@@ -17,14 +19,14 @@ public class Model extends Instance {
 		this.defineField(C_MATERIAL.toString(), LuaValue.NIL, false);
 		
 		this.setInstanceable(true);
-		this.getField("Name").setLocked(false);
-		this.getField("Parent").setLocked(false);
+		this.getField(C_NAME).setLocked(false);
+		this.getField(C_PARENT).setLocked(false);
 	}
 
 	@Override
 	protected LuaValue onValueSet(LuaValue key, LuaValue value) {
 		// Parent MUST be inside a prefab
-		if ( key.toString().equals("Parent") )  {
+		if ( key.eq_b(C_PARENT))  {
 			if ( !(value instanceof Instance) )
 				return null;
 			if ( !(value instanceof Prefab) )

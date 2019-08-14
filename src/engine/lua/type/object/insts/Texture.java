@@ -95,7 +95,7 @@ public class Texture extends AssetLoadable implements TreeViewable,FileResource 
 
 	@Override
 	protected LuaValue onValueSet(LuaValue key, LuaValue value) {
-		if ( this.containsField(key.toString()) ) {
+		if ( this.containsField(key) ) {
 			if ( key.toString().equals("FilePath") || key.toString().equals("FlipY") ) {
 				if ( key.toString().equals("FlipY") ) {
 					this.rawset(key, value);
