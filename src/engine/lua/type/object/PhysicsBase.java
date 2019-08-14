@@ -23,7 +23,6 @@ import engine.lua.type.object.insts.Mesh;
 import engine.lua.type.object.insts.Player;
 import engine.lua.type.object.insts.Prefab;
 import engine.lua.type.object.services.Connections;
-import engine.lua.type.object.services.Players;
 import engine.physics.PhysicsObjectInternal;
 import engine.util.Pair;
 

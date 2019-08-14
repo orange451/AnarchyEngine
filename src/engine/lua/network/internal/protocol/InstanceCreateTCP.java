@@ -8,14 +8,18 @@ import org.json.simple.parser.ParseException;
 import org.luaj.vm2.LuaValue;
 
 import engine.lua.network.internal.ClientProcessable;
+import engine.lua.network.internal.NonReplicatable;
 import engine.lua.network.internal.PacketUtility;
 import engine.lua.type.object.Instance;
 
 public class InstanceCreateTCP implements ClientProcessable {
 	public String instanceType;
 	public String instanceData;
-	
+
 	private static final LuaValue C_CLASSNAME = LuaValue.valueOf("ClassName");
+	private static final LuaValue C_NAME = LuaValue.valueOf("Name");
+	private static final LuaValue C_PARENT = LuaValue.valueOf("Parent");
+	private static final LuaValue C_SID = LuaValue.valueOf("SID");
 	
 	public InstanceCreateTCP() {
 		this.instanceType = "";
@@ -34,6 +38,12 @@ public class InstanceCreateTCP implements ClientProcessable {
 			
 			if ( field.eq_b(C_CLASSNAME) )
 				continue;
+			
+			if ( instance instanceof NonReplicatable ) {
+				if ( !field.eq_b(C_NAME) && !field.eq_b(C_PARENT) && !field.eq_b(C_SID) ) {
+					continue;
+				}
+			}
 			
 			j.put(field, PacketUtility.fieldToJSON(instance.get(field)));
 		}

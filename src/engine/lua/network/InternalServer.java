@@ -147,10 +147,6 @@ public class InternalServer extends Server {
 		Game.game().descendantAddedEvent().connect((args) -> {
 			Instance instance = (Instance) args[0];
 			
-			// DO NOT LEAK PLAYER CONNECTIONS TO CLIENTS
-			if ( instance instanceof engine.lua.type.object.insts.Connection )
-				return;
-
 			// Create instance packet
 			InstanceCreateTCP sendObject = new InstanceCreateTCP(instance);
 			sendAllTCP(sendObject);

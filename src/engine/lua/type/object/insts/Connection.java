@@ -6,12 +6,13 @@ import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.ZeroArgFunction;
 
 import engine.Game;
+import engine.lua.network.internal.NonReplicatable;
 import engine.lua.network.internal.PingRequest;
 import engine.lua.type.object.Instance;
 import engine.lua.type.object.TreeViewable;
 import ide.layout.windows.icons.Icons;
 
-public class Connection extends Instance implements TreeViewable {
+public class Connection extends Instance implements TreeViewable,NonReplicatable {
 	private com.esotericsoftware.kryonet.Connection kryoConnection;
 	
 	public Connection( com.esotericsoftware.kryonet.Connection kryoConnection) {
@@ -27,8 +28,6 @@ public class Connection extends Instance implements TreeViewable {
 		this.defineField("Data", "", false);
 		this.defineField("Player", LuaValue.NIL, true);
 		this.defineField("Ping", LuaValue.valueOf(0), true);
-		
-		this.rawset("Archivable", LuaValue.valueOf(false));
 		
 		this.forceSetParent(Game.getService("Connections"));
 		
@@ -47,11 +46,14 @@ public class Connection extends Instance implements TreeViewable {
 		if (!Game.isRunning())
 			return;
 		AtomicLong lastSend = new AtomicLong(System.currentTimeMillis());
-		Game.runService().heartbeatEvent().connect((args)->{
-			if ( System.currentTimeMillis() - lastSend.get() > 100 ) {
-				lastSend.set(System.currentTimeMillis());
-				kryoConnection.sendUDP(new PingRequest(this));
-			}
+		
+		Game.runLater(()-> {
+			Game.runService().heartbeatEvent().connect((args)->{
+				if ( System.currentTimeMillis() - lastSend.get() > 100 ) {
+					lastSend.set(System.currentTimeMillis());
+					kryoConnection.sendUDP(new PingRequest(this));
+				}
+			});
 		});
 	}
 	
