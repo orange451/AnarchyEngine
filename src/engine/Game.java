@@ -140,12 +140,16 @@ public class Game implements Tickable {
 	}
 
 	public static Service getService(String string) {
+		return getService(LuaValue.valueOf(string));
+	}
+
+	public static Service getService(LuaValue name) {
 		if ( !loaded )
 			return null;
 		if ( Game.game().isnil() )
 			return null;
 		
-		LuaValue service = Game.game().get(string);
+		LuaValue service = Game.game().get(name);
 		if ( service != null && !service.equals(LuaValue.NIL) && service instanceof Service ) {
 			return (Service) service;
 		}
@@ -176,36 +180,45 @@ public class Game implements Tickable {
 		return resourceLoader;
 	}
 
+	private static final LuaValue C_GAME = LuaValue.valueOf("game");
+	private static final LuaValue C_WORKSPACE = LuaValue.valueOf("Workspace");
+	private static final LuaValue C_LIGHTING = LuaValue.valueOf("Lighting");
+	private static final LuaValue C_RUNSERVICE = LuaValue.valueOf("RunService");
+	private static final LuaValue C_USERINPUTSERVICE = LuaValue.valueOf("UserInputService");
+	private static final LuaValue C_PLAYERS = LuaValue.valueOf("Players");
+	private static final LuaValue C_CONNECTIONS = LuaValue.valueOf("Connections");
+	private static final LuaValue C_ASSETS = LuaValue.valueOf("Assets");
+
 	public static Instance game() {
-		return (Instance) LuaEngine.globals.get("game");
+		return (Instance) LuaEngine.globals.get(C_GAME);
 	}
 
 	public static Workspace workspace() {
-		return (Workspace) Game.getService("Workspace");
+		return (Workspace) Game.getService(C_WORKSPACE);
 	}
 
 	public static Lighting lighting() {
-		return (Lighting) Game.getService("Lighting");
+		return (Lighting) Game.getService(C_LIGHTING);
 	}
 	
 	public static RunService runService() {
-		return (RunService) Game.getService("RunService");
+		return (RunService) Game.getService(C_RUNSERVICE);
 	}
 	
 	public static UserInputService userInputService() {
-		return (UserInputService) Game.getService("UserInputService");
+		return (UserInputService) Game.getService(C_USERINPUTSERVICE);
 	}
 	
 	public static Players players() {
-		return (Players) Game.getService("Players");
+		return (Players) Game.getService(C_PLAYERS);
 	}
 	
 	public static Connections connections() {
-		return (Connections) Game.getService("Connections");
+		return (Connections) Game.getService(C_CONNECTIONS);
 	}
 	
 	public static Assets assets() {
-		return (Assets) Game.getService("Assets");
+		return (Assets) Game.getService(C_ASSETS);
 	}
 
 	public static Game getGame() {

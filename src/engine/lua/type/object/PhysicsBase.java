@@ -486,7 +486,7 @@ public abstract class PhysicsBase extends Instance implements GameSubscriber {
 				for (int i = 0; i < ownedCharacters.size(); i++) {
 					GameObject character = ownedCharacters.get(i);
 					if ( this.isDescendantOf(character) ) {
-						Player player = ((Players)Game.getService("Players")).getPlayerFromCharacter(character);
+						Player player = Game.players().getPlayerFromCharacter(character);
 						playerOwns = player;
 					}
 				}
@@ -496,7 +496,7 @@ public abstract class PhysicsBase extends Instance implements GameSubscriber {
 					Player player = (Player) localPlayer;
 					
 					if (player.get("ClientOwnsPhysics").toboolean()) {
-						LuaValue character = player.get("Character");
+						LuaValue character = player.getCharacter();
 						if ( !character.isnil() && character instanceof GameObject && this.isDescendantOf((GameObject)character) ) {
 							playerOwns = player;
 						}
