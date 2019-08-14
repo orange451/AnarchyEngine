@@ -11,31 +11,35 @@ import ide.layout.windows.icons.Icons;
 public class Player extends Instance implements TreeViewable {
 	private Instance lastCharacter;
 	
+	private static final LuaValue C_CHARACTER = LuaValue.valueOf("Character");
+	private static final LuaValue C_CONNECTION = LuaValue.valueOf("Connection");
+	private static final LuaValue C_CLIENTOWNSPHYSICS = LuaValue.valueOf("ClientOwnsPhysics");
+	
 	public Player() {
 		super("Player");
 		
-		this.defineField("Character", LuaValue.NIL, false);
-		this.defineField("Connection", LuaValue.NIL, true);
-		this.defineField("ClientOwnsPhysics", LuaValue.TRUE, false);
+		this.defineField(C_CHARACTER.toString(), LuaValue.NIL, false);
+		this.defineField(C_CONNECTION.toString(), LuaValue.NIL, true);
+		this.defineField(C_CLIENTOWNSPHYSICS.toString(), LuaValue.TRUE, false);
 
-		this.rawset("Archivable", LuaValue.valueOf(false));
+		this.setArchivable(false);
 		
 		this.setInstanceable(false);
 		this.setLocked(true);
 		
 		this.changedEvent().connect((args)->{
-			if ( args[0].toString().equals("Character") ) {
+			if ( args[0].eq_b(C_CHARACTER)) {
 				
 				// Check if we can give this player ownership
 				boolean can = false;
-				if ( Game.isServer() || (!Game.isServer() && Game.getService("Players").get("LocalPlayer").equals(this)))
+				if ( Game.isServer() || (!Game.isServer() && Game.players().getLocalPlayer().equals(this)))
 					can = true;
 				
 				// If we can't, get out.
 				if ( !can )
 					return;
 				
-				Connections c = (Connections)Game.getService("Connections");
+				Connections c = (Connections)Game.connections();
 				
 				// Remove the last character
 				if ( lastCharacter != null ) {
@@ -72,7 +76,7 @@ public class Player extends Instance implements TreeViewable {
 	}
 	
 	public Instance getCharacter() {
-		LuaValue c = this.get("Character");
+		LuaValue c = this.get(C_CHARACTER);
 		return (!c.isnil() && c instanceof Instance)?(Instance)c:null;
 	}
 
@@ -82,7 +86,12 @@ public class Player extends Instance implements TreeViewable {
 	}
 
 	public Connection getConnection() {
-		LuaValue connection = this.get("Connection");
+		LuaValue connection = this.get(C_CONNECTION);
 		return (!connection.isnil()&&connection instanceof Connection)?(Connection)connection:null;
+	}
+
+	public boolean doesClientOwnPhysics() {
+		LuaValue p = this.get(C_CLIENTOWNSPHYSICS);
+		return p.toboolean();
 	}
 }

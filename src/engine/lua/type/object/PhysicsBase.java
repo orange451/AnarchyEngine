@@ -495,9 +495,9 @@ public abstract class PhysicsBase extends Instance implements GameSubscriber {
 				if ( localPlayer != null && localPlayer instanceof Player ) {
 					Player player = (Player) localPlayer;
 					
-					if (player.get("ClientOwnsPhysics").toboolean()) {
-						LuaValue character = player.getCharacter();
-						if ( !character.isnil() && character instanceof GameObject && this.isDescendantOf((GameObject)character) ) {
+					if (player.doesClientOwnPhysics()) {
+						Instance character = player.getCharacter();
+						if ( character != null && character instanceof GameObject && this.isDescendantOf((GameObject)character) ) {
 							playerOwns = player;
 						}
 					}
