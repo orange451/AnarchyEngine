@@ -295,7 +295,7 @@ public class Save {
 				if ( field.equals("Name") || field.equals("ClassName") || field.equals("Parent") )
 					continue;
 
-				if ( Game.isRunning() && instance instanceof NonReplicatable ) {
+				if ( !field.equals("SID") && Game.isRunning() && instance instanceof NonReplicatable ) {
 					// Protect the fields of non replicatable objects being sent when running.
 					p.put(field, fieldToJSONBlank(instance.get(field)));
 				} else {
