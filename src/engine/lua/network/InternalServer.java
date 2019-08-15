@@ -128,7 +128,7 @@ public class InternalServer extends Server {
 				Connections connections = ((Connections)Game.getService("Connections"));
 				
 				// Create new connection object
-				Instance conInst = new engine.lua.type.object.insts.Connection(connection);
+				Instance conInst = new engine.lua.type.object.insts.PlayerConnection(connection);
 				conInst.forceSetParent(connections);
 			}
 			

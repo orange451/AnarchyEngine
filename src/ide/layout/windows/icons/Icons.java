@@ -31,6 +31,7 @@ public class Icons {
 	public static final Icons icon_keyboard = new Icons("Keyboard.png");
 	public static final Icons icon_network = new Icons("Network.png");
 	public static final Icons icon_network_player = new Icons("NetworkPlayer.png");
+	public static final Icons icon_network_server = new Icons("NetworkServer.png");
 	public static final Icons icon_gameobject = new Icons("GameObject.png");
 	public static final Icons icon_model = new Icons("Model.png");
 	public static final Icons icon_box = new Icons("Box.png");

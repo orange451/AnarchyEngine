@@ -81,7 +81,7 @@ public class InternalClient extends Client {
 									Game.load();
 									
 									// Create connection object
-									connectionInstance = new engine.lua.type.object.insts.Connection(connection);
+									connectionInstance = new engine.lua.type.object.insts.ServerConnection(connection);
 									connectionInstance.forceSetName("ConnectionServer");
 									connectionInstance.forceSetParent(Game.getService("Connections"));
 									Game.connections().rawset("LocalConnection", connectionInstance);

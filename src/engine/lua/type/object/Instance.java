@@ -257,6 +257,8 @@ public abstract class Instance extends DataModel {
 			return null;
 		
 		LuaInstancetypeData c = TYPES.get(type);
+		if ( c == null )
+			return null;
 		try {
 			return (Instance) c.instanceableClass.getDeclaredConstructor().newInstance();
 		} catch (Exception e) {

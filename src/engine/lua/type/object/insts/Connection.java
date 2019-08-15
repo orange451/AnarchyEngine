@@ -6,26 +6,16 @@ import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.ZeroArgFunction;
 
 import engine.Game;
-import engine.lua.network.internal.NonReplicatable;
 import engine.lua.network.internal.PingRequest;
 import engine.lua.type.object.Instance;
-import engine.lua.type.object.TreeViewable;
-import ide.layout.windows.icons.Icons;
 
-public class Connection extends Instance implements TreeViewable,NonReplicatable {
-	private com.esotericsoftware.kryonet.Connection kryoConnection;
+public abstract class Connection extends Instance {
+	protected com.esotericsoftware.kryonet.Connection kryoConnection;
 	
-	public Connection( com.esotericsoftware.kryonet.Connection kryoConnection) {
-		this();
-		this.kryoConnection = kryoConnection;
-		this.rawset("Address", kryoConnection.getRemoteAddressTCP().getAddress().getHostAddress());
-	}
-	
-	public Connection() {
-		super("Connection");
-		
-		this.defineField("Address", "127.0.0.1", true);
-		this.defineField("Data", "", false);
+	public Connection(String objectName) {
+		super(objectName);
+		this.defineField("Address", LuaValue.valueOf(""), true);
+		this.defineField("Data", LuaValue.valueOf(""), false);
 		this.defineField("Player", LuaValue.NIL, true);
 		this.defineField("Ping", LuaValue.valueOf(0), true);
 		
@@ -110,11 +100,6 @@ public class Connection extends Instance implements TreeViewable,NonReplicatable
 	@Override
 	public void onDestroy() {
 		//
-	}
-
-	@Override
-	public Icons getIcon() {
-		return Icons.icon_network_player;
 	}
 
 	public String getAddress() {
