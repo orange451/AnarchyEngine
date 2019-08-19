@@ -15,7 +15,7 @@ public abstract class Asset extends Instance {
 	@Override
 	public void set(LuaValue key, LuaValue value) {
 		if ( key.eq_b(C_PARENT) && getPreferredParent() != null ) {
-			if ( !value.isnil() && !value.equals(getPreferredParent()) ) {
+			if ( !value.isnil() && !value.equals(getPreferredParent()) && !this.isDescendantOf(value) ) {
 				LuaEngine.error("Asset type: " + this.typename() + " must exist within: " + this.getPreferredParent().getFullName());
 				return;
 			}
