@@ -11,13 +11,19 @@ import engine.lua.type.object.Instance;
 
 public abstract class Connection extends Instance {
 	protected com.esotericsoftware.kryonet.Connection kryoConnection;
+
+	protected static final LuaValue C_ADDRESS = LuaValue.valueOf("Address");
+	protected static final LuaValue C_DATA = LuaValue.valueOf("Data");
+	protected static final LuaValue C_PLAYER = LuaValue.valueOf("Player");
+	protected static final LuaValue C_PING = LuaValue.valueOf("Ping");
+	protected static final LuaValue C_CONNECTION = LuaValue.valueOf("C_CONNECTION");
 	
 	public Connection(String objectName) {
 		super(objectName);
-		this.defineField("Address", LuaValue.valueOf(""), true);
-		this.defineField("Data", LuaValue.valueOf(""), false);
-		this.defineField("Player", LuaValue.NIL, true);
-		this.defineField("Ping", LuaValue.valueOf(0), true);
+		this.defineField(C_ADDRESS.toString(), LuaValue.valueOf(""), true);
+		this.defineField(C_DATA.toString(), LuaValue.valueOf(""), false);
+		this.defineField(C_PLAYER.toString(), LuaValue.NIL, true);
+		this.defineField(C_PING.toString(), LuaValue.valueOf(0), true);
 		
 		this.forceSetParent(Game.getService("Connections"));
 		
@@ -54,7 +60,7 @@ public abstract class Connection extends Instance {
 	public Player connectPlayer() {
 		// Create new player
 		Player p = new Player();
-		p.rawset("Connection", Connection.this);
+		p.rawset(C_CONNECTION, Connection.this);
 		p.forceSetName(Connection.this.getName());
 		
 		// Player scripts folder
@@ -62,8 +68,8 @@ public abstract class Connection extends Instance {
 		ps.forceSetParent(p);
 		
 		// Put in game
-		Connection.this.rawset("Player", p);
-		p.forceSetParent(Game.getService("Players"));
+		Connection.this.rawset(C_PLAYER, p);
+		p.forceSetParent(Game.players());
 		
 		return p;
 	}
@@ -83,7 +89,7 @@ public abstract class Connection extends Instance {
 	}
 
 	public Player getPlayer() {
-		LuaValue t = this.get("Player");
+		LuaValue t = this.get(C_PLAYER);
 		return (t.isnil())?null:(Player)t;
 	}
 
@@ -103,7 +109,7 @@ public abstract class Connection extends Instance {
 	}
 
 	public String getAddress() {
-		return this.get("Address").toString();
+		return this.get(C_ADDRESS).toString();
 	}
 
 	public com.esotericsoftware.kryonet.Connection getKryo() {

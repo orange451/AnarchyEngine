@@ -30,13 +30,22 @@ import ide.layout.windows.icons.Icons;
 public class Mesh extends AssetLoadable implements TreeViewable {
 	private BufferedMesh mesh;
 	private boolean changed;
+
+	private static final LuaValue C_CAPSULE = LuaValue.valueOf("Capsule");
+	private static final LuaValue C_SPHERE = LuaValue.valueOf("Sphere");
+	private static final LuaValue C_TEAPOT = LuaValue.valueOf("Teapot");
+	private static final LuaValue C_CUBE = LuaValue.valueOf("Cube");
+	private static final LuaValue C_BLOCK = LuaValue.valueOf("Block");
+	
+	private static final LuaValue C_MESHES = LuaValue.valueOf("Meshes");
+	private static final LuaValue C_BLANK = LuaValue.valueOf("");
 	
 	public Mesh() {
 		super("Mesh");
 		
 		this.setLocked(false);
 		
-		this.getmetatable().set("Capsule", new ThreeArgFunction() {
+		this.getmetatable().set(C_CAPSULE, new ThreeArgFunction() {
 			@Override
 			public LuaValue call(LuaValue myself, LuaValue radius, LuaValue height) {
 				if ( !myself.eq_b(Mesh.this) )
@@ -47,7 +56,7 @@ public class Mesh extends AssetLoadable implements TreeViewable {
 			}
 		});
 		
-		this.getmetatable().set("Sphere", new TwoArgFunction() {
+		this.getmetatable().set(C_SPHERE, new TwoArgFunction() {
 			@Override
 			public LuaValue call(LuaValue myself, LuaValue radius) {
 				if ( !myself.eq_b(Mesh.this) )
@@ -58,7 +67,7 @@ public class Mesh extends AssetLoadable implements TreeViewable {
 			}
 		});
 		
-		this.getmetatable().set("Teapot", new TwoArgFunction() {
+		this.getmetatable().set(C_TEAPOT, new TwoArgFunction() {
 			@Override
 			public LuaValue call(LuaValue myself, LuaValue radius) {
 				if ( !myself.eq_b(Mesh.this) )
@@ -69,7 +78,7 @@ public class Mesh extends AssetLoadable implements TreeViewable {
 			}
 		});
 		
-		this.getmetatable().set("Cube", new TwoArgFunction() {
+		this.getmetatable().set(C_CUBE, new TwoArgFunction() {
 			@Override
 			public LuaValue call(LuaValue myself, LuaValue arg2) {
 				if ( !myself.eq_b(Mesh.this) )
@@ -80,7 +89,7 @@ public class Mesh extends AssetLoadable implements TreeViewable {
 			}
 		});
 		
-		this.getmetatable().set("Block", new FourArgFunction() {
+		this.getmetatable().set(C_BLOCK, new FourArgFunction() {
 			@Override
 			public LuaValue call(LuaValue myself, LuaValue arg2, LuaValue arg3, LuaValue arg4) {
 				if ( !myself.eq_b(Mesh.this) )
@@ -113,7 +122,7 @@ public class Mesh extends AssetLoadable implements TreeViewable {
 	}
 	
 	public void setMesh(BufferedMesh mesh) {
-		this.set("FilePath", LuaValue.valueOf(""));
+		this.set(C_FILEPATH, C_BLANK);
 		this.mesh = mesh;
 		this.changed = true;
 	}
@@ -214,11 +223,11 @@ public class Mesh extends AssetLoadable implements TreeViewable {
 
 	@Override
 	public Instance getPreferredParent() {
-		Service assets = Game.getService("Assets");
+		Service assets = Game.assets();
 		if ( assets == null )
 			return null;
 		
-		return assets.findFirstChild("Meshes");
+		return assets.findFirstChild(C_MESHES);
 	}
 
 	public static String getFileTypes() {

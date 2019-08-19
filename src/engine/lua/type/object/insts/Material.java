@@ -37,6 +37,8 @@ public class Material extends Asset implements TreeViewable {
 	protected static final LuaValue C_EMISSIVE = LuaValue.valueOf("Emissive");
 	protected static final LuaValue C_TRANSPARENCY = LuaValue.valueOf("Transparency");
 	
+	protected static final LuaValue C_MATERIALS = LuaValue.valueOf("Materials");
+	
 	public Material() {
 		super("Material");
 		
@@ -236,10 +238,10 @@ public class Material extends Asset implements TreeViewable {
 
 	@Override
 	public Instance getPreferredParent() {
-		Service assets = Game.getService("Assets");
+		Service assets = Game.assets();
 		if ( assets == null )
 			return null;
 		
-		return assets.findFirstChild("Materials");
+		return assets.findFirstChild(C_MATERIALS);
 	}
 }

@@ -387,11 +387,15 @@ public abstract class Instance extends DataModel {
 	 * @return
 	 */
 	public Instance findFirstChild(String name) {
-		if ( this.containsField(LuaValue.valueOf(name)) ) {
+		return findFirstChild(LuaValue.valueOf(name));
+	}
+	
+	public Instance findFirstChild(LuaValue name) {
+		if ( this.containsField(name) ) {
 			synchronized(children) {
 				for (int i = 0; i < children.size(); i++) {
 					Instance child = children.get(i);
-					if ( child.get(C_NAME).toString().equals(name) ) {
+					if ( child.get(C_NAME).eq_b(name) ) {
 						return child;
 					}
 				}
@@ -399,7 +403,7 @@ public abstract class Instance extends DataModel {
 			return null;
 		}
 		LuaValue temp = this.get(name);
-		if ( temp instanceof Instance && ((Instance)temp).getName().equals(name) )
+		if ( temp instanceof Instance && ((Instance)temp).get(C_NAME).eq_b(name) )
 			return (Instance)temp;
 		
 		return null;
@@ -433,6 +437,10 @@ public abstract class Instance extends DataModel {
 	}
 
 	public List<Instance> getChildrenWithName(String name) {
+		return getChildrenWithName(LuaValue.valueOf(name));
+	}
+
+	public List<Instance> getChildrenWithName(LuaValue name) {
 		List<Instance> ret = new ArrayList<Instance>();
 		
 		for (int i = 0; i < children.size(); i++) {
@@ -442,8 +450,8 @@ public abstract class Instance extends DataModel {
 			if ( child == null )
 				continue;
 			
-			String cName = child.get(C_NAME).toString();
-			if ( cName.equals(name) ) {
+			LuaValue cName = child.get(C_NAME);
+			if ( cName.eq_b(name) ) {
 				ret.add(child);
 			}			
 		}

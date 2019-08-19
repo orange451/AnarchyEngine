@@ -17,14 +17,18 @@ import engine.lua.type.object.insts.Player;
 import ide.layout.windows.icons.Icons;
 
 public class Players extends Service implements TreeViewable {
+	
+	private static final LuaValue C_LOCALPLAYER = LuaValue.valueOf("LocalPlayer");
+	private static final LuaValue C_PLAYERADDED = LuaValue.valueOf("PlayerAdded");
+	private static final LuaValue C_PLAYERREMOVED = LuaValue.valueOf("PlayerRemoved");
 
 	public Players() {
 		super("Players");
 
-		this.defineField("LocalPlayer", LuaValue.NIL, true);
+		this.defineField(C_LOCALPLAYER.toString(), LuaValue.NIL, true);
 
-		this.rawset("PlayerAdded",		new LuaEvent());
-		this.rawset("PlayerRemoved",	new LuaEvent());
+		this.rawset(C_PLAYERADDED.tostring(),	new LuaEvent());
+		this.rawset(C_PLAYERREMOVED.tostring(),	new LuaEvent());
 		
 		this.getmetatable().set("GetPlayers", new ZeroArgFunction() {
 			@Override
@@ -56,22 +60,20 @@ public class Players extends Service implements TreeViewable {
 		});
 		
 		// Fire player added when a player is added
-		LuaEvent added = (LuaEvent) this.rawget("ChildAdded");
-		added.connectLua(new OneArgFunction() {
+		this.childAddedEvent().connectLua(new OneArgFunction() {
 			@Override
 			public LuaValue call(LuaValue arg) {
 				if ( arg instanceof Player ) {
-					((LuaEvent)Players.this.rawget("PlayerAdded")).fire(arg);
+					((LuaEvent)Players.this.rawget(C_PLAYERADDED)).fire(arg);
 				}
 				return LuaValue.NIL;
 			}
 		});
 		
 		// Fire player removed when a player is removed
-		LuaEvent removed = this.childRemovedEvent();
-		removed.connect((args)->{
+		this.childRemovedEvent().connect((args)->{
 			if ( args[0] instanceof Player ) {
-				((LuaEvent)Players.this.rawget("PlayerRemoved")).fire(args[0]);
+				((LuaEvent)Players.this.rawget(C_PLAYERREMOVED)).fire(args[0]);
 			}
 		});
 	}
@@ -116,11 +118,15 @@ public class Players extends Service implements TreeViewable {
 	}
 
 	public LuaEvent playerAddedEvent() {
-		return (LuaEvent) this.get("PlayerAdded");
+		return (LuaEvent) this.get(C_PLAYERADDED);
+	}
+
+	public LuaEvent playerRemovedEvent() {
+		return (LuaEvent) this.get(C_PLAYERREMOVED);
 	}
 	
 	public Player getLocalPlayer() {
-		LuaValue p = this.get("LocalPlayer");
+		LuaValue p = this.get(C_LOCALPLAYER);
 		return (!p.isnil()&&p instanceof Player)?(Player)p:null;
 	}
 }

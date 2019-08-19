@@ -45,6 +45,11 @@ import ide.layout.windows.icons.Icons;
 
 public class Assets extends Service implements TreeViewable {
 
+	private static final LuaValue C_MATERIALS = LuaValue.valueOf("Materials");
+	private static final LuaValue C_MESHES = LuaValue.valueOf("Meshes");
+	private static final LuaValue C_TEXTURES = LuaValue.valueOf("Textures");
+	private static final LuaValue C_PREFABS = LuaValue.valueOf("Prefabs");
+
 	public Assets() {
 		super("Assets");
 		
@@ -143,7 +148,7 @@ public class Assets extends Service implements TreeViewable {
 	
 	private List<AssetLoadable> getAssets(Instance directory) {
 		List<AssetLoadable> ret = new ArrayList<AssetLoadable>();
-		List<Instance> c = directory.getChildren();
+		List<Instance> c = directory.getDescendents();
 		
 		for (int i = 0; i < c.size(); i++) {
 			Instance in = c.get(i);
@@ -159,7 +164,7 @@ public class Assets extends Service implements TreeViewable {
 	 * @return
 	 */
 	public List<AssetLoadable> getTextures() {
-		return getAssets((Instance)this.getChildrenWithName("Textures").get(0));
+		return getAssets((Instance)this.getChildrenWithName(C_TEXTURES).get(0));
 	}
 	
 	/**
@@ -167,7 +172,7 @@ public class Assets extends Service implements TreeViewable {
 	 * @return
 	 */
 	public List<AssetLoadable> getMeshes() {
-		return getAssets((Instance)this.getChildrenWithName("Meshes").get(0));
+		return getAssets((Instance)this.getChildrenWithName(C_MESHES).get(0));
 	}
 	
 	//String fileName = Thread.currentThread().getContextClassLoader().getResource("model.obj").getFile();
@@ -444,20 +449,20 @@ public class Assets extends Service implements TreeViewable {
 	}
 
 	public AssetFolder materials() {
-		return (AssetFolder) this.findFirstChild("Materials");
+		return (AssetFolder) this.findFirstChild(C_MATERIALS);
 	}
 
 	public AssetFolder meshes() {
-		return (AssetFolder) this.findFirstChild("Meshes");
+		return (AssetFolder) this.findFirstChild(C_MESHES);
 	}
 
 	public AssetFolder textures() {
-		return (AssetFolder) this.findFirstChild("Textures");
+		return (AssetFolder) this.findFirstChild(C_TEXTURES);
 	}
 	
 
 	public AssetFolder prefabs() {
-		return (AssetFolder) this.findFirstChild("Prefabs");
+		return (AssetFolder) this.findFirstChild(C_PREFABS);
 	}
 
 	public Mesh newMesh() {

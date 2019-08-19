@@ -24,21 +24,26 @@ public class Texture extends AssetLoadable implements TreeViewable,FileResource 
 	private AsynchronousImage image;
 	private Image loadedImage;
 	
+	private static final LuaValue C_TEXTURELOADED = LuaValue.valueOf("TextureLoaded");
+	private static final LuaValue C_SRGB = LuaValue.valueOf("SRGB");
+	private static final LuaValue C_FLIPY = LuaValue.valueOf("FlipY");
+	private static final LuaValue C_TEXTURES = LuaValue.valueOf("Textures");
+	
 	public Texture() {
 		super("Texture");
 		
-		this.defineField("SRGB", LuaValue.FALSE, false);
-		this.defineField("FlipY", LuaValue.FALSE, false);
+		this.defineField(C_SRGB.toString(), LuaValue.FALSE, false);
+		this.defineField(C_FLIPY.toString(), LuaValue.FALSE, false);
 		
-		this.rawset("TextureLoaded", new LuaEvent());
+		this.rawset(C_TEXTURELOADED, new LuaEvent());
 	}
 	
 	public LuaEvent textureLoadedEvent() {
-		return (LuaEvent) this.rawget("TextureLoaded");
+		return (LuaEvent) this.rawget(C_TEXTURELOADED);
 	}
 	
 	public void setSRGB(boolean b) {
-		this.set("SRGB", LuaValue.valueOf(b));
+		this.set(C_SRGB, LuaValue.valueOf(b));
 	}
 	
 	public void setTexture(Texture2D force) {
@@ -62,8 +67,8 @@ public class Texture extends AssetLoadable implements TreeViewable,FileResource 
 		}
 		
 		if ( this.texture == null || changed ) {
-			if ( image == null || !image.isLoaded() || this.get("FilePath").isnil() || this.get("FilePath").toString().length() == 0 ) {
-				if ( this.get("SRGB").checkboolean() ) {
+			if ( image == null || !image.isLoaded() || this.get(C_FILEPATH).isnil() || this.get(C_FILEPATH).toString().length() == 0 ) {
+				if ( this.get(C_SRGB).checkboolean() ) {
 					setTexture( Resources.TEXTURE_WHITE_SRGB );
 				} else {
 					setTexture( Resources.TEXTURE_WHITE_RGBA );
@@ -71,12 +76,12 @@ public class Texture extends AssetLoadable implements TreeViewable,FileResource 
 				this.loaded = false;
 			} else {
 				loadedImage = image.getResource();
-				if ( this.get("SRGB").checkboolean() ) {
+				if ( this.get(C_SRGB).checkboolean() ) {
 					setTexture( TextureUtils.loadSRGBTextureFromImage(image.getResource()) );
 				} else {
 					setTexture( TextureUtils.loadRGBATextureFromImage(image.getResource()) );
 				}
-				((LuaEvent)this.rawget("TextureLoaded")).fire();
+				((LuaEvent)this.rawget(C_TEXTURELOADED)).fire();
 			}
 		}
 		return this.texture;
@@ -86,7 +91,7 @@ public class Texture extends AssetLoadable implements TreeViewable,FileResource 
 		String realPath = IDEFilePath.convertToSystem(path);
 		
 		loaded = false; // Force image to reload
-		image = new AsynchronousImage(realPath, this.rawget("FlipY").toboolean());
+		image = new AsynchronousImage(realPath, this.rawget(C_FLIPY).toboolean());
 		Game.resourceLoader().addResource(image);
 		
 		loadedImage = null;
@@ -96,13 +101,13 @@ public class Texture extends AssetLoadable implements TreeViewable,FileResource 
 	@Override
 	protected LuaValue onValueSet(LuaValue key, LuaValue value) {
 		if ( this.containsField(key) ) {
-			if ( key.toString().equals("FilePath") || key.toString().equals("FlipY") ) {
-				if ( key.toString().equals("FlipY") ) {
+			if ( key.eq_b(C_FILEPATH) || key.eq_b(C_FLIPY) ) {
+				if ( key.eq_b(C_FLIPY) ) {
 					this.rawset(key, value);
 				}
 				
 				String texturePath = value.toString();
-				if ( !key.toString().equals("FilePath") )
+				if ( !key.eq_b(C_FILEPATH) )
 					texturePath = this.getFilePath();
 				
 				final String fTexPath = texturePath;
@@ -131,11 +136,11 @@ public class Texture extends AssetLoadable implements TreeViewable,FileResource 
 
 	@Override
 	public Instance getPreferredParent() {
-		Service assets = Game.getService("Assets");
+		Service assets = Game.assets();
 		if ( assets == null )
 			return null;
 		
-		return assets.findFirstChild("Textures");
+		return assets.findFirstChild(C_TEXTURES);
 	}
 	
 	public static String getFileTypes() {

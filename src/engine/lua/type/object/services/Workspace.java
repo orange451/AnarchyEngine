@@ -87,7 +87,7 @@ public class Workspace extends Service implements TreeViewable,Tickable,RunScrip
 
 	@Override
 	protected LuaValue onValueSet(LuaValue key, LuaValue value) {
-		if ( key.toString().equals("CurrentCamera") ) {
+		if ( key.eq_b(C_CURRENTCAMERA) ) {
 			if ( value == null || (!value.isnil() && !(value instanceof Camera)) )
 				return null;
 		}
