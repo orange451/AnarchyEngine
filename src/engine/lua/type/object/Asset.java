@@ -14,10 +14,14 @@ public abstract class Asset extends Instance {
 	
 	@Override
 	public void set(LuaValue key, LuaValue value) {
-		if ( key.eq_b(C_PARENT) && getPreferredParent() != null ) {
-			if ( !value.isnil() && !value.equals(getPreferredParent()) && !this.isDescendantOf(value) ) {
-				LuaEngine.error("Asset type: " + this.typename() + " must exist within: " + this.getPreferredParent().getFullName());
-				return;
+		Instance preferred = this.getPreferredParent();
+		if ( key.eq_b(C_PARENT) && preferred != null ) {
+			if ( !value.isnil() ) {
+				Instance newParent = (Instance)value;
+				if ( !value.equals(preferred) && !newParent.isDescendantOf(preferred) ) {
+					LuaEngine.error("Asset type: " + this.typename() + " must exist within: " + this.getPreferredParent().getFullName());
+					return;
+				}
 			}
 		}
 		super.set(key, value);
