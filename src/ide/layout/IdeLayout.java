@@ -19,6 +19,7 @@ import lwjgui.geometry.Pos;
 import lwjgui.scene.control.Menu;
 import lwjgui.scene.control.MenuBar;
 import lwjgui.scene.control.MenuItem;
+import lwjgui.scene.control.SeparatorMenuItem;
 import lwjgui.scene.control.SplitPane;
 import lwjgui.scene.layout.BorderPane;
 import lwjgui.scene.layout.Pane;
@@ -129,6 +130,24 @@ public class IdeLayout {
 		});
 		menuEdit.getItems().add(t2);
 		
+
+		// Normal server test
+		MenuItem ts = new MenuItem("Test Server (IDE)", Icons.icon_play_server.getView());
+		ts.setOnAction( event -> {
+			if ( Game.isRunning() )
+				return;
+			
+			boolean saved = Save.save();
+			if ( !saved )
+				return;
+			
+			JVMUtil.newJVM(IDE.class, new String[] {"server",Game.saveFile});
+		});
+		menuEdit.getItems().add(ts);
+		
+		// Separator!
+		menuEdit.getItems().add(new SeparatorMenuItem());
+		
 		// Normal test
 		MenuItem t = new MenuItem("Test Client", Icons.icon_play.getView());
 		t.setOnAction( event -> {
@@ -178,20 +197,6 @@ public class IdeLayout {
 			menuEdit.getItems().add(endTest);
 		});
 		menuEdit.getItems().add(t2);*/
-		
-		// Normal server test
-		MenuItem ts = new MenuItem("Test Server (IDE)", Icons.icon_play_server.getView());
-		ts.setOnAction( event -> {
-			if ( Game.isRunning() )
-				return;
-			
-			boolean saved = Save.save();
-			if ( !saved )
-				return;
-			
-			JVMUtil.newJVM(IDE.class, new String[] {"server",Game.saveFile});
-		});
-		menuEdit.getItems().add(ts);
 		
 		
 		// Normal client test
