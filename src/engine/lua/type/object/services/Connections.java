@@ -29,15 +29,19 @@ public class Connections extends Service implements TreeViewable,GameSubscriber 
 	private boolean enabled;
 	public List<GameObject> ownedCharacters;
 	
+	private static final LuaValue C_DEFAULTPORT = LuaValue.valueOf("DefaultPort");
+	private static final LuaValue C_LOCALCONNECTION = LuaValue.valueOf("LocalConnection");
+	
 	public Connections() {
 		super("Connections");
 		
 		ownedCharacters = new ArrayList<GameObject>();
 		
-		this.defineField("DefaultPort", LuaValue.valueOf(36545), false);
-		this.defineField("LocalConnection", LuaValue.NIL, true);
+		this.defineField(C_DEFAULTPORT.toString(), LuaValue.valueOf(36545), false);
+		this.defineField(C_LOCALCONNECTION.toString(), LuaValue.NIL, true);
 		
-		this.rawset("Archivable", LuaValue.valueOf(true));
+		this.setArchivable(true);
+		
 		this.rawset("OnConnect", new LuaEvent());
 		this.rawset("OnDisconnect", new LuaEvent());
 		
@@ -62,7 +66,7 @@ public class Connections extends Service implements TreeViewable,GameSubscriber 
 				}
 				
 				String ipf = ip.toString();
-				int portf = Connections.this.get("DefaultPort").toint();
+				int portf = Connections.this.get(C_DEFAULTPORT).toint();
 				
 				return LuaValue.valueOf(connect(ipf, portf, username.toString(), (LuaTable) data));
 			}
@@ -150,7 +154,7 @@ public class Connections extends Service implements TreeViewable,GameSubscriber 
 			if ( !enabled ) {
 				enabled = true;
 				if ( Game.isServer() || Game.internalTesting ) {
-					int port = Connections.this.get("DefaultPort").toint();
+					int port = Connections.this.get(C_DEFAULTPORT).toint();
 					internalServer = new InternalServer(port);
 				}
 			}
@@ -201,7 +205,7 @@ public class Connections extends Service implements TreeViewable,GameSubscriber 
 	}
 
 	public Connection getLocalConnection() {
-		LuaValue con = this.get("LocalConnection");
+		LuaValue con = this.get(C_LOCALCONNECTION);
 		return !con.isnil()&&con instanceof Connection ? (Connection)con:null;
 	}
 }

@@ -104,13 +104,17 @@ public abstract class LuaDatatype extends LuaTable {
 		return this.locked;
 	}
 
+	private static final LuaValue C_NAME = LuaValue.valueOf("Name");
+	private static final LuaValue C_PARENT = LuaValue.valueOf("Parent");
+	private static final LuaValue C_ENUM = LuaValue.valueOf("Enum");
+
 	public boolean hasKey( LuaValue key ) {
-		if ( key.equals("Name") || key.equals("Parent") )
+		if ( key.eq_b(C_NAME) || key.eq_b(C_PARENT) )
 			return true;
 
 		LuaValue[] keys = this.keys();
 		for (int i = 0; i < keys.length; i++) {
-			String name = keys[i].toString();
+			LuaValue name = keys[i];
 			if ( name.equals(key) ) {
 				return true;
 			}
@@ -145,7 +149,8 @@ public abstract class LuaDatatype extends LuaTable {
 					LuaValue v = super.get(key);
 					if ( v instanceof Instance ) {
 						Instance inst = (Instance)v;
-						if ( !inst.getName().equals("game") && inst.getParent().equals(NIL) ) {
+						//if ( !inst.getName().equals("game") && inst.getParent().equals(NIL) ) {
+						if ( !inst.equals(Game.game()) && inst.getParent().eq_b(LuaValue.NIL) ) {
 							return NIL;
 						}
 					}
@@ -162,7 +167,7 @@ public abstract class LuaDatatype extends LuaTable {
 		if (locked) {
 			//LuaValue.error("Cannot set field " + key.toString() + " in type " + this.typename() + ". Table is locked.");
 			//return;
-			if ( key.toString().equals("Name") || key.toString().equals("Parent") ) {
+			if ( key.eq_b(C_NAME) || key.eq_b(C_PARENT) ) {
 				LuaValue.error("Cannot set field " + key.toString() + " in type " + this.typename() + ". Table is locked.");
 				return;	
 			}
@@ -204,7 +209,7 @@ public abstract class LuaDatatype extends LuaTable {
 				
 				// If it needs to be an enum, check here
 				if ( f.getEnumType() != null ) {
-					LuaValue tab = LuaEngine.globals.get("Enum");
+					LuaValue tab = LuaEngine.globals.get(C_ENUM);
 					LuaValue enu = tab.get(f.getEnumType().getType());
 					
 					if ( enu.get(value).isnil() ) {
@@ -215,7 +220,7 @@ public abstract class LuaDatatype extends LuaTable {
 		}
 
 		LuaValue newSet = value;
-		if ( !key.toString().equals("Name") && !key.toString().equals("Parent") ) {
+		if ( !key.eq_b(C_NAME) && !key.eq_b(C_PARENT) ) {
 			newSet = onValueSet(key,value);
 			if ( newSet == null ) {
 				LuaValue.error("This value cannot be modified.");

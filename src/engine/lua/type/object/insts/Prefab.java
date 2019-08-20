@@ -20,13 +20,13 @@ import ide.layout.windows.icons.Icons;
 public class Prefab extends Asset implements TreeViewable {
 	private PrefabRenderer prefab;
 	
-	private final static LuaValue C_PREFAB = LuaValue.valueOf("Scale");
+	private final static LuaValue C_SCALE = LuaValue.valueOf("Scale");
 
 	public Prefab() {
 		super("Prefab");
 		
-		this.defineField(C_PREFAB.toString(), LuaValue.valueOf(1.0), false);
-		this.getField(C_PREFAB).setClamp(new NumberClampPreferred(0, 1024, 0, 4));
+		this.defineField(C_SCALE.toString(), LuaValue.valueOf(1.0), false);
+		this.getField(C_SCALE).setClamp(new NumberClampPreferred(0, 1024, 0, 4));
 		
 		prefab = new PrefabRenderer(this);
 		
@@ -74,7 +74,7 @@ public class Prefab extends Asset implements TreeViewable {
 	 * @return scalar value
 	 */
 	public float getScale() {
-		return this.get(C_PREFAB).tofloat();
+		return this.get(C_SCALE).tofloat();
 	}
 	
 	/**
@@ -82,7 +82,7 @@ public class Prefab extends Asset implements TreeViewable {
 	 * @param f
 	 */
 	public void setScale(float f) {
-		this.set(C_PREFAB, LuaValue.valueOf(f));
+		this.set(C_SCALE, LuaValue.valueOf(f));
 	}
 	
 	public Pair<Vector3f, Vector3f> getAABB() {

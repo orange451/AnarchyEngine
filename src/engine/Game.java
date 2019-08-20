@@ -187,6 +187,7 @@ public class Game implements Tickable {
 	private static final LuaValue C_USERINPUTSERVICE = LuaValue.valueOf("UserInputService");
 	private static final LuaValue C_PLAYERS = LuaValue.valueOf("Players");
 	private static final LuaValue C_CONNECTIONS = LuaValue.valueOf("Connections");
+	private static final LuaValue C_CORE = LuaValue.valueOf("Core");
 	private static final LuaValue C_ASSETS = LuaValue.valueOf("Assets");
 
 	public static Instance game() {
@@ -219,6 +220,10 @@ public class Game implements Tickable {
 	
 	public static Assets assets() {
 		return (Assets) Game.getService(C_ASSETS);
+	}
+	
+	public static Core core() {
+		return (Core) Game.getService(C_CORE);
 	}
 
 	public static Game getGame() {

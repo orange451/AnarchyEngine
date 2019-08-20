@@ -38,7 +38,7 @@ public class PrefabRenderer {
 	public void render(BaseShader shader, Matrix4f worldMatrix) {
 		// World matrix remains the same for all meshes inside. So you can optimize by setting once.
 		Matrix4f wmat = new Matrix4f(worldMatrix);
-		wmat.scale(parent.get("Scale").tofloat());
+		wmat.scale(parent.getScale());
 		shader.setWorldMatrix(wmat);
 		
 		// Loop through each model and render
@@ -69,7 +69,7 @@ public class PrefabRenderer {
 	}
 	
 	private void calculateAABB() {
-		float scale = parent.get("Scale").tofloat();
+		float scale = parent.getScale();
 		Model[] temp = models.toArray(new Model[models.size()]);
 		this.AABB = AABBUtil.prefabAABB(scale, temp);
 	}
@@ -114,7 +114,7 @@ public class PrefabRenderer {
 		}
 		
 		combined = BufferedMesh.combineMeshes(getMeshes());
-		combined.scale(parent.get("Scale").tofloat());
+		combined.scale(parent.getScale());
 		updated = false;
 	}
 

@@ -30,6 +30,8 @@ public abstract class DataModel extends LuaDatatype {
 	private static final LuaValue C_CHILDREMOVED = LuaValue.valueOf("ChildRemoved");
 	private static final LuaValue C_DESCENDANTADDED = LuaValue.valueOf("DescendantAdded");
 	private static final LuaValue C_DESCENDANTREMOVED = LuaValue.valueOf("DescendantRemoved");
+	private static final LuaValue C_ARCHIVABLE = LuaValue.valueOf("Archivable");
+	private static final LuaValue C_SID = LuaValue.valueOf("SID");
 
 	private static final LuaValue C_CLASSNAME = LuaValue.valueOf("ClassName");
 	private static final LuaValue C_NAME = LuaValue.valueOf("Name");
@@ -95,9 +97,9 @@ public abstract class DataModel extends LuaDatatype {
 
 		this.defineField(C_NAME.toString(),			LuaValue.valueOf(name), false);
 		this.defineField(C_CLASSNAME.toString(),	LuaValue.valueOf(name), true);
-		this.defineField(C_PARENT.toString(),	LuaValue.NIL,			false);
-		this.defineField("SID", 				LuaValue.valueOf(-1),   true);
-		this.defineField("Archivable",		LuaValue.valueOf(true), false);
+		this.defineField(C_PARENT.toString(),		LuaValue.NIL,			false);
+		this.defineField(C_SID.toString(), 			LuaValue.valueOf(-1),   true);
+		this.defineField(C_ARCHIVABLE.toString(),	LuaValue.valueOf(true), false);
 
 		this.rawset(C_CHANGED,		new LuaEvent());
 		this.rawset(C_DESTROYED,	new LuaEvent());
@@ -110,11 +112,11 @@ public abstract class DataModel extends LuaDatatype {
 	}
 	
 	public boolean isArhivable() {
-		return this.get("Archivable").toboolean();
+		return this.get(C_ARCHIVABLE).toboolean();
 	}
 	
 	public void setArchivable(boolean archivable) {
-		this.set("Archivable", LuaValue.valueOf(archivable));
+		this.set(C_ARCHIVABLE, LuaValue.valueOf(archivable));
 	}
 	
 	public String getFullName() {
@@ -301,7 +303,7 @@ public abstract class DataModel extends LuaDatatype {
 				//}
 				
 				// Fire added event
-				((LuaEvent)newParInst.rawget("ChildAdded")).fire(this);
+				newParInst.childAddedEvent().fire(this);
 	
 				// Fire descendant added event
 				descendantAdded(newParInst);
@@ -341,7 +343,7 @@ public abstract class DataModel extends LuaDatatype {
 				}
 				
 				// Child has finished being removed. Fire event.
-				((LuaEvent)oldParent.rawget("ChildRemoved")).fire(this);
+				((Instance) oldParent).childRemovedEvent().fire(this);
 			}
 			Game.getGame().gameUpdate(true);
 		}
@@ -363,7 +365,7 @@ public abstract class DataModel extends LuaDatatype {
 		
 		DataModel r = (Instance)root;
 		if ( r.descendents.contains(this) ) {
-			((LuaEvent)r.rawget("DescendantRemoved")).fire(this);
+			r.descendantRemovedEvent().fire(this);
 			r.descendents.remove(this);
 			r.descendentsList.remove(this);
 			descendantRemovedForce(r.getParent());
@@ -377,7 +379,7 @@ public abstract class DataModel extends LuaDatatype {
 		DataModel r = (DataModel)root;
 		
 		if ( !r.descendents.contains(this) ) {
-			((LuaEvent)r.rawget("DescendantAdded")).fire(this);
+			r.descendantAddedEvent().fire(this);
 			r.descendents.add((Instance) this);
 			r.descendentsList.add((Instance) this);
 			//System.out.println(this.getName() + " was added as descendent to " + r.getFullName());
@@ -453,7 +455,7 @@ public abstract class DataModel extends LuaDatatype {
 	}
 	
 	public Long getSID() {
-		return this.get("SID").tolong();
+		return this.get(C_SID).tolong();
 	}
 	
 	public LuaEvent changedEvent() {
@@ -481,7 +483,7 @@ public abstract class DataModel extends LuaDatatype {
 	}
 
 	public void setInstanceable( boolean instanceable ) {
-		TYPES.get(this.get("ClassName").toString()).instanceable = instanceable;
+		TYPES.get(this.get(C_CLASSNAME).toString()).instanceable = instanceable;
 	}
 
 	/**
@@ -489,7 +491,7 @@ public abstract class DataModel extends LuaDatatype {
 	 * @return
 	 */
 	public boolean isInstanceable() {
-		return TYPES.get(this.get("ClassName").toString()).instanceable;
+		return TYPES.get(this.get(C_CLASSNAME).toString()).instanceable;
 	}
 	
 	@Override

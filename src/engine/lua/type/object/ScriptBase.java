@@ -22,11 +22,14 @@ public abstract class ScriptBase extends Instance implements GameSubscriber {
 	private AtomicBoolean running;
 	public HashMap<LuaEvent,LuaConnection> connections;
 
+	private static final LuaValue C_SOURCE = LuaValue.valueOf("Source");
+	private static final LuaValue C_DISABLED = LuaValue.valueOf("Disabled");
+
 	public ScriptBase(String typename) {
 		super(typename);
 
-		this.defineField("Source", LuaValue.valueOf(""), false);
-		this.defineField("Disabled", LuaValue.valueOf(false), false);
+		this.defineField(C_SOURCE.toString(), LuaValue.valueOf(""), false);
+		this.defineField(C_DISABLED.toString(), LuaValue.valueOf(false), false);
 		
 		this.getmetatable().set("LoadFromFile", new TwoArgFunction() {
 			@Override
@@ -48,25 +51,25 @@ public abstract class ScriptBase extends Instance implements GameSubscriber {
 		if ( running.get() )
 			return;
 		
-		if ( this.get("Disabled").checkboolean())
+		if ( this.get(C_DISABLED).checkboolean())
 			return;
 
 		running.set(true);
-		String source = "local script=_G.last_script;"+(this.get("Source").toString());
+		String source = "local script=_G.last_script;"+(this.get(C_SOURCE).toString());
 		scriptInstance = LuaEngine.runLua(source, this);
 	}
 
-	public void setSource(String soure) {
-		this.set("Source", soure);
+	public void setSource(String source) {
+		this.set(C_SOURCE, LuaValue.valueOf(source));
 	}
 	
 	public String getSource() {
-		return this.get("Source").toString();
+		return this.get(C_SOURCE).toString();
 	}
 
 	@Override
 	protected LuaValue onValueSet(LuaValue key, LuaValue value) {
-		if ( key.toString().equals("Disabled") && value.checkboolean() ) {
+		if ( key.eq_b(C_DISABLED) && value.checkboolean() ) {
 			stop();
 		}
 		
@@ -125,11 +128,11 @@ public abstract class ScriptBase extends Instance implements GameSubscriber {
 		}
 		
 		// Calculate whether or not we can run
-		boolean override = this.isDescendantOf(Game.getService("Core"));
-		boolean canRun = inRunnableService || override;
+		boolean inCore = this.isDescendantOf(Game.core());
+		boolean canRun = inRunnableService || inCore;
 		
 		// Stop script if game is not running and we're supposed to be running (but not overridden), or if we can't run.
-		if ( (!Game.isRunning() && canRun && !override) || !canRun ) {
+		if ( (!Game.isRunning() && canRun && !inCore) || !canRun ) {
 			stop();
 			return;
 		}
@@ -142,6 +145,7 @@ public abstract class ScriptBase extends Instance implements GameSubscriber {
 		if (!getCanRun())
 			canRun = false;
 		
+		// Run the script!
 		synchronized(running) {
 			if ( canRun ) {
 				execute();
