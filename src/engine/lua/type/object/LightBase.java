@@ -56,28 +56,32 @@ public abstract class LightBase extends Instance implements Positionable {
 	public abstract Light getLightInternal();
 	
 	public void setVisible( boolean visible ) {
-		this.set("Visible", LuaValue.valueOf(visible));
+		this.set(C_VISIBLE, LuaValue.valueOf(visible));
 	}
 	
 	public boolean isVisible() {
-		return this.get("Visible").toboolean();
+		return this.get(C_VISIBLE).toboolean();
 	}
 
 	public void setIntensity(float intensity) {
-		this.set("Intensity", LuaValue.valueOf(intensity));
+		this.set(C_INTENSITY, LuaValue.valueOf(intensity));
+	}
+	
+	public float getIntensity() {
+		return this.get(C_INTENSITY).tofloat();
 	}
 
 	public void setPosition(int x, int y, int z) {
-		this.set("Position", new Vector3(x, y, z));
+		this.set(C_POSITION, new Vector3(x, y, z));
 	}
 	
 	public void setPosition(Vector3 position) {
-		this.set("Position", position.clone());
+		this.set(C_POSITION, position.clone());
 	}
 	
 	@Override
 	public Vector3 getPosition() {
-		return (Vector3) this.get("Position");
+		return (Vector3) this.get(C_POSITION);
 	}
 	
 	@Override

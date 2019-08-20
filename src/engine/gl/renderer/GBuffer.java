@@ -23,7 +23,6 @@ import engine.gl.PostProcessor;
 import engine.gl.Surface;
 import engine.gl.Texture2D;
 import engine.gl.shader.BaseShader;
-import engine.lua.type.data.Color3;
 import lwjgui.paint.Color;
 
 public class GBuffer {
@@ -101,7 +100,7 @@ public class GBuffer {
 	
 	public void bind() {
 		buffer.bind();
-		buffer.draw_clear_alpha(new Color(3, 3, 3), 1.0f);
+		buffer.draw_clear_alpha(Color.BLACK, 1.0f);
 		
 		pipeline.shader_set(shader);
 
@@ -191,10 +190,10 @@ public class GBuffer {
 		pipeline.ortho();
 		
 		if ( Game.isLoaded() ) {
-			this.saturation = Game.getService("Lighting").get("Saturation").tofloat();
-			this.exposure = Game.getService("Lighting").get("Exposure").tofloat();
-			this.gamma = Game.getService("Lighting").get("Gamma").tofloat();
-			Color color = ((Color3)Game.getService("Lighting").get("Ambient")).toColor();
+			this.saturation = Game.lighting().getSaturation();
+			this.exposure = Game.lighting().getExposure();
+			this.gamma = Game.lighting().getGamma();
+			Color color = Game.lighting().getAmbient().toColor();
 			this.ambient = new Vector3f( 
 					Math.max(1/255f, color.getRed()/255f),
 					Math.max(1/255f, color.getGreen()/255f),

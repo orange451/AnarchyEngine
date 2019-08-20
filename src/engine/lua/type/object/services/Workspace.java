@@ -8,7 +8,6 @@ import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.OneArgFunction;
 
 import engine.lua.LuaEngine;
-import engine.lua.type.LuaEvent;
 import engine.lua.type.object.Instance;
 import engine.lua.type.object.RunScript;
 import engine.lua.type.object.Service;
@@ -35,7 +34,7 @@ public class Workspace extends Service implements TreeViewable,Tickable,RunScrip
 		if ( physicsWorld == null )
 			physicsWorld = new PhysicsWorld();
 		
-		((LuaEvent)this.rawget("DescendantRemoved")).connectLua(new OneArgFunction() {
+		this.descendantRemovedEvent().connectLua(new OneArgFunction() {
 			@Override
 			public LuaValue call(LuaValue object) {
 				synchronized(descendants) {
@@ -44,7 +43,8 @@ public class Workspace extends Service implements TreeViewable,Tickable,RunScrip
 				return LuaValue.NIL;
 			}
 		});
-		((LuaEvent)this.rawget("DescendantAdded")).connectLua(new OneArgFunction() {
+		
+		this.descendantAddedEvent().connectLua(new OneArgFunction() {
 			@Override
 			public LuaValue call(LuaValue object) {
 				synchronized(descendants) {

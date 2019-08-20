@@ -23,6 +23,8 @@ public class ScriptData extends LuaValue implements Runnable {
 	private Varargs arguments;
 	private ScriptBase script;
 	
+	private static final LuaValue C_LASTSCRIPT = LuaValue.valueOf("last_script");
+	
 	//private Thread thread;
 
 	static {
@@ -77,7 +79,7 @@ public class ScriptData extends LuaValue implements Runnable {
 		try {
 			if ( script != null ) {
 				System.out.println("Running data: " + this + " on thread: " + Thread.currentThread());
-				LuaEngine.globals.set("last_script", script);
+				LuaEngine.globals.set(C_LASTSCRIPT, script);
 				threadToScriptData.put(Thread.currentThread(),ScriptData.this);
 			}
 			scriptDataToThread.put(ScriptData.this, Thread.currentThread());

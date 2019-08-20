@@ -9,7 +9,6 @@ import java.util.Observer;
 import org.luaj.vm2.LuaValue;
 
 import engine.application.Application;
-import engine.lua.type.LuaEvent;
 import engine.lua.type.object.services.RunService;
 import engine.observer.Tickable;
 import engine.util.Sync;
@@ -86,7 +85,7 @@ public class InternalGameThread extends Observable implements Runnable {
 				if ( Game.isLoaded() ) {
 					RunService runService = (RunService)Game.getService("RunService");
 					if ( runService != null ) {
-						((LuaEvent)runService.get("Heartbeat")).fire(LuaValue.valueOf(delta));
+						runService.heartbeatEvent().fire(LuaValue.valueOf(delta));
 					}
 					Game.getGame().tick();
 					this.notifyObservers();

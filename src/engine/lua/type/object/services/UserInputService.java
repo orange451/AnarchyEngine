@@ -192,15 +192,23 @@ public class UserInputService extends Service implements TreeViewable {
 }
 
 class InputObjectKey extends LuaTableReadOnly {
+	private static final LuaValue C_KEYCODE = LuaValue.valueOf("KeyCode");
+	private static final LuaValue C_USERINPUTTYPE = LuaValue.valueOf("UserInputType");
+	private static final LuaValue C_KEYBOARD = LuaValue.valueOf("Keyboard");
+	
 	public InputObjectKey(int keyCode) {
-		this.rawset("KeyCode", keyCode);
-		this.rawset("UserInputType", "Keyboard");
+		this.rawset(C_KEYCODE, LuaValue.valueOf(keyCode));
+		this.rawset(C_USERINPUTTYPE, C_KEYBOARD);
 	}
 }
 
 class InputObjectMouse extends LuaTableReadOnly {
+	private static final LuaValue C_BUTTON = LuaValue.valueOf("Button");
+	private static final LuaValue C_USERINPUTTYPE = LuaValue.valueOf("UserInputType");
+	private static final LuaValue C_MOUSE = LuaValue.valueOf("Mouse");
+	
 	public InputObjectMouse(int keyCode) {
-		this.rawset("Button", keyCode);
-		this.rawset("UserInputType", "Mouse");
+		this.rawset(C_BUTTON, LuaValue.valueOf(keyCode));
+		this.rawset(C_USERINPUTTYPE, C_MOUSE);
 	}
 }

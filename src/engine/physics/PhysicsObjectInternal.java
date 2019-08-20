@@ -356,7 +356,7 @@ public class PhysicsObjectInternal {
 		float scale = 1.0f;
 		Prefab prefab = (Prefab) luaFrontEnd.get(C_LINKED).get(C_PREFAB);
 		if ( !prefab.isnil() ) {
-			scale = prefab.get("Scale").tofloat();
+			scale = prefab.getScale();
 		}
 		
 		BufferedMesh mesh = null;

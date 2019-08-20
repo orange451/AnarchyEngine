@@ -283,7 +283,7 @@ public class Game implements Tickable {
 				}
 			});
 			
-			((LuaEvent)this.rawget("DescendantRemoved")).connectLua(new OneArgFunction() {
+			this.descendantRemovedEvent().connectLua(new OneArgFunction() {
 				@Override
 				public LuaValue call(LuaValue object) {
 					synchronized(createdInstances) {
@@ -297,14 +297,15 @@ public class Game implements Tickable {
 					return LuaValue.NIL;
 				}
 			});
-			((LuaEvent)this.rawget("DescendantAdded")).connectLua(new OneArgFunction() {
+			
+			this.descendantAddedEvent().connectLua(new OneArgFunction() {
 				@Override
 				public LuaValue call(LuaValue object) {
 					synchronized(createdInstances) {
 						if ( object instanceof Instance ) {
 							Instance inst = (Instance)object;
 							if ( Game.isServer() ) {
-								inst.rawset("SID", Game.generateSID());
+								inst.rawset(C_SID, LuaValue.valueOf(Game.generateSID()));
 							}
 							
 							long sid = inst.getSID();
@@ -324,7 +325,7 @@ public class Game implements Tickable {
 		}
 		
 		public String getName() {
-			return this.get("Name").toString().toLowerCase();
+			return this.get(C_NAME).toString().toLowerCase();
 		}
 
 		@Override
@@ -415,11 +416,14 @@ public class Game implements Tickable {
 			runnables.add(object);
 		}
 	}
+	
+	private static final LuaValue C_RUNNING = LuaValue.valueOf("Running");
+	private static final LuaValue C_ISSERVER = LuaValue.valueOf("IsServer");
 
 	@Override
 	public void tick() {
-		Game.game().rawset("Running", LuaValue.valueOf(running));
-		Game.game().rawset("IsServer", LuaValue.valueOf(Game.isServer()));
+		Game.game().rawset(C_RUNNING, LuaValue.valueOf(running));
+		Game.game().rawset(C_ISSERVER, LuaValue.valueOf(Game.isServer()));
 		
 		if ( !isLoaded() )
 			return;
@@ -429,7 +433,7 @@ public class Game implements Tickable {
 			Camera c = new Camera();
 			c.setArchivable(false);
 			c.setParent(Game.workspace());
-			workspace().set("CurrentCamera", c);
+			workspace().setCurrentCamera(c);
 			
 		}
 		
@@ -520,7 +524,7 @@ public class Game implements Tickable {
 			return;
 		
 		Game.running = running;
-		Game.game().rawset("Running", LuaValue.valueOf(running));
+		Game.game().rawset(C_RUNNING, LuaValue.valueOf(running));
 		game.gameUpdate(true);
 		
 		if (running) {
