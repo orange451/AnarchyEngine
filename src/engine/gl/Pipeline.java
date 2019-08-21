@@ -246,8 +246,9 @@ public class Pipeline implements Renderable {
 		drawQuad( 0, 0, size.x, size.y);
 	}
 	
+	private Matrix4f tempMat4 = new Matrix4f();
 	private void drawQuad( int x, int y, int width, int height ) {
-		fullscreenMesh.render(shader_get(), new Matrix4f().translate(x, y, 0).scale(width, height,1), null);
+		fullscreenMesh.render(shader_get(), tempMat4.identity().translate(x, y, 0).scale(width, height,1), null);
 	}
 	
 	private void drawTexture( int buffer, int x, int y, int width, int height) {

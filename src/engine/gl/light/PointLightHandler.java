@@ -58,6 +58,8 @@ public class PointLightHandler {
 		}
 	}
 	
+	private Matrix4f tempLightMatrix = new Matrix4f();
+	
 	public void handle(Pipeline pipeline) {
 		glEnable(GL_CULL_FACE);
 		glCullFace(GL_FRONT);
@@ -98,11 +100,11 @@ public class PointLightHandler {
 				lightShader.shader_set_uniform_f( lightShader.shader_get_uniform( "lightPosition"), lightEyePos.x, lightEyePos.y, lightEyePos.z );
 				lightShader.shader_set_uniform_f( lightShader.shader_get_uniform( "lightColor"), light.color.x, light.color.y, light.color.z );
 				
-				Matrix4f worldMatrix = new Matrix4f();
-				worldMatrix.translate(light.x, light.y, light.z);
-				worldMatrix.scale(light.radius);
+				tempLightMatrix.identity();
+				tempLightMatrix.translate(light.x, light.y, light.z);
+				tempLightMatrix.scale(light.radius);
 				
-				mesh.render(lightShader, worldMatrix, null);
+				mesh.render(lightShader, tempLightMatrix, null);
 			}
 		}
 		

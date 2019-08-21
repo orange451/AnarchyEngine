@@ -35,9 +35,11 @@ public class PrefabRenderer {
 		});
 	}
 
+	private Matrix4f tempWorldMatrix = new Matrix4f();
+	
 	public void render(BaseShader shader, Matrix4f worldMatrix) {
 		// World matrix remains the same for all meshes inside. So you can optimize by setting once.
-		Matrix4f wmat = new Matrix4f(worldMatrix);
+		Matrix4f wmat = tempWorldMatrix.set(worldMatrix);
 		wmat.scale(parent.getScale());
 		shader.setWorldMatrix(wmat);
 		

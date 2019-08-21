@@ -324,8 +324,20 @@ public class Vector3 extends LuaValuetype {
 		return true;
 	}
 
+	/**
+	 * Returns a copy of the internal Vector3f
+	 * @return
+	 */
 	public Vector3f toJoml() {
-		return new Vector3f(internal);
+		return new Vector3f(this.getInternal());
+	}
+	
+	/**
+	 * Returns the internal vector3f.
+	 * @return
+	 */
+	public Vector3f getInternal() {
+		return this.internal;
 	}
 
 	public void setInternal(Vector3f internal) {

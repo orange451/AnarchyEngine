@@ -191,6 +191,9 @@ public class Camera extends Instance implements TreeViewable {
 	public Vector3 getLookAt() {
 		return (Vector3)this.get(C_LOOKAT);
 	}
+	
+	private Matrix4f tempMatrix4 = new Matrix4f();
+	private Vector3f tempVector3 = new Vector3f();
 
 	@Override
 	public void onValueUpdated( LuaValue key, LuaValue value ) {
@@ -204,11 +207,11 @@ public class Camera extends Instance implements TreeViewable {
 		// Directly updates position and lookat
 		// Indirectly updates pitch and yaw
 		if ( key.eq_b(C_VIEWMATRIX) ) {
-			float dist = ((Vector3)this.get(C_LOOKAT)).toJoml().distance(((Vector3)this.get(C_POSITION)).toJoml());
+			float dist = ((Vector3)this.get(C_LOOKAT)).getInternal().distance(((Vector3)this.get(C_POSITION)).getInternal());
 			
 			Matrix4f view = ((Matrix4)this.get("ViewMatrix")).toJoml();
-			Vector3f t = view.invert(new Matrix4f()).getTranslation(new Vector3f());
-			Vector3f l = new Vector3f(0,0,dist).mulProject(view);
+			Vector3f t = view.invert(tempMatrix4).getTranslation(tempVector3);
+			Vector3f l = new Vector3f(0, 0, dist).mulProject(view);
 
 			this.rawset(C_POSITION, new Vector3(t));
 			this.set(C_LOOKAT, new Vector3(l));

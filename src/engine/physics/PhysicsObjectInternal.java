@@ -172,27 +172,30 @@ public class PhysicsObjectInternal {
 	private static final LuaValue C_WORLDMATRIX = LuaValue.valueOf("WorldMatrix");
 	private static final LuaValue C_PREFAB = LuaValue.valueOf("Prefab");
 
+	private static final Matrix4f IDENTITY = new Matrix4f().identity();
+	
+	private Matrix4f tempWorldMat = new Matrix4f();
+	
 	public Matrix4f getWorldMatrix() {
 		if (this.destroyed || body == null) {
 			if ( luaFrontEnd == null )
-				return new Matrix4f();
+				return IDENTITY;
 			
 			LuaValue linked = luaFrontEnd.get(C_LINKED);
 			if ( linked.isnil() )
-				return new Matrix4f();
+				return IDENTITY;
 			
 			LuaValue wMat = linked.get(C_WORLDMATRIX);
 			if ( wMat.isnil() )
-				return new Matrix4f();
+				return IDENTITY;
 			
-			return ((engine.lua.type.data.Matrix4)wMat).toJoml();
+			return ((engine.lua.type.data.Matrix4)wMat).getInternal();
 		}
 
 		Matrix4 transform = getWorldMatrixInternal();
-		org.joml.Matrix4f worldMatrix = new org.joml.Matrix4f();
-		worldMatrix.set(transform.val);
+		tempWorldMat.set(transform.val);
 
-		return worldMatrix;
+		return tempWorldMat;
 	}
 	
 	public Matrix4 getWorldMatrixInternal() {
@@ -201,9 +204,11 @@ public class PhysicsObjectInternal {
 		
 		return this.body.getWorldTransform();
 	}
+	
+	private Quaternionf tempRotation = new Quaternionf();
 
 	public Quaternionf getRotation() {
-		return getWorldMatrix().getNormalizedRotation(new Quaternionf());
+		return getWorldMatrix().getNormalizedRotation(tempRotation);
 	}
 
 	public void destroy() {

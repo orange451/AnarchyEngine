@@ -11,6 +11,9 @@ import engine.io.Image;
 
 public abstract class SkyBoxDynamic extends SkyBox {
 
+	private Matrix4f tempMat4 = new Matrix4f();
+	private Matrix4f tempViewMatrix = new Matrix4f();
+	
 	public SkyBoxDynamic(Image image) {
 		super(image);
 	}
@@ -22,7 +25,7 @@ public abstract class SkyBoxDynamic extends SkyBox {
 		glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
 		glViewport(0, 0, width, height);
 		
-		Matrix4f projectionMatrix = new Matrix4f().perspective((float)Math.toRadians(90), 1.0f, 1.0f, 1024);
+		Matrix4f projectionMatrix = tempMat4.identity().perspective((float)Math.toRadians(90), 1.0f, 1.0f, 1024);
 
 		for (int i = 0; i < 6; i++) {
 			int face = i;
@@ -33,7 +36,7 @@ public abstract class SkyBoxDynamic extends SkyBox {
 	        // clear
 	        glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
-	        Matrix4f viewMatrix = new Matrix4f();
+	        Matrix4f viewMatrix = tempViewMatrix.identity();
 	        viewMatrix.lookAt(new Vector3f(0, 0, 0), new Vector3f(1, 0, 0), new Vector3f(0, 0, 1));
 	        switch(face) {
 		        case 0: { // POSITIVE X

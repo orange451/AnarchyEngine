@@ -24,11 +24,16 @@ public class SkySphere extends SkyBoxDynamic {
 		material = new MaterialGL().setDiffuseTexture(TextureUtils.loadSRGBTextureFromImage(image));
 		sphere = BufferedMesh.Import("engine/gl/ibl/skysphere.mesh");
 	}
+	
+	private Matrix4f worldMatrix;
 
 	@Override
 	protected void renderGeometry(Pipeline pipeline) {
-		Matrix4f worldMatrix = new Matrix4f();
-		worldMatrix.rotateX((float) (Math.PI/2f));
+		if ( worldMatrix == null ) {
+			worldMatrix = new Matrix4f();
+			worldMatrix.rotateX((float) (Math.PI/2f));
+		}
+		
 		sphere.render(pipeline.shader_get(), worldMatrix, material);
 	}
 

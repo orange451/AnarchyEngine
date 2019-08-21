@@ -274,8 +274,9 @@ public class BaseShader {
 	 * @param w
 	 * @param h
 	 */
+	private Matrix4f orthoMatrix = new Matrix4f();
 	public void projectOrtho(float x, float y, float w, float h) {
-		setProjectionMatrix(new Matrix4f().ortho(x, x+w, y+h, y, -32000, 32000));
+		setProjectionMatrix(orthoMatrix.identity().ortho(x, x+w, y+h, y, -32000, 32000));
 		setViewMatrix(IDENTITY_MATRIX);
 		setWorldMatrix(IDENTITY_MATRIX);
 	}
@@ -289,6 +290,7 @@ public class BaseShader {
 		lastProjectionMatrix.set(mat);
 	}
 
+	private Matrix4f inverseViewMatrix = new Matrix4f();
 	public void setViewMatrix(Matrix4f mat) {
 		if ( viewMatLoc == -1 || mat.equals(lastViewMatrix) )
 			return;
@@ -298,11 +300,11 @@ public class BaseShader {
 		
 		int iViewMatrixLoc = shader_get_uniform("uInverseViewMatrix");
 		if ( iViewMatrixLoc > 0 ) {
-			shader_set_uniform_matrix(iViewMatrixLoc, new Matrix4f(mat).invert());
+			shader_set_uniform_matrix(iViewMatrixLoc, inverseViewMatrix.set(mat).invert());
 		}
 
 		if ( normalMatLoc > 0 ) {
-			Matrix3f normalMatrix = mat.normal(new Matrix3f());
+			Matrix3f normalMatrix = mat.normal(tempNormal);
 			normalMatrix.get(matrix33Buffer);
 			glUniformMatrix3fv(normalMatLoc, false, matrix33Buffer);
 		}
