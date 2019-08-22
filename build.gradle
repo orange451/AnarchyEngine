@@ -13,7 +13,7 @@ project.ext.gdxVersion = "1.9.3"
 
 sourceSets {
 	main {
-		java.srcDir("${projectDir}/src/")
+		java.srcDir("${projectDir}/src/main/java/")
 		resources.srcDir("${projectDir}/src/main/resources/")
 	}
 

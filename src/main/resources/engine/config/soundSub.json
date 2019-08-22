@@ -1,0 +1,13 @@
+{
+	"libraries": [
+		"paulscode.sound.libraries.LibraryLWJGLOpenAL"
+	],
+	"codecs": [
+		{
+			"name": "ogg",
+			"implementation": "paulscode.sound.codecs.CodecJOgg"
+		}
+	],
+	"soundFilesPackage": "assets/",
+	"customLogger": "net.luxvacuos.lightengine.client.util.LoggerSoundSystem"
+}

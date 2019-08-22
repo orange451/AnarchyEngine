@@ -1,0 +1,13 @@
+{
+	"resources": {
+		"ENGINE_WM_3DWindow_VS": {
+			"type": "SHADER",
+			"path": "assets/shaders/wm/3DWindow.vs"
+		},
+		"ENGINE_WM_3DWindow_FS": {
+			"type": "SHADER",
+			"path": "assets/shaders/wm/3DWindow.fs"
+		}
+	},
+	"definitions": []
+}

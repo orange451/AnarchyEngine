@@ -1,0 +1,101 @@
+{
+	"resources": {
+		"ENGINE_RND_DFR_Bloom_VS": {
+			"type": "SHADER",
+			"path": "assets/shaders/deferred/Bloom.vs"
+		},
+		"ENGINE_RND_DFR_LensFlares_VS": {
+			"type": "SHADER",
+			"path": "assets/shaders/deferred/LensFlares.vs"
+		},
+		"ENGINE_RND_DFR_VolumetricLight_VS": {
+			"type": "SHADER",
+			"path": "assets/shaders/deferred/VolumetricLight.vs"
+		},
+		"ENGINE_RND_DFR_ColorCorrection_VS": {
+			"type": "SHADER",
+			"path": "assets/shaders/deferred/ColorCorrection.vs"
+		},
+		"ENGINE_RND_DFR_TAA_FS": {
+			"type": "SHADER",
+			"path": "assets/shaders/deferred/TAA.fs"
+		},
+		"ENGINE_RND_DFR_GaussianBlur_VS": {
+			"type": "SHADER",
+			"path": "assets/shaders/deferred/GaussianBlur.vs"
+		},
+		"ENGINE_RND_DFR_LocalLightsPass_FS": {
+			"type": "SHADER",
+			"path": "assets/shaders/deferred/LocalLightsPass.fs"
+		},
+		"ENGINE_RND_DFR_LensFlaresMod_VS": {
+			"type": "SHADER",
+			"path": "assets/shaders/deferred/LensFlaresMod.vs"
+		},
+		"ENGINE_RND_DFR_Reflections_FS": {
+			"type": "SHADER",
+			"path": "assets/shaders/deferred/Reflections.fs"
+		},
+		"ENGINE_RND_DFR_BloomMask_VS": {
+			"type": "SHADER",
+			"path": "assets/shaders/deferred/BloomMask.vs"
+		},
+		"ENGINE_RND_DFR_Final_FS": {
+			"type": "SHADER",
+			"path": "assets/shaders/deferred/Final.fs"
+		},
+		"ENGINE_RND_DFR_Lighting_VS": {
+			"type": "SHADER",
+			"path": "assets/shaders/deferred/Lighting.vs"
+		},
+		"ENGINE_RND_DFR_Bloom_FS": {
+			"type": "SHADER",
+			"path": "assets/shaders/deferred/Bloom.fs"
+		},
+		"ENGINE_RND_DFR_LensFlares_FS": {
+			"type": "SHADER",
+			"path": "assets/shaders/deferred/LensFlares.fs"
+		},
+		"ENGINE_RND_DFR_VolumetricLight_FS": {
+			"type": "SHADER",
+			"path": "assets/shaders/deferred/VolumetricLight.fs"
+		},
+		"ENGINE_RND_DFR_ColorCorrection_FS": {
+			"type": "SHADER",
+			"path": "assets/shaders/deferred/ColorCorrection.fs"
+		},
+		"ENGINE_RND_DFR_TAA_VS": {
+			"type": "SHADER",
+			"path": "assets/shaders/deferred/TAA.vs"
+		},
+		"ENGINE_RND_DFR_GaussianBlur_FS": {
+			"type": "SHADER",
+			"path": "assets/shaders/deferred/GaussianBlur.fs"
+		},
+		"ENGINE_RND_DFR_LocalLightsPass_VS": {
+			"type": "SHADER",
+			"path": "assets/shaders/deferred/LocalLightsPass.vs"
+		},
+		"ENGINE_RND_DFR_LensFlaresMod_FS": {
+			"type": "SHADER",
+			"path": "assets/shaders/deferred/LensFlaresMod.fs"
+		},
+		"ENGINE_RND_DFR_Reflections_VS": {
+			"type": "SHADER",
+			"path": "assets/shaders/deferred/Reflections.vs"
+		},
+		"ENGINE_RND_DFR_BloomMask_FS": {
+			"type": "SHADER",
+			"path": "assets/shaders/deferred/BloomMask.fs"
+		},
+		"ENGINE_RND_DFR_Final_VS": {
+			"type": "SHADER",
+			"path": "assets/shaders/deferred/Final.vs"
+		},
+		"ENGINE_RND_DFR_Lighting_FS": {
+			"type": "SHADER",
+			"path": "assets/shaders/deferred/Lighting.fs"
+		}
+	},
+	"definitions": []
+}

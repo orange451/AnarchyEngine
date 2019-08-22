@@ -1,0 +1,15 @@
+{
+	"icons": [
+		{
+			"resKey": "ENGINE_Icon32"
+		},
+		{
+			"resKey": "ENGINE_Icon64"
+		}
+	],
+	"cursor": {
+		"resKey": "ENGINE_Cursor",
+		"hotX": 0,
+		"hotY": 0
+	}
+}

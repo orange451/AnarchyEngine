@@ -1,0 +1,84 @@
+{
+	"resources": {
+		"ENGINE_RND_IrradianceCapture_FS": {
+			"type": "SHADER",
+			"path": "assets/shaders/IrradianceCapture.fs"
+		},
+		"ENGINE_RND_Water_FS": {
+			"type": "SHADER",
+			"path": "assets/shaders/Water.fs"
+		},
+		"ENGINE_RND_Water_GS": {
+			"type": "SHADER",
+			"path": "assets/shaders/Water.gs"
+		},
+		"ENGINE_RND_EntityDeferred_FS": {
+			"type": "SHADER",
+			"path": "assets/shaders/EntityDeferred.fs"
+		},
+		"ENGINE_RND_Skydome_VS": {
+			"type": "SHADER",
+			"path": "assets/shaders/Skydome.vs"
+		},
+		"ENGINE_RND_PreFilteredEnvironment_VS": {
+			"type": "SHADER",
+			"path": "assets/shaders/PreFilteredEnvironment.vs"
+		},
+		"ENGINE_RND_BRDFIntegrationMap_FS": {
+			"type": "SHADER",
+			"path": "assets/shaders/BRDFIntegrationMap.fs"
+		},
+		"ENGINE_RND_EntityBasic_FS": {
+			"type": "SHADER",
+			"path": "assets/shaders/EntityBasic.fs"
+		},
+		"ENGINE_RND_EntityForward_FS": {
+			"type": "SHADER",
+			"path": "assets/shaders/EntityForward.fs"
+		},
+		"ENGINE_RND_Particle_FS": {
+			"type": "SHADER",
+			"path": "assets/shaders/Particle.fs"
+		},
+		"ENGINE_RND_IrradianceCapture_VS": {
+			"type": "SHADER",
+			"path": "assets/shaders/IrradianceCapture.vs"
+		},
+		"ENGINE_RND_Water_VS": {
+			"type": "SHADER",
+			"path": "assets/shaders/Water.vs"
+		},
+		"ENGINE_RND_EntityDeferred_VS": {
+			"type": "SHADER",
+			"path": "assets/shaders/EntityDeferred.vs"
+		},
+		"ENGINE_RND_Skydome_FS": {
+			"type": "SHADER",
+			"path": "assets/shaders/Skydome.fs"
+		},
+		"ENGINE_RND_PreFilteredEnvironment_FS": {
+			"type": "SHADER",
+			"path": "assets/shaders/PreFilteredEnvironment.fs"
+		},
+		"ENGINE_RND_BRDFIntegrationMap_VS": {
+			"type": "SHADER",
+			"path": "assets/shaders/BRDFIntegrationMap.vs"
+		},
+		"ENGINE_RND_EntityBasic_VS": {
+			"type": "SHADER",
+			"path": "assets/shaders/EntityBasic.vs"
+		},
+		"ENGINE_RND_EntityForward_VS": {
+			"type": "SHADER",
+			"path": "assets/shaders/EntityForward.vs"
+		},
+		"ENGINE_RND_Particle_VS": {
+			"type": "SHADER",
+			"path": "assets/shaders/Particle.vs"
+		}
+	},
+	"definitions": [
+		"engine/resdefinitions/deferredShaders.json",
+		"engine/resdefinitions/postProcessShaders.json"
+	]
+}
