@@ -230,7 +230,9 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 			
 			this.setPadding(new Insets(0,0,0,4));
 			this.setPrefSize(1, 1);
-			this.setAlignment(Pos.TOP_LEFT);
+			this.setMaxHeight(20);
+			this.setMinHeight(20);
+			this.setAlignment(Pos.CENTER_LEFT);
 		}
 	}
 	
@@ -243,6 +245,7 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 			label = new Label(initialValue.toString());
 			label.setFontSize(16);
 			label.setMouseTransparent(true);
+			this.setAlignment(Pos.CENTER_LEFT);
 			this.getChildren().add(label);
 			
 			if ( !editable )
@@ -258,7 +261,7 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 			
 			this.check = new CheckBox(value.toString());
 			this.check.setFontSize(16);
-			this.check.setSize(16);
+			this.check.setSize(18);
 			this.check.setChecked(value.checkboolean());
 			this.check.setDisabled(!editable);
 			this.getChildren().add(check);
@@ -275,7 +278,7 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 	
 	static class SliderPropertyModifier extends PropertyModifier {
 		private HBox hbox;
-		private Slider check;
+		private Slider slider;
 		private PropertyModifierInput direct;
 		
 		public SliderPropertyModifier(Instance instance, String field, LuaValue value, boolean editable) {
@@ -292,19 +295,20 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 			}
 			
 			this.hbox = new HBox();
+			this.hbox.setAlignment(Pos.CENTER_LEFT);
 			this.hbox.setBackground(null);
 			this.getChildren().add(hbox);
 			
-			this.check = new Slider(min, max, value.tofloat());
-			this.check.setDisabled(!editable);
-			this.check.setPrefWidth(100);
-			this.hbox.getChildren().add(check);
+			this.slider = new Slider(min, max, value.tofloat());
+			this.slider.setDisabled(!editable);
+			this.slider.setPrefWidth(100);
+			this.hbox.getChildren().add(slider);
 			
 			this.direct = new StringPropertyModifier(instance, field, value, editable) {
 				@Override
 				public void onValueSet(String text) {
 					super.onValueSet(text);
-					check.setValue(Double.parseDouble(text));
+					slider.setValue(Double.parseDouble(text));
 				}
 			};
 			this.direct.setBackground(null);
@@ -316,9 +320,9 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 			this.hbox.getChildren().add(direct);
 			
 			if ( editable ) {
-				this.check.setOnValueChangedEvent(event->{
-					double v = Math.floor(check.getValue()*100)/100f;
-					this.instance.set(field, check.getValue());
+				this.slider.setOnValueChangedEvent(event->{
+					double v = Math.floor(slider.getValue()*100)/100f;
+					this.instance.set(field, slider.getValue());
 					this.direct.label.setText(""+v);
 				});
 			}
@@ -362,7 +366,7 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 					for (int i = 0; i < this.buttons.size(); i++) {
 						Button button = this.buttons.get(i);
 						button.setPadding(new Insets(0,8,0,8));
-						button.setMaxHeight(16);
+						button.setMaxHeight(20);
 					}
 				}
 			};
@@ -374,7 +378,7 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 				dropdown.getItems().add(type);
 			}
 			this.setPadding(Insets.EMPTY);
-			this.dropdown.setMaxHeight(16);
+			this.dropdown.setMaxHeight(20);
 			this.dropdown.setPrefWidth(100);
 			this.dropdown.setValue(instance.get(field).toString());
 			this.getChildren().add(dropdown);
@@ -425,7 +429,6 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 			};
 			//this.textField.setPreferredColumnCount(1024);
 			//this.textField.setFillToParentWidth(true);
-			this.setMaxHeight(16);
 			this.textField.setAlignment(Pos.CENTER_LEFT);
 			
 			if ( editable ) {
@@ -698,7 +701,7 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 				StackPane t1 = new StackPane();
 				if ( i % 2 == 1 )
 					t1.setBackground(alt);
-				t1.setPadding(new Insets(0,0,0,12));
+				t1.setPadding(new Insets(2,0,2,12));
 				t1.setPrefSize(1, 1);
 				t1.getChildren().add(fieldLabel);
 				
