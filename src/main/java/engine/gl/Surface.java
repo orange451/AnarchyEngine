@@ -74,7 +74,7 @@ public class Surface {
 			for(int j = 0; j < i; j++){
 				db.put(GL_COLOR_ATTACHMENT0 + j);
 			}
-			db.flip();
+			db.rewind();
 			drawBuffers[i] = db;
 		}
 	}
