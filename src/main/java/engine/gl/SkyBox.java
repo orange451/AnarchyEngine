@@ -40,6 +40,7 @@ import java.nio.FloatBuffer;
 
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL12;
 import org.lwjgl.opengl.GL30;
 import org.lwjgl.opengl.GL32;
 
@@ -72,9 +73,9 @@ public class SkyBox {
 		glBindTexture(GL_TEXTURE_CUBE_MAP, cubemap);
 		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP);
-		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP);
-		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL12.GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL12.GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL12.GL_CLAMP_TO_EDGE);
 		glEnable(GL32.GL_TEXTURE_CUBE_MAP_SEAMLESS);
 
 		int components = image.getComponents();
@@ -90,27 +91,27 @@ public class SkyBox {
 
 		//TextureUtils.loadImageBuffer(image, size*2, size, size, size, handler, imageBuffer);
 		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X, 0, internalFormat, size, size, 0, externalFormat, type, imageBuffer);
-		GL11.glTexSubImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X, 0, size*2, size, size, size, externalFormat, type, image.getData());
+		//GL11.glTexSubImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X, 0, size*2, size, size, size, externalFormat, type, image.getData());
 
 		//TextureUtils.loadImageBuffer(image, 0, size, size, size, handler, imageBuffer);
 		glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_X, 0, internalFormat, size, size, 0, externalFormat, type, imageBuffer);
-		GL11.glTexSubImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_X, 0, 0, size, size, size, externalFormat, type, image.getData());
+		//GL11.glTexSubImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_X, 0, 0, size, size, size, externalFormat, type, image.getData());
 
 		//TextureUtils.loadImageBuffer(image, size, 0, size, size, handler, imageBuffer);
 		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Y, 0, internalFormat, size, size, 0, externalFormat, type, imageBuffer);
-		GL11.glTexSubImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Y, 0, size, 0, size, size, externalFormat, type, image.getData());
+		//GL11.glTexSubImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Y, 0, size, 0, size, size, externalFormat, type, image.getData());
 
 		//TextureUtils.loadImageBuffer(image, size, size*2, size, size, handler, imageBuffer);
 		glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Y, 0, internalFormat, size, size, 0, externalFormat, type, imageBuffer);
-		GL11.glTexSubImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Y, 0, size, size*2, size, size, externalFormat, type, image.getData());
+		//GL11.glTexSubImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Y, 0, size, size*2, size, size, externalFormat, type, image.getData());
 
 		//TextureUtils.loadImageBuffer(image, size, size, size, size, handler, imageBuffer);
 		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Z, 0, internalFormat, size, size, 0, externalFormat, type, imageBuffer);
-		GL11.glTexSubImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Z, 0, size, size, size, size, externalFormat, type, image.getData());
+		//GL11.glTexSubImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Z, 0, size, size, size, size, externalFormat, type, image.getData());
 
 		//TextureUtils.loadImageBuffer(image, size*3, size, size, size, handler, imageBuffer);
 		glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, 0, internalFormat, size, size, 0, externalFormat, type, imageBuffer);
-		GL11.glTexSubImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, 0, size*3, size, size, size, externalFormat, type, image.getData());
+		//GL11.glTexSubImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, 0, size*3, size, size, size, externalFormat, type, image.getData());
 
 		glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
 
@@ -122,10 +123,10 @@ public class SkyBox {
 		depthbuffer = glGenRenderbuffers();
 		glBindRenderbuffer(GL_RENDERBUFFER, depthbuffer);
 		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, width, height);
-		glBindRenderbuffer(GL_RENDERBUFFER, 0);
 
         // attach it
-		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, framebuffer);
+		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthbuffer);
+		glBindRenderbuffer(GL_RENDERBUFFER, 0);
 
         // attach only the +X cubemap texture (for completeness)
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X, cubemap, 0);
