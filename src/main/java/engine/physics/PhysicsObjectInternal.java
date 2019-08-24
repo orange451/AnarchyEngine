@@ -148,14 +148,12 @@ public class PhysicsObjectInternal {
 		body.applyImpulse( new Vector3( impulse.x, impulse.y, impulse.z ), new Vector3( location.x, location.y, location.z ));
 	}
 
-	private Matrix4 transform = new Matrix4();
-	private float[] transformTemp = new float[16];
 	public void setWorldMatrix( Matrix4f worldMatrix ) {
 		if (this.destroyed || body == null)
 			return;
-		transform.set(worldMatrix.get(transformTemp));
+
 		//transform.setFromOpenGLMatrix(worldMatrix.get(new float[16]));
-		body.setWorldTransform(transform);
+		body.setWorldTransform(new Matrix4(worldMatrix.get(new float[16])));
 		this.wakeup();
 	}
 
@@ -173,9 +171,7 @@ public class PhysicsObjectInternal {
 	private static final LuaValue C_PREFAB = LuaValue.valueOf("Prefab");
 
 	private static final Matrix4f IDENTITY = new Matrix4f().identity();
-	
-	private Matrix4f tempWorldMat = new Matrix4f();
-	
+
 	public Matrix4f getWorldMatrix() {
 		if (this.destroyed || body == null) {
 			if ( luaFrontEnd == null )
@@ -193,9 +189,7 @@ public class PhysicsObjectInternal {
 		}
 
 		Matrix4 transform = getWorldMatrixInternal();
-		tempWorldMat.set(transform.val);
-
-		return tempWorldMat;
+		return new Matrix4f().set(transform.val);
 	}
 	
 	public Matrix4 getWorldMatrixInternal() {

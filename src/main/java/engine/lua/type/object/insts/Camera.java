@@ -93,11 +93,13 @@ public class Camera extends Instance implements TreeViewable {
 		float yaw = Camera.this.getYaw();
 		float pitch = Camera.this.getPitch();
 		
-		Camera.this.rawset(C_POSITION,position);
-		Camera.this.rawset(C_LOOKAT,t2.clone());
-		Camera.this.setPosition(position);
-		Camera.this.setYaw(yaw);
-		Camera.this.setPitch(pitch);
+		synchronized(Camera.this) {
+			Camera.this.rawset(C_POSITION,position);
+			Camera.this.rawset(C_LOOKAT,t2);
+			Camera.this.setPosition(position);
+			Camera.this.setYaw(yaw);
+			Camera.this.setPitch(pitch);
+		}
 	}
 
 	/**
@@ -109,9 +111,11 @@ public class Camera extends Instance implements TreeViewable {
 		Vector3 current2 = Camera.this.getLookAt();
 		Vector3 t1 = (Vector3) current1.add(offset);
 		Vector3 t2 = (Vector3) current2.add(offset);
-		
-		Camera.this.setPosition(t1);
-		Camera.this.setLookAt(t2);
+
+		synchronized(Camera.this) {
+			Camera.this.setPosition(t1);
+			Camera.this.setLookAt(t2);
+		}
 	}
 	
 	/**
