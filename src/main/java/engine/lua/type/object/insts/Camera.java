@@ -87,18 +87,12 @@ public class Camera extends Instance implements TreeViewable {
 	 */
 	public void moveTo(Vector3 position) {
 		Vector3 lookAt = Camera.this.getLookAt();
-		Vector3 offset = (Vector3) Camera.this.getPosition().sub(position);
+		Vector3 offset = (Vector3) position.sub(Camera.this.getPosition());
 		Vector3 t2 = (Vector3) lookAt.add(offset);
 		
-		float yaw = Camera.this.getYaw();
-		float pitch = Camera.this.getPitch();
-		
 		synchronized(Camera.this) {
-			Camera.this.rawset(C_POSITION,position);
 			Camera.this.rawset(C_LOOKAT,t2);
-			Camera.this.setPosition(position);
-			Camera.this.setYaw(yaw);
-			Camera.this.setPitch(pitch);
+			Camera.this.set(C_POSITION, position);
 		}
 	}
 
@@ -195,9 +189,6 @@ public class Camera extends Instance implements TreeViewable {
 	public Vector3 getLookAt() {
 		return (Vector3)this.get(C_LOOKAT);
 	}
-	
-	private Matrix4f tempMatrix4 = new Matrix4f();
-	private Vector3f tempVector3 = new Vector3f();
 
 	@Override
 	public void onValueUpdated( LuaValue key, LuaValue value ) {
@@ -213,9 +204,9 @@ public class Camera extends Instance implements TreeViewable {
 		if ( key.eq_b(C_VIEWMATRIX) ) {
 			float dist = ((Vector3)this.get(C_LOOKAT)).getInternal().distance(((Vector3)this.get(C_POSITION)).getInternal());
 			
-			Matrix4f view = ((Matrix4)this.get("ViewMatrix")).toJoml();
-			Vector3f t = view.invert(tempMatrix4).getTranslation(tempVector3);
-			Vector3f l = new Vector3f(0, 0, dist).mulProject(view);
+			Matrix4f view = ((Matrix4)this.get(C_VIEWMATRIX)).getInternal();
+			Vector3f t = view.invert(new Matrix4f()).getTranslation(new Vector3f());
+			Vector3f l = new Vector3f(0,0,dist).mulProject(view);
 
 			this.rawset(C_POSITION, new Vector3(t));
 			this.set(C_LOOKAT, new Vector3(l));
@@ -240,7 +231,7 @@ public class Camera extends Instance implements TreeViewable {
 
 		// Recalculate Look At Matrix if yaw/pitch are changed.
 		if ( key.eq_b(C_YAW) || key.eq_b(C_PITCH) ) {
-			float dist = ((Vector3)this.get(C_LOOKAT)).toJoml().distance(((Vector3)this.get(C_POSITION)).toJoml());
+			float dist = ((Vector3)this.get(C_LOOKAT)).getInternal().distance(((Vector3)this.get(C_POSITION)).getInternal());
 			
 			float yaw = (float) this.get(C_YAW).checkdouble() - (float)Math.PI/2f;
 			float pitch = (float) this.get(C_PITCH).checkdouble();
