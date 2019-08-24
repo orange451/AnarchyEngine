@@ -98,7 +98,7 @@ public abstract class Instance extends DataModel {
 					Instance c = findFirstChild(child.toString());
 					if ( c == null ) {
 						try {
-							Thread.sleep(5);
+							Thread.sleep(1);
 						} catch (InterruptedException e) {
 							//
 						}
