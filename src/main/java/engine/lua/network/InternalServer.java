@@ -23,7 +23,6 @@ import engine.lua.network.internal.protocol.InstanceCreateTCP;
 import engine.lua.network.internal.protocol.InstanceDestroyTCP;
 import engine.lua.network.internal.protocol.InstanceUpdateUDP;
 import engine.lua.type.object.Instance;
-import engine.lua.type.object.insts.Camera;
 import engine.lua.type.object.insts.Player;
 import engine.lua.type.object.services.Connections;
 

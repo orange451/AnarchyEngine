@@ -40,6 +40,7 @@ public class Vector3 extends LuaValuetype {
 		defineField(C_X.toString(), LuaValue.valueOf(0), true);
 		defineField(C_Y.toString(), LuaValue.valueOf(0), true);
 		defineField(C_Z.toString(), LuaValue.valueOf(0), true);
+		this.rawset(C_MAGNITUDE, LuaValue.valueOf(0));
 		this.internal = new Vector3f();
 		
 		// Create ToString function
@@ -303,13 +304,16 @@ public class Vector3 extends LuaValuetype {
 
 	@Override
 	protected boolean onValueGet(LuaValue key) {
-		String keyName = key.toString();
-		if ( keyName.equals(C_UNIT.toString()) || keyName.equals(C_MAGNITUDE.toString()) ) {
+		if ( key.eq_b(C_UNIT) || key.eq_b(C_MAGNITUDE) ) {
 			if ( modified ) {
 				modified = false;
 				
 				// Compute magnitude
-				float magnitude = internal.length();
+				float magSQ = internal.lengthSquared();
+				float magnitude = 0;
+				if ( magSQ > 0 ) {
+					magnitude = (float) Math.sqrt(magSQ);
+				}
 				this.rawset(C_MAGNITUDE, LuaValue.valueOf(magnitude));
 				
 				// Compute unit vector
