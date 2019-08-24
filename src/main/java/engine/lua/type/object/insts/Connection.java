@@ -16,7 +16,7 @@ public abstract class Connection extends Instance {
 	protected static final LuaValue C_DATA = LuaValue.valueOf("Data");
 	protected static final LuaValue C_PLAYER = LuaValue.valueOf("Player");
 	protected static final LuaValue C_PING = LuaValue.valueOf("Ping");
-	protected static final LuaValue C_CONNECTION = LuaValue.valueOf("C_CONNECTION");
+	protected static final LuaValue C_CONNECTION = LuaValue.valueOf("Connection");
 	
 	public Connection(String objectName) {
 		super(objectName);
