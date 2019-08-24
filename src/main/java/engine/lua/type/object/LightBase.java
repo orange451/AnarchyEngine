@@ -14,11 +14,11 @@ import engine.util.Pair;
 
 public abstract class LightBase extends Instance implements Positionable {
 
-	private static final LuaValue C_POSITION = LuaValue.valueOf("Position");
-	private static final LuaValue C_INTENSITY = LuaValue.valueOf("Intensity");
-	private static final LuaValue C_COLOR = LuaValue.valueOf("Color");
-	private static final LuaValue C_SHADOWS = LuaValue.valueOf("Shadows");
-	private static final LuaValue C_VISIBLE = LuaValue.valueOf("Visible");
+	protected static final LuaValue C_POSITION = LuaValue.valueOf("Position");
+	protected static final LuaValue C_INTENSITY = LuaValue.valueOf("Intensity");
+	protected static final LuaValue C_COLOR = LuaValue.valueOf("Color");
+	protected static final LuaValue C_SHADOWS = LuaValue.valueOf("Shadows");
+	protected static final LuaValue C_VISIBLE = LuaValue.valueOf("Visible");
 	
 	public LightBase(String typename) {
 		super(typename);

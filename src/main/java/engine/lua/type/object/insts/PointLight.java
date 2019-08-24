@@ -19,7 +19,7 @@ import lwjgui.paint.Color;
 public class PointLight extends LightBase implements TreeViewable,GameSubscriber {
 
 	private engine.gl.light.PointLightInternal light;
-	
+
 	private static final LuaValue C_RADIUS = LuaValue.valueOf("Radius");
 
 	public PointLight() {
@@ -35,16 +35,16 @@ public class PointLight extends LightBase implements TreeViewable,GameSubscriber
 			LuaValue value = args[1];
 			
 			if ( light != null ) {
-				if ( key.toString().equals("Position") ) {
+				if ( key.eq_b(C_POSITION) ) {
 					Vector3f pos = ((Vector3)value).toJoml();
 					light.x = pos.x;
 					light.y = pos.y;
 					light.z = pos.z;
-				} else if ( key.toString().equals(C_RADIUS) ) {
+				} else if ( key.eq_b(C_RADIUS) ) {
 					light.radius = value.tofloat();
-				} else if ( key.toString().equals("Intensity") ) {
+				} else if ( key.eq_b(C_INTENSITY) ) {
 					light.intensity = value.tofloat();
-				} else if ( key.toString().equals("Color") ) {
+				} else if ( key.eq_b(C_COLOR) ) {
 					Color color = ((Color3)value).toColor();
 					light.color = new Vector3f( Math.max( color.getRed(),1 )/255f, Math.max( color.getGreen(),1 )/255f, Math.max( color.getBlue(),1 )/255f );
 				}
