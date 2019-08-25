@@ -2,6 +2,8 @@ package engine.lua.type.object.insts;
 
 import org.luaj.vm2.LuaValue;
 
+import engine.Game;
+import engine.InternalGameThread;
 import engine.lua.type.object.Instance;
 import engine.lua.type.object.TreeViewable;
 import ide.layout.windows.icons.Icons;
@@ -13,6 +15,17 @@ public class PlayerScriptsStart extends Instance implements TreeViewable {
 
 		this.setLocked(true);
 		this.setInstanceable(false);
+		
+		InternalGameThread.runLater(()->{
+			if ( destroyed )
+				return;
+			
+			Instance ss = Game.getService("ScriptService");
+			
+			if ( !this.getParent().eq_b(ss) ) {
+				this.forceSetParent(ss);
+			}
+		});
 	}
 
 	@Override

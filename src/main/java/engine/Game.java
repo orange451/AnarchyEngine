@@ -91,11 +91,6 @@ public class Game implements Tickable {
 		if ( Game.getService("Storage") == null )
 			new Storage();
 		
-		if ( Game.getService("Storage").findFirstChild("StarterPlayerScripts") == null ) {
-			PlayerScriptsStart pls = new PlayerScriptsStart();
-			pls.forceSetParent(Game.getService("Storage"));
-		}
-		
 		if ( Game.getService("ScriptService") == null )
 			new ScriptService();
 
@@ -137,6 +132,14 @@ public class Game implements Tickable {
 			camera.setParent(Game.getService("Core"));
 			camera.setLocked(true);
 		}
+		
+
+		InternalGameThread.runLater(()->{
+			if ( Game.getService("ScriptService").findFirstChild("StarterPlayerScripts") == null ) {
+				PlayerScriptsStart pls = new PlayerScriptsStart();
+				pls.forceSetParent(Game.getService("ScriptService"));
+			}
+		});
 	}
 
 	public static Service getService(String string) {

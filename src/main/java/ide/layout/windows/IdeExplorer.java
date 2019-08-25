@@ -63,20 +63,18 @@ public class IdeExplorer extends IdePane implements GameSubscriber {
 	private static HashMap<Class<? extends Instance>, Integer> priority = new HashMap<>();
 	
 	static {
-		priority.put(Folder.class, 20);
-		priority.put(PlayerScriptsStart.class, 21);
-
 		priority.put(Camera.class, 50);
+		priority.put(PlayerScriptsStart.class, 41);
 		
 		priority.put(ScriptBase.class, 35);
 		priority.put(Script.class, 35);
 		priority.put(LocalScript.class, 35);
 		priority.put(GlobalScript.class, 35);
 
-		priority.put(GameObject.class, 8);
-		
-		priority.put(AnimationController.class, 7);
+		priority.put(Folder.class, 20);
 
+		priority.put(GameObject.class, 8);
+		priority.put(AnimationController.class, 7);
 		priority.put(PhysicsBase.class, 6);
 		priority.put(PhysicsObject.class, 6);
 		priority.put(PlayerPhysics.class, 6);
