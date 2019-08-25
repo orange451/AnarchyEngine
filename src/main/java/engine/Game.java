@@ -30,6 +30,7 @@ import engine.lua.type.object.services.Lighting;
 import engine.lua.type.object.services.Players;
 import engine.lua.type.object.services.RunService;
 import engine.lua.type.object.services.ScriptService;
+import engine.lua.type.object.services.StarterPlayer;
 import engine.lua.type.object.services.Storage;
 import engine.lua.type.object.services.UserInputService;
 import engine.lua.type.object.services.Workspace;
@@ -93,6 +94,9 @@ public class Game implements Tickable {
 		
 		if ( Game.getService("ScriptService") == null )
 			new ScriptService();
+		
+		if ( Game.getService("StarterPlayer") == null )
+			new StarterPlayer();
 
 		if ( Game.getService("Assets") == null )
 			new Assets();
@@ -135,7 +139,7 @@ public class Game implements Tickable {
 		
 
 		InternalGameThread.runLater(()->{
-			if ( Game.getService("ScriptService").findFirstChild("StarterPlayerScripts") == null ) {
+			if ( Game.starterPlayer().findFirstChild("StarterPlayerScripts") == null ) {
 				PlayerScriptsStart pls = new PlayerScriptsStart();
 				pls.forceSetParent(Game.getService("ScriptService"));
 			}
@@ -189,6 +193,7 @@ public class Game implements Tickable {
 	private static final LuaValue C_RUNSERVICE = LuaValue.valueOf("RunService");
 	private static final LuaValue C_USERINPUTSERVICE = LuaValue.valueOf("UserInputService");
 	private static final LuaValue C_SCRIPTSERVICE = LuaValue.valueOf("ScriptService");
+	private static final LuaValue C_STARTERPLAYER = LuaValue.valueOf("StarterPlayer");
 	private static final LuaValue C_PLAYERS = LuaValue.valueOf("Players");
 	private static final LuaValue C_CONNECTIONS = LuaValue.valueOf("Connections");
 	private static final LuaValue C_CORE = LuaValue.valueOf("Core");
@@ -216,6 +221,10 @@ public class Game implements Tickable {
 	
 	public static ScriptService scriptService() {
 		return (ScriptService) Game.getService(C_SCRIPTSERVICE);
+	}
+	
+	public static StarterPlayer starterPlayer() {
+		return (StarterPlayer) Game.getService(C_STARTERPLAYER);
 	}
 	
 	public static Players players() {

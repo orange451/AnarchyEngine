@@ -21,6 +21,7 @@ public class Icons {
 	public static final Icons icon_script_local = new Icons("ScriptLocal.png");
 	public static final Icons icon_script_global = new Icons("ScriptGlobal.png");
 	public static final Icons icon_player_scripts = new Icons("PlayerScripts.png");
+	public static final Icons icon_starter_player = new Icons("StarterPlayer.png");
 	public static final Icons icon_workspace = new Icons("World.png");
 	public static final Icons icon_storage = new Icons("Storage.png");
 	public static final Icons icon_players = new Icons("Players.png");

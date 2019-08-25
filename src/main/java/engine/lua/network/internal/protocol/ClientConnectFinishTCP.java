@@ -41,7 +41,7 @@ public class ClientConnectFinishTCP implements ClientProcessable {
 				}
 				
 				// Copy starter player scripts in to player
-				Instance starterScripts = Game.scriptService().findFirstChild("StarterPlayerScripts");
+				Instance starterScripts = Game.starterPlayer().findFirstChild("StarterPlayerScripts");
 				List<Instance> cc = starterScripts.getChildren();
 				for (int j = 0; j < cc.size(); j++) {
 					Instance obj = cc.get(j);

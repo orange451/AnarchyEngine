@@ -20,7 +20,7 @@ public class PlayerScriptsStart extends Instance implements TreeViewable {
 			if ( destroyed )
 				return;
 			
-			Instance ss = Game.getService("ScriptService");
+			Instance ss = Game.starterPlayer();
 			
 			if ( !this.getParent().eq_b(ss) ) {
 				this.forceSetParent(ss);
