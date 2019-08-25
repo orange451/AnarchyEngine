@@ -38,6 +38,8 @@ public abstract class DataModel extends LuaDatatype {
 	private static final LuaValue C_PARENT = LuaValue.valueOf("Parent");
 	
 	protected boolean initialized;
+	protected boolean destroyed;
+
 	
 	private String internalName;
 	
@@ -368,7 +370,8 @@ public abstract class DataModel extends LuaDatatype {
 		
 		DataModel r = (Instance)root;
 		if ( r.descendents.contains(this) ) {
-			r.descendantRemovedEvent().fire(this);
+			if ( !destroyed )
+				r.descendantRemovedEvent().fire(this);
 			r.descendents.remove(this);
 			r.descendentsList.remove(this);
 			descendantRemovedForce(r.getParent());
@@ -443,6 +446,8 @@ public abstract class DataModel extends LuaDatatype {
 		//boolean l2 = !this.getField("Parent").canModify();
 
 		LuaValue oldParent = this.rawget(C_PARENT);
+		if ( oldParent.eq_b(parent) )
+			return;
 		
 		/*LuaField pField = this.getField("Parent");
 		if ( pField == null )

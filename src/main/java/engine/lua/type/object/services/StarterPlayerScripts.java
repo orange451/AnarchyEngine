@@ -1,4 +1,4 @@
-package engine.lua.type.object.insts;
+package engine.lua.type.object.services;
 
 import org.luaj.vm2.LuaValue;
 
@@ -8,9 +8,9 @@ import engine.lua.type.object.Instance;
 import engine.lua.type.object.TreeViewable;
 import ide.layout.windows.icons.Icons;
 
-public class PlayerScriptsStart extends Instance implements TreeViewable {
+public class StarterPlayerScripts extends Instance implements TreeViewable {
 
-	public PlayerScriptsStart() {
+	public StarterPlayerScripts() {
 		super("StarterPlayerScripts");
 
 		this.setLocked(true);

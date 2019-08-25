@@ -23,8 +23,6 @@ import engine.lua.type.LuaValuetype;
 import engine.lua.type.DataModel.LuaInstancetypeData;
 
 public abstract class Instance extends DataModel {
-	protected boolean destroyed;
-
 	protected static final LuaValue C_PARENT = LuaValue.valueOf("Parent");
 	protected static final LuaValue C_CLASSNAME = LuaValue.valueOf("ClassName");
 	protected static final LuaValue C_NAME = LuaValue.valueOf("Name");

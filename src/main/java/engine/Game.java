@@ -21,12 +21,12 @@ import engine.lua.type.object.insts.Camera;
 import engine.lua.type.object.insts.GlobalScript;
 import engine.lua.type.object.insts.Player;
 import engine.lua.type.object.insts.PlayerScripts;
-import engine.lua.type.object.insts.PlayerScriptsStart;
 import engine.lua.type.object.services.Assets;
 import engine.lua.type.object.services.Connections;
 import engine.lua.type.object.services.Core;
 import engine.lua.type.object.services.Debris;
 import engine.lua.type.object.services.Lighting;
+import engine.lua.type.object.services.StarterPlayerScripts;
 import engine.lua.type.object.services.Players;
 import engine.lua.type.object.services.RunService;
 import engine.lua.type.object.services.ScriptService;
@@ -97,6 +97,13 @@ public class Game implements Tickable {
 		
 		if ( Game.getService("StarterPlayer") == null )
 			new StarterPlayer();
+		
+		InternalGameThread.runLater(()->{
+			if ( Game.starterPlayer().findFirstChild("StarterPlayerScripts") == null ) {
+				StarterPlayerScripts pls = new StarterPlayerScripts();
+				pls.forceSetParent(Game.starterPlayer());
+			}
+		});
 
 		if ( Game.getService("Assets") == null )
 			new Assets();
@@ -136,14 +143,6 @@ public class Game implements Tickable {
 			camera.setParent(Game.getService("Core"));
 			camera.setLocked(true);
 		}
-		
-
-		InternalGameThread.runLater(()->{
-			if ( Game.starterPlayer().findFirstChild("StarterPlayerScripts") == null ) {
-				PlayerScriptsStart pls = new PlayerScriptsStart();
-				pls.forceSetParent(Game.getService("ScriptService"));
-			}
-		});
 	}
 
 	public static Service getService(String string) {
@@ -369,6 +368,7 @@ public class Game implements Tickable {
 			selectedInstances.clear();
 		}
 		instanceCounter = new AtomicLong(0);
+		
 		clearServices();
 		ScriptData.cleanup();
 		

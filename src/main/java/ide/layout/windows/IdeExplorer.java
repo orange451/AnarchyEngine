@@ -30,11 +30,11 @@ import engine.lua.type.object.insts.LocalScript;
 import engine.lua.type.object.insts.Mesh;
 import engine.lua.type.object.insts.PhysicsObject;
 import engine.lua.type.object.insts.PlayerPhysics;
-import engine.lua.type.object.insts.PlayerScriptsStart;
 import engine.lua.type.object.insts.Prefab;
 import engine.lua.type.object.insts.Script;
 import engine.lua.type.object.insts.Texture;
 import engine.lua.type.object.services.Assets;
+import engine.lua.type.object.services.StarterPlayerScripts;
 import engine.util.FileUtils;
 import ide.IDE;
 import ide.layout.IdePane;
@@ -64,7 +64,7 @@ public class IdeExplorer extends IdePane implements GameSubscriber {
 	
 	static {
 		priority.put(Camera.class, 50);
-		priority.put(PlayerScriptsStart.class, 41);
+		priority.put(StarterPlayerScripts.class, 41);
 		
 		priority.put(ScriptBase.class, 35);
 		priority.put(Script.class, 35);
