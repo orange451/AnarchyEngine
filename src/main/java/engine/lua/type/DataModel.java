@@ -37,6 +37,8 @@ public abstract class DataModel extends LuaDatatype {
 	private static final LuaValue C_NAME = LuaValue.valueOf("Name");
 	private static final LuaValue C_PARENT = LuaValue.valueOf("Parent");
 	
+	protected boolean initialized;
+	
 	private String internalName;
 	
 	public class LuaInstancetypeData {
@@ -109,6 +111,7 @@ public abstract class DataModel extends LuaDatatype {
 		this.rawset(C_DESCENDANTREMOVED,	new LuaEvent());
 
 		this.internalName = name;
+		this.initialized = true;
 	}
 	
 	public boolean isArhivable() {

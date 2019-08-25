@@ -344,20 +344,24 @@ public abstract class Instance extends DataModel {
 	}
 
 	public void destroy() {
+		if ( destroyed )
+			return;
+		
 		destroyed = true;
 		
-		// Destroy children
-		List<Instance> ch = getChildren();
-		for (int i = 0; i < ch.size(); i++) {
-			ch.get(i).destroy();
+		if ( initialized ) {
+			// Destroy children
+			List<Instance> ch = getChildren();
+			for (int i = 0; i < ch.size(); i++) {
+				ch.get(i).destroy();
+			}
+			children.clear();
+			propertySubscribers.clear();
+	
+			// Call destroy function
+			this.onDestroy();
+			this.destroyedEvent().fire();
 		}
-		children.clear();
-		propertySubscribers.clear();
-
-		// Call destroy function
-		this.onDestroy();
-		this.destroyedEvent().fire();
-
 		// Destroy all values
 		this.cleanup();
 		
