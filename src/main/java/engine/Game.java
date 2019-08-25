@@ -188,6 +188,7 @@ public class Game implements Tickable {
 	private static final LuaValue C_LIGHTING = LuaValue.valueOf("Lighting");
 	private static final LuaValue C_RUNSERVICE = LuaValue.valueOf("RunService");
 	private static final LuaValue C_USERINPUTSERVICE = LuaValue.valueOf("UserInputService");
+	private static final LuaValue C_SCRIPTSERVICE = LuaValue.valueOf("ScriptService");
 	private static final LuaValue C_PLAYERS = LuaValue.valueOf("Players");
 	private static final LuaValue C_CONNECTIONS = LuaValue.valueOf("Connections");
 	private static final LuaValue C_CORE = LuaValue.valueOf("Core");
@@ -211,6 +212,10 @@ public class Game implements Tickable {
 	
 	public static UserInputService userInputService() {
 		return (UserInputService) Game.getService(C_USERINPUTSERVICE);
+	}
+	
+	public static ScriptService scriptService() {
+		return (ScriptService) Game.getService(C_SCRIPTSERVICE);
 	}
 	
 	public static Players players() {
