@@ -460,6 +460,7 @@ public abstract class DataModel extends LuaDatatype {
 		//pField.setLocked(l2);
 
 		this.checkSetParent(C_PARENT, oldParent, parent);
+		this.onValueUpdated(C_PARENT, parent);
 	}
 	
 	public Long getSID() {

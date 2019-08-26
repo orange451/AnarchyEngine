@@ -47,7 +47,7 @@ public class AnimationKeyframe extends Instance implements TreeViewable {
 		return ret==null?null:(Matrix4)ret;
 	}
 	
-	public Matrix4f getMatrixJOML() {
+	public Matrix4f getMatrixInternal() {
 		Matrix4 mat = getMatrix();
 		if ( mat == null )
 			return null;

@@ -1,11 +1,15 @@
 package engine.lua.type.object.insts;
 
 import org.luaj.vm2.LuaValue;
+
+import engine.lua.type.data.Matrix4;
 import engine.lua.type.object.Instance;
 import engine.lua.type.object.TreeViewable;
 import ide.layout.windows.icons.Icons;
 
 public class Bones extends Instance implements TreeViewable {
+	
+	public static final LuaValue C_ROOTINVERSE = LuaValue.valueOf("RootInverse");
 	
 	public Bones() {
 		super("Bones");
@@ -14,6 +18,8 @@ public class Bones extends Instance implements TreeViewable {
 		this.setInstanceable(false);
 
 		this.getField(LuaValue.valueOf("Archivable")).setLocked(true);
+		
+		this.defineField(C_ROOTINVERSE.toString(), new Matrix4(), true);
 		
 		this.childAddedEvent().connect((args)->{
 			LuaValue c = args[0];

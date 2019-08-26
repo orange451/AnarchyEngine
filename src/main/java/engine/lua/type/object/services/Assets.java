@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import org.joml.Matrix4f;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.luaj.vm2.LuaValue;
@@ -19,6 +20,7 @@ import org.lwjgl.assimp.AIColor4D;
 import org.lwjgl.assimp.AIFace;
 import org.lwjgl.assimp.AIMaterial;
 import org.lwjgl.assimp.AIMaterialProperty;
+import org.lwjgl.assimp.AIMatrix4x4;
 import org.lwjgl.assimp.AIMesh;
 import org.lwjgl.assimp.AIScene;
 import org.lwjgl.assimp.AIString;
@@ -28,6 +30,7 @@ import org.lwjgl.assimp.Assimp;
 import engine.gl.mesh.BufferedMesh;
 import engine.gl.mesh.Vertex;
 import engine.lua.type.data.Color3;
+import engine.lua.type.data.Matrix4;
 import engine.lua.type.object.AssetLoadable;
 import engine.lua.type.object.Instance;
 import engine.lua.type.object.Service;
@@ -203,7 +206,7 @@ public class Assets extends Service implements TreeViewable {
 			}
 	
 			// Get scene
-			int flags = Assimp.aiProcess_JoinIdenticalVertices | Assimp.aiProcess_Triangulate;
+			int flags = Assimp.aiProcess_JoinIdenticalVertices | Assimp.aiProcess_Triangulate | Assimp.aiProcess_GenSmoothNormals;
 			if ( extraFlags > 0 )
 				flags = flags | extraFlags;
 			AIScene scene = Assimp.aiImportFile(file.getAbsolutePath(), flags);

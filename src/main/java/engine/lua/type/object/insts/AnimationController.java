@@ -11,6 +11,7 @@ import engine.Game;
 import engine.gl.Resources;
 import engine.gl.shader.BaseShader;
 import engine.lua.type.LuaConnection;
+import engine.lua.type.data.Matrix4;
 import engine.lua.type.object.Instance;
 
 public class AnimationController extends Instance {
@@ -18,10 +19,12 @@ public class AnimationController extends Instance {
 	protected ArrayList<AnimationTrack> playingAnimations;
 	protected LuaConnection animationUpdator;
 	
+	protected final static LuaValue C_LINKED = LuaValue.valueOf("Linked");
+	
 	public AnimationController() {
 		super("AnimationController");
 		
-		this.defineField("Linked", LuaValue.NIL, true);
+		this.defineField(C_LINKED.toString(), LuaValue.NIL, true);
 		
 		this.playingAnimations = new ArrayList<AnimationTrack>();
 		
@@ -58,11 +61,11 @@ public class AnimationController extends Instance {
 
 	@Override
 	public void onValueUpdated(LuaValue key, LuaValue value) {
-		if ( key.toString().equals("Parent") ) {
+		if ( key.eq_b(C_PARENT) ) {
 			if ( value.isnil() || !(value instanceof GameObject) ) {
-				this.forceset("Linked", LuaValue.NIL);
+				this.forceset(C_LINKED, LuaValue.NIL);
 			} else {
-				this.forceset("Linked", value);
+				this.forceset(C_LINKED, value);
 			}
 		}
 	}
@@ -95,7 +98,7 @@ public class AnimationController extends Instance {
 	 * @return
 	 */
 	public GameObject getLinkedInstance() {
-		LuaValue linked = this.get("Linked");
+		LuaValue linked = this.get(C_LINKED);
 		return linked.isnil()?null:(GameObject)linked;
 	}
 
@@ -147,21 +150,34 @@ public class AnimationController extends Instance {
 			if ( keyframe == null )
 				continue;
 			
-			debugRenderRecursive( shader, keyframe, boneStructure, linked.getWorldMatrix().getInternal());
+			debugRenderRecursive( shader, keyframe, boneStructure, linked.getWorldMatrix().toJoml());
 		}
 	}
-
-	private void debugRenderRecursive(BaseShader shader, AnimationKeyframeSequence keyframe, Instance root, Matrix4f worldMatrix) {
+	
+	private void debugRenderRecursive(BaseShader shader, AnimationKeyframeSequence keyframe, Instance root, Matrix4f parentMatrix) {
+		Matrix4f globalTransformation = new Matrix4f(parentMatrix);
+		
 		// Do rendering
 		if ( root instanceof BoneTreeNode ) {
 			Instance keyframeBone = keyframe.findFirstChild(root.getName());
 			if ( keyframeBone != null && keyframeBone instanceof AnimationKeyframe ) {
-				Instance bone = ((Instance)((Instance)((Instance)keyframe.getParent()).getParent()).getParent()).findFirstChild("Bones").findFirstChild(keyframeBone.getName());
+				Instance animationData = ((Instance)((Instance)((Instance)keyframe.getParent()).getParent()).getParent());
+				Instance bones = animationData.findFirstChild("Bones");
+				Instance bone = bones.findFirstChild(keyframeBone.getName());
+				
 				if ( bone != null && bone instanceof Bone ) {
-					worldMatrix = new Matrix4f();
-					worldMatrix.mul(((Bone)bone).getOffsetMatrix().getInternal());
-					worldMatrix.mul(((AnimationKeyframe)keyframeBone).getMatrixJOML());
-					Resources.MESH_CUBE.render(shader, worldMatrix, Resources.MATERIAL_BLANK);
+					Matrix4f keyframeMatrix = ((AnimationKeyframe)keyframeBone).getMatrixInternal();
+					Matrix4f offsetMatrix = ((Bone)bone).getOffsetMatrix().toJoml();
+					Matrix4f inverseRoot = ((Matrix4)bones.get(Bones.C_ROOTINVERSE)).toJoml();
+					
+					globalTransformation.mul(keyframeMatrix);
+					
+					Matrix4f finalTransform = new Matrix4f();
+					finalTransform.mul(inverseRoot);
+					//finalTransform.mul(globalTransformation);
+					finalTransform.mul(offsetMatrix.invert());
+					
+					Resources.MESH_CUBE.render(shader, finalTransform, Resources.MATERIAL_BLANK);
 				}
 			}
 		}
@@ -170,7 +186,7 @@ public class AnimationController extends Instance {
 		List<Instance> bones = root.getChildren();
 		for (int i = 0; i < bones.size(); i++) {
 			Instance newRoot = bones.get(i);
-			debugRenderRecursive( shader, keyframe, newRoot, worldMatrix );
+			debugRenderRecursive( shader, keyframe, newRoot, globalTransformation );
 		}
 	}
 

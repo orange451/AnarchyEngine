@@ -54,6 +54,15 @@ public class AnimationData extends Instance implements TreeViewable {
 	public Icons getIcon() {
 		return Icons.icon_animation_data;
 	}
+	
+	private Matrix4f fromAssimpMatrix(AIMatrix4x4 mOff) {
+		return new Matrix4f(
+				mOff.a1(), mOff.a2(), mOff.a3(), mOff.a4(),
+				mOff.b1(), mOff.b2(), mOff.b3(), mOff.b4(),
+				mOff.c1(), mOff.c2(), mOff.c3(), mOff.c4(),
+				mOff.d1(), mOff.d2(), mOff.d3(), mOff.d4()
+			).transpose();
+	}
 
 	public void processBones(Mesh mesh, Instance boneData, PointerBuffer mBones) {
 		if ( mBones == null )
@@ -61,14 +70,7 @@ public class AnimationData extends Instance implements TreeViewable {
 
 		for (int a = 0; a < mBones.remaining(); a++) {
 			AIBone bone = AIBone.create(mBones.get(a));
-			AIMatrix4x4 mOff = bone.mOffsetMatrix();
-			Matrix4f offsetMat = new Matrix4f(
-					mOff.a1(), mOff.a2(), mOff.a3(), mOff.a4(),
-					mOff.b1(), mOff.b2(), mOff.b3(), mOff.b4(),
-					mOff.c1(), mOff.c2(), mOff.c3(), mOff.c4(),
-					mOff.d1(), mOff.d2(), mOff.d3(), mOff.d4()
-				);
-			offsetMat.transpose();
+			Matrix4f offsetMat = fromAssimpMatrix(bone.mOffsetMatrix());
 
 			Bone b = new Bone();
 			b.rawset("Mesh", mesh);
@@ -90,23 +92,30 @@ public class AnimationData extends Instance implements TreeViewable {
 	
 	private Instance boneTree;
 	public void processBoneTree(AINode node, Instance parent) {
+		// Create initial bone tree folder
 		boolean c = false;
 		if ( this.boneTree == null ) {
 			this.boneTree = new BoneTree();
-			c = true; 
+			c = true;
+			
+			Matrix4 temp = new Matrix4(fromAssimpMatrix(node.mTransformation()).invert());
+			this.findFirstChildOfClass("Bones").rawset(Bones.C_ROOTINVERSE, temp);
 		}
 		
 		if ( parent == null )
 			parent = boneTree;
 		
+		// Create node object for this node
 		BoneTreeNode t = new BoneTreeNode();
 		t.forceSetName(node.mName().dataString());
 		
+		// Create children node objects
 		for (int i = 0; i < node.mNumChildren(); i++) {
 			AINode child = AINode.create(node.mChildren().get(i));
 			processBoneTree( child, t );
 		}
 		
+		// Put node object in parent
 		t.forceSetParent(parent);
 		
 		if ( c )
@@ -134,7 +143,7 @@ public class AnimationData extends Instance implements TreeViewable {
 			for (int j = 0; j < nodes; j++) {
 				AINodeAnim nodeData = AINodeAnim.create(aiAnimation.mChannels().get(j));
 
-				Instance bones = this.findFirstChild("Bones");
+				Instance bones = this.findFirstChildOfClass("Bones");
 				if ( bones == null )
 					continue;
 
@@ -194,11 +203,11 @@ public class AnimationData extends Instance implements TreeViewable {
 				for (Map.Entry<Bone,TempKeyframe> entryK : keyframes.entrySet()) {
 					
 					// Compute translation matrix
-					Matrix4f offsetMatrix = new Matrix4f();
-					offsetMatrix.translate(
-							entryK.getValue().position.mValue().x(),
-							entryK.getValue().position.mValue().y(),
-							entryK.getValue().position.mValue().z()
+					Matrix4f translation = new Matrix4f();
+					translation.translate(
+						entryK.getValue().position.mValue().x(),
+						entryK.getValue().position.mValue().y(),
+						entryK.getValue().position.mValue().z()
 					);
 					
 					// Compute rotation matrix
@@ -210,12 +219,12 @@ public class AnimationData extends Instance implements TreeViewable {
 					);
 					
 					// relative = offset * rotation
-					Matrix4f relativeMatrix = offsetMatrix.rotate(rotation, new Matrix4f());
+					Matrix4f nodeTransform = translation.rotate(rotation);
 					
 					// Create keyframe
 					AnimationKeyframe keyframe = new AnimationKeyframe();
 					keyframe.forceset("Bone", entryK.getKey());
-					keyframe.forceset("Matrix", new Matrix4(relativeMatrix));
+					keyframe.forceset("Matrix", new Matrix4(nodeTransform));
 					keyframe.forceSetName(entryK.getKey().getName());
 					keyframe.forceSetParent(seq);
 				}

@@ -49,7 +49,7 @@ public class GameObject extends Instance implements RenderableInstance,TreeViewa
 		
 		// Render
 		PrefabRenderer prefab = luaPrefab.getPrefab();
-		prefab.render(shader, matrix.toJoml());
+		prefab.render(shader, matrix.getInternal());
 	}
 	
 	/**
