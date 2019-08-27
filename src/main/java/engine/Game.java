@@ -436,7 +436,8 @@ public class Game implements Tickable {
 	
 	private static final LuaValue C_RUNNING = LuaValue.valueOf("Running");
 	private static final LuaValue C_ISSERVER = LuaValue.valueOf("IsServer");
-
+	private int ticksNoCamera = 0;
+	
 	@Override
 	public void tick() {
 		Game.game().rawset(C_RUNNING, LuaValue.valueOf(running));
@@ -447,11 +448,15 @@ public class Game implements Tickable {
 
 		// Make sure there's a camera
 		if ( Game.workspace().getCurrentCamera() == null ) {
-			Camera c = new Camera();
-			c.setArchivable(false);
-			c.setParent(Game.workspace());
-			workspace().setCurrentCamera(c);
-			
+			ticksNoCamera++;
+			if ( ticksNoCamera > 2 ) {
+				Camera c = new Camera();
+				c.setArchivable(false);
+				c.setParent(Game.workspace());
+				workspace().setCurrentCamera(c);
+			}
+		} else {
+			ticksNoCamera = 0;
 		}
 		
 		if ( !running )
