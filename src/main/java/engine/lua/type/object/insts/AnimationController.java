@@ -8,9 +8,11 @@ import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.TwoArgFunction;
 
 import engine.Game;
+import engine.InternalGameThread;
 import engine.gl.Resources;
 import engine.gl.shader.BaseShader;
 import engine.lua.type.LuaConnection;
+import engine.lua.type.LuaEvent;
 import engine.lua.type.data.Matrix4;
 import engine.lua.type.object.Instance;
 
@@ -18,8 +20,11 @@ public class AnimationController extends Instance {
 	
 	protected ArrayList<AnimationTrack> playingAnimations;
 	protected LuaConnection animationUpdator;
-	
+
 	protected final static LuaValue C_LINKED = LuaValue.valueOf("Linked");
+	protected final static LuaValue C_PREFAB = LuaValue.valueOf("Prefab");
+	
+	private LuaConnection linkedConnection = null;
 	
 	public AnimationController() {
 		super("AnimationController");
@@ -40,17 +45,37 @@ public class AnimationController extends Instance {
 		});
 		
 		// Handle animations
-		if ( !Game.isLoaded() ) {
-			Game.startEvent().connect((a)->{
-				animationUpdator = Game.runService().heartbeatEvent().connect((args)->{
-					animate(args[0].checkdouble());
-				});
-			});
-		} else {
+		InternalGameThread.runLater(()->{
 			animationUpdator = Game.runService().heartbeatEvent().connect((args)->{
 				animate(args[0].checkdouble());
 			});
-		}
+		});
+		
+		// Reset animations if linked changes... Also reset animations of the linked prefab changes?
+		this.changedEvent().connect((args) -> {
+			if ( args[0].eq_b(C_LINKED) ) {
+				clearAnimations();
+				
+				if ( linkedConnection != null ) {
+					linkedConnection.disconnect();
+					linkedConnection = null;
+				}
+				
+				LuaValue val = this.get(args[0]);
+				if ( !val.isnil() ) {
+					linkedConnection = ((Instance)val).changedEvent().connect((args2)->{
+						if ( args2[0].eq_b(C_PREFAB) ) {
+							clearAnimations();
+						}
+					});
+				}
+			}
+		});
+	}
+
+	private void clearAnimations() {
+		playingAnimations.clear();
+		System.out.println("Animations cleared");
 	}
 
 	@Override

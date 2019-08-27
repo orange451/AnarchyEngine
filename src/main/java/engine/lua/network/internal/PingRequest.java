@@ -12,7 +12,6 @@ public class PingRequest {
 	public boolean ack;
 	
 	private static final LuaValue C_PING = LuaValue.valueOf("Ping");
-			
 	
 	public PingRequest() {
 		originalSendTime = System.currentTimeMillis();
