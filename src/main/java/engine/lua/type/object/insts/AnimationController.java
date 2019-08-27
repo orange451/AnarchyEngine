@@ -1,6 +1,7 @@
 package engine.lua.type.object.insts;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import org.joml.Matrix4f;
@@ -12,7 +13,6 @@ import engine.InternalGameThread;
 import engine.gl.Resources;
 import engine.gl.shader.BaseShader;
 import engine.lua.type.LuaConnection;
-import engine.lua.type.LuaEvent;
 import engine.lua.type.data.Matrix4;
 import engine.lua.type.object.Instance;
 
@@ -25,6 +25,7 @@ public class AnimationController extends Instance {
 	protected final static LuaValue C_PREFAB = LuaValue.valueOf("Prefab");
 	
 	private LuaConnection linkedConnection = null;
+	private HashMap<Bone, Matrix4> boneAbsolutePositions;
 	
 	public AnimationController() {
 		super("AnimationController");
@@ -76,6 +77,11 @@ public class AnimationController extends Instance {
 	private void clearAnimations() {
 		playingAnimations.clear();
 		System.out.println("Animations cleared");
+		
+		if ( boneAbsolutePositions != null )
+			boneAbsolutePositions.clear();
+		else
+			boneAbsolutePositions = new HashMap<>(); 
 	}
 
 	@Override
@@ -199,10 +205,12 @@ public class AnimationController extends Instance {
 					
 					Matrix4f finalTransform = new Matrix4f();
 					finalTransform.mul(inverseRoot);
-					//finalTransform.mul(globalTransformation);
-					finalTransform.mul(offsetMatrix.invert());
+					finalTransform.mul(globalTransformation);
+					//finalTransform.mul(offsetMatrix.invert());
 					
 					Resources.MESH_CUBE.render(shader, finalTransform, Resources.MATERIAL_BLANK);
+					
+					boneAbsolutePositions.put((Bone) bone, new Matrix4(finalTransform));
 				}
 			}
 		}
