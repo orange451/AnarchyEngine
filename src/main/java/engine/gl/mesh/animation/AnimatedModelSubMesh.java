@@ -10,24 +10,20 @@ import static org.lwjgl.opengl.GL30.glGenVertexArrays;
 
 import java.nio.FloatBuffer;
 
-import org.joml.Matrix4f;
 import org.joml.Vector4f;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL15;
 import org.lwjgl.opengl.GL20;
 
-import engine.gl.MaterialGL;
 import engine.gl.mesh.BufferedMesh;
 import engine.gl.mesh.Vertex;
-import engine.gl.shader.BaseShader;
 
 public class AnimatedModelSubMesh {
 	private Vertex[] vertices;
 	private Vector4f[] weightBoneIndices;
 	private Vector4f[] weightBoneWeights;
 	private FloatBuffer verticesBuffer;
-	protected MaterialGL material;
 	private boolean modified;
 	private int vaoId = -1;
 	private int vboId = -1;
@@ -68,20 +64,11 @@ public class AnimatedModelSubMesh {
 		this.weightBoneWeights[index] = weights;
 	}
 
-	public void render( BaseShader shader, Matrix4f worldMatrix ) {
+	public void bind() {
 		if (modified)
 			sendToGPU();
 		
-		// Upload world transformations
-		shader.setWorldMatrix(worldMatrix);
-		
-		// Bind Material
-		if (material != null)
-			material.bind( shader );
-		
-		// Draw
 		glBindVertexArray(vaoId);
-		GL11.glDrawArrays(GL11.GL_TRIANGLES, 0, vertices.length);
 	}
 
 	private void sendToGPU() {
@@ -164,5 +151,9 @@ public class AnimatedModelSubMesh {
 
 	public Vertex[] getVertices() {
 		return this.vertices;
+	}
+
+	public int size() {
+		return this.vertices.length;
 	}
 }

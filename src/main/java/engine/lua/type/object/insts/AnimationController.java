@@ -160,11 +160,6 @@ public class AnimationController extends Instance {
 			
 			// Update bones
 			computeBones( keyframe, boneStructure, linked.getWorldMatrix().toJoml());
-			
-			// Update in animated model
-			if ( this.animatedModel != null ) {
-				this.animatedModel.updateBones();
-			}
 		}
 	}
 	
@@ -218,15 +213,13 @@ public class AnimationController extends Instance {
 				
 				if ( bone != null && bone instanceof Bone ) {
 					Matrix4f keyframeMatrix = ((AnimationKeyframe)keyframeBone).getMatrixInternal();
-					Matrix4f offsetMatrix = ((Bone)bone).getOffsetMatrix().toJoml();
-					Matrix4f inverseRoot = ((Matrix4)bones.get(Bones.C_ROOTINVERSE)).toJoml();
+					Matrix4f inverseRoot = ((Matrix4)bones.get(Bones.C_ROOTINVERSE)).getInternal();
 					
 					globalTransformation.mul(keyframeMatrix);
 					
 					Matrix4f finalTransform = new Matrix4f();
 					finalTransform.mul(inverseRoot);
 					finalTransform.mul(globalTransformation);
-					//finalTransform.mul(offsetMatrix.invert());
 					
 					boneAbsolutePositions.put((Bone) bone, new Matrix4(finalTransform));
 				}

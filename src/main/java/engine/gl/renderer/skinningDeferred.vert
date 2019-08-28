@@ -16,8 +16,8 @@ layout(location = 0) in vec3 inPos;
 layout(location = 1) in vec3 inNormal;
 layout(location = 2) in vec2 inTexCoord;
 layout(location = 3) in vec4 inColor;
-layout(location = 4) in vec4 BoneIDs;
-layout(location = 5) in vec4 Weights;
+layout(location = 4) in vec4 BoneIndices;
+layout(location = 5) in vec4 BoneWeights;
 
 out vec2 passTexCoord;
 out vec4 passColor;
@@ -26,10 +26,10 @@ out vec3 vViewSpacePos;
 out vec3 vViewSpaceNor;
 
 void main(void) {
-    mat4 BoneTransform = boneMat[int(BoneIDs[0])] * 1;
-    BoneTransform += boneMat[int(BoneIDs[1])] * Weights[1];
-    BoneTransform += boneMat[int(BoneIDs[2])] * Weights[2];
-    BoneTransform += boneMat[int(BoneIDs[3])] * Weights[3];
+    mat4 BoneTransform = boneMat[int(BoneIndices[0])] * BoneWeights[0];
+    	BoneTransform += boneMat[int(BoneIndices[1])] * BoneWeights[1];
+    	BoneTransform += boneMat[int(BoneIndices[2])] * BoneWeights[2];
+    	BoneTransform += boneMat[int(BoneIndices[3])] * BoneWeights[3];
     
     vec4 PosL = BoneTransform * vec4(inPos, 1.0);
     vec4 NorL = BoneTransform * vec4(inNormal, 0.0);
