@@ -7,12 +7,12 @@ public class Animation {
 	private float overrideSpeed;
 	private float frame_current;
 	private boolean loop = true;
-	private AnimatedModel parent;
+	private AnimatedModelBroken parent;
 	private String name;
 
 	protected ArrayList<AnimationFrame> frames;
 
-	public Animation( AnimatedModel parent, String name, float speed, boolean loop ) {
+	public Animation( AnimatedModelBroken parent, String name, float speed, boolean loop ) {
 		this.parent = parent;
 		this.name = name;
 		this.speed = speed;

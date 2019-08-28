@@ -198,8 +198,11 @@ public class AnimationController extends Instance {
 			Bone bone = iterator.next();
 			Matrix4 matrix = boneAbsolutePositions.get(bone);
 			
-			Resources.MESH_CUBE.render(shader, matrix.getInternal(), Resources.MATERIAL_BLANK);
+			//Resources.MESH_CUBE.render(shader, matrix.getInternal(), Resources.MATERIAL_BLANK);
 		}
+		
+		if ( animatedModel != null )
+			animatedModel.render(new Matrix4f());
 	}
 	
 	private void computeBones(AnimationKeyframeSequence keyframe, Instance root, Matrix4f parentMatrix) {

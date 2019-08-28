@@ -311,6 +311,7 @@ public class Pipeline implements Renderable {
 			Instance animationController = root.findFirstChildOfClass(AnimationController.class.getSimpleName());
 			if ( animationController != null ) {
 				((AnimationController)animationController).debugRender(shader);
+				return;
 			}
 			
 			if ( transparency == 0 ) { // Solid

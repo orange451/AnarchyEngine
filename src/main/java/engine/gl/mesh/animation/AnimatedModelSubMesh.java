@@ -27,8 +27,6 @@ public class AnimatedModelSubMesh {
 	private Vector4f[] weightBoneIndices;
 	private Vector4f[] weightBoneWeights;
 	private FloatBuffer verticesBuffer;
-	private FloatBuffer modelBuffer;
-	private FloatBuffer normalBuffer;
 	protected MaterialGL material;
 	private boolean modified;
 	private int vaoId = -1;
@@ -51,10 +49,10 @@ public class AnimatedModelSubMesh {
 		
 		for (int i = 0; i < verts; i++) {
 			this.setVertex(source.getVertex(i), i);
+
+			this.setBoneIndices(i, new Vector4f(0));
+			this.setBoneWeights(i, new Vector4f(0));
 		}
-		
-		this.modelBuffer  = BufferUtils.createFloatBuffer(16);
-		this.normalBuffer = BufferUtils.createFloatBuffer(9);
 	}
 	
 	public void setVertex(Vertex v, int index) {
