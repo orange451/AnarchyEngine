@@ -2,6 +2,7 @@ package engine.lua.type.object.insts;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 
 import org.joml.Matrix4f;
@@ -11,6 +12,7 @@ import org.luaj.vm2.lib.TwoArgFunction;
 import engine.Game;
 import engine.InternalGameThread;
 import engine.gl.Resources;
+import engine.gl.mesh.animation.AnimatedModel;
 import engine.gl.shader.BaseShader;
 import engine.lua.type.LuaConnection;
 import engine.lua.type.data.Matrix4;
@@ -26,6 +28,7 @@ public class AnimationController extends Instance {
 	
 	private LuaConnection linkedConnection = null;
 	private HashMap<Bone, Matrix4> boneAbsolutePositions;
+	private AnimatedModel animatedModel;
 	
 	public AnimationController() {
 		super("AnimationController");
@@ -82,6 +85,8 @@ public class AnimationController extends Instance {
 			boneAbsolutePositions.clear();
 		else
 			boneAbsolutePositions = new HashMap<>(); 
+		
+		animatedModel = new AnimatedModel(this);
 	}
 
 	@Override
@@ -112,15 +117,54 @@ public class AnimationController extends Instance {
 	}
 	
 	private void animate(double delta) {
+		GameObject linked = this.getLinkedInstance();
+		if ( linked == null )
+			return;
+		
+		Prefab prefab = linked.getPrefab();
+		if ( prefab == null )
+			return;
+		
+		Instance animationData = prefab.findFirstChildOfClass(AnimationData.class.getSimpleName());
+		if ( animationData == null )
+			return;
+		
+		Instance boneStructure = animationData.findFirstChildOfClass(BoneTree.class.getSimpleName());
+		if ( boneStructure == null )
+			return;
+		
+		Instance animations = animationData.findFirstChildOfClass(Animations.class.getSimpleName());
+		if ( animations == null )
+			return;
+		
+		Instance bones = animationData.findFirstChildOfClass(Bones.class.getSimpleName());
+		if ( bones == null )
+			return;
+		
 		for (int i = 0; i < playingAnimations.size(); i++) {
 			if ( i >= playingAnimations.size() )
 				continue;
 			
+			// Get current playing track
 			AnimationTrack track = playingAnimations.get(i);
 			if ( track == null )
 				continue;
 			
+			// Update it
 			track.update(delta);
+			
+			// Get the current keyframe in trrack
+			AnimationKeyframeSequence keyframe = track.getCurrentKeyframe();
+			if ( keyframe == null )
+				continue;
+			
+			// Update bones
+			computeBones( keyframe, boneStructure, linked.getWorldMatrix().toJoml());
+			
+			// Update in animated model
+			if ( this.animatedModel != null ) {
+				this.animatedModel.updateBones();
+			}
 		}
 	}
 	
@@ -149,43 +193,16 @@ public class AnimationController extends Instance {
 	 * @param shader
 	 */
 	public void debugRender(BaseShader shader) {
-		
-		GameObject linked = this.getLinkedInstance();
-		if ( linked == null )
-			return;
-		
-		Prefab prefab = linked.getPrefab();
-		if ( prefab == null )
-			return;
-		
-		Instance animationData = prefab.findFirstChildOfClass(AnimationData.class.getSimpleName());
-		if ( animationData == null )
-			return;
-		
-		Instance boneStructure = animationData.findFirstChildOfClass(BoneTree.class.getSimpleName());
-		if ( boneStructure == null )
-			return;
-		
-		Instance animations = animationData.findFirstChildOfClass(Animations.class.getSimpleName());
-		if ( animations == null )
-			return;
-		
-		Instance bones = animationData.findFirstChildOfClass(Bones.class.getSimpleName());
-		if ( bones == null )
-			return;
-		
-		for (int i = 0; i < playingAnimations.size(); i++) {
-			AnimationTrack track = playingAnimations.get(i);
-			AnimationKeyframeSequence keyframe = track.getCurrentKeyframe();
+		Iterator<Bone> iterator = boneAbsolutePositions.keySet().iterator();
+		while(iterator.hasNext()) {
+			Bone bone = iterator.next();
+			Matrix4 matrix = boneAbsolutePositions.get(bone);
 			
-			if ( keyframe == null )
-				continue;
-			
-			debugRenderRecursive( shader, keyframe, boneStructure, linked.getWorldMatrix().toJoml());
+			Resources.MESH_CUBE.render(shader, matrix.getInternal(), Resources.MATERIAL_BLANK);
 		}
 	}
 	
-	private void debugRenderRecursive(BaseShader shader, AnimationKeyframeSequence keyframe, Instance root, Matrix4f parentMatrix) {
+	private void computeBones(AnimationKeyframeSequence keyframe, Instance root, Matrix4f parentMatrix) {
 		Matrix4f globalTransformation = new Matrix4f(parentMatrix);
 		
 		// Do rendering
@@ -208,8 +225,6 @@ public class AnimationController extends Instance {
 					finalTransform.mul(globalTransformation);
 					//finalTransform.mul(offsetMatrix.invert());
 					
-					Resources.MESH_CUBE.render(shader, finalTransform, Resources.MATERIAL_BLANK);
-					
 					boneAbsolutePositions.put((Bone) bone, new Matrix4(finalTransform));
 				}
 			}
@@ -219,8 +234,12 @@ public class AnimationController extends Instance {
 		List<Instance> bones = root.getChildren();
 		for (int i = 0; i < bones.size(); i++) {
 			Instance newRoot = bones.get(i);
-			debugRenderRecursive( shader, keyframe, newRoot, globalTransformation );
+			computeBones( keyframe, newRoot, globalTransformation );
 		}
+	}
+
+	public HashMap<Bone, Matrix4> getBoneAbsolutePositions() {
+		return boneAbsolutePositions;
 	}
 
 }

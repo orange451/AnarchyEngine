@@ -8,11 +8,14 @@ import ide.layout.windows.icons.Icons;
 
 public class BoneWeight extends Instance implements TreeViewable {
 
+	private static final LuaValue C_VERTEXID = LuaValue.valueOf("VertexId");
+	private static final LuaValue C_WEIGHT = LuaValue.valueOf("Weight");
+	
 	public BoneWeight() {
 		super("BoneWeight");
 
-		this.defineField("VertexId", LuaValue.valueOf(-1), true);
-		this.defineField("Weight", LuaValue.valueOf(0.0), true);
+		this.defineField(C_VERTEXID.toString(), LuaValue.valueOf(-1), true);
+		this.defineField(C_WEIGHT.toString(), LuaValue.valueOf(0.0), true);
 		
 		this.setLocked(true);
 		this.setInstanceable(false);
@@ -30,6 +33,14 @@ public class BoneWeight extends Instance implements TreeViewable {
 		return true;
 	}
 
+	public int getVertexId() {
+		return this.get(C_VERTEXID).toint();
+	}
+	
+	public float getWeight() {
+		return this.get(C_WEIGHT).tofloat();
+	}
+	
 	@Override
 	public void onDestroy() {
 		//

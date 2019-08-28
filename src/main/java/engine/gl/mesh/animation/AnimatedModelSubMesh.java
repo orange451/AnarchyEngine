@@ -18,11 +18,11 @@ import org.lwjgl.opengl.GL15;
 import org.lwjgl.opengl.GL20;
 
 import engine.gl.MaterialGL;
+import engine.gl.mesh.BufferedMesh;
 import engine.gl.mesh.Vertex;
 import engine.gl.shader.BaseShader;
 
 public class AnimatedModelSubMesh {
-	private AnimatedModel parent;
 	private Vertex[] vertices;
 	private Vector4f[] weightBoneIndices;
 	private Vector4f[] weightBoneWeights;
@@ -43,11 +43,15 @@ public class AnimatedModelSubMesh {
 	private static final int elementCount = Vertex.elementCount + weightBoneIndicesElementCount + weightBoneWeightElementCount;
 	private static final int stride       = elementCount * Vertex.elementBytes;
 	
-	public AnimatedModelSubMesh(AnimatedModel model, int vertices, int bones) {
-		this.parent              = model;
-		this.vertices            = new Vertex[vertices];
-		this.weightBoneIndices   = new Vector4f[vertices];
-		this.weightBoneWeights   = new Vector4f[vertices];
+	public AnimatedModelSubMesh(BufferedMesh source) {
+		int verts = source.getSize();
+		this.vertices            = new Vertex[verts];
+		this.weightBoneIndices   = new Vector4f[verts];
+		this.weightBoneWeights   = new Vector4f[verts];
+		
+		for (int i = 0; i < verts; i++) {
+			this.setVertex(source.getVertex(i), i);
+		}
 		
 		this.modelBuffer  = BufferUtils.createFloatBuffer(16);
 		this.normalBuffer = BufferUtils.createFloatBuffer(9);

@@ -9,10 +9,12 @@ import ide.layout.windows.icons.Icons;
 
 public class Bone extends Instance implements TreeViewable {
 
+	protected static final LuaValue C_MESH = LuaValue.valueOf("Mesh");
+	
 	public Bone() {
 		super("Bone");
 		
-		this.defineField("Mesh", LuaValue.NIL, true);
+		this.defineField(C_MESH.toString(), LuaValue.NIL, true);
 		this.defineField("OffsetMatrix", new Matrix4(), true);
 		
 		this.setLocked(true);
@@ -39,6 +41,11 @@ public class Bone extends Instance implements TreeViewable {
 	@Override
 	public Icons getIcon() {
 		return Icons.icon_film;
+	}
+	
+	public Mesh getMesh() {
+		LuaValue mesh = this.get(C_MESH);
+		return mesh.isnil()?null:(Mesh)mesh;
 	}
 
 	public Matrix4 getOffsetMatrix() {
