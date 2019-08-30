@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Map.Entry;
 
 import org.joml.Matrix4f;
-import org.joml.Vector3f;
 import org.joml.Vector4f;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
@@ -34,7 +33,6 @@ import engine.lua.type.object.insts.Bones;
 import engine.lua.type.object.insts.GameObject;
 import engine.lua.type.object.insts.Mesh;
 import engine.lua.type.object.insts.Prefab;
-import engine.util.MatrixUtils;
 
 public class AnimatedModel {
 	protected static final int MAX_BONES = 64;
@@ -47,11 +45,12 @@ public class AnimatedModel {
 	protected List<AnimatedModelSubMesh> meshes = new ArrayList<>();
 	protected AnimationController controller;
 	
-	private Matrix4f tempMat = new Matrix4f();
+	private Matrix4f tempMat;
 	private SkinningShader shader;
 	
 	public AnimatedModel(AnimationController controller) {
 		this.controller = controller;
+		this.tempMat = new Matrix4f();
 		this.rebuild();
 		
 		InternalRenderThread.runLater(()->{
@@ -77,11 +76,10 @@ public class AnimatedModel {
 			return;
 		
 		// Compute bone indices
-		HashMap<Bone, Integer> boneIndices = computeBoneIndices( new HashMap<>(), bones, aData.findFirstChildOfClass(BoneTree.class.getSimpleName()) );
+		HashMap<String, Integer> boneIndices = computeBoneIndices( new HashMap<>(), bones, aData.findFirstChildOfClass(BoneTree.class.getSimpleName()) );
 		
 		// Temporary data to store bone data
-		HashMap<BufferedMesh, HashMap<Integer, List<Float>>> tempData1 = new HashMap<>();
-		HashMap<BufferedMesh, HashMap<Integer, List<Integer>>> tempData2 = new HashMap<>();
+		HashMap<BufferedMesh, HashMap<Integer, BoneData>> tempData1 = new HashMap<>();
 
 		// Get all bone data
 		List<Instance> children = bones.getChildrenOfClass("Bone");
@@ -94,11 +92,9 @@ public class AnimatedModel {
 			BufferedMesh bufferedMesh = mesh.getMesh();
 			if (!tempData1.containsKey(bufferedMesh)) {
 				tempData1.put(bufferedMesh, new HashMap<>());
-				tempData2.put(bufferedMesh, new HashMap<>());
 			}
 
-			HashMap<Integer, List<Float>> weightData = tempData1.get(bufferedMesh);
-			HashMap<Integer, List<Integer>> indexData = tempData2.get(bufferedMesh);
+			HashMap<Integer, BoneData> weightData = tempData1.get(bufferedMesh);
 
 			List<Instance> weights = bone.getChildren();
 			for (int j = 0; j < weights.size(); j++) {
@@ -111,62 +107,36 @@ public class AnimatedModel {
 				float wei = bWeight.getWeight();
 
 				// Store vertex ID Weights
-				List<Float> weightsTemp = weightData.get(ind);
+				BoneData weightsTemp = weightData.get(ind);
 				if (weightsTemp == null) {
-					weightsTemp = new ArrayList<Float>();
+					weightsTemp = new BoneData();
 					weightData.put(ind, weightsTemp);
 				}
-				weightsTemp.add(wei);
 				
-				// Store Vertex ID Bone Indices
-				List<Integer> bonesTemp = indexData.get(ind);
-				if ( bonesTemp == null ) {
-					bonesTemp = new ArrayList<Integer>();
-					indexData.put(ind, bonesTemp);
-				}
-				
-				Integer boneIndex = boneIndices.get(bone);
+				// Find the bone this weight is attached to
+				Integer boneIndex = boneIndices.get(bone.getName());
 				if ( boneIndex == null )
 					boneIndex = 0;
-				bonesTemp.add(boneIndex);
+				
+				weightsTemp.weights.add(wei);
+				weightsTemp.indices.add(boneIndex);
 			}
-		}
-		
-		// Create sub meshes
-		HashMap<BufferedMesh, AnimatedModelSubMesh> meshMap = new HashMap<>();
-		for (Entry<BufferedMesh, HashMap<Integer, List<Float>>> entry : tempData1.entrySet()) {
-			BufferedMesh key = entry.getKey();
-			AnimatedModelSubMesh subMesh = new AnimatedModelSubMesh(key);
-			meshMap.put(key, subMesh);
-			meshes.add(subMesh);
 		}
 
 		// Put bone vertex weight data into sub meshes...
-		for (Entry<BufferedMesh, HashMap<Integer, List<Float>>> entry : tempData1.entrySet()) {
+		for (Entry<BufferedMesh, HashMap<Integer, BoneData>> entry : tempData1.entrySet()) {
 			BufferedMesh key = entry.getKey();
-			HashMap<Integer, List<Float>> value = entry.getValue();
-			
-			AnimatedModelSubMesh subMesh = meshMap.get(key);
-			for (Entry<Integer, List<Float>> vertexData : value.entrySet()) {
+			HashMap<Integer, BoneData> value = entry.getValue();
+
+			AnimatedModelSubMesh subMesh = new AnimatedModelSubMesh(key);
+			for (Entry<Integer, BoneData> vertexData : value.entrySet()) {
 				int index = vertexData.getKey();
+				BoneData boneData = vertexData.getValue();
 				
-				List<Float> weightVals = vertexData.getValue();
-				subMesh.setBoneWeights(index, listToVector(weightVals));
+				subMesh.setBoneWeights(index, listToVector(boneData.weights));
+				subMesh.setBoneIndices(index, listToVector(boneData.indices));
 			}
-		}
-		
-		// Put bone index data into sub meshes
-		for (Entry<BufferedMesh, HashMap<Integer, List<Integer>>> entry : tempData2.entrySet()) {
-			BufferedMesh key = entry.getKey();
-			HashMap<Integer, List<Integer>> value = entry.getValue();
-			
-			AnimatedModelSubMesh subMesh = meshMap.get(key);
-			for (Entry<Integer, List<Integer>> vertexData : value.entrySet()) {
-				int index = vertexData.getKey();
-				
-				List<Integer> boneInd = vertexData.getValue();
-				subMesh.setBoneIndices(index, listToVector(boneInd));
-			}
+			meshes.add(subMesh);
 		}
 	}
 	
@@ -214,11 +184,11 @@ public class AnimatedModel {
 	 * @param root
 	 * @return
 	 */
-	private HashMap<Bone, Integer> computeBoneIndices(HashMap<Bone,Integer> hashMap, Instance bones, Instance root) {
+	private HashMap<String, Integer> computeBoneIndices(HashMap<String,Integer> hashMap, Instance bones, Instance root) {
 		if ( root instanceof BoneTreeNode ) {
 			Instance bone = bones.findFirstChild(root.getName());
 			if ( bone != null && bone instanceof Bone ) {
-				hashMap.put((Bone) bone, hashMap.size());
+				hashMap.put(bone.getName(), hashMap.size());
 			}
 		}
 		
@@ -292,6 +262,16 @@ public class AnimatedModel {
 		}
 		
 		Pipeline.pipeline_get().shader_set(oldShader);
+	}
+	
+	static class BoneData {
+		public List<Float> weights;
+		public List<Integer> indices;
+		
+		public BoneData() {
+			this.weights = new ArrayList<Float>();
+			this.indices = new ArrayList<Integer>();
+		}
 	}
 	
 	static class SkinningShader extends BaseShader {

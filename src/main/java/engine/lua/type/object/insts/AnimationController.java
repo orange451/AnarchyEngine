@@ -11,7 +11,6 @@ import org.luaj.vm2.lib.TwoArgFunction;
 
 import engine.Game;
 import engine.InternalGameThread;
-import engine.gl.Resources;
 import engine.gl.mesh.animation.AnimatedModel;
 import engine.gl.shader.BaseShader;
 import engine.lua.type.LuaConnection;
