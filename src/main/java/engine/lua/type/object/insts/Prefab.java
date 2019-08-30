@@ -1,11 +1,16 @@
 package engine.lua.type.object.insts;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.joml.Vector3f;
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.OneArgFunction;
 import org.luaj.vm2.lib.ThreeArgFunction;
+import org.luaj.vm2.lib.ZeroArgFunction;
 
 import engine.Game;
+import engine.lua.lib.LuaUtil;
 import engine.lua.type.LuaEvent;
 import engine.lua.type.NumberClampPreferred;
 import engine.lua.type.object.Asset;
@@ -21,6 +26,8 @@ public class Prefab extends Asset implements TreeViewable {
 	private PrefabRenderer prefab;
 	
 	private final static LuaValue C_SCALE = LuaValue.valueOf("Scale");
+	
+	private List<Model> models;
 
 	public Prefab() {
 		super("Prefab");
@@ -29,6 +36,14 @@ public class Prefab extends Asset implements TreeViewable {
 		this.getField(C_SCALE).setClamp(new NumberClampPreferred(0, 1024, 0, 4));
 		
 		prefab = new PrefabRenderer(this);
+		models = new ArrayList<Model>();
+		
+		this.getmetatable().set("GetModels", new ZeroArgFunction() {
+			@Override
+			public LuaValue call() {
+				return LuaUtil.listToTable(getModels());
+			}
+		});
 		
 		this.getmetatable().set("AddModel", new ThreeArgFunction() {
 			@Override
@@ -53,6 +68,8 @@ public class Prefab extends Asset implements TreeViewable {
 							prefab.update();
 						}
 					});
+					
+					models.add((Model)arg);
 				}
 				return LuaValue.NIL;
 			}
@@ -63,10 +80,19 @@ public class Prefab extends Asset implements TreeViewable {
 			public LuaValue call(LuaValue arg) {
 				if ( arg instanceof Model ) {
 					prefab.removeModel((Model) arg);
+					models.remove((Model) arg);
 				}
 				return LuaValue.NIL;
 			}
 		});
+	}
+	
+	/**
+	 * Returns immutable list of models attached to this prefab.
+	 * @return
+	 */
+	public List<Model> getModels() {
+		return new ArrayList<Model>(models);
 	}
 	
 	/**
