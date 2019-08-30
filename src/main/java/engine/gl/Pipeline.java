@@ -277,7 +277,7 @@ public class Pipeline implements Renderable {
 	}
 	
 	public void addTransparentRenderableToQueue(Model model, Matrix4f worldMatrix, float transparency) {
-		MaterialGL material = model.getMaterial();
+		MaterialGL material = model.getMaterial().getMaterial();
 		if ( material == null )
 			material = Resources.MATERIAL_BLANK;
 		

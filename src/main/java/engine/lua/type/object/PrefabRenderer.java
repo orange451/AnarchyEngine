@@ -7,10 +7,12 @@ import java.util.List;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
+import engine.gl.MaterialGL;
 import engine.gl.Pipeline;
 import engine.gl.Resources;
 import engine.gl.mesh.BufferedMesh;
 import engine.gl.shader.BaseShader;
+import engine.lua.type.object.insts.Material;
 import engine.lua.type.object.insts.Model;
 import engine.lua.type.object.insts.Prefab;
 import engine.util.AABBUtil;
@@ -54,9 +56,14 @@ public class PrefabRenderer {
 					mesh = Resources.MESH_SPHERE;
 				
 				// Get material
-				engine.gl.MaterialGL material = p.getMaterial();
-				if ( material == null )
-					material = Resources.MATERIAL_BLANK;
+				engine.gl.MaterialGL material = Resources.MATERIAL_BLANK;
+				Material ECSMat = p.getMaterial();
+				if ( ECSMat != null) {
+					MaterialGL GLMat = ECSMat.getMaterial();
+					if ( GLMat != null ) {
+						material = GLMat;
+					}
+				}
 				
 				// If transparent send to transparent queue
 				if ( material.getTransparency() > 0 ) {

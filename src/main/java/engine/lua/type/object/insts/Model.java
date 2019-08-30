@@ -60,7 +60,13 @@ public class Model extends Instance {
 		return this.get(C_MESH) instanceof Mesh ? ((Mesh)this.get(C_MESH)).getMesh() : null;
 	}
 	
+	public Material getMaterial() {
+		LuaValue material = this.get(C_MATERIAL);
+		return material.isnil()?null:(Material)material;
+	}
+	/*
 	public engine.gl.MaterialGL getMaterial() {
 		return this.get(C_MATERIAL) instanceof Material ? ((Material)this.get(C_MATERIAL)).getMaterial() : null;
 	}
+	*/
 }
