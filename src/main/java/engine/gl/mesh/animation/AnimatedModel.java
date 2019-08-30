@@ -43,6 +43,7 @@ public class AnimatedModel {
 	private HashMap<String, Integer> boneIndices;
 	private HashMap<Integer, String> indexToBoneMap;
 	private Bones bonesFolder;
+	private Prefab prefab;
 	
 	protected List<MaterialGL> materials = new ArrayList<>();
 	protected List<AnimatedModelSubMesh> meshes = new ArrayList<>();
@@ -66,6 +67,7 @@ public class AnimatedModel {
 
 		GameObject linked = controller.getLinkedInstance();
 		Prefab prefab = linked.getPrefab();
+		this.prefab = prefab;
 
 		// Get animation data
 		Instance aData = prefab.findFirstChildOfClass("AnimationData");
@@ -102,6 +104,7 @@ public class AnimatedModel {
 
 			HashMap<Integer, BoneData> weightData = tempData1.get(bufferedMesh);
 
+			// Write bone weights and indices
 			List<Instance> weights = bone.getChildren();
 			for (int j = 0; j < weights.size(); j++) {
 				Instance weight = weights.get(j);
@@ -240,6 +243,7 @@ public class AnimatedModel {
 		boneBuffer.flip();
 	}
 	
+	private Matrix4f renderMat;
 	public void render(Matrix4f worldMatrix) {
 		if ( shader == null )
 			return;
@@ -261,7 +265,9 @@ public class AnimatedModel {
 
 		// Set material/world matrix
 		Resources.MATERIAL_BLANK.bind(this.shader);
-		this.shader.setWorldMatrix(worldMatrix);
+		this.renderMat.set(worldMatrix);
+		this.renderMat.scale(prefab.getScale());
+		this.shader.setWorldMatrix(this.renderMat);
 		
 		// Loop through each mesh and render
 		for (int i = 0; i < meshes.size(); i++) {
