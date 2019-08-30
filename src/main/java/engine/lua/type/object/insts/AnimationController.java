@@ -26,7 +26,7 @@ public class AnimationController extends Instance {
 	protected final static LuaValue C_PREFAB = LuaValue.valueOf("Prefab");
 	
 	private LuaConnection linkedConnection = null;
-	private HashMap<Bone, Matrix4> boneAbsolutePositions;
+	private HashMap<String, Matrix4> boneAbsolutePositions;
 	private AnimatedModel animatedModel;
 	
 	public AnimationController() {
@@ -186,15 +186,7 @@ public class AnimationController extends Instance {
 	 * Debug render
 	 * @param shader
 	 */
-	public void debugRender(BaseShader shader) {
-		Iterator<Bone> iterator = boneAbsolutePositions.keySet().iterator();
-		while(iterator.hasNext()) {
-			Bone bone = iterator.next();
-			Matrix4 matrix = boneAbsolutePositions.get(bone);
-			
-			//Resources.MESH_CUBE.render(shader, matrix.getInternal(), Resources.MATERIAL_BLANK);
-		}
-		
+	public void debugRender(BaseShader shader) {		
 		if ( animatedModel != null )
 			animatedModel.render(new Matrix4f());
 	}
@@ -220,7 +212,7 @@ public class AnimationController extends Instance {
 					finalTransform.mul(inverseRoot);
 					finalTransform.mul(globalTransformation);
 					
-					boneAbsolutePositions.put((Bone) bone, new Matrix4(finalTransform));
+					boneAbsolutePositions.put(bone.getName(), new Matrix4(finalTransform));
 				}
 			}
 		}
@@ -233,7 +225,7 @@ public class AnimationController extends Instance {
 		}
 	}
 
-	public HashMap<Bone, Matrix4> getBoneAbsolutePositions() {
+	public HashMap<String, Matrix4> getBoneAbsolutePositions() {
 		return boneAbsolutePositions;
 	}
 

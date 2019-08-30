@@ -40,6 +40,9 @@ public class AnimatedModel {
 
 	private final FloatBuffer boneBuffer = MemoryUtil.memAllocFloat(MAX_BONES * VALUES_PER_MATRIX);
 	private FloatBuffer matrixBuffer = MemoryUtil.memAllocFloat(VALUES_PER_MATRIX);
+	private HashMap<String, Integer> boneIndices;
+	private HashMap<Integer, String> indexToBoneMap;
+	private Bones bonesFolder;
 	
 	protected List<MaterialGL> materials = new ArrayList<>();
 	protected List<AnimatedModelSubMesh> meshes = new ArrayList<>();
@@ -74,8 +77,12 @@ public class AnimatedModel {
 		if (bones == null)
 			return;
 		
+		bonesFolder = bones;
+		
 		// Compute bone indices
-		HashMap<String, Integer> boneIndices = computeBoneIndices( new HashMap<>(), bones, aData.findFirstChildOfClass(BoneTree.class.getSimpleName()) );
+		boneIndices = new HashMap<>();
+		indexToBoneMap = new HashMap<>();
+		computeBoneIndices( bones, aData.findFirstChildOfClass(BoneTree.class.getSimpleName()) );
 		
 		// Temporary data to store bone data
 		HashMap<BufferedMesh, HashMap<Integer, BoneData>> tempData1 = new HashMap<>();
@@ -183,36 +190,41 @@ public class AnimatedModel {
 	 * @param root
 	 * @return
 	 */
-	private HashMap<String, Integer> computeBoneIndices(HashMap<String,Integer> hashMap, Instance bones, Instance root) {
+	private void computeBoneIndices(Instance bones, Instance root) {
 		if ( root instanceof BoneTreeNode ) {
 			Instance bone = bones.findFirstChild(root.getName());
 			if ( bone != null && bone instanceof Bone ) {
-				hashMap.put(bone.getName(), hashMap.size());
+				int index = boneIndices.size();
+				boneIndices.put(bone.getName(), index);
+				indexToBoneMap.put(index, bone.getName());
 			}
 		}
 		
 		List<Instance> children = root.getChildren();
 		for (int i = 0; i < children.size(); i++) {
 			Instance newRoot = children.get(i);
-			computeBoneIndices( hashMap, bones, newRoot );
+			computeBoneIndices( bones, newRoot );
 		}
-		
-		return hashMap;
 	}
 	
 	/**
 	 * Updates the current bone buffer from the animation controllers bone data.
 	 */
 	private void updateBones() {
-		HashMap<Bone, Matrix4> bones = controller.getBoneAbsolutePositions();
+		HashMap<String, Matrix4> bones = controller.getBoneAbsolutePositions();
 		if (bones.size() == 0)
+			return;
+		
+		if ( boneIndices.size() == 0 )
 			return;
 
 		// Store bones to buffer
 		boneBuffer.rewind();
-		for (Entry<Bone, Matrix4> entry : bones.entrySet()) {
-			Bone bone = entry.getKey();
-			Matrix4 absoluteMatrix = entry.getValue();
+		for (int i = 0; i < boneIndices.size(); i++) {
+			String boneName = indexToBoneMap.get(i);
+			Bone bone = (Bone) bonesFolder.findFirstChild(boneName);
+			
+			Matrix4 absoluteMatrix = bones.get(boneName);
 			Matrix4 bindMatrix = bone.getOffsetMatrix();
 			
 			// Multiple absolute matrix by bind matrix
@@ -233,9 +245,9 @@ public class AnimatedModel {
 			return;
 		
 		// Compute absolute positions of bones
-		updateBones();
 		if ( meshes.size() == 0 )
 			rebuild();
+		updateBones();
 		
 		// Apply skinning shader
 		BaseShader oldShader = Pipeline.pipeline_get().shader_get();
