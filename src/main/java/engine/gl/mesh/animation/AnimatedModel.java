@@ -35,7 +35,7 @@ import engine.lua.type.object.insts.Mesh;
 import engine.lua.type.object.insts.Prefab;
 
 public class AnimatedModel {
-	protected static final int MAX_BONES = 64;
+	protected static final int MAX_BONES = 128;
 	protected static final int VALUES_PER_MATRIX = 16;
 
 	private final FloatBuffer boneBuffer = MemoryUtil.memAllocFloat(MAX_BONES * VALUES_PER_MATRIX);

@@ -1,6 +1,6 @@
 #version 330
 
-const int MAX_BONES = 64;
+const int MAX_BONES = 128;
 
 uniform mat4 projectionMatrix;
 uniform mat4 viewMatrix;
