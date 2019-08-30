@@ -125,6 +125,21 @@ public class MaterialGL {
 		
 		return this;
 	}
+
+	private final static String U_METALNESS = "uMetalness";
+	private final static String U_ROUGHNESS = "uRoughness";
+	private final static String U_REFLECTIVE = "uReflective";
+	private final static String U_MATERIALCOLOR = "uMaterialColor";
+	private final static String U_MATERIALEMISSIVE = "uMaterialEmissive";
+	private final static String U_AMBIENT = "uAmbient";
+	private final static String U_ENABLESKYBOX = "enableSkybox";
+	private final static String U_ENABLEIBL = "enableIBL";
+	private final static String U_NORMALMAPENABLED = "normalMapEnabled";
+	private final static String U_TRANSPARENCYMATERIAL = "uTransparencyMaterial";
+
+	private final static String U_TEXTURE_CUBEMAP = "texture_cubemap";
+	private final static String U_SKYBOX_POWER = "uSkyBoxLightPower";
+	private final static String U_SKYBOX_MULTIPLIER = "uSkyBoxLightMultiplier";
 	
 	public void bind(BaseShader shader) {
 		if ( shader == null )
@@ -150,27 +165,27 @@ public class MaterialGL {
 		// Bind IBL map (if it exists)
 		SkySphere ibl = null;
 		if ( cubemap != null ) {
-			shader.texture_set_stage(shader.shader_get_uniform("texture_cubemap"), cubemap, 4);
+			shader.texture_set_stage(shader.shader_get_uniform(U_TEXTURE_CUBEMAP), cubemap, 4);
 			
 			if ( cubemap instanceof SkySphereIBL ) {
-				shader.shader_set_uniform_f(shader.shader_get_uniform("uSkyBoxLightPower"), ((SkySphereIBL)cubemap).getLightPower());
-				shader.shader_set_uniform_f(shader.shader_get_uniform("uSkyBoxLightMultiplier"), ((SkySphereIBL)cubemap).getLightMultiplier());
+				shader.shader_set_uniform_f(shader.shader_get_uniform(U_SKYBOX_POWER), ((SkySphereIBL)cubemap).getLightPower());
+				shader.shader_set_uniform_f(shader.shader_get_uniform(U_SKYBOX_MULTIPLIER), ((SkySphereIBL)cubemap).getLightMultiplier());
 			} else {
-				shader.shader_set_uniform_f(shader.shader_get_uniform("uSkyBoxLightMultiplier"), 1.0f);
+				shader.shader_set_uniform_f(shader.shader_get_uniform(U_SKYBOX_MULTIPLIER), 1.0f);
 			}
 		}
 
 		// Set uniforms
-		shader.shader_set_uniform_f(shader.shader_get_uniform("uMetalness"), metalness);
-		shader.shader_set_uniform_f(shader.shader_get_uniform("uRoughness"), roughness);
-		shader.shader_set_uniform_f(shader.shader_get_uniform("uReflective"), reflective);
-		shader.shader_set_uniform_f(shader.shader_get_uniform("uMaterialColor"), color);
-		shader.shader_set_uniform_f(shader.shader_get_uniform("uMaterialEmissive"), emissive);
-		shader.shader_set_uniform_f(shader.shader_get_uniform("uAmbient"), Pipeline.pipeline_get().getGBuffer().getAmbient());
-		shader.shader_set_uniform_f(shader.shader_get_uniform("enableSkybox"), cubemap == null ? 0:1);
-		shader.shader_set_uniform_f(shader.shader_get_uniform("enableIBL"), ibl == null ? 0:1);
-		shader.shader_set_uniform_f(shader.shader_get_uniform("normalMapEnabled"), normalTexture.equals(Resources.TEXTURE_NORMAL_RGBA) ? 0:1);
-		shader.shader_set_uniform_f(shader.shader_get_uniform("uTransparencyMaterial"), transparency);
+		shader.shader_set_uniform_f(shader.shader_get_uniform(U_METALNESS), metalness);
+		shader.shader_set_uniform_f(shader.shader_get_uniform(U_ROUGHNESS), roughness);
+		shader.shader_set_uniform_f(shader.shader_get_uniform(U_REFLECTIVE), reflective);
+		shader.shader_set_uniform_f(shader.shader_get_uniform(U_MATERIALCOLOR), color);
+		shader.shader_set_uniform_f(shader.shader_get_uniform(U_MATERIALEMISSIVE), emissive);
+		shader.shader_set_uniform_f(shader.shader_get_uniform(U_AMBIENT), Pipeline.pipeline_get().getGBuffer().getAmbient());
+		shader.shader_set_uniform_f(shader.shader_get_uniform(U_ENABLESKYBOX), cubemap == null ? 0:1);
+		shader.shader_set_uniform_f(shader.shader_get_uniform(U_ENABLEIBL), ibl == null ? 0:1);
+		shader.shader_set_uniform_f(shader.shader_get_uniform(U_NORMALMAPENABLED), normalTexture.equals(Resources.TEXTURE_NORMAL_RGBA) ? 0:1);
+		shader.shader_set_uniform_f(shader.shader_get_uniform(U_TRANSPARENCYMATERIAL), transparency);
 	}
 
 }
