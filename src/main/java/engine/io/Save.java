@@ -7,7 +7,10 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.ListIterator;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -42,7 +45,8 @@ import lwjgui.theme.Theme;
 
 public class Save {
 	private static long REFID = Integer.MAX_VALUE;
-	private static ArrayList<SavedInstance> inst;
+	private static LinkedList<SavedInstance> inst;
+	private static HashMap<Instance, SavedInstance> instanceMap;
 
 	public static void requestSave(Runnable after) {
 		long win = LWJGUIUtil.createOpenGLCoreWindow("Save Dialog", 300, 100, false, true);
@@ -200,8 +204,9 @@ public class Save {
 	public static JSONObject getInstanceJSONRecursive(Instance instance) {
 		JSONObject ret = null;
 		try {
+			instanceMap = new HashMap<>();
 			inst = getSavedInstances(instance);
-			ret = inst.get(0).toJSON();
+			ret = inst.getFirst().toJSON();
 		} catch(Exception e ) {
 			e.printStackTrace();
 		}
@@ -229,10 +234,10 @@ public class Save {
 		return ret;
 	}
 
-	private static ArrayList<SavedInstance> getSavedInstances(Instance root) {
-		ArrayList<SavedInstance> ret = new ArrayList<SavedInstance>();
+	private static LinkedList<SavedInstance> getSavedInstances(Instance root) {
+		LinkedList<SavedInstance> ret = new LinkedList<SavedInstance>();
 		
-		if ( !root.get("Archivable").checkboolean() )
+		if ( !root.isArhivable() )
 			return ret;
 
 		ret.add(new SavedInstance(root));
@@ -240,9 +245,13 @@ public class Save {
 		List<Instance> children = root.getChildren();
 		for (int i = 0; i < children.size(); i++) {
 			Instance child = children.get(i);
-			ArrayList<SavedInstance> t = getSavedInstances(child);
-			for (int j = 0; j < t.size(); j++) {
-				ret.add(t.get(j));
+			List<SavedInstance> t = getSavedInstances(child);
+			
+			ListIterator<SavedInstance> listIterator = t.listIterator();
+			while(listIterator.hasNext()) {
+				SavedInstance si = listIterator.next();
+				ret.add(si);
+				instanceMap.put(si.instance, si);
 			}
 		}
 
@@ -264,12 +273,12 @@ public class Save {
 
 		@SuppressWarnings("unchecked")
 		public JSONObject toJSON() {
-			if ( !instance.get("Archivable").checkboolean() )
+			if ( !instance.isArhivable() )
 				return null;
 			
 			SavedInstance parent = null;
 			if ( !instance.getParent().isnil() ) {
-				parent = getSavedInstance((Instance) instance.getParent());
+				parent = instanceMap.get((Instance) instance.getParent());
 			}
 
 			List<Instance> children = instance.getChildren();
@@ -279,7 +288,7 @@ public class Save {
 				if ( child instanceof TreeInvisible )
 					continue;
 
-				SavedInstance sinst = getSavedInstance(child);
+				SavedInstance sinst = instanceMap.get(child);
 				if ( sinst != null ) {
 					JSONObject json = sinst.toJSON();
 					if ( json != null ) {
@@ -371,7 +380,7 @@ public class Save {
 
 		// Instances in the game
 		if ( luaValue instanceof Instance ) {
-			SavedInstance svd = getSavedInstance((Instance) luaValue);
+			SavedInstance svd = instanceMap.get((Instance) luaValue);
 			if ( svd != null ) {
 				return svd.reference;
 			} else {
@@ -394,7 +403,7 @@ public class Save {
 		return null;
 	}
 
-	protected static SavedInstance getSavedInstance(Instance instance) {
+	/*protected static SavedInstance getSavedInstance(Instance instance) {
 		for (int i = 0; i < inst.size(); i++) {
 			SavedInstance s = inst.get(i);
 			if ( s.instance.equals(instance) ) {
@@ -402,7 +411,7 @@ public class Save {
 			}
 		}
 		return null;
-	}
+	}*/
 
 	protected static void writeResources(File resourcesFolder) {
 		String resourcesPath = resourcesFolder.getAbsolutePath();
