@@ -51,14 +51,13 @@ public class AnimatedModel {
 	public AnimatedModel(AnimationController controller) {
 		this.controller = controller;
 		this.tempMat = new Matrix4f();
-		this.rebuild();
 		
 		InternalRenderThread.runLater(()->{
 			this.shader = new SkinningShader();
 		});
 	}
 
-	public void rebuild() {
+	private void rebuild() {
 		meshes.clear();
 		materials.clear();
 
@@ -235,6 +234,8 @@ public class AnimatedModel {
 		
 		// Compute absolute positions of bones
 		updateBones();
+		if ( meshes.size() == 0 )
+			rebuild();
 		
 		// Apply skinning shader
 		BaseShader oldShader = Pipeline.pipeline_get().shader_get();

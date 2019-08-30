@@ -415,18 +415,18 @@ public class BufferedMesh implements RenderableMesh {
 			ret = new BufferedMesh(verts);
 			for (int i = 0; i < verts; i++) {
 				Vertex v = new Vertex(
-						bin.readFloat(),
-						bin.readFloat(),
-						bin.readFloat(),
-						bin.readFloat(),
-						bin.readFloat(),
-						bin.readFloat(),
-						bin.readFloat(),
-						bin.readFloat(),
-						bin.readFloat(),
-						bin.readFloat(),
-						bin.readFloat(),
-						bin.readFloat()
+						bin.readFloat(), // X
+						bin.readFloat(), // Y
+						bin.readFloat(), // Z
+						bin.readFloat(), // NX
+						bin.readFloat(), // NY
+						bin.readFloat(), // NZ
+						bin.readFloat(), // S
+						bin.readFloat(), // T
+						bin.readFloat(), // R
+						bin.readFloat(), // G
+						bin.readFloat(), // B
+						bin.readFloat()  // A
 				);
 				ret.setVertex(i, v);
 			}
