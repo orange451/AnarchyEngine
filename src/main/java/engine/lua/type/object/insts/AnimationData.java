@@ -208,24 +208,39 @@ public class AnimationData extends Instance implements TreeViewable {
 				HashMap<Bone, TempKeyframe> keyframes = entry.getValue();
 				for (Map.Entry<Bone,TempKeyframe> entryK : keyframes.entrySet()) {
 					
+					// Keyframe data
+					TempKeyframe keyFrame = entryK.getValue();
+					if ( keyFrame == null )
+						continue;
+					
+					AIVectorKey keyFramePosition = keyFrame.position;
+					AIQuatKey keyFrameRotation = keyFrame.rotation;
+					
 					// Compute translation matrix
 					Matrix4f translation = new Matrix4f();
-					translation.translate(
-						entryK.getValue().position.mValue().x(),
-						entryK.getValue().position.mValue().y(),
-						entryK.getValue().position.mValue().z()
-					);
+					if ( keyFramePosition != null ) {
+						translation.translate(
+							keyFrame.position.mValue().x(),
+							keyFrame.position.mValue().y(),
+							keyFrame.position.mValue().z()
+						);
+					}
+					
+					// Overall node transform is translation for now...
+					Matrix4f nodeTransform = translation;
 					
 					// Compute rotation matrix
-					Quaternionf rotation = new Quaternionf(
-						entryK.getValue().rotation.mValue().x(),
-						entryK.getValue().rotation.mValue().y(),
-						entryK.getValue().rotation.mValue().z(),
-						entryK.getValue().rotation.mValue().w()
-					);
-					
-					// relative = offset * rotation
-					Matrix4f nodeTransform = translation.rotate(rotation);
+					if ( keyFrameRotation != null ) {
+						Quaternionf rotation = new Quaternionf(
+							keyFrame.rotation.mValue().x(),
+							keyFrame.rotation.mValue().y(),
+							keyFrame.rotation.mValue().z(),
+							keyFrame.rotation.mValue().w()
+						);
+						
+						// relative = offset * rotation
+						nodeTransform = translation.rotate(rotation);
+					}
 					
 					// Create keyframe
 					AnimationKeyframe keyframe = new AnimationKeyframe();
