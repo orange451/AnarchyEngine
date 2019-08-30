@@ -64,7 +64,7 @@ public class AnimationData extends Instance implements TreeViewable {
 			).transpose();
 	}
 
-	public void processBones(Mesh mesh, Instance boneData, PointerBuffer mBones) {
+	public void processBones(Mesh mesh, HashMap<Integer, List<Integer>> indexToVertexIndex, Instance boneData, PointerBuffer mBones) {
 		if ( mBones == null )
 			return;
 
@@ -79,11 +79,17 @@ public class AnimationData extends Instance implements TreeViewable {
 
 			for (int i = 0; i < bone.mNumWeights(); i++) {
 				AIVertexWeight weight = bone.mWeights().get(i);
-
-				BoneWeight w = new BoneWeight();
-				w.forceset("VertexId", LuaValue.valueOf(weight.mVertexId()));
-				w.forceset("Weight", LuaValue.valueOf(weight.mWeight()));
-				w.forceSetParent(b);
+				
+				int vertexIndex = weight.mVertexId();
+				float vertexWeight = weight.mWeight();
+				List<Integer> vertices = indexToVertexIndex.get(vertexIndex);
+				
+				for (int j = 0; j < vertices.size(); j++) {
+					BoneWeight w = new BoneWeight();
+					w.forceset("VertexId", LuaValue.valueOf(vertices.get(j)));
+					w.forceset("Weight", LuaValue.valueOf(vertexWeight));
+					w.forceSetParent(b);
+				}
 			}
 			
 			b.forceSetParent(boneData);

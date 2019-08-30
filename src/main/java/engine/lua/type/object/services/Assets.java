@@ -230,6 +230,14 @@ public class Assets extends Service implements TreeViewable {
 				BufferedMesh bm = new BufferedMesh( mesh.mNumFaces() * 3 );
 				int vertCounter = 0;
 				
+				// Create mesh object (used to house the actual mesh)
+				Mesh mm = new Mesh();
+				mm.setName(fileWithoutExtension+"_"+i);
+				
+				// This is real hacky to get the actual vertex indices from the assimp indices... I don't like it. I should have planned ahead for this
+				// But I didn't, and now im stuck. Oh well...
+				HashMap<Integer, List<Integer>> indexToVertexIndex = new HashMap<>();
+				
 				// Get every face in mesh
 				org.lwjgl.assimp.AIVector3D.Buffer vertices = mesh.mVertices();
 				org.lwjgl.assimp.AIVector3D.Buffer normals = mesh.mNormals();
@@ -241,6 +249,12 @@ public class Assets extends Service implements TreeViewable {
 					// Loop through each index
 					for (int k = 0; k < indices.capacity(); k++) {
 						int index = indices.get(k);
+						List<Integer> vertexMap = indexToVertexIndex.get(index);
+						if ( vertexMap == null ) {
+							vertexMap = new ArrayList<Integer>();
+							indexToVertexIndex.put(index, vertexMap);
+						}
+						
 						// Vert Data
 						Vector2f textureCoords = new Vector2f();
 						Vector3f normalVector = new Vector3f();
@@ -259,6 +273,7 @@ public class Assets extends Service implements TreeViewable {
 						// Send vertex to output mesh
 						Vertex output = new Vertex( vertex.x()*scale, vertex.y()*scale, vertex.z()*scale, normalVector.x, normalVector.y, normalVector.z, textureCoords.x, textureCoords.y, 1, 1, 1, 1 );
 						bm.setVertex(vertCounter, output);
+						vertexMap.add(vertCounter);
 						vertCounter++;
 					}
 				}
@@ -270,14 +285,13 @@ public class Assets extends Service implements TreeViewable {
 				tm.forceSetParent(tm.getPreferredParent());
 	
 				// Load mesh
-				Mesh mm = new Mesh();
-				mm.setName(fileWithoutExtension+"_"+i);
 				mm.setMesh(bm);
 				mm.forceSetParent(mm.getPreferredParent());
+				
 	
 				// Check for bones
 				if ( aData != null ) {
-					aData.processBones(mm, boneData, mesh.mBones());
+					aData.processBones(mm, indexToVertexIndex, boneData, mesh.mBones());
 				}
 				
 				prefab.addModel(mm, tm);
