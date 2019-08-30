@@ -59,6 +59,17 @@ public class PointLightHandler {
 	}
 	
 	private Matrix4f tempLightMatrix = new Matrix4f();
+
+	private static final String U_INVERSE_PROJ_MAT = "inverseProjectionMatrix";
+	private static final String U_TEXEL = "texel";
+	private static final String U_TEXTURE_ALBEDO = "texture_albedo";
+	private static final String U_TEXTURE_DEPTH = "texture_depth";
+	private static final String U_TEXTURE_NORMAL = "texture_normal";
+	private static final String U_TEXTURE_PBR = "texture_pbr";
+	private static final String U_L_RADIUS = "radius";
+	private static final String U_L_INTENSITY = "intensity";
+	private static final String U_L_POSITION = "lightPosition";
+	private static final String U_L_COLOR = "lightColor";
 	
 	public void handle(Pipeline pipeline) {
 		glEnable(GL_CULL_FACE);
@@ -78,12 +89,12 @@ public class PointLightHandler {
 			lightShader.setProjectionMatrix(projMatrix);
 			lightShader.setViewMatrix(viewMatrix);
 			
-			lightShader.shader_set_uniform_matrix( lightShader.shader_get_uniform( "inverseProjectionMatrix"), iProjMatrix );
-			lightShader.shader_set_uniform_f( lightShader.shader_get_uniform( "texel"), 1f/(float)pipeline.getWidth(), 1f/(float)pipeline.getHeight());
-			lightShader.texture_set_stage( lightShader.shader_get_uniform( "texture_albedo"), pipeline.getGBuffer().getBuffer0(), 0);
-			lightShader.texture_set_stage( lightShader.shader_get_uniform( "texture_depth"), pipeline.getGBuffer().getBufferDepth(), 1);
-			lightShader.texture_set_stage( lightShader.shader_get_uniform( "texture_normal"), pipeline.getGBuffer().getBuffer1(), 2);
-			lightShader.texture_set_stage( lightShader.shader_get_uniform( "texture_pbr"), pipeline.getGBuffer().getBuffer2(), 3);
+			lightShader.shader_set_uniform_matrix( lightShader.shader_get_uniform( U_INVERSE_PROJ_MAT ), iProjMatrix );
+			lightShader.shader_set_uniform_f( lightShader.shader_get_uniform( U_TEXEL), 1f/(float)pipeline.getWidth(), 1f/(float)pipeline.getHeight());
+			lightShader.texture_set_stage( lightShader.shader_get_uniform( U_TEXTURE_ALBEDO), pipeline.getGBuffer().getBuffer0(), 0);
+			lightShader.texture_set_stage( lightShader.shader_get_uniform( U_TEXTURE_DEPTH), pipeline.getGBuffer().getBufferDepth(), 1);
+			lightShader.texture_set_stage( lightShader.shader_get_uniform( U_TEXTURE_NORMAL), pipeline.getGBuffer().getBuffer1(), 2);
+			lightShader.texture_set_stage( lightShader.shader_get_uniform( U_TEXTURE_PBR), pipeline.getGBuffer().getBuffer2(), 3);
 				
 			for (int i = 0; i < lights.size(); i++) {
 				PointLightInternal light = lights.get(i);
@@ -95,10 +106,10 @@ public class PointLightHandler {
 				
 				//System.out.println(lightEyePos);
 
-				lightShader.shader_set_uniform_f( lightShader.shader_get_uniform( "radius"), light.radius );
-				lightShader.shader_set_uniform_f( lightShader.shader_get_uniform( "intensity"), light.intensity );
-				lightShader.shader_set_uniform_f( lightShader.shader_get_uniform( "lightPosition"), lightEyePos.x, lightEyePos.y, lightEyePos.z );
-				lightShader.shader_set_uniform_f( lightShader.shader_get_uniform( "lightColor"), light.color.x, light.color.y, light.color.z );
+				lightShader.shader_set_uniform_f( lightShader.shader_get_uniform( U_L_RADIUS), light.radius );
+				lightShader.shader_set_uniform_f( lightShader.shader_get_uniform( U_L_INTENSITY), light.intensity );
+				lightShader.shader_set_uniform_f( lightShader.shader_get_uniform( U_L_POSITION), lightEyePos.x, lightEyePos.y, lightEyePos.z );
+				lightShader.shader_set_uniform_f( lightShader.shader_get_uniform( U_L_COLOR), light.color.x, light.color.y, light.color.z );
 				
 				tempLightMatrix.identity();
 				tempLightMatrix.translate(light.x, light.y, light.z);
