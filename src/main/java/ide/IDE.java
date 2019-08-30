@@ -97,6 +97,9 @@ public class IDE extends RenderableApplication {
 		if ( GLFW.glfwWindowShouldClose(window) )
 			return;
 		
+		// Pipeline needs to draw our workspace
+		pipeline.setRenderableWorld(Game.workspace());
+		
 		// Render UI:
 		//   (final 3d scene gets rendered as a component)
 		//   (3d scene is attached to render thread)

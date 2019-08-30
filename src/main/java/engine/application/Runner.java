@@ -80,6 +80,9 @@ public abstract class Runner extends RenderableApplication {
 		if ( GLFW.glfwWindowShouldClose(window) )
 			return;
 		
+		// Pipeline needs to draw our workspace
+		pipeline.setRenderableWorld(Game.workspace());
+		
 		// Render pipeline
 		pipeline.setSize(windowWidth, windowHeight);
 		pipeline.render();

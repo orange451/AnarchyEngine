@@ -3,6 +3,7 @@ package engine.gl;
 import static org.lwjgl.opengl.GL11.GL_CULL_FACE;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
 import static org.lwjgl.opengl.GL11.glBindTexture;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -11,7 +12,6 @@ import java.util.List;
 import org.joml.Matrix4f;
 import org.joml.Vector2i;
 import org.joml.Vector3f;
-import org.luaj.vm2.LuaValue;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 
@@ -33,6 +33,7 @@ import engine.lua.type.object.insts.Prefab;
 import engine.observer.Renderable;
 import engine.observer.RenderableInstance;
 import engine.observer.RenderableMesh;
+import engine.observer.RenderableWorld;
 import engine.util.MeshUtils;
 import engine.util.Pair;
 
@@ -48,6 +49,8 @@ public class Pipeline implements Renderable {
 	private Matrix4f projMatrix;
 	private Camera currentCamera;
 	private BufferedMesh fullscreenMesh;
+	
+	private RenderableWorld renderableWorld; 
 	
 	private BaseShader currentShader;
 	
@@ -66,6 +69,10 @@ public class Pipeline implements Renderable {
 		viewMatrix = new Matrix4f();
 		projMatrix = new Matrix4f();
 		renderables = Collections.synchronizedList(new ArrayList<Renderable>());
+	}
+	
+	public void setRenderableWorld(RenderableWorld instance) {
+		this.renderableWorld = instance;
 	}
 	
 	public void setSize(int width, int height) {
@@ -115,6 +122,9 @@ public class Pipeline implements Renderable {
 		if ( !enabled )
 			return;
 		
+		if ( this.renderableWorld == null )
+			return;
+		
 		// Update current pipeline
 		currentPipeline = this;
 		
@@ -127,7 +137,7 @@ public class Pipeline implements Renderable {
 			// Render workspace into gbuffer (also seperates out special renderables)
 			synchronized(transparencies) {
 				transparencies.clear();
-				renderInstancesRecursive(gbuffer.getShader(), Game.workspace());
+				renderInstancesRecursive(gbuffer.getShader(), renderableWorld.getInstance());
 			}
 			
 			// Render everything attached
@@ -331,7 +341,7 @@ public class Pipeline implements Renderable {
 	}
 	
 	private void perspective() {
-		Camera camera = Game.workspace().getCurrentCamera();
+		Camera camera = renderableWorld.getCurrentCamera();
 		if ( camera != null ) {
 			float fov = camera.getFov();
 			float aspect = (float)size.x/(float)size.y;

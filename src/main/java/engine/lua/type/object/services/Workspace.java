@@ -13,11 +13,12 @@ import engine.lua.type.object.RunScript;
 import engine.lua.type.object.Service;
 import engine.lua.type.object.TreeViewable;
 import engine.lua.type.object.insts.Camera;
+import engine.observer.RenderableWorld;
 import engine.observer.Tickable;
 import engine.physics.PhysicsWorld;
 import ide.layout.windows.icons.Icons;
 
-public class Workspace extends Service implements TreeViewable,Tickable,RunScript  {
+public class Workspace extends Service implements RenderableWorld,TreeViewable,Tickable,RunScript  {
 	private static PhysicsWorld physicsWorld;
 	private List<Instance> descendants = Collections.synchronizedList(new ArrayList<Instance>());
 
@@ -132,5 +133,10 @@ public class Workspace extends Service implements TreeViewable,Tickable,RunScrip
 	 */
 	public void setGravity(float gravity) {
 		this.set(C_GRAVITY, LuaValue.valueOf(gravity));
+	}
+
+	@Override
+	public Instance getInstance() {
+		return this;
 	}
 }
