@@ -26,7 +26,7 @@ public class LuaUtil {
 	 * @param objects
 	 * @return
 	 */
-	public static LuaTable arrayToTable(Object... objects) {
+	public static LuaTable arrayToTable(Object[] objects) {
 		LuaTable table = new LuaTable();
 		for (int i = 0; i < objects.length; i++) {
 			table.set(i+1, (LuaValue) objects[i]);

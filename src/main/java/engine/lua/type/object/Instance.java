@@ -1,13 +1,9 @@
 package engine.lua.type.object;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 
-import org.luaj.vm2.LuaNumber;
 import org.luaj.vm2.LuaTable;
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.ThreeArgFunction;
@@ -16,11 +12,9 @@ import org.luaj.vm2.lib.ZeroArgFunction;
 
 import engine.Game;
 import engine.lua.LuaEngine;
+import engine.lua.lib.LuaUtil;
 import engine.lua.type.DataModel;
-import engine.lua.type.LuaEvent;
-import engine.lua.type.LuaField;
 import engine.lua.type.LuaValuetype;
-import engine.lua.type.DataModel.LuaInstancetypeData;
 
 public abstract class Instance extends DataModel {
 	protected static final LuaValue C_PARENT = LuaValue.valueOf("Parent");
@@ -39,12 +33,7 @@ public abstract class Instance extends DataModel {
 		this.getmetatable().set("GetChildren", new ZeroArgFunction() {
 			@Override
 			public LuaValue call() {
-				List<Instance> temp = getChildren();
-				LuaTable table = new LuaTable();
-				for (int i = 0; i < temp.size(); i++) {
-					table.set(i+1, temp.get(i));
-				}
-				return table;
+				return LuaUtil.listToTable(getChildren());
 			}
 		});
 
@@ -66,24 +55,14 @@ public abstract class Instance extends DataModel {
 		this.getmetatable().set("GetChildrenWithName", new TwoArgFunction() {
 			@Override
 			public LuaValue call(LuaValue root, LuaValue arg) {
-				List<Instance> temp = getChildrenWithName(arg.toString());
-				LuaTable table = new LuaTable();
-				for (int i = 0; i < temp.size(); i++) {
-					table.set(i+1, temp.get(i));
-				}
-				return table;
+				return LuaUtil.listToTable(getChildrenWithName(arg.toString()));
 			}
 		});
 
 		this.getmetatable().set("GetChildrenOfClass", new TwoArgFunction() {
 			@Override
 			public LuaValue call(LuaValue root, LuaValue arg) {
-				List<Instance> temp = getChildrenOfClass(arg.toString());
-				LuaTable table = new LuaTable();
-				for (int i = 0; i < temp.size(); i++) {
-					table.set(i+1, temp.get(i));
-				}
-				return table;
+				return LuaUtil.listToTable(getChildrenOfClass(arg.toString()));
 			}
 		});
 		
@@ -118,7 +97,7 @@ public abstract class Instance extends DataModel {
 					Instance c = findFirstChildOfClass(child.toString());
 					if ( c == null ) {
 						try {
-							Thread.sleep(5);
+							Thread.sleep(1);
 						} catch (InterruptedException e) {
 							//
 						}

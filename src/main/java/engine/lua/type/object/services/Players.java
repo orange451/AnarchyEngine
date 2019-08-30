@@ -3,12 +3,12 @@ package engine.lua.type.object.services;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.luaj.vm2.LuaTable;
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.OneArgFunction;
 import org.luaj.vm2.lib.TwoArgFunction;
 import org.luaj.vm2.lib.ZeroArgFunction;
 
+import engine.lua.lib.LuaUtil;
 import engine.lua.type.LuaEvent;
 import engine.lua.type.object.Instance;
 import engine.lua.type.object.Service;
@@ -33,13 +33,7 @@ public class Players extends Service implements TreeViewable {
 		this.getmetatable().set("GetPlayers", new ZeroArgFunction() {
 			@Override
 			public LuaValue call() {
-				List<Player> temp = getPlayers();
-				LuaTable table = new LuaTable();
-				for (int i = 0; i < temp.size(); i++) {
-					table.set(i+1, temp.get(i));
-				}
-				
-				return table;
+				return LuaUtil.listToTable(getPlayers());
 			}
 		});
 		
@@ -94,16 +88,12 @@ public class Players extends Service implements TreeViewable {
 	}
 	
 	public List<Player> getPlayers() {
-		List<Player> players = new ArrayList<Player>();
-		List<Instance> children = this.getChildren();
-		for (int i = 0; i < children.size(); i++) {
-			Instance child = children.get(i);
-			if ( child instanceof Player ) {
-				players.add((Player) child);
-			}
+		List<Instance> players = this.getChildrenOfClass(Player.class.getSimpleName());
+		List<Player> ret = new ArrayList<Player>();
+		for (int i = 0; i < players.size(); i++) {
+			ret.add((Player) players.get(i));
 		}
-		
-		return players;
+		return ret;
 	}
 
 	public Player getPlayerFromCharacter(Instance character) {
