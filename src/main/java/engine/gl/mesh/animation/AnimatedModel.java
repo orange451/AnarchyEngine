@@ -31,7 +31,9 @@ import engine.lua.type.object.insts.BoneTreeNode;
 import engine.lua.type.object.insts.BoneWeight;
 import engine.lua.type.object.insts.Bones;
 import engine.lua.type.object.insts.GameObject;
+import engine.lua.type.object.insts.Material;
 import engine.lua.type.object.insts.Mesh;
+import engine.lua.type.object.insts.Model;
 import engine.lua.type.object.insts.Prefab;
 
 public class AnimatedModel {
@@ -45,7 +47,7 @@ public class AnimatedModel {
 	private Bones bonesFolder;
 	private Prefab prefab;
 	
-	protected List<MaterialGL> materials = new ArrayList<>();
+	protected HashMap<AnimatedModelSubMesh, Model> meshToModelMap = new HashMap<>();
 	protected List<AnimatedModelSubMesh> meshes = new ArrayList<>();
 	protected AnimationController controller;
 	
@@ -63,7 +65,7 @@ public class AnimatedModel {
 
 	private void rebuild() {
 		meshes.clear();
-		materials.clear();
+		meshToModelMap.clear();
 
 		GameObject linked = controller.getLinkedInstance();
 		Prefab prefab = linked.getPrefab();
@@ -146,11 +148,20 @@ public class AnimatedModel {
 				subMesh.setBoneIndices(index, listToVector(boneData.indices));
 			}
 			meshes.add(subMesh);
+			
+			// Grab the model (used for material data)
+			List<Model> models = prefab.getModels();
+			for (int i = 0; i < models.size(); i++) {
+				Model model = models.get(i);
+				if ( model.getMesh().equals(key) ) {
+					meshToModelMap.put(subMesh, model);
+				}
+			}
 		}
 	}
 	
 	/**
-	 * Convert a n lengthed (max 4) list into a Vector4.
+	 * Convert a n length'd (max 4) list into a Vector4.
 	 * @param list
 	 * @return
 	 */
@@ -243,7 +254,7 @@ public class AnimatedModel {
 		boneBuffer.flip();
 	}
 	
-	private Matrix4f renderMat;
+	private Matrix4f renderMat = new Matrix4f();
 	public void render(Matrix4f worldMatrix) {
 		if ( shader == null )
 			return;
@@ -275,6 +286,16 @@ public class AnimatedModel {
 			
 			// Bind mesh
 			mesh.bind();
+			
+			// Bind material
+			Model model = meshToModelMap.get(mesh);
+			Material material = model.getMaterial();
+			if ( material != null ) {
+				MaterialGL GLMat = material.getMaterial();
+				if ( GLMat != null ) {
+					GLMat.bind(this.shader);
+				}
+			}
 			
 			// Draw mesh
 			GL11.glDrawArrays(GL11.GL_TRIANGLES, 0, mesh.size());
