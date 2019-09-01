@@ -107,8 +107,8 @@ public class Camera extends Instance implements TreeViewable {
 		Vector3 t2 = (Vector3) current2.add(offset);
 
 		synchronized(Camera.this) {
+			Camera.this.rawset(C_LOOKAT,t2);
 			Camera.this.setPosition(t1);
-			Camera.this.setLookAt(t2);
 		}
 	}
 	
@@ -126,7 +126,7 @@ public class Camera extends Instance implements TreeViewable {
 		float zz = (float) (Math.sin(pitch) * distance);
 		
 		this.setPosition(new Vector3(xx, yy, zz));
-		this.setLookAt(Vector3.zero());
+		this.setLookAt(origin);
 	}
 
 	@Override
@@ -192,12 +192,6 @@ public class Camera extends Instance implements TreeViewable {
 
 	@Override
 	public void onValueUpdated( LuaValue key, LuaValue value ) {
-		if ( !Game.isLoaded() )
-			return;
-		
-		if ( !this.equals(Game.workspace().getCurrentCamera()) )
-			return;
-
 		// If viewmatrix is directly changed, change sub variables
 		// Directly updates position and lookat
 		// Indirectly updates pitch and yaw
