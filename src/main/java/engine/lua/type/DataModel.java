@@ -233,6 +233,9 @@ public abstract class DataModel extends LuaDatatype {
 	}
 	
 	private void onKeyChange(LuaValue key, LuaValue value) {
+		this.onValueUpdated(key, value);
+		Game.changes = true;
+		
 		LuaEvent event = this.changedEvent();
 		event.fire(key, value);
 		notifyPropertySubscribers(key, value);

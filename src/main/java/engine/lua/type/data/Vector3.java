@@ -187,13 +187,15 @@ public class Vector3 extends LuaValuetype {
 		if ( !(vector instanceof Vector3) )
 			return false;
 		
-		if ( ((Vector3)vector).getX() != getX() )
+		Vector3 vector3 = (Vector3)vector;
+		
+		if ( vector3.getX() != getX() )
 			return false;
 		
-		if ( ((Vector3)vector).getY() != getY() )
+		if ( vector3.getY() != getY() )
 			return false;
 		
-		if ( ((Vector3)vector).getZ() != getZ() )
+		if ( vector3.getZ() != getZ() )
 			return false;
 		
 		return true;

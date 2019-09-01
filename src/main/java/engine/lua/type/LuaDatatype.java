@@ -229,9 +229,6 @@ public abstract class LuaDatatype extends LuaTable {
 		}
 
 		super.set(key, newSet);
-		this.onValueUpdated(key, newSet);
-		
-		Game.changes = true;
 	}
 	
 	public void cleanup() {
