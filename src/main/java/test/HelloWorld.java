@@ -34,7 +34,7 @@ public class HelloWorld extends ClientApplication {
 		
 		// Create prefab
 		Prefab p = Game.assets().newPrefab();
-		p.setName("Prefab0");
+		p.setName("Teapot");
 		p.addModel(mesh, material);
 		
 		// Create game object in the world with prefab

@@ -7,6 +7,7 @@ import static org.lwjgl.opengl.GL11.glBindTexture;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 
 import org.joml.Matrix4f;
@@ -51,12 +52,13 @@ public class Pipeline implements Renderable {
 	private BufferedMesh fullscreenMesh;
 	
 	private RenderableWorld renderableWorld; 
-	
 	private BaseShader currentShader;
-	
 	private List<Renderable> renderables;
 	
 	private static Pipeline currentPipeline;
+	private static HashMap<RenderableWorld, Pipeline> pipelineMap = new HashMap<>();
+	
+	private boolean debug;
 	
 	private static final Matrix4f IDENTITY = new Matrix4f().identity();
 
@@ -71,8 +73,21 @@ public class Pipeline implements Renderable {
 		renderables = Collections.synchronizedList(new ArrayList<Renderable>());
 	}
 	
+	public void setDebug(boolean debug) {
+		this.debug = debug;
+	}
+	
 	public void setRenderableWorld(RenderableWorld instance) {
 		this.renderableWorld = instance;
+		pipelineMap.put(instance, this);
+	}
+	
+	public RenderableWorld getRenderableWorld() {
+		return this.renderableWorld;
+	}
+	
+	public static Pipeline get(RenderableWorld world) {
+		return pipelineMap.get(world);
 	}
 	
 	public void setSize(int width, int height) {
@@ -134,6 +149,7 @@ public class Pipeline implements Renderable {
 		// Draw to GBuffer
 		gbuffer.bind();
 		{
+			
 			// Render workspace into gbuffer (also seperates out special renderables)
 			synchronized(transparencies) {
 				transparencies.clear();
@@ -220,7 +236,6 @@ public class Pipeline implements Renderable {
 			drawTexture( gbuffer.getBufferFinal(), 0, 0, size.x, size.y );
 			
 			// Draw buffers
-			boolean debug = false;
 			if ( debug ) {
 				int s = 150;
 				drawTexture( gbuffer.getBuffer0(), s*0, 0, s, s );
@@ -335,7 +350,11 @@ public class Pipeline implements Renderable {
 	}
 	
 	public void ortho() {
-		projMatrix.set(IDENTITY).ortho(0, size.x, 0, size.y, -3200, 3200);
+		ortho(size.x, size.y);
+	}
+	
+	public void ortho(float width, float height) {
+		projMatrix.set(IDENTITY).ortho(0, width, 0, height, -3200, 3200);
 		viewMatrix.set(IDENTITY);
 		currentCamera = null;
 	}

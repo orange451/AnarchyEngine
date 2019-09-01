@@ -34,18 +34,6 @@ public class PointLightHandler {
 	private BaseShader lightShader = new PointLightShader();
 	private BufferedMesh mesh = MeshUtils.sphere(1, 16);
 	
-	public PointLightHandler() {
-		/*int close = 8;
-		int r = 48;
-		int b = 10;
-		int xx = 8;
-		addLight(new PointLight(new Vector3f(-xx, close, xx), r, b));
-		addLight(new PointLight(new Vector3f(xx, close, xx), r, b));
-		addLight(new PointLight(new Vector3f(-xx, close, -xx), r, b));
-		addLight(new PointLight(new Vector3f(xx, close, -xx), r, b));
-		addLight(new PointLight(new Vector3f(0, -close*2, 0), r, b/2f));*/
-	}
-	
 	public void addLight(PointLightInternal l) {
 		synchronized(lights) {
 			lights.add(l);
@@ -103,8 +91,6 @@ public class PointLightHandler {
 				
 				Vector4f lightEyePos = new Vector4f(light.x, light.y, light.z, 1.0f);
 				viewMatrix.transform(lightEyePos, lightEyePos);
-				
-				//System.out.println(lightEyePos);
 
 				lightShader.shader_set_uniform_f( lightShader.shader_get_uniform( U_L_RADIUS), light.radius );
 				lightShader.shader_set_uniform_f( lightShader.shader_get_uniform( U_L_INTENSITY), light.intensity );

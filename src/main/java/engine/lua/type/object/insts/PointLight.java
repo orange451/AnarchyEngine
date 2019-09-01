@@ -6,12 +6,14 @@ import org.luaj.vm2.LuaValue;
 import engine.Game;
 import engine.GameSubscriber;
 import engine.application.RenderableApplication;
+import engine.gl.Pipeline;
 import engine.gl.light.Light;
 import engine.lua.type.NumberClampPreferred;
 import engine.lua.type.data.Color3;
 import engine.lua.type.data.Vector3;
 import engine.lua.type.object.LightBase;
 import engine.lua.type.object.TreeViewable;
+import engine.observer.RenderableWorld;
 import ide.IDE;
 import ide.layout.windows.icons.Icons;
 import lwjgui.paint.Color;
@@ -19,6 +21,7 @@ import lwjgui.paint.Color;
 public class PointLight extends LightBase implements TreeViewable,GameSubscriber {
 
 	private engine.gl.light.PointLightInternal light;
+	private Pipeline pipeline;
 
 	private static final LuaValue C_RADIUS = LuaValue.valueOf("Radius");
 
@@ -47,11 +50,37 @@ public class PointLight extends LightBase implements TreeViewable,GameSubscriber
 				} else if ( key.eq_b(C_COLOR) ) {
 					Color color = ((Color3)value).toColor();
 					light.color = new Vector3f( Math.max( color.getRed(),1 )/255f, Math.max( color.getGreen(),1 )/255f, Math.max( color.getBlue(),1 )/255f );
+				} else if ( key.eq_b(C_PARENT) ) {
+					onParentChange();
 				}
 			}
 		});
 	}
 	
+	private void onParentChange() {
+		LuaValue t = this.getParent();
+		if ( t == null ) {
+			onDestroy();
+			return;
+		}
+		
+		while ( t != null && !t.isnil() ) {
+			if ( t instanceof RenderableWorld ) {
+				Pipeline tempPipeline = Pipeline.get((RenderableWorld)t);
+				if ( pipeline != null && pipeline.equals(tempPipeline) )
+					break;
+				
+				if ( pipeline != null )
+					onDestroy();
+				
+				pipeline = tempPipeline;
+				makeLight();
+				break;
+			}
+			t = this.getParent();
+		}
+	}
+
 	public void setRadius(float radius) {
 		this.set(C_RADIUS, LuaValue.valueOf(radius));
 	}
@@ -64,11 +93,34 @@ public class PointLight extends LightBase implements TreeViewable,GameSubscriber
 	@Override
 	public void onDestroy() {
 		if ( light != null ) {
-			IDE.pipeline.getGBuffer().getLightProcessor().getPointLightHandler().removeLight(light);
+			pipeline.getGBuffer().getLightProcessor().getPointLightHandler().removeLight(light);
 			light = null;
+			System.out.println("Destroyed light");
 		}
 	}
-
+	
+	private void makeLight() {
+		if ( pipeline == null )
+			return;
+		
+		if ( light != null )
+			return;
+		
+		// Create light
+		Vector3f pos = ((Vector3)this.get("Position")).toJoml();
+		float radius = this.get(C_RADIUS).tofloat();
+		float intensity = this.get("Intensity").tofloat();
+		light = new engine.gl.light.PointLightInternal(pos, radius, intensity);
+		
+		// Color it
+		Color color = ((Color3)this.get("Color")).toColor();
+		light.color = new Vector3f( Math.max( color.getRed(),1 )/255f, Math.max( color.getGreen(),1 )/255f, Math.max( color.getBlue(),1 )/255f );
+		
+		// Add it to pipeline
+		pipeline.getGBuffer().getLightProcessor().getPointLightHandler().addLight(light);
+		System.out.println("New Light " + pipeline.getRenderableWorld().getInstance().getFullName());
+	}
+	
 	@Override
 	public Icons getIcon() {
 		return Icons.icon_light;
@@ -76,30 +128,9 @@ public class PointLight extends LightBase implements TreeViewable,GameSubscriber
 
 	@Override
 	public void gameUpdateEvent(boolean important) {
-		if (!important)
+		if ( !important )
 			return;
 		
-		if ( RenderableApplication.pipeline == null || RenderableApplication.pipeline.getGBuffer() == null || RenderableApplication.pipeline.getGBuffer().getLightProcessor() == null || RenderableApplication.pipeline.getGBuffer().getLightProcessor().getPointLightHandler() == null ) {
-			return;
-		}
-		
-		if ( this.isDescendantOf(Game.workspace()) ) {
-			if ( light == null ) {
-				// Create light
-				Vector3f pos = ((Vector3)this.get("Position")).toJoml();
-				float radius = this.get(C_RADIUS).tofloat();
-				float intensity = this.get("Intensity").tofloat();
-				light = new engine.gl.light.PointLightInternal(pos, radius, intensity);
-				
-				// Color it
-				Color color = ((Color3)this.get("Color")).toColor();
-				light.color = new Vector3f( Math.max( color.getRed(),1 )/255f, Math.max( color.getGreen(),1 )/255f, Math.max( color.getBlue(),1 )/255f );
-				
-				// Add it to pipeline
-				RenderableApplication.pipeline.getGBuffer().getLightProcessor().getPointLightHandler().addLight(light);
-			}
-		} else {
-			onDestroy();
-		}
+		onParentChange();
 	}
 }

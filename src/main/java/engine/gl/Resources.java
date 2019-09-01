@@ -14,6 +14,7 @@ public class Resources {
 	public static final BufferedMesh MESH_CUBE;
 	public static final BufferedMesh MESH_CONE;
 	public static final BufferedMesh MESH_CYLINDER;
+	public static final BufferedMesh MESH_UNIT_QUAD;
 	public static final MaterialGL MATERIAL_BLANK;
 	
 	static {
@@ -25,6 +26,7 @@ public class Resources {
 		MESH_CUBE = MeshUtils.cube(1);
 		MESH_CONE = MeshUtils.cone(1, 1, 16);
 		MESH_CYLINDER = MeshUtils.cylinder(1, 1, 16);
+		MESH_UNIT_QUAD = MeshUtils.quad(1, 1);
 		
 		MATERIAL_BLANK = new MaterialGL();
 	}
