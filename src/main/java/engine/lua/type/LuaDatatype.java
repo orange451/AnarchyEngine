@@ -149,9 +149,11 @@ public abstract class LuaDatatype extends LuaTable {
 					LuaValue v = super.get(key);
 					if ( v instanceof Instance ) {
 						Instance inst = (Instance)v;
-						//if ( !inst.getName().equals("game") && inst.getParent().equals(NIL) ) {
-						if ( !inst.equals(Game.game()) && inst.getParent().eq_b(LuaValue.NIL) ) {
+						if ( inst.destroyed )
 							return NIL;
+						//if ( !inst.getName().equals("game") && inst.getParent().equals(NIL) ) {
+						if ( !inst.equals(Game.game()) && inst.rawget(C_PARENT).eq_b(LuaValue.NIL) ) {
+							//return NIL;
 						}
 					}
 				}

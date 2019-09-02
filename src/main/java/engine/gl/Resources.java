@@ -10,6 +10,7 @@ public class Resources {
 	public static final Texture2D TEXTURE_WHITE_SRGB;
 	public static final Texture2D TEXTURE_WHITE_RGBA;
 	public static final Texture2D TEXTURE_NORMAL_RGBA;
+	public static final Texture2D TEXTURE_DEBUG;
 	public static final BufferedMesh MESH_SPHERE;
 	public static final BufferedMesh MESH_CUBE;
 	public static final BufferedMesh MESH_CONE;
@@ -21,6 +22,7 @@ public class Resources {
 		TEXTURE_WHITE_SRGB = TextureUtils.loadSRGBTextureFromImage(new Image(Color.WHITE,1,1));
 		TEXTURE_WHITE_RGBA = TextureUtils.loadRGBATextureFromImage(new Image(Color.WHITE,1,1));
 		TEXTURE_NORMAL_RGBA = TextureUtils.loadRGBATextureFromImage(new Image(new Color(127,127,255),1,1));
+		TEXTURE_DEBUG = TextureUtils.loadRGBATexture("engine/gl/checker.png");
 		
 		MESH_SPHERE = MeshUtils.sphere(1, 16);
 		MESH_CUBE = MeshUtils.cube(1);

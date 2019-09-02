@@ -11,6 +11,7 @@ import ide.layout.windows.IdeConsole;
 import ide.layout.windows.IdeExplorer;
 import ide.layout.windows.IdeExplorer;
 import ide.layout.windows.IdeGameView;
+import ide.layout.windows.IdeMaterialViewer;
 import ide.layout.windows.IdeProperties;
 import ide.layout.windows.icons.Icons;
 import lwjgui.LWJGUI;
@@ -63,7 +64,7 @@ public class IdeLayout {
 		
 		// Add left
 		west = new IdeVerticalDock();
-		//west.dockNorth(new IdeExplorerNew());
+		west.dockNorth(new IdeMaterialViewer());
 		//west.dockNorth(new IdeExplorer());
 		split.getItems().add(west);
 		

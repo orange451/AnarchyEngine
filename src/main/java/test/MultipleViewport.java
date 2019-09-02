@@ -47,13 +47,13 @@ public class MultipleViewport extends ClientApplication {
 		// Create secondary pipeline
 		secondaryPipeline = new Pipeline();
 		secondaryPipeline.setRenderableWorld(renderableWorld);
-		secondaryPipeline.setSize(600, 600);
+		secondaryPipeline.setSize(400, 400);
 
 		{
 			Camera camera = new Camera();
 			camera.setParent((LuaValue) renderableWorld);
+			camera.setPosition(new Vector3(-1,-1,1));
 			((Workspace)renderableWorld).setCurrentCamera(camera);
-			camera.setPosition(new Vector3(1,1,1));
 
 			Mesh mesh = new Mesh();
 			mesh.forceSetParent((LuaValue) renderableWorld);
@@ -65,11 +65,47 @@ public class MultipleViewport extends ClientApplication {
 			prefab.addModel(mesh, material);
 			prefab.forceSetParent((LuaValue) renderableWorld);
 
-			PointLight l = new PointLight();
-			l.setPosition(2, -2, 2);
-			l.setIntensity(10.0f);
-			l.setRadius(100.0f);
-			l.setParent((LuaValue) renderableWorld);
+			{
+				int close = 8;
+				int r = 48;
+				int b = 10;
+				int xx = 8;
+				PointLight l1 = new PointLight();
+				l1.setPosition(-xx, close, xx);
+				l1.setRadius(r);
+				l1.setIntensity(b);
+				l1.setParent( renderableWorld.getInstance() );
+
+				PointLight l2 = new PointLight();
+				l2.setPosition(xx, close, xx);
+				l2.setRadius(r);
+				l2.setIntensity(b);
+				l2.setParent(renderableWorld.getInstance() );
+
+				PointLight l3 = new PointLight();
+				l3.setPosition(-xx, close, -xx);
+				l3.setRadius(r);
+				l3.setIntensity(b);
+				l3.setParent(renderableWorld.getInstance() );
+
+				PointLight l4 = new PointLight();
+				l4.setPosition(xx, close, -xx);
+				l4.setRadius(r);
+				l4.setIntensity(b);
+				l4.setParent(renderableWorld.getInstance() );
+
+				PointLight l5 = new PointLight();
+				l5.setPosition(xx, -close*2, -xx);
+				l5.setRadius(r);
+				l5.setIntensity(b/2);
+				l5.setParent(renderableWorld.getInstance() );
+
+				PointLight l6 = new PointLight();
+				l6.setPosition(-xx, -xx, xx);
+				l6.setRadius(r);
+				l6.setIntensity(b*0.77f);
+				l6.setParent(renderableWorld.getInstance() );
+			}
 
 			GameObject obj = new GameObject();
 			obj.setPrefab(prefab);

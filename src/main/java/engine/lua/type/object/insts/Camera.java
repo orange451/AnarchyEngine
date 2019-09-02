@@ -8,7 +8,6 @@ import org.luaj.vm2.lib.TwoArgFunction;
 import org.luaj.vm2.lib.VarArgFunction;
 import org.luaj.vm2.lib.ZeroArgFunction;
 
-import engine.Game;
 import engine.lua.lib.EnumType;
 import engine.lua.type.NumberClamp;
 import engine.lua.type.data.Matrix4;

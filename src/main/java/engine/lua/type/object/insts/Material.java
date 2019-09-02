@@ -9,6 +9,7 @@ import engine.Game;
 import engine.gl.Resources;
 import engine.gl.Texture2D;
 import engine.lua.type.LuaConnection;
+import engine.lua.type.LuaEvent;
 import engine.lua.type.NumberClamp;
 import engine.lua.type.data.Color3;
 import engine.lua.type.data.Vector3;
@@ -39,6 +40,8 @@ public class Material extends Asset implements TreeViewable {
 	
 	protected static final LuaValue C_MATERIALS = LuaValue.valueOf("Materials");
 	
+	protected static final LuaValue C_MATERIALUPDATEEVENT = LuaValue.valueOf("MaterialUpdateEvent");
+	
 	public Material() {
 		super("Material");
 		
@@ -64,7 +67,13 @@ public class Material extends Asset implements TreeViewable {
 		this.defineField(C_TRANSPARENCY.toString(), LuaValue.ZERO, false);
 		this.getField(C_TRANSPARENCY).setClamp(new NumberClamp(0, 1));
 		
+		this.rawset(C_MATERIALUPDATEEVENT, new LuaEvent());
+		
 		this.material = new engine.gl.MaterialGL();
+	}
+	
+	public LuaEvent materialUpdateEvent() {
+		return (LuaEvent) this.get(C_MATERIALUPDATEEVENT);
 	}
 	
 	public float getMetalness() {
@@ -198,8 +207,11 @@ public class Material extends Asset implements TreeViewable {
 
 	private long lastUpdate = System.currentTimeMillis();
 	public engine.gl.MaterialGL getMaterial() {
-		if ( changed || (System.currentTimeMillis()-lastUpdate > 50)) {
+		if ( changed || (System.currentTimeMillis()-lastUpdate > 500)) {
 			lastUpdate = System.currentTimeMillis();
+			if ( changed ) {
+				this.materialUpdateEvent().fire();
+			}
 			changed = false;
 			
 			Texture2D dt = null;
