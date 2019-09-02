@@ -65,7 +65,6 @@ public class Pipeline implements Renderable {
 	public Pipeline() {
 		this.setSize(RenderableApplication.windowWidth, RenderableApplication.windowHeight);
 		genericShader = new BaseShader();
-		buffer = new Surface(size.x,size.y, GL11.GL_RGBA8);
 		gbuffer = new GBuffer(this, size.x,size.y);
 		tbuffer = new TransparencyRenderer(this, size.x,size.y);
 		viewMatrix = new Matrix4f();
@@ -101,10 +100,10 @@ public class Pipeline implements Renderable {
 		this.size.x = width;
 		this.size.y = height;
 
-		if ( buffer != null ) {
+		if ( buffer != null )
 			this.buffer.cleanup();
-			this.buffer = new Surface(width,height);
-		}
+		this.buffer = new Surface(width,height, GL11.GL_RGBA8);
+			
 		if ( gbuffer != null )
 			this.gbuffer.resize(width, height);
 		

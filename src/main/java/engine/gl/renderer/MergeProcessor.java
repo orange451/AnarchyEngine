@@ -71,7 +71,7 @@ public class MergeProcessor implements PostProcessor {
 				surface.cleanup();
 			}
 			Surface.filter = GL11.GL_LINEAR;
-			surface = new Surface(pipeline.getWidth(),pipeline.getHeight(), GL30.GL_R11F_G11F_B10F);
+			surface = new Surface(pipeline.getWidth(),pipeline.getHeight(), GL30.GL_RGBA16F);
 		}
 		
 		// Update skybox if it needs to be updated.

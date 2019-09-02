@@ -39,14 +39,14 @@ float dither(){
 
 
 void main(){
-	vec3 c = toneMap(texture(texture_diffuse, passTexCoord).rgb * uExposure);
+	vec4 sample = texture(texture_diffuse, passTexCoord);
+	vec3 c = toneMap(sample.rgb * uExposure);
+	float alpha = sample.a;
 	
 	vec3 whiteScale = 1.0/toneMap(vec3(W));
 	c = pow(c*whiteScale, vec3(uGamma));
 	float lum = luma(c);
 	c += dither()/2.0;
 	
-	
-	fragColor = vec4(mix(vec3(lum), c, uSaturation), 1.0);
-	//fragColor = vec4(c, 1.0);
+	fragColor = vec4(mix(vec3(lum), c, uSaturation), alpha);
 }

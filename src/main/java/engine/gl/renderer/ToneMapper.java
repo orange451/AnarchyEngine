@@ -2,7 +2,6 @@ package engine.gl.renderer;
 
 import java.net.URL;
 
-import engine.Game;
 import engine.gl.Pipeline;
 import engine.gl.PostProcessor;
 import engine.gl.Surface;
@@ -18,7 +17,7 @@ public class ToneMapper implements PostProcessor {
 	
 	@Override
 	public void process(Pipeline pipeline) {
-		if ( Game.workspace().getCurrentCamera() == null )
+		if ( Pipeline.pipeline_get() == null )
 			return;
 		
 		int buffer0 = pipeline.getGBuffer().getMergeProcessor().getBuffer().getTextureId();
@@ -27,7 +26,7 @@ public class ToneMapper implements PostProcessor {
 		// Woah brah! u toned!
 		buffer.bind();
 		{
-			buffer.draw_clear_alpha(Color.BLACK, 1.0f);
+			buffer.draw_clear_alpha(Color.BLACK, 0.0f);
 			pipeline.shader_set(shader);
 			shader.texture_set_stage(shader.shader_get_uniform("texture_diffuse"), buffer0, 0);
 			shader.shader_set_uniform_f(shader.shader_get_uniform("uExposure"), pipeline.getGBuffer().getExposure());

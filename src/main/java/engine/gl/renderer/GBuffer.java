@@ -136,7 +136,7 @@ public class GBuffer {
 		{
 			// R11 G11 B10  (better quality colors (but) low data size, no alpha)
 			{
-				finalBuffer = new Surface(width, height, GL30.GL_R11F_G11F_B10F);
+				finalBuffer = new Surface(width, height, GL30.GL_RGBA16F);
 				buffer = new Surface(width, height, GL30.GL_R11F_G11F_B10F);
 			}
 			

@@ -51,6 +51,7 @@ void main(void) {
 	if ( rawDepth == 1.0 ) {
 		//diffuseLight = skybox;
 		diffuseLight = vec3(0.0);
+		discard;
 	}
 	
 	vec3 finalColor = vec3( diffuseLight);
