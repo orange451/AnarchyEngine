@@ -86,6 +86,14 @@ public class MaterialGL {
 		return this.transparency;
 	}
 	
+	public Vector3f getEmissive() {
+		return this.emissive;
+	}
+
+	public Vector3f getColor() {
+		return this.color;
+	}
+
 	public MaterialGL setDiffuseTexture(Texture2D texture) {
 		if ( texture == null ) {
 			this.diffuseTexture = Resources.TEXTURE_WHITE_SRGB;
@@ -124,6 +132,22 @@ public class MaterialGL {
 		}
 		
 		return this;
+	}
+
+	public Texture2D getDiffuseTexture() {
+		return this.diffuseTexture;
+	}
+
+	public Texture2D getNormalTexture() {
+		return this.normalTexture;
+	}
+
+	public Texture2D getMetalnessTexture() {
+		return this.metalnessTexture;
+	}
+
+	public Texture2D getRoughnessTexture() {
+		return this.roughnessTexture;
 	}
 
 	private final static String U_METALNESS = "uMetalness";
