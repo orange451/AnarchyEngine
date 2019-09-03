@@ -21,6 +21,7 @@ public class Players extends Service implements TreeViewable {
 	private static final LuaValue C_LOCALPLAYER = LuaValue.valueOf("LocalPlayer");
 	private static final LuaValue C_PLAYERADDED = LuaValue.valueOf("PlayerAdded");
 	private static final LuaValue C_PLAYERREMOVED = LuaValue.valueOf("PlayerRemoved");
+	private static final LuaValue C_PLAYER = LuaValue.valueOf("Player");
 
 	public Players() {
 		super("Players");
@@ -88,7 +89,7 @@ public class Players extends Service implements TreeViewable {
 	}
 	
 	public List<Player> getPlayers() {
-		List<Instance> players = this.getChildrenOfClass(Player.class.getSimpleName());
+		List<Instance> players = this.getChildrenOfClass(C_PLAYER);
 		List<Player> ret = new ArrayList<Player>();
 		for (int i = 0; i < players.size(); i++) {
 			ret.add((Player) players.get(i));

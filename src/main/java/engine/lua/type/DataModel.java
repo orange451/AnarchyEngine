@@ -426,8 +426,8 @@ public abstract class DataModel extends LuaDatatype {
 		this.internalName = name;
 	}
 	
-	public String getClassName() {
-		return this.get(C_CLASSNAME).toString();
+	public LuaValue getClassName() {
+		return this.get(C_CLASSNAME);
 	}
 
 	public LuaValue getParent() {

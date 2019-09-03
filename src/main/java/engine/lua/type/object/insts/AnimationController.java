@@ -114,6 +114,11 @@ public class AnimationController extends Instance {
 	protected boolean onValueGet(LuaValue key) {
 		return true;
 	}
+
+	private static final LuaValue C_ANIMATIONDATA = LuaValue.valueOf("AnimationData");
+	private static final LuaValue C_ANIMATIONS = LuaValue.valueOf("Animations");
+	private static final LuaValue C_BONETREE = LuaValue.valueOf("BoneTree");
+	private static final LuaValue C_BONES = LuaValue.valueOf("Bones");
 	
 	private void animate(double delta) {
 		GameObject linked = this.getLinkedInstance();
@@ -124,19 +129,19 @@ public class AnimationController extends Instance {
 		if ( prefab == null )
 			return;
 		
-		Instance animationData = prefab.findFirstChildOfClass(AnimationData.class.getSimpleName());
+		Instance animationData = prefab.findFirstChildOfClass(C_ANIMATIONDATA);
 		if ( animationData == null )
 			return;
 		
-		Instance boneStructure = animationData.findFirstChildOfClass(BoneTree.class.getSimpleName());
+		Instance boneStructure = animationData.findFirstChildOfClass(C_BONETREE);
 		if ( boneStructure == null )
 			return;
 		
-		Instance animations = animationData.findFirstChildOfClass(Animations.class.getSimpleName());
+		Instance animations = animationData.findFirstChildOfClass(C_ANIMATIONS);
 		if ( animations == null )
 			return;
 		
-		Instance bones = animationData.findFirstChildOfClass(Bones.class.getSimpleName());
+		Instance bones = animationData.findFirstChildOfClass(C_BONES);
 		if ( bones == null )
 			return;
 		

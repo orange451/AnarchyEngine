@@ -11,6 +11,7 @@ import java.util.Map.Entry;
 
 import org.joml.Matrix4f;
 import org.joml.Vector4f;
+import org.luaj.vm2.LuaValue;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.system.MemoryUtil;
@@ -62,7 +63,9 @@ public class AnimatedModel {
 			this.shader = new SkinningShader();
 		});
 	}
-
+	
+	private static final LuaValue C_BONETREE = LuaValue.valueOf("BoneTree");
+	
 	private void rebuild() {
 		meshes.clear();
 		meshToModelMap.clear();
@@ -86,7 +89,7 @@ public class AnimatedModel {
 		// Compute bone indices
 		boneIndices = new HashMap<>();
 		indexToBoneMap = new HashMap<>();
-		computeBoneIndices( bones, aData.findFirstChildOfClass(BoneTree.class.getSimpleName()) );
+		computeBoneIndices( bones, aData.findFirstChildOfClass(C_BONETREE) );
 		
 		// Temporary data to store bone data
 		HashMap<BufferedMesh, HashMap<Integer, BoneData>> tempData1 = new HashMap<>();

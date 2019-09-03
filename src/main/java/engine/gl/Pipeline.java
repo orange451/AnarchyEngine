@@ -13,6 +13,7 @@ import java.util.List;
 import org.joml.Matrix4f;
 import org.joml.Vector2i;
 import org.joml.Vector3f;
+import org.luaj.vm2.LuaValue;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 
@@ -314,7 +315,10 @@ public class Pipeline implements Renderable {
 		Pair<Float, Pair<RenderableMesh, Pair<Matrix4f, MaterialGL>>> p = new Pair<Float, Pair<RenderableMesh, Pair<Matrix4f, MaterialGL>>>(transparency, t2);
 		transparencies.add(p);
 	}
-
+	
+	/** Constant used to reference animation controller objects by class name */
+	private static final LuaValue C_ANIMATIONCONTROLLER = LuaValue.valueOf("AnimationController");
+	
 	private void renderInstancesRecursive(BaseShader shader, Instance root) {
 		List<Instance> instances = root.getChildren();
 		for (int i = 0; i < instances.size(); i++) {
@@ -332,7 +336,7 @@ public class Pipeline implements Renderable {
 			}
 			
 			// Replace shader with animatable shader
-			Instance animationController = root.findFirstChildOfClass(AnimationController.class.getSimpleName());
+			Instance animationController = root.findFirstChildOfClass(C_ANIMATIONCONTROLLER);
 			if ( animationController != null ) {
 				((AnimationController)animationController).debugRender(shader);
 				return;

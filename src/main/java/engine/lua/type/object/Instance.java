@@ -371,6 +371,17 @@ public abstract class Instance extends DataModel {
 		return findFirstChild(LuaValue.valueOf(name));
 	}
 	
+	/**
+	 * Returns the first child with the matching name.
+	 * <br>
+	 * It is O(1) time if the name is NOT the name of a field for the object.
+	 * <br>
+	 * if the name parameter is the name of a field, it is O(n) time, as it has to search for the first child.
+	 * <br>
+	 * Non field name objects are automatically generated when added as a child.
+	 * @param name
+	 * @return
+	 */
 	public Instance findFirstChild(LuaValue name) {
 		if ( this.containsField(name) ) {
 			synchronized(children) {
@@ -390,11 +401,16 @@ public abstract class Instance extends DataModel {
 		return null;
 	}
 
-	public Instance findFirstChildOfClass(String name) {
+	/**
+	 * Returns the first child whos class matches the desired class name. This method is O(n) time.
+	 * @param name
+	 * @return
+	 */
+	public Instance findFirstChildOfClass(LuaValue name) {
 		synchronized(children) {
 			for (int i = 0; i < children.size(); i++) {
 				Instance child = children.get(i);
-				if ( child.getClassName().equals(name) ) {
+				if ( child.getClassName().eq_b(name) ) {
 					return child;
 				}
 			}
@@ -402,19 +418,42 @@ public abstract class Instance extends DataModel {
 		return null;
 	}
 	
-	public List<Instance> getChildrenOfClass(String className) {
+	/**
+	 * Returns the first child whos class matches the desired class name. This method is O(n) time.
+	 * @param name
+	 * @return
+	 */
+	public Instance findFirstChildOfClass(String name) {
+		return this.findFirstChildOfClass(LuaValue.valueOf(name));
+	}
+	
+	/**
+	 * Returns a list of children whos classes match the desired class name. This method is O(n) time.
+	 * @param className
+	 * @return
+	 */
+	public List<Instance> getChildrenOfClass(LuaValue className) {
 		List<Instance> ret = new ArrayList<Instance>();
 		synchronized(children) {
 			for (int i = 0; i < children.size(); i++) {
 				Instance child = children.get(i);
-				String cName = child.getClassName();
-				if ( cName.equals(className) ) {
+				LuaValue cName = child.getClassName();
+				if ( cName.eq_b(className) ) {
 					ret.add(child);
 				}
 			}
 		}
 
 		return ret;
+	}
+	
+	/**
+	 * Returns a list of children whos classes match the desired class name. This method is O(n) time.
+	 * @param className
+	 * @return
+	 */
+	public List<Instance> getChildrenOfClass(String className) {
+		return this.getChildrenOfClass(LuaValue.valueOf(className));
 	}
 
 	public List<Instance> getChildrenWithName(String name) {
