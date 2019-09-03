@@ -30,12 +30,13 @@ import lwjgui.paint.Color;
 import lwjgui.scene.Context;
 import lwjgui.scene.control.Label;
 import lwjgui.scene.control.ScrollPane;
+import lwjgui.scene.layout.GridView;
 import lwjgui.scene.layout.OpenGLPane;
 import lwjgui.scene.layout.VBox;
 
 public class IdeMaterialViewer extends IdePane {
 	
-	private VBox materialBox;
+	private GridView materialBox;
 	private HashMap<Material, MaterialNode> materialToNodeMap;
 
 	public IdeMaterialViewer() {
@@ -49,11 +50,12 @@ public class IdeMaterialViewer extends IdePane {
 	
 	private void init() {
 		if ( materialBox != null ) {
-			materialBox.getChildren().clear();
+			materialBox.getItems().clear();
 			materialToNodeMap.clear();
 		} else {
 			materialToNodeMap = new HashMap<>();
-			materialBox = new VBox();
+			materialBox = new GridView();
+			materialBox.setAlignment(Pos.TOP_LEFT);
 			
 			ScrollPane scroll = new ScrollPane();
 			scroll.setFillToParentHeight(true);
@@ -98,14 +100,14 @@ public class IdeMaterialViewer extends IdePane {
 		if ( node == null ) 
 			return;
 		
-		materialBox.getChildren().remove(node);
+		materialBox.getItems().remove(node);
 		materialToNodeMap.remove(material);
 	}
 
 	private void attachMaterial(Material material) {
 		MaterialNode p = new MaterialNode(material);
 		
-		materialBox.getChildren().add(p);
+		materialBox.getItems().add(p);
 		materialToNodeMap.put(material, p);
 	}
 	
@@ -130,17 +132,25 @@ public class IdeMaterialViewer extends IdePane {
 			
 			// Setup pipeline world
 			{
+				// Camera
 				float d = 1.5f;
 				Camera camera = new Camera();
 				camera.setParent((LuaValue) renderableWorld);
 				camera.setPosition(new Vector3(-d,-d,d/2));
 				((Workspace)renderableWorld).setCurrentCamera(camera);
 
-				Prefab prefab = new Prefab();
-				prefab.addModel(null, material);
-				prefab.forceSetParent((LuaValue) renderableWorld);
+				// Material object
+				{
+					Prefab prefab = new Prefab();
+					prefab.addModel(null, material);
+					prefab.forceSetParent((LuaValue) renderableWorld);
+	
+					GameObject obj = new GameObject();
+					obj.setPrefab(prefab);
+					obj.setParent((LuaValue) renderableWorld);
+				}
 				
-				// Background
+				// Background object
 				{
 					float BG_D = 20;
 					Mesh BGMESH = new Mesh();
@@ -208,10 +218,6 @@ public class IdeMaterialViewer extends IdePane {
 					l6.setIntensity(b*0.77f);
 					l6.setParent(renderableWorld.getInstance() );
 				}
-
-				GameObject obj = new GameObject();
-				obj.setPrefab(prefab);
-				obj.setParent((LuaValue) renderableWorld);
 			}
 			
 			// OpenGL rendering pane
