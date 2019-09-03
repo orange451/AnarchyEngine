@@ -11,6 +11,7 @@ import engine.gl.light.Light;
 import engine.lua.type.NumberClampPreferred;
 import engine.lua.type.data.Color3;
 import engine.lua.type.data.Vector3;
+import engine.lua.type.object.Instance;
 import engine.lua.type.object.LightBase;
 import engine.lua.type.object.TreeViewable;
 import engine.observer.RenderableWorld;
@@ -77,7 +78,7 @@ public class PointLight extends LightBase implements TreeViewable,GameSubscriber
 				makeLight();
 				break;
 			}
-			t = this.getParent();
+			t = ((Instance)t).getParent();
 		}
 	}
 

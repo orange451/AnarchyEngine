@@ -20,7 +20,19 @@ public class ToneMapper implements PostProcessor {
 		if ( Pipeline.pipeline_get() == null )
 			return;
 		
-		int buffer0 = pipeline.getGBuffer().getMergeProcessor().getBuffer().getTextureId();
+		GBuffer gbuffer = pipeline.getGBuffer();
+		if ( gbuffer == null )
+			return;
+		
+		MergeProcessor merge = gbuffer.getMergeProcessor();
+		if ( merge == null )
+			return;
+		
+		Surface mergeBuffer = merge.getBuffer();
+		if ( mergeBuffer == null )
+			return;
+		
+		int buffer0 = mergeBuffer.getTextureId();
 		Surface buffer = pipeline.getGBuffer().getBufferFinal();
 		
 		// Woah brah! u toned!
