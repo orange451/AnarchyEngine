@@ -26,7 +26,6 @@ import ide.layout.IdePane;
 import lwjgui.geometry.Pos;
 import lwjgui.gl.GenericShader;
 import lwjgui.gl.Renderer;
-import lwjgui.paint.Color;
 import lwjgui.scene.Context;
 import lwjgui.scene.control.Label;
 import lwjgui.scene.control.ScrollPane;
@@ -37,7 +36,10 @@ import lwjgui.scene.layout.VBox;
 public class IdeMaterialViewer extends IdePane {
 	
 	private GridView materialBox;
+	private ScrollPane scrollPane;
 	private HashMap<Material, MaterialNode> materialToNodeMap;
+	
+	private static final int NODE_SIZE = 120;
 
 	public IdeMaterialViewer() {
 		super("Material Viewer", true);
@@ -46,6 +48,14 @@ public class IdeMaterialViewer extends IdePane {
 			init();
 		});
 		init();
+	}
+	
+	@Override
+	protected void resize() {
+		super.resize();
+
+		materialBox.setPrefWidth(scrollPane.getViewportWidth());
+		materialBox.setPrefHeight(scrollPane.getViewportHeight());
 	}
 	
 	private void init() {
@@ -57,11 +67,11 @@ public class IdeMaterialViewer extends IdePane {
 			materialBox = new GridView();
 			materialBox.setAlignment(Pos.TOP_LEFT);
 			
-			ScrollPane scroll = new ScrollPane();
-			scroll.setFillToParentHeight(true);
-			scroll.setFillToParentWidth(true);
-			this.getChildren().add(scroll);
-			scroll.setContent(materialBox);
+			scrollPane = new ScrollPane();
+			scrollPane.setFillToParentHeight(true);
+			scrollPane.setFillToParentWidth(true);
+			this.getChildren().add(scrollPane);
+			scrollPane.setContent(materialBox);
 		}
 		
 		System.out.println("INITIALIZING MATERIAL VIEWER");
@@ -113,12 +123,11 @@ public class IdeMaterialViewer extends IdePane {
 	
 	static class MaterialNode extends VBox {
 		private OpenGLPane oglPane;
-		private static final int size = 150;
 		private Pipeline materialPipeline;
 		
 		public MaterialNode(Material material) {
 			this.setAlignment(Pos.CENTER);
-			this.setMaxWidth(size);
+			this.setMaxWidth(NODE_SIZE);
 			
 
 			// Create secondary world
@@ -128,12 +137,12 @@ public class IdeMaterialViewer extends IdePane {
 			// Create secondary pipeline
 			materialPipeline = new Pipeline();
 			materialPipeline.setRenderableWorld(renderableWorld);
-			materialPipeline.setSize(size, size);
+			materialPipeline.setSize(NODE_SIZE, NODE_SIZE);
 			
 			// Setup pipeline world
 			{
 				// Camera
-				float d = 1.5f;
+				float d = 1.33f;
 				Camera camera = new Camera();
 				camera.setParent((LuaValue) renderableWorld);
 				camera.setPosition(new Vector3(-d,-d,d/2));
@@ -222,7 +231,7 @@ public class IdeMaterialViewer extends IdePane {
 			
 			// OpenGL rendering pane
 			this.oglPane = new OpenGLPane();
-			this.oglPane.setPrefSize(size, size);
+			this.oglPane.setPrefSize(NODE_SIZE, NODE_SIZE);
 			this.oglPane.setFlipY(true);
 			this.oglPane.setRendererCallback(new Renderer() {
 				GenericShader shader;
