@@ -118,7 +118,6 @@ public class PointLight extends LightBase implements TreeViewable,GameSubscriber
 		
 		// Add it to pipeline
 		pipeline.getGBuffer().getLightProcessor().getPointLightHandler().addLight(light);
-		System.out.println("New Light " + pipeline.getRenderableWorld().getInstance().getFullName());
 	}
 	
 	@Override

@@ -35,9 +35,9 @@ public class PointLightHandler {
 	private BufferedMesh mesh = MeshUtils.sphere(1, 16);
 	
 	public void addLight(PointLightInternal l) {
-		synchronized(lights) {
+		//synchronized(lights) {
 			lights.add(l);
-		}
+		//}
 	}
 	
 	public void removeLight(PointLightInternal l) {
