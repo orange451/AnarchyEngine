@@ -510,7 +510,7 @@ public abstract class DataModel extends LuaDatatype {
 	public void cleanup() {
 		this.setLocked(false);
 		
-		if ( this.hasKey(C_PARENT) ) {
+		if ( this.containsField(C_PARENT) ) {
 			this.getField(C_PARENT).setLocked(false);
 			this.set(C_PARENT, LuaValue.NIL);
 		}

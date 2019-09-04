@@ -107,24 +107,6 @@ public abstract class LuaDatatype extends LuaTable {
 	private static final LuaValue C_NAME = LuaValue.valueOf("Name");
 	private static final LuaValue C_PARENT = LuaValue.valueOf("Parent");
 	private static final LuaValue C_ENUM = LuaValue.valueOf("Enum");
-
-	public boolean hasKey( LuaValue key ) {
-		if ( key.eq_b(C_NAME) || key.eq_b(C_PARENT) )
-			return true;
-
-		LuaValue[] keys = this.keys();
-		for (int i = 0; i < keys.length; i++) {
-			LuaValue name = keys[i];
-			if ( name.equals(key) ) {
-				return true;
-			}
-		}
-		
-		if ( containsField(key) )
-			return true;
-		
-		return false;
-	}
 	
 	@Override
 	public LuaValue setmetatable(LuaValue metatable) {
@@ -143,8 +125,8 @@ public abstract class LuaDatatype extends LuaTable {
 		
 		// If you're getting an instance field, but that instance is no longer in the game, return nil
 		if ( Game.isLoaded() ) {
-			if ( this.containsField(key) ) {
-				LuaField field = this.getField(key);
+			LuaField field = this.getField(key);
+			if ( field != null ) {
 				if ( field.isInstance ) {
 					LuaValue v = super.get(key);
 					if ( v instanceof Instance ) {
@@ -152,9 +134,9 @@ public abstract class LuaDatatype extends LuaTable {
 						if ( inst.destroyed )
 							return NIL;
 						//if ( !inst.getName().equals("game") && inst.getParent().equals(NIL) ) {
-						if ( !inst.equals(Game.game()) && inst.rawget(C_PARENT).eq_b(LuaValue.NIL) ) {
+						//if ( !inst.equals(Game.game()) && inst.rawget(C_PARENT).eq_b(LuaValue.NIL) ) {
 							//return NIL;
-						}
+						//}
 					}
 				}
 			}
@@ -176,47 +158,44 @@ public abstract class LuaDatatype extends LuaTable {
 		}
 
 		// Check for fields
-		if ( !hasKey(key) ) {
+		LuaField f = this.getField(key);
+		if ( f == null) {
 			LuaValue.error("Cannot create new field " + key.toString() + " in type " + this.typename());
 		} else {
 			boolean typeMismatch = true;
-			LuaField f = this.getField(key);
 			
-			// Modifying a field
-			if ( f != null ) {
-				// Cant be modified
-				if ( !f.canModify() ) {
-					LuaValue.error("Cannot set field " + key.toString() + ". Field is locked.");
+			// Cant be modified
+			if ( !f.canModify() ) {
+				LuaValue.error("Cannot set field " + key.toString() + ". Field is locked.");
+				return;
+			}
+			
+			// Check if its the right datatype
+			if ( f.matches(value) )
+				typeMismatch = false;
+			if ( value instanceof Instance && f.isInstance )
+				typeMismatch = false;
+			
+			// Type mismatch? Or missing field
+			if ( typeMismatch ) {
+				LuaValue.error("Cannot set field " + key.toString() + ". Type mismatch. Expects: " + f.getType().getSimpleName());
+				return;
+			}
+			
+			// Clamp the value (will only clamp if a clamp was defined)
+			LuaValue t = f.clamp(value);
+			if ( t != value ) {
+				value = t;
+			}
+			
+			// If it needs to be an enum, check here
+			if ( f.getEnumType() != null ) {
+				LuaValue tab = LuaEngine.globals.get(C_ENUM);
+				LuaValue enu = tab.get(f.getEnumType().getType());
+				
+				if ( enu.get(value).isnil() ) {
+					LuaValue.error("Cannot set field " + key.toString() + ". Enum type mismatch.");
 					return;
-				}
-				
-				// Check if its the right datatype
-				if ( f.matches(value) )
-					typeMismatch = false;
-				if ( value instanceof Instance && f.isInstance )
-					typeMismatch = false;
-				
-				// Type mismatch? Or missing field
-				if ( typeMismatch ) {
-					System.out.println(f.getType() + " / " + value.getClass());
-					LuaValue.error("Cannot set field " + key.toString() + ". Type mismatch.");
-					return;
-				}
-				
-				// Clamp the value (will only clamp if a clamp was defined)
-				LuaValue t = f.clamp(value);
-				if ( t != value ) {
-					value = t;
-				}
-				
-				// If it needs to be an enum, check here
-				if ( f.getEnumType() != null ) {
-					LuaValue tab = LuaEngine.globals.get(C_ENUM);
-					LuaValue enu = tab.get(f.getEnumType().getType());
-					
-					if ( enu.get(value).isnil() ) {
-						LuaValue.error("Cannot set field " + key.toString() + ". Enum type mismatch.");
-					}
 				}
 			}
 		}
@@ -233,7 +212,7 @@ public abstract class LuaDatatype extends LuaTable {
 		super.set(key, newSet);
 	}
 	
-	public void cleanup() {
+	protected void cleanup() {
 		
 		// Lock it, can no longer be modified.
 		this.setLocked(true);
