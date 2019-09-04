@@ -311,7 +311,8 @@ public class BaseShader {
 		lastViewMatrix.set(mat);
 	}
 
-	Matrix3f tempNormal = new Matrix3f();
+	private static final Matrix3f IDENTITY_NORMAL_MATRIX = new Matrix3f().identity().normal();
+	private Matrix3f tempNormal = new Matrix3f();
 	public void setWorldMatrix(Matrix4f mat) {
 		if ( worldMatLoc == -1 || mat.equals(lastWorldMatrix) )
 			return;
@@ -320,7 +321,14 @@ public class BaseShader {
 		glUniformMatrix4fv(worldMatLoc, false, matrix44Buffer);
 
 		if ( worldNormalMatLoc > 0 ) {
-			Matrix3f normalMatrix = mat.normal(tempNormal);
+			Matrix3f normalMatrix = IDENTITY_NORMAL_MATRIX;
+			
+			boolean hasRotation = true;
+			if ( mat.m00() == 1 && mat.m11() == 1 && mat.m22() == 1 )
+				hasRotation = false;
+			
+			if ( hasRotation )
+				mat.normal(tempNormal);
 			normalMatrix.get(matrix33Buffer);
 			glUniformMatrix3fv(worldNormalMatLoc, false, matrix33Buffer);
 		}
