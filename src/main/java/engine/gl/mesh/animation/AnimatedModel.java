@@ -245,7 +245,9 @@ public class AnimatedModel {
 			Matrix4 bindMatrix = bone.getOffsetMatrix();
 			
 			// Multiple absolute matrix by bind matrix
-			absoluteMatrix.getInternal().mul(bindMatrix.getInternal(), tempMat);
+			if ( absoluteMatrix != null && bindMatrix != null ) {
+				absoluteMatrix.getInternal().mul(bindMatrix.getInternal(), tempMat);
+			}
 			
 			// Store matrix to buffer
 			matrixBuffer.rewind();

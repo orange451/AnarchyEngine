@@ -26,6 +26,7 @@ import ide.layout.windows.ErrorWindow;
 
 public class Load {
 	private static ArrayList<LoadedInstance> instances;
+	private static HashMap<Long, LoadedInstance> instancesMap;
 	
 	public static void load() {
 		String path = "";
@@ -83,6 +84,7 @@ public class Load {
 	public static boolean parseJSON(JSONObject... obj) {
 		// Read in the objects from JSON
 		instances = new ArrayList<LoadedInstance>();
+		instancesMap = new HashMap<>();
 		for ( int i = 0; i < obj.length; i++) {
 			readObjects(obj[i]);
 		}
@@ -190,6 +192,7 @@ public class Load {
 		}
 		
 		instances.add(root);
+		instancesMap.put(root.Reference, root);
 		
 		JSONArray children = (JSONArray) obj.get("Children");
 		for (int i = 0; i < children.size(); i++) {
@@ -206,12 +209,9 @@ public class Load {
 	}
 	
 	protected static Instance getInstanceFromReference(long ref) {
-		// First search "temporary" instances
-		for (int i = 0; i < instances.size(); i++) {
-			if ( instances.get(i).Reference == ref ) {
-				return instances.get(i).instance;
-			}
-		}
+		LoadedInstance loaded = instancesMap.get(ref);
+		if ( loaded != null )
+			return loaded.instance;
 		
 		// Now search for instance by SID if it wasn't found before.
 		return Game.getInstanceFromSID(ref);
