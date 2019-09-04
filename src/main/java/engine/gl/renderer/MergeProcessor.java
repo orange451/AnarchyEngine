@@ -54,7 +54,7 @@ public class MergeProcessor implements PostProcessor {
 	
 	@Override
 	public void process(Pipeline pipeline) {
-		if ( Game.workspace().getCurrentCamera() == null )
+		if ( pipeline.getCamera() == null )
 			return;
 		
 		int buffer0 = pipeline.getGBuffer().getBuffer0(); // Albedo
@@ -101,7 +101,7 @@ public class MergeProcessor implements PostProcessor {
 			shader.shader_set_uniform_matrix(shader.shader_get_uniform("inverseProjectionMatrix"), pipeline.getGBuffer().getInverseProjectionMatrix());
 			shader.shader_set_uniform_matrix(shader.shader_get_uniform("inverseViewMatrix"), pipeline.getGBuffer().getInverseViewMatrix());
 			shader.shader_set_uniform_matrix(shader.shader_get_uniform("uSkyBoxRotation"), skyBoxRotation);
-			Vector3f pos = Game.workspace().getCurrentCamera().getPosition().toJoml();
+			Vector3f pos = pipeline.getCamera().getPosition().toJoml();
 			shader.shader_set_uniform_f(shader.shader_get_uniform("cameraPosition"), pos);
 			
 			pipeline.fullscreenQuad();

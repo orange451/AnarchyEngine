@@ -212,7 +212,7 @@ public abstract class LuaDatatype extends LuaTable {
 		super.set(key, newSet);
 	}
 	
-	protected void cleanup() {
+	public void cleanup() {
 		
 		// Lock it, can no longer be modified.
 		this.setLocked(true);

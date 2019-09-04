@@ -359,7 +359,6 @@ public class Pipeline implements Renderable {
 	public void ortho(float width, float height) {
 		projMatrix.set(IDENTITY).ortho(0, width, 0, height, -3200, 3200);
 		viewMatrix.set(IDENTITY);
-		currentCamera = null;
 	}
 	
 	private void perspective() {
