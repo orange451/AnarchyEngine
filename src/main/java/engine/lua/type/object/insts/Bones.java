@@ -14,7 +14,6 @@ public class Bones extends Instance implements TreeViewable {
 	public Bones() {
 		super("Bones");
 		
-		this.setLocked(true);
 		this.setInstanceable(false);
 
 		this.getField(LuaValue.valueOf("Archivable")).setLocked(true);

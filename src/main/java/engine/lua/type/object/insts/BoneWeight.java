@@ -17,7 +17,6 @@ public class BoneWeight extends Instance implements TreeViewable {
 		this.defineField(C_VERTEXID.toString(), LuaValue.valueOf(-1), true);
 		this.defineField(C_WEIGHT.toString(), LuaValue.valueOf(0.0), true);
 		
-		this.setLocked(true);
 		this.setInstanceable(false);
 
 		this.getField(LuaValue.valueOf("Archivable")).setLocked(true);

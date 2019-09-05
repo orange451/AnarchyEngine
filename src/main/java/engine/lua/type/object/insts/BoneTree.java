@@ -10,7 +10,6 @@ public class BoneTree extends Instance implements TreeViewable {
 	public BoneTree() {
 		super("BoneTree");
 		
-		this.setLocked(true);
 		this.setInstanceable(false);
 
 		this.getField(LuaValue.valueOf("Archivable")).setLocked(true);

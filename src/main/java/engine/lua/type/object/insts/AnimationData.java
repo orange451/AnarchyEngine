@@ -28,8 +28,6 @@ public class AnimationData extends Instance implements TreeViewable {
 
 	public AnimationData() {
 		super("AnimationData");
-
-		this.setLocked(true);
 		this.setInstanceable(false);
 
 		this.getField(LuaValue.valueOf("Archivable")).setLocked(true);

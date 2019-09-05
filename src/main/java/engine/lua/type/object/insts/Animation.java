@@ -11,7 +11,6 @@ public class Animation extends Instance implements TreeViewable {
 	public Animation() {
 		super("Animation");
 		
-		this.setLocked(true);
 		this.setInstanceable(false);
 		
 		this.getField(LuaValue.valueOf("Archivable")).setLocked(true);

@@ -17,7 +17,6 @@ public class Bone extends Instance implements TreeViewable {
 		this.defineField(C_MESH.toString(), LuaValue.NIL, true);
 		this.defineField("OffsetMatrix", new Matrix4(), true);
 		
-		this.setLocked(true);
 		this.setInstanceable(false);
 
 		this.getField(LuaValue.valueOf("Archivable")).setLocked(true);
