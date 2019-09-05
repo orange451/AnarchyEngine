@@ -39,6 +39,7 @@ import org.lwjgl.opengl.GL;
 import org.lwjgl.system.MemoryStack;
 
 import engine.application.launchstrategy.ClientLauncher;
+import engine.gl.IPipeline;
 import engine.gl.Pipeline;
 import engine.gl.Resources;
 import engine.observer.InternalRenderable;
@@ -67,7 +68,7 @@ public abstract class RenderableApplication extends Application implements Rende
 	
 	public static boolean GLFW_INITIALIZED;
 	
-	public static Pipeline pipeline;
+	public static IPipeline pipeline;
 
 	public void attachRenderable( Renderable o ) {
 		renderThread.attach(o);

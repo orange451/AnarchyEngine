@@ -45,6 +45,7 @@ import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.ARBClipControl;
 
 import engine.application.RenderableApplication;
+import engine.gl.IPipeline;
 import engine.gl.Surface;
 import engine.glv2.entities.Sun;
 import engine.glv2.entities.SunCamera;
@@ -61,7 +62,7 @@ import engine.lua.type.object.insts.Camera;
 import engine.observer.Renderable;
 import engine.observer.RenderableWorld;
 
-public class GLRenderer implements Renderable {
+public class GLRenderer implements Renderable, IPipeline {
 
 	private boolean enabled;
 

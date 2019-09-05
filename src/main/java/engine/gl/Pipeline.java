@@ -39,7 +39,7 @@ import engine.observer.RenderableWorld;
 import engine.util.MeshUtils;
 import engine.util.Pair;
 
-public class Pipeline implements Renderable {
+public class Pipeline implements IPipeline {
 	private boolean enabled = true;
 	private Vector2i size = new Vector2i(1,1);
 	private Surface buffer;

@@ -2,6 +2,7 @@ package ide.layout.windows;
 
 import engine.Game;
 import engine.InternalRenderThread;
+import engine.gl.IPipeline;
 import engine.gl.Pipeline;
 import engine.gl.Surface;
 import engine.lua.type.object.services.UserInputService;
@@ -19,10 +20,10 @@ import lwjgui.scene.layout.OpenGLPane;
 
 public class IdeGameView extends IdePane {
 	private OpenGLPane internal;
-	private Pipeline pipeline;
+	private IPipeline pipeline;
 	private Label fps;
 	
-	public IdeGameView(Pipeline pipeline) {
+	public IdeGameView(IPipeline pipeline) {
 		super("Game", false);
 		
 		this.pipeline = pipeline;
