@@ -239,7 +239,6 @@ public abstract class Instance extends DataModel {
 		try {
 			return (Instance) c.instanceableClass.getDeclaredConstructor().newInstance();
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		

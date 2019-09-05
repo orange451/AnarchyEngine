@@ -5,6 +5,9 @@ import java.io.FileReader;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -181,11 +184,10 @@ public class Load {
 		
 		if ( obj.get("Properties") != null ) {
 			JSONObject properties = (JSONObject) obj.get("Properties");
-			@SuppressWarnings("unchecked")
-			String[] keys = (String[]) properties.keySet().toArray(new String[properties.keySet().size()]);
-			for (int i = 0; i < keys.length; i++) {
-				String key = keys[i];
-				Object t = properties.get(key);
+			for (Object entry : properties.entrySet()) {
+				Map.Entry<Object,Object> entry2 = (Entry<Object, Object>) entry;
+				String key = entry2.getKey().toString();
+				Object t = entry2.getValue();
 				PropertyValue<?> v = PropertyValue.parse(t);
 				root.properties.put(key, v);
 			}
@@ -227,6 +229,8 @@ public class Load {
 		
 		public HashMap<String,PropertyValue<?>> properties = new HashMap<String,PropertyValue<?>>();
 	}
+	
+	private static HashMap<String, Method> dataTypeToMethodMap = new HashMap<String, Method>();
 	
 	static class PropertyValue<T> {
 		private T value;
@@ -274,18 +278,25 @@ public class Load {
 					String type = (String) data.get("ClassName");
 					JSONObject temp = (JSONObject) data.get("Data");
 					
-					Class<? extends LuaValuetype> c = LuaValuetype.DATA_TYPES.get(type);
-					if ( c != null ) {
-						LuaValuetype o = null;
+					// Get the fromJSON method
+					Method method = dataTypeToMethodMap.get(type);
+					if ( method == null ) {
+						Class<? extends LuaValuetype> c = LuaValuetype.DATA_TYPES.get(type);
 						try {
-							Method method = c.getMethod("fromJSON", JSONObject.class);
-							Object ot = method.invoke(null, temp);
-							o = (LuaValuetype)ot;
-						}catch( Exception e ) {
-							e.printStackTrace();
+							method = c.getMethod("fromJSON", JSONObject.class);
+							dataTypeToMethodMap.put(type, method);
+						} catch (NoSuchMethodException e) {
+							//
 						}
-						
+					}
+					
+					// Call it to get a returned value
+					try {
+						Object ot = method.invoke(null, temp);
+						LuaValuetype o = (LuaValuetype)ot;
 						return new PropertyValue<LuaValuetype>(o);
+					}catch( Exception e ) {
+						e.printStackTrace();
 					}
 				}
 			}
