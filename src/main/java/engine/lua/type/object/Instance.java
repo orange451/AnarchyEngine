@@ -298,7 +298,7 @@ public abstract class Instance extends DataModel {
 					Instance child = children.get(i);
 					Instance t = child.clone();
 					if ( t != null ) {
-						t.setParent(inst);
+						t.forceSetParent(inst);
 					}
 				}
 			//}
