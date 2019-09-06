@@ -20,8 +20,8 @@
 
 #struct Material
 struct Material {
-	vec4 diffuse;
-	vec4 emissive;
+	vec3 diffuse;
+	vec3 emissive;
 	float roughness;
 	float metallic;
 	sampler2D diffuseTex;

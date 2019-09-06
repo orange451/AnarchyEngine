@@ -26,4 +26,5 @@ uniform sampler2D image;
 
 void main() {
 	out_Color = texture(image, textureCoords);
+	out_Color.a = 1.0;
 }

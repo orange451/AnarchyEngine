@@ -42,38 +42,43 @@ public class CubeMapCamera {
 	public void switchToFace(int faceIndex) {
 		switch (faceIndex) {
 		case 0:
-			rotation.x = 0;
+			rotation.x = 90;
 			rotation.y = -90;
+			rotation.z = -90;
 			break;
 		case 1:
-			rotation.x = 0;
+			rotation.x = 90;
 			rotation.y = 90;
+			rotation.z = 90;
 			break;
 		case 2:
-			rotation.x = 90;
-			rotation.y = 180;
+			rotation.x = -90;
+			rotation.y = 0;
+			rotation.z = 0;
 			break;
 		case 3:
-			rotation.x = -90;
-			rotation.y = 180;
+			rotation.x = 90;
+			rotation.y = 0;
+			rotation.z = 0;
 			break;
 		case 4:
-			rotation.x = 0;
-			rotation.y = 180;
+			rotation.x = 180;
+			rotation.y = 0;
+			rotation.z = 0;
 			break;
 		case 5:
 			rotation.x = 0;
 			rotation.y = 0;
+			rotation.z = 180;
 			break;
 		}
-		rotation.z = 180;
 		updateViewMatrix();
 	}
-	
+
 	public Vector3f getRotation() {
 		return rotation;
 	}
-	
+
 	public Vector3f getPosition() {
 		return position;
 	}
@@ -102,7 +107,7 @@ public class CubeMapCamera {
 	private void updateViewMatrix() {
 		viewMatrix = createViewMatrix(this);
 	}
-	
+
 	public void setPosition(Vector3f position) {
 		this.position = position;
 	}
@@ -110,7 +115,7 @@ public class CubeMapCamera {
 	private static Matrix4f createViewMatrix(CubeMapCamera camera) {
 		Matrix4f viewMatrix = new Matrix4f();
 		viewMatrix.identity();
-		createViewMatrixRot(camera.rotation.x, camera.rotation.y, 0, viewMatrix);
+		createViewMatrixRot(camera.rotation.x, camera.rotation.y, camera.rotation.z, viewMatrix);
 		createViewMatrixPos(camera.position, viewMatrix);
 		return viewMatrix;
 	}

@@ -77,7 +77,7 @@ void main() {
 			if (rayDist > cameraToWorldDist - bias)
 				break;
 			float curr = max(computeShadow(finalTrace), VOLUME_ON_SHADOW) * VOLUME_DENSITY;
-			curr *= smoothstep(150, 0, finalTrace.y);
+			curr *= smoothstep(150, 0, finalTrace.z);
 			rays += curr;
 			if (rayDist > MAX_DISTANCE_VOLUME)
 				break;

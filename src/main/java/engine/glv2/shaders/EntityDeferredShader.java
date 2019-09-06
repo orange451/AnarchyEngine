@@ -52,7 +52,7 @@ public class EntityDeferredShader extends ShaderProgram {
 
 	public EntityDeferredShader() {
 		super("assets/shaders/EntityDeferred.vs", "assets/shaders/EntityDeferred.fs", new Attribute(0, "position"),
-				new Attribute(1, "textureCoords"), new Attribute(2, "normals"), new Attribute(3, "tangent"));
+				new Attribute(1, "normals"), new Attribute(2, "textureCoords"), new Attribute(3, "inColor"));
 		super.storeUniforms(transformationMatrix, material, projectionMatrix, viewMatrix, jitterMatrix);
 		super.validate();
 	}

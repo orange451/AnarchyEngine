@@ -62,8 +62,8 @@ public class SunCamera {
 		viewMatrix = createViewMatrix(this);
 		if (inverted)
 			castRay.update(projectionMatrix,
-					Maths.createViewMatrixPos(position,
-							Maths.createViewMatrixRot(rotation.x() + 180, rotation.y(), rotation.z(), null)),
+					createViewMatrixPos(position,
+							createViewMatrixRot(rotation.x() + 180, rotation.y(), rotation.z(), null)),
 					center, 2048, 2048);
 		else
 			castRay.update(projectionMatrix, viewMatrix, center, 2048, 2048);
@@ -80,15 +80,27 @@ public class SunCamera {
 	public Matrix4f[] getProjectionArray() {
 		return projectionArray;
 	}
-	
+
 	public Matrix4f getViewMatrix() {
 		return viewMatrix;
+	}
+
+	public Matrix4f getProjectionMatrix() {
+		return projectionMatrix;
 	}
 
 	public void setRotation(Vector3f rotation) {
 		this.rotation = rotation;
 	}
-	
+
+	public Vector3f getPosition() {
+		return position;
+	}
+
+	public void setPosition(Vector3f position) {
+		this.position = position;
+	}
+
 	public CastRay getDRay() {
 		return castRay;
 	}
@@ -96,7 +108,7 @@ public class SunCamera {
 	private static Matrix4f createViewMatrix(SunCamera camera) {
 		Matrix4f viewMatrix = new Matrix4f();
 		viewMatrix.identity();
-		createViewMatrixRot(camera.rotation.x, camera.rotation.y, 0, viewMatrix);
+		createViewMatrixRot(camera.rotation.x, camera.rotation.y, camera.rotation.z, viewMatrix);
 		createViewMatrixPos(camera.position, viewMatrix);
 		return viewMatrix;
 	}

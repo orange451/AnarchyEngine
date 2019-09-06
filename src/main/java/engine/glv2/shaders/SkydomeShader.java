@@ -23,7 +23,6 @@ package engine.glv2.shaders;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
-import engine.glv2.Maths;
 import engine.glv2.entities.CubeMapCamera;
 import engine.glv2.shaders.data.Attribute;
 import engine.glv2.shaders.data.UniformBoolean;
@@ -54,14 +53,21 @@ public class SkydomeShader extends ShaderProgram {
 
 	public void loadCamera(Camera camera, Matrix4f projection) {
 		projectionMatrix.loadMatrix(projection);
-		viewMatrix.loadMatrix(Maths.createViewMatrixRot(camera.getPitch(), camera.getYaw(), 0, temp.identity()));
+		temp.set(camera.getViewMatrix().getInternal());
+		temp._m30(0);
+		temp._m31(0);
+		temp._m32(0);
+		viewMatrix.loadMatrix(temp);
 		cameraPosition.loadVec3(camera.getPosition().getInternal());
 	}
 
 	public void loadCamera(CubeMapCamera camera) {
 		projectionMatrix.loadMatrix(camera.getProjectionMatrix());
-		viewMatrix.loadMatrix(Maths.createViewMatrixRot(camera.getRotation().x(), camera.getRotation().y(),
-				camera.getRotation().z(), temp.identity()));
+		temp.set(camera.getViewMatrix());
+		temp._m30(0);
+		temp._m31(0);
+		temp._m32(0);
+		viewMatrix.loadMatrix(temp);
 		cameraPosition.loadVec3(camera.getPosition());
 	}
 

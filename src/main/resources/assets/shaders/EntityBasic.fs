@@ -20,9 +20,9 @@
 
 in vec2 pass_textureCoords;
 
-uniform sampler2D texture0;
+uniform float transparency;
 
 void main() {
-	if (texture(texture0, pass_textureCoords).a < 0.5)
+	if (transparency > 0.0)
 		discard;
 }

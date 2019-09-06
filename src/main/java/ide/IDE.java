@@ -11,6 +11,7 @@ import engine.InternalGameThread;
 import engine.InternalRenderThread;
 import engine.application.RenderableApplication;
 import engine.gl.Pipeline;
+import engine.glv2.GLRenderer;
 import engine.io.Load;
 import ide.layout.IdeLayout;
 import lwjgui.LWJGUI;
@@ -51,7 +52,9 @@ public class IDE extends RenderableApplication {
 		});
 		
 		// Create rendering pipeline
-		this.attachRenderable(pipeline = new Pipeline());
+		//this.attachRenderable(pipeline = new Pipeline());
+		
+		this.attachRenderable(pipeline = new GLRenderer());
 		
 		// Setup mane IDE layout
 		layout = new IdeLayout(background);

@@ -163,4 +163,8 @@ public class PrefabRenderer {
 	public boolean isEmpty() {
 		return models.size() == 0;
 	}
+	
+	public Prefab getParent() {
+		return parent;
+	}
 }

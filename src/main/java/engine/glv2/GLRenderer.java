@@ -41,9 +41,11 @@ import static org.lwjgl.opengl.GL11C.glEnable;
 import static org.lwjgl.opengl.GL32C.GL_TEXTURE_CUBE_MAP_SEAMLESS;
 
 import org.joml.Matrix4f;
+import org.luaj.vm2.LuaValue;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.ARBClipControl;
 
+import engine.Game;
 import engine.application.RenderableApplication;
 import engine.gl.IPipeline;
 import engine.gl.Surface;
@@ -62,7 +64,7 @@ import engine.lua.type.object.insts.Camera;
 import engine.observer.Renderable;
 import engine.observer.RenderableWorld;
 
-public class GLRenderer implements Renderable, IPipeline {
+public class GLRenderer implements IPipeline {
 
 	private boolean enabled;
 
@@ -75,7 +77,7 @@ public class GLRenderer implements Renderable, IPipeline {
 	private SkydomeRenderer skydomeRenderer;
 	// private WaterRenderer waterRenderer;
 	// private LightRenderer lightRenderer;
-	// private RenderingManager renderingManager;
+	private RenderingManager renderingManager;
 
 	private DirectionalLightShadowMap dlsm;
 
@@ -100,15 +102,15 @@ public class GLRenderer implements Renderable, IPipeline {
 	private GLResourceLoader loader;
 
 	private IRenderingData rd;
-	
+
 	private RenderableWorld renderableWorld;
-	
+
 	private int width, height;
-	
-	private float time = 12000, globalTime;
+
+	private float time = 19000, globalTime = 0;
 
 	public GLRenderer() {
-	
+
 		rnd = new RendererData();
 		loader = new GLResourceLoader();
 		sun = new Sun();
@@ -119,12 +121,20 @@ public class GLRenderer implements Renderable, IPipeline {
 		glCullFace(GL_BACK);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
-		
+
 		ShaderIncludes.processIncludeFile("assets/shaders/includes/lighting.isl");
 		ShaderIncludes.processIncludeFile("assets/shaders/includes/materials.isl");
 		ShaderIncludes.processIncludeFile("assets/shaders/includes/common.isl");
 		ShaderIncludes.processIncludeFile("assets/shaders/includes/global.isl");
-		
+
+		Game.userInputService().inputBeganEvent().connect((args) -> {
+			if (args[0].get("KeyCode").eq_b(LuaValue.valueOf(GLFW.GLFW_KEY_F5))) {
+				System.out.println("Reloading Shaders...");
+				dp.reloadShaders();
+				pp.reloadShaders();
+			}
+		});
+
 		init();
 	}
 
@@ -132,7 +142,7 @@ public class GLRenderer implements Renderable, IPipeline {
 		if (enabled)
 			return;
 
-		// renderingManager = new RenderingManager();
+		renderingManager = new RenderingManager();
 		// lightRenderer = new LightRenderer();
 		// frustum = new Frustum();
 
@@ -146,7 +156,7 @@ public class GLRenderer implements Renderable, IPipeline {
 		// particleRenderer = new ParticleRenderer(loader);
 		skydomeRenderer = new SkydomeRenderer(loader);
 		// waterRenderer = new WaterRenderer(loader);
-		// renderingManager.addRenderer(new EntityRenderer());
+		renderingManager.addRenderer(new EntityRenderer());
 		rnd.dlsm = dlsm = new DirectionalLightShadowMap(rs.shadowsResolution);
 		dp = new MultiPass(RenderableApplication.windowWidth, RenderableApplication.windowHeight);
 		pp = new PostProcess(RenderableApplication.windowWidth, RenderableApplication.windowHeight);
@@ -164,6 +174,7 @@ public class GLRenderer implements Renderable, IPipeline {
 	private void shadowPass() {
 		// TODO: Render transparent shadows using an extra texture
 		SunCamera sunCamera = sun.getCamera();
+		sunCamera.setPosition(currentCamera.getPosition().getInternal());
 		if (rs.shadowsEnabled) {
 			sunCamera.switchProjectionMatrix(0);
 			// frustum.calculateFrustum(sunCamera);
@@ -171,7 +182,7 @@ public class GLRenderer implements Renderable, IPipeline {
 			dlsm.bind();
 			dlsm.swapTexture(0);
 			glClear(GL_DEPTH_BUFFER_BIT);
-			// renderingManager.renderShadow(sunCamera);
+			renderingManager.renderShadow(sunCamera);
 			// shadowPass.shadowPass(sunCamera);
 
 			sunCamera.switchProjectionMatrix(1);
@@ -179,7 +190,7 @@ public class GLRenderer implements Renderable, IPipeline {
 
 			dlsm.swapTexture(1);
 			glClear(GL_DEPTH_BUFFER_BIT);
-			// renderingManager.renderShadow(sunCamera);
+			renderingManager.renderShadow(sunCamera);
 			// shadowPass.shadowPass(sunCamera);
 
 			sunCamera.switchProjectionMatrix(2);
@@ -187,7 +198,7 @@ public class GLRenderer implements Renderable, IPipeline {
 
 			dlsm.swapTexture(2);
 			glClear(GL_DEPTH_BUFFER_BIT);
-			// renderingManager.renderShadow(sunCamera);
+			renderingManager.renderShadow(sunCamera);
 			// shadowPass.shadowPass(sunCamera);
 
 			sunCamera.switchProjectionMatrix(3);
@@ -195,7 +206,7 @@ public class GLRenderer implements Renderable, IPipeline {
 
 			dlsm.swapTexture(3);
 			glClear(GL_DEPTH_BUFFER_BIT);
-			// renderingManager.renderShadow(sunCamera);
+			renderingManager.renderShadow(sunCamera);
 			// shadowPass.shadowPass(sunCamera);
 			dlsm.unbind();
 			glCullFace(GL_FRONT);
@@ -214,9 +225,9 @@ public class GLRenderer implements Renderable, IPipeline {
 		envRenderer.renderEnvironmentMap(currentCamera.getPosition().getInternal(), skydomeRenderer,
 				sun.getSunPosition());
 		irradianceCapture.render(envRenderer.getCubeTexture());
-		// envRendererEntities.renderEnvironmentMap(currentCamera.getPosition().getInternal(),
-		// skydomeRenderer, renderingManager, rd, rnd);
-		preFilteredEnvironment.render(envRenderer.getCubeTexture().getTexture()); // Use entities here
+		envRendererEntities.renderEnvironmentMap(currentCamera.getPosition().getInternal(), skydomeRenderer,
+				renderingManager, rd, rnd);
+		preFilteredEnvironment.render(envRendererEntities.getCubeTexture().getTexture()); // Use entities here
 	}
 
 	private void occlusionPass() {
@@ -232,7 +243,7 @@ public class GLRenderer implements Renderable, IPipeline {
 		glClearDepth(0.0);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		// gbufferPass.gBufferPass(camera);
-		// renderingManager.render(camera);
+		renderingManager.render(currentCamera, projMatrix);
 		// waterRenderer.render(rd.getEngine().getEntitiesFor(waterFam), camera,
 		// worldSimulation.getGlobalTime(), frustum);
 		skydomeRenderer.render(currentCamera, projMatrix, /* worldSimulation, */ sun.getSunPosition(), true, true);
@@ -255,7 +266,7 @@ public class GLRenderer implements Renderable, IPipeline {
 		dp.render(pp.getMain());
 		// forwardPass.forwardPass(rd, rnd);
 		// particleRenderer.render(ParticleDomain.getParticles(), camera);
-		// renderingManager.renderForward(rd, rnd);
+		renderingManager.renderForward(rd, rnd);
 		glClearDepth(1.0);
 		glDepthFunc(GL_LESS);
 		pp.unbind();
@@ -270,21 +281,21 @@ public class GLRenderer implements Renderable, IPipeline {
 	public void render() {
 		if (!enabled)
 			return;
-		
-		if ( this.renderableWorld == null )
+		if (this.renderableWorld == null)
+			return;
+		currentCamera = renderableWorld.getCurrentCamera();
+		if (currentCamera == null)
 			return;
 		resetState();
-		// renderingManager.preProcess(rd.getEngine().getEntitiesFor(renderable));
-		currentCamera = renderableWorld.getCurrentCamera();
-		
+		renderingManager.preProcess(renderableWorld.getInstance());
+
 		this.time += 0.016f * 1;
 		this.time %= 24000;
 		// Set global time for clouds
-		this.globalTime += 0.016f * 1;
+		this.globalTime += 0.016f * 10;
 		float res = time * 0.015f;
 		sun.update(res, 0);
-		System.out.println(time);
-		
+
 		rd.camera = currentCamera;
 		rd.sun = sun;
 		rd.projectionMatrix = projMatrix;
@@ -303,28 +314,23 @@ public class GLRenderer implements Renderable, IPipeline {
 
 		postFXPass();
 
-		// renderingManager.end();
+		renderingManager.end();
 
 		pp.render();
 
 		rnd.previousCameraPosition.set(currentCamera.getPosition().getInternal());
 		rnd.previousViewMatrix.set(currentCamera.getViewMatrix().getInternal());
-
-		/*
-		 * if (window.getKeyboardHandler().isKeyPressed(GLFW.GLFW_KEY_F2)) {
-		 * window.getKeyboardHandler().ignoreKeyUntilRelease(GLFW.GLFW_KEY_F2);
-		 * System.out.println("Reloading Shaders..."); dp.reloadShaders();
-		 * pp.reloadShaders(); }
-		 */
 	}
 
 	public void setSize(int width, int height) {
 		if (!enabled)
 			return;
-		if(this.width == width && this.height == height)
+		if (this.width == width && this.height == height)
 			return;
 		this.width = width;
 		this.height = height;
+		projMatrix = Maths.createProjectionMatrix(this.width, this.height,
+				currentCamera == null ? 90 : currentCamera.getFov(), 0.1f, Float.POSITIVE_INFINITY, true);
 		dp.resize(width, height);
 		pp.resize(width, height);
 		// EventSubsystem.triggerEvent("lightengine.renderer.postresize");
@@ -345,22 +351,22 @@ public class GLRenderer implements Renderable, IPipeline {
 		irradianceCapture.dispose();
 		preFilteredEnvironment.dispose();
 		// waterRenderer.dispose();
-		// renderingManager.dispose();
+		renderingManager.dispose();
 		// lightRenderer.dispose();
 	}
-	
+
 	public void setRenderableWorld(RenderableWorld instance) {
 		this.renderableWorld = instance;
 	}
-	
+
 	public RenderableWorld getRenderableWorld() {
 		return this.renderableWorld;
 	}
-	
-	public void setEnabled( boolean enabled ) {
+
+	public void setEnabled(boolean enabled) {
 		this.enabled = enabled;
 	}
-	
+
 	public Surface getPipelineBuffer() {
 		return pp.getFinalSurface();
 	}

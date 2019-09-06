@@ -138,6 +138,8 @@ public abstract class PostProcessPipeline {
 		generatePipeline();
 		for (PostProcesPass<?> pass : passes)
 			pass.resize(width, height);
+		finalSurface.cleanup();
+		finalSurface = new Surface(width, height);
 	}
 
 	public void dispose() {

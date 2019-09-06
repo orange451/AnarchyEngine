@@ -253,8 +253,7 @@ public class BufferedMesh implements RenderableMesh {
 		glBindVertexArray(0);
 
 		// Clear buffer
-		buffer.clear();
-		buffer = null;
+		MemoryUtil.memFree(buffer);
 
 		// Reset modified flag
 		modified = false;

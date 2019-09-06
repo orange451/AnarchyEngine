@@ -22,9 +22,10 @@ package engine.glv2.shaders;
 
 import org.joml.Matrix4f;
 
+import engine.glv2.entities.SunCamera;
 import engine.glv2.shaders.data.Attribute;
+import engine.glv2.shaders.data.UniformFloat;
 import engine.glv2.shaders.data.UniformMatrix4;
-import engine.glv2.shaders.data.UniformSampler;
 import engine.lua.type.object.insts.Camera;
 
 public class EntityBasicShader extends ShaderProgram {
@@ -32,21 +33,12 @@ public class EntityBasicShader extends ShaderProgram {
 	private UniformMatrix4 transformationMatrix = new UniformMatrix4("transformationMatrix");
 	private UniformMatrix4 projectionMatrix = new UniformMatrix4("projectionMatrix");
 	private UniformMatrix4 viewMatrix = new UniformMatrix4("viewMatrix");
-	private UniformSampler texture0 = new UniformSampler("texture0");
+	private UniformFloat transparency = new UniformFloat("transparency");
 
 	public EntityBasicShader() {
-		super("assets/shaders/EntityBasic.vs", "assets/shaders/EntityBasic.fs", new Attribute(0, "position"),
-				new Attribute(1, "textureCoords"));
-		super.storeUniforms(transformationMatrix, projectionMatrix, viewMatrix, texture0);
+		super("assets/shaders/EntityBasic.vs", "assets/shaders/EntityBasic.fs", new Attribute(0, "position"));
+		super.storeUniforms(transformationMatrix, projectionMatrix, viewMatrix, transparency);
 		super.validate();
-		this.loadInitialData();
-	}
-
-	@Override
-	protected void loadInitialData() {
-		super.start();
-		texture0.loadTexUnit(0);
-		super.stop();
 	}
 
 	public void loadTransformationMatrix(Matrix4f matrix) {
@@ -57,8 +49,17 @@ public class EntityBasicShader extends ShaderProgram {
 		viewMatrix.loadMatrix(camera.getViewMatrix().getInternal());
 	}
 
+	public void loadsunCamera(SunCamera camera) {
+		viewMatrix.loadMatrix(camera.getViewMatrix());
+		projectionMatrix.loadMatrix(camera.getProjectionMatrix());
+	}
+
 	public void loadProjectionMatrix(Matrix4f projection) {
 		projectionMatrix.loadMatrix(projection);
+	}
+
+	public void loadTransparency(float t) {
+		transparency.loadFloat(t);
 	}
 
 }

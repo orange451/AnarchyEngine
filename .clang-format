@@ -1,0 +1,7 @@
+# Format style for glsl code
+BasedOnStyle: LLVM
+IndentWidth: 4
+TabWidth: 4
+UseTab: Always
+ColumnLimit: 100
+AllowShortFunctionsOnASingleLine: None

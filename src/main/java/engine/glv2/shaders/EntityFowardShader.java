@@ -24,8 +24,10 @@ import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
 import engine.gl.MaterialGL;
+import engine.glv2.entities.CubeMapCamera;
 import engine.glv2.shaders.data.Attribute;
 import engine.glv2.shaders.data.UniformBoolean;
+import engine.glv2.shaders.data.UniformFloat;
 import engine.glv2.shaders.data.UniformMaterial;
 import engine.glv2.shaders.data.UniformMatrix4;
 import engine.glv2.shaders.data.UniformSampler;
@@ -45,6 +47,8 @@ public class EntityFowardShader extends ShaderProgram {
 	private UniformSampler brdfLUT = new UniformSampler("brdfLUT");
 	private UniformBoolean colorCorrect = new UniformBoolean("colorCorrect");
 
+	private UniformFloat transparency = new UniformFloat("transparency");
+
 	private UniformBoolean useShadows = new UniformBoolean("useShadows");
 
 	private UniformMatrix4 projectionLightMatrix[];
@@ -54,7 +58,7 @@ public class EntityFowardShader extends ShaderProgram {
 
 	public EntityFowardShader() {
 		super("assets/shaders/EntityForward.vs", "assets/shaders/EntityForward.fs", new Attribute(0, "position"),
-				new Attribute(1, "textureCoords"), new Attribute(2, "normals"), new Attribute(3, "tangent"));
+				new Attribute(1, "normals"), new Attribute(2, "textureCoords"), new Attribute(3, "inColor"));
 		projectionLightMatrix = new UniformMatrix4[4];
 		for (int x = 0; x < 4; x++)
 			projectionLightMatrix[x] = new UniformMatrix4("projectionLightMatrix[" + x + "]");
@@ -64,7 +68,8 @@ public class EntityFowardShader extends ShaderProgram {
 			shadowMap[x] = new UniformSampler("shadowMap[" + x + "]");
 		super.storeUniforms(shadowMap);
 		super.storeUniforms(transformationMatrix, projectionMatrix, viewMatrix, material, cameraPosition, lightPosition,
-				irradianceMap, preFilterEnv, brdfLUT, colorCorrect, biasMatrix, viewLightMatrix, useShadows);
+				irradianceMap, preFilterEnv, brdfLUT, colorCorrect, biasMatrix, viewLightMatrix, useShadows,
+				transparency);
 		super.validate();
 		this.loadInitialData();
 	}
@@ -112,6 +117,12 @@ public class EntityFowardShader extends ShaderProgram {
 		cameraPosition.loadVec3(camera.getPosition().getInternal());
 	}
 
+	public void loadCamera(CubeMapCamera camera) {
+		projectionMatrix.loadMatrix(camera.getProjectionMatrix());
+		viewMatrix.loadMatrix(camera.getViewMatrix());
+		cameraPosition.loadVec3(camera.getPosition());
+	}
+
 	public void loadBiasMatrix(Matrix4f[] shadowProjectionMatrix) {
 		for (int x = 0; x < 4; x++)
 			this.projectionLightMatrix[x].loadMatrix(shadowProjectionMatrix[x]);
@@ -123,6 +134,10 @@ public class EntityFowardShader extends ShaderProgram {
 
 	public void loadSettings(boolean useShadows) {
 		this.useShadows.loadBoolean(useShadows);
+	}
+
+	public void loadTransparency(float t) {
+		transparency.loadFloat(t);
 	}
 
 }

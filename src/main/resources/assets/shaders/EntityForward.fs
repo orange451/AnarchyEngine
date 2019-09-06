@@ -38,6 +38,7 @@ uniform mat4 projectionLightMatrix[4];
 uniform mat4 viewLightMatrix;
 uniform mat4 biasMatrix;
 uniform sampler2DShadow shadowMap[4];
+uniform float transparency;
 
 #include variable pi
 
@@ -59,7 +60,7 @@ uniform sampler2DShadow shadowMap[4];
 
 void main() {
 
-	vec4 diffuseF = texture(material.diffuseTex, pass_textureCoords);
+	vec3 diffuseF = texture(material.diffuseTex, pass_textureCoords).rgb;
 	float roughness = texture(material.roughnessTex, pass_textureCoords).r;
 	float metallic = texture(material.metallicTex, pass_textureCoords).r;
 
@@ -67,12 +68,15 @@ void main() {
 	roughness *= material.roughness;
 	metallic *= material.metallic;
 	
-	if (diffuseF.a == 0.0)
-		discard;
+	//if (diffuseF.a == 0.0)
+	//	discard;
 
-	vec3 normal = texture(material.normalTex, pass_textureCoords).rgb;
-	normal = normalize(normal * 2.0 - 1.0);
-	normal = normalize(TBN * normal);
+	vec3 norm = texture(material.normalTex, pass_textureCoords).rgb;
+	vec3 map = vec3(norm.x, norm.y, 1.0);
+    map = map * -2.0 + 1.0;
+    map.z = sqrt(1.0 - dot( map.xx, map.yy ));
+    map.y = map.y;
+	vec3 normal = normalize(TBN * map);
 
 	vec3 position = pass_position.xyz;
 
@@ -123,7 +127,7 @@ void main() {
 	if (colorCorrect == 1) {
 		vec3 final = vec3(1.0) - exp(-color * exposure);
 		final = pow(final, vec3(1.0 / GAMMA));
-		out_Color = vec4(final, diffuseF.a);
+		out_Color = vec4(final, 1.0 - transparency);
 	} else
-		out_Color = vec4(color, diffuseF.a);
+		out_Color = vec4(color, 1.0 - transparency);
 }

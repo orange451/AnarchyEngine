@@ -31,8 +31,8 @@ public class UniformMaterial extends UniformArray {
 	private MaterialGL currentValue;
 
 	public UniformMaterial(String matName) {
-		super(matName + ".diffuseTex", matName + ".normalTex", matName + ".metalnessTex", matName + ".roughnessTex",
-				matName + ".metalness", matName + ".roughness", matName + ".reflective", matName + ".color",
+		super(matName + ".diffuseTex", matName + ".normalTex", matName + ".metallicTex", matName + ".roughnessTex",
+				matName + ".metallic", matName + ".roughness", matName + ".reflective", matName + ".diffuse",
 				matName + ".emissive");
 	}
 

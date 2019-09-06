@@ -146,7 +146,7 @@ vec3 atmosphere(vec3 r, vec3 r0, vec3 pSun, float iSun, float rPlanet, float rAt
 #define SURF_DIST .01
 
 float GetDist(vec3 p) {
-	float planeDist = abs(2400 - p.y);
+	float planeDist = abs(2400 - p.z);
 	return planeDist;
 }
 
@@ -168,9 +168,12 @@ void main() {
 	vec3 V = normalize(pass_normal);
 	vec3 L = normalize(lightPosition);
 
-	vec3 color = atmosphere(V,								// normalized ray direction
-							vec3(0, 6372e3 + cameraPosition.y, 0),				// ray origin
-							L,								// position of the sun
+	vec3 atm = normalize(vec3(pass_normal.x, pass_normal.z, pass_normal.y));
+	vec3 atmL = normalize(vec3(lightPosition.x, lightPosition.z, lightPosition.y));
+
+	vec3 color = atmosphere(atm,								// normalized ray direction
+							vec3(0, 6372e3 + cameraPosition.z, 0),				// ray origin
+							atmL,								// position of the sun
 							22.0,							// intensity of the sun
 							6371e3,							// radius of the planet in meters
 							6471e3,							// radius of the atmosphere in meters
@@ -190,7 +193,7 @@ void main() {
 			clamp((pass_textureCoords.y - SUN_LOWER_LIMIT) / (SUN_UPPER_LIMIT - SUN_LOWER_LIMIT),
 				  0.0, 1.0);
 		if (vl > 0.999)
-			color = mix(color, mix(color, vec3(100.0), smoothstep(0.9992, 0.9993, vl)), factorSun);
+			color =/* mix(color,*/ mix(color, vec3(100.0), smoothstep(0.9992, 0.9993, vl))/*, factorSun)*/;
 	}
 
 	vec3 rd = V;
@@ -201,7 +204,7 @@ void main() {
 		vec3 p = ro + rd * d;
 		// color = vec3(fbm(p.xz * 0.005));
 
-		vec2 st = p.xz * 0.00075 + vec2(time * 0.0005, time * 0.00005);
+		vec2 st = p.xy * 0.00075 + vec2(time * 0.0005, time * 0.00005);
 
 		vec3 cloudColor = vec3(0.0);
 		float cloudTime = time * 0.025;
@@ -225,7 +228,7 @@ void main() {
 
 		// color = mix(color, vec3(1), fbm(p.xz * 0.005));
 		float finalF = f * f * f + .6 * f * f + .5 * f;
-		color = mix(color, finalF * cloudColor * clamp(dot(vec3(0, 1, 0), L) * 5.0, 0.0, 1.0),
+		color = mix(color, finalF * cloudColor * clamp(dot(vec3(0, 0, 1), L) * 5.0, 0.0, 1.0),
 					clamp(length(r.x), 0.0, 1.0));
 	}
 
