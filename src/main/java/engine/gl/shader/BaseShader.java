@@ -321,15 +321,21 @@ public class BaseShader {
 		glUniformMatrix4fv(worldMatLoc, false, matrix44Buffer);
 
 		if ( worldNormalMatLoc > 0 ) {
-			Matrix3f normalMatrix = IDENTITY_NORMAL_MATRIX;
 			
+			// Check if there is a rotation
 			boolean hasRotation = true;
-			if ( mat.m00() == 1 && mat.m11() == 1 && mat.m22() == 1 )
+			if ( mat.m00() == 1 && mat.m11() == 1 && mat.m22() == 1) {
 				hasRotation = false;
+			}
 			
+			// Choose which normal matrix to use
 			if ( hasRotation )
 				mat.normal(tempNormal);
-			normalMatrix.get(matrix33Buffer);
+			else
+				tempNormal.set(IDENTITY_NORMAL_MATRIX);
+			
+			// Store normal to shader
+			tempNormal.get(matrix33Buffer);
 			glUniformMatrix3fv(worldNormalMatLoc, false, matrix33Buffer);
 		}
 		lastWorldMatrix.set(mat);
