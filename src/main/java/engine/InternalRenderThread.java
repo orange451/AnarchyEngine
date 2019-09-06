@@ -109,9 +109,7 @@ public class InternalRenderThread {
 	private void cleanup() {
 		// TODO clean up loaded OpenGL data...
 		
-		// Close window
-		long window = RenderableApplication.window;
-		glfwDestroyWindow(window);
+		// Close OpenGL
 		glfwTerminate();
 	}
 

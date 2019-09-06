@@ -1,6 +1,7 @@
 package ide.layout;
 
 import engine.Game;
+import engine.InternalGameThread;
 import engine.application.impl.ClientApplication;
 import engine.application.impl.ServerApplication;
 import engine.io.Load;
@@ -263,7 +264,7 @@ public class IdeLayout {
 			Runnable r = new Runnable() {
 				@Override
 				public void run() {
-					System.exit(0);
+					InternalGameThread.terminate();
 				}
 			};
 			if ( Game.changes ) {
