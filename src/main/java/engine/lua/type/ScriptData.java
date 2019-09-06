@@ -62,6 +62,8 @@ public class ScriptData extends LuaValue implements Runnable {
 		//this.thread = new Thread(this);//LuaEngine.globals,function);
 		//this.thread.start();
 		//this.thread.resume(LuaValue.NONE);
+		if ( THREAD_POOL.isShutdown() )
+			return;
 		THREAD_POOL.schedule(this, 0, TimeUnit.MILLISECONDS);
 	}
 	
@@ -111,6 +113,10 @@ public class ScriptData extends LuaValue implements Runnable {
 	public static void cleanup() {
 		threadToScriptData.clear();
 		interruptedClosures.clear();
+	}
+	
+	public static void shutdown() {
+		THREAD_POOL.shutdown();
 	}
 
 	public static ScriptBase getScript(Thread thread) {

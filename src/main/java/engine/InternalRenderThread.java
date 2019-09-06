@@ -77,7 +77,7 @@ public class InternalRenderThread {
 		long timer = System.currentTimeMillis();
 		double nanoSecond = 1e+9;
 
-		while ( GameEngine.gameThread.isRunning() && !GLFW.glfwWindowShouldClose(window) ) {
+		while ( InternalGameThread.isRunning() ) {
 			//long t1 = System.nanoTime();
 			forceUpdate();
 			//long t2 = System.nanoTime();
@@ -96,14 +96,25 @@ public class InternalRenderThread {
 
 			// Sync
 			Sync.sync( Math.max(Math.min(1000, desiredFPS), 30) );
+			
+			// Check for window closing
+			if ( GLFW.glfwWindowShouldClose(window) ) {
+				InternalGameThread.terminate();
+			}
 		}
 
-		glfwDestroyWindow(window);
-		glfwTerminate();
-
-		System.exit(0);
+		cleanup();
 	}
 	
+	private void cleanup() {
+		// TODO clean up loaded OpenGL data...
+		
+		// Close window
+		long window = RenderableApplication.window;
+		glfwDestroyWindow(window);
+		glfwTerminate();
+	}
+
 	public static void runLater(Runnable runnable) {
 		synchronized(runnables) {
 			runnables.add(runnable);

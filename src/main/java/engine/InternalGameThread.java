@@ -9,6 +9,7 @@ import java.util.Observer;
 import org.luaj.vm2.LuaValue;
 
 import engine.application.Application;
+import engine.lua.type.ScriptData;
 import engine.lua.type.object.services.RunService;
 import engine.observer.Tickable;
 import engine.util.Sync;
@@ -105,11 +106,23 @@ public class InternalGameThread extends Observable implements Runnable {
 			}
 		}
 
-		running = false;
-		System.exit(0);
+		cleanup();
+	}
+	
+	private void cleanup() {
+		// Clean up all lua objects
+		Game.unload();
+		
+		// Disable scripts
+		ScriptData.shutdown();
 	}
 
-	public boolean isRunning() {
+	public static void terminate() {
+		running = false;
+		System.out.println("Terminating game thread");
+	}
+
+	public static boolean isRunning() {
 		return running;
 	}
 }
