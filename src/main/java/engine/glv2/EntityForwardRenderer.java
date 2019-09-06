@@ -94,6 +94,10 @@ public class EntityForwardRenderer {
 
 	private void renderInstance(Instance inst, boolean transparentOnly) {
 		GameObject go = (GameObject) inst;
+		if (go.getParent().isnil())
+			return;
+		if (go.getPrefab().isnil())
+			return;
 		PrefabRenderer pfr = go.getPrefab().getPrefab();
 
 		Matrix4f mat = go.getWorldMatrix().toJoml();

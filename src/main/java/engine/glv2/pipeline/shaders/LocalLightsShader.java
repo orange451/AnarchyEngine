@@ -18,30 +18,30 @@
  * 
  */
 
-package net.luxvacuos.lightengine.client.rendering.opengl.pipeline.shaders;
+package engine.glv2.pipeline.shaders;
 
 import java.util.List;
 
 import org.joml.Matrix4f;
 
-import net.luxvacuos.lightengine.client.ecs.entities.CameraEntity;
-import net.luxvacuos.lightengine.client.rendering.opengl.shaders.data.UniformInteger;
-import net.luxvacuos.lightengine.client.rendering.opengl.shaders.data.UniformLight;
-import net.luxvacuos.lightengine.client.rendering.opengl.shaders.data.UniformMatrix;
-import net.luxvacuos.lightengine.client.rendering.opengl.shaders.data.UniformSampler;
-import net.luxvacuos.lightengine.client.rendering.opengl.shaders.data.UniformVec3;
-import net.luxvacuos.lightengine.client.rendering.opengl.v2.lights.Light;
+import engine.gl.light.PointLightInternal;
+import engine.glv2.shaders.data.UniformInteger;
+import engine.glv2.shaders.data.UniformMatrix4;
+import engine.glv2.shaders.data.UniformPointLight;
+import engine.glv2.shaders.data.UniformSampler;
+import engine.glv2.shaders.data.UniformVec3;
+import engine.lua.type.object.insts.Camera;
 
 public class LocalLightsShader extends BasePipelineShader {
 
-	private UniformMatrix projectionMatrix = new UniformMatrix("projectionMatrix");
-	private UniformMatrix viewMatrix = new UniformMatrix("viewMatrix");
-	private UniformMatrix inverseProjectionMatrix = new UniformMatrix("inverseProjectionMatrix");
-	private UniformMatrix inverseViewMatrix = new UniformMatrix("inverseViewMatrix");
+	private UniformMatrix4 projectionMatrix = new UniformMatrix4("projectionMatrix");
+	private UniformMatrix4 viewMatrix = new UniformMatrix4("viewMatrix");
+	private UniformMatrix4 inverseProjectionMatrix = new UniformMatrix4("inverseProjectionMatrix");
+	private UniformMatrix4 inverseViewMatrix = new UniformMatrix4("inverseViewMatrix");
 
 	private UniformVec3 cameraPosition = new UniformVec3("cameraPosition");
 
-	private UniformLight lights[];
+	private UniformPointLight lights[];
 	private UniformInteger totalLights = new UniformInteger("totalLights");
 
 	private UniformSampler gDiffuse = new UniformSampler("gDiffuse");
@@ -52,19 +52,17 @@ public class LocalLightsShader extends BasePipelineShader {
 	private UniformSampler gMask = new UniformSampler("gMask");
 	private UniformSampler image = new UniformSampler("image");
 
-	private UniformMatrix biasMatrix = new UniformMatrix("biasMatrix");
-
 	private Matrix4f projInv = new Matrix4f(), viewInv = new Matrix4f();
 
 	public LocalLightsShader(String name) {
-		super("DFR_" + name);
-		lights = new UniformLight[26];
-		for (int x = 0; x < 26; x++) {
-			lights[x] = new UniformLight("lights[" + x + "]");
+		super("deferred/" + name);
+		lights = new UniformPointLight[256];
+		for (int x = 0; x < 256; x++) {
+			lights[x] = new UniformPointLight("lights[" + x + "]");
 		}
 		super.storeUniforms(lights);
 		super.storeUniforms(projectionMatrix, viewMatrix, cameraPosition, gDiffuse, gPosition, gNormal, gDepth, gPBR,
-				gMask, image, totalLights, biasMatrix, inverseProjectionMatrix, inverseViewMatrix);
+				gMask, image, totalLights, inverseProjectionMatrix, inverseViewMatrix);
 		super.validate();
 		this.loadInitialData();
 	}
@@ -79,28 +77,20 @@ public class LocalLightsShader extends BasePipelineShader {
 		gPBR.loadTexUnit(4);
 		gMask.loadTexUnit(5);
 		image.loadTexUnit(6);
-		Matrix4f bias = new Matrix4f();
-		bias.m00(0.5f);
-		bias.m11(0.5f);
-		bias.m22(0.5f);
-		bias.m30(0.5f);
-		bias.m31(0.5f);
-		bias.m32(0.5f);
-		biasMatrix.loadMatrix(bias);
 		super.stop();
 	}
 
-	public void loadPointLightsPos(List<Light> lights) {
+	public void loadPointLightsPos(List<PointLightInternal> lights) {
 		for (int x = 0; x < lights.size(); x++)
-			this.lights[x].loadLight(lights.get(x), 7, x);
+			this.lights[x].loadLight(lights.get(x));
 		totalLights.loadInteger(lights.size());
 	}
 
-	public void loadCameraData(CameraEntity camera) {
-		this.projectionMatrix.loadMatrix(camera.getProjectionMatrix());
-		this.viewMatrix.loadMatrix(camera.getViewMatrix());
-		this.cameraPosition.loadVec3(camera.getPosition());
-		this.inverseProjectionMatrix.loadMatrix(camera.getProjectionMatrix().invert(projInv));
-		this.inverseViewMatrix.loadMatrix(camera.getViewMatrix().invert(viewInv));
+	public void loadCameraData(Camera camera, Matrix4f projection) {
+		this.projectionMatrix.loadMatrix(projection);
+		this.viewMatrix.loadMatrix(camera.getViewMatrix().getInternal());
+		this.cameraPosition.loadVec3(camera.getPosition().getInternal());
+		this.inverseProjectionMatrix.loadMatrix(projection.invert(projInv));
+		this.inverseViewMatrix.loadMatrix(camera.getViewMatrix().getInternal().invert(viewInv));
 	}
 }

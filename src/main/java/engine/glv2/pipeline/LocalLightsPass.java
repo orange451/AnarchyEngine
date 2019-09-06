@@ -28,15 +28,13 @@ import static org.lwjgl.opengl.GL13C.GL_TEXTURE3;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE4;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE5;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE6;
-import static org.lwjgl.opengl.GL13C.GL_TEXTURE7;
 
-import net.luxvacuos.lightengine.client.network.IRenderingData;
-import net.luxvacuos.lightengine.client.rendering.opengl.RendererData;
-import net.luxvacuos.lightengine.client.rendering.opengl.objects.Texture;
-import net.luxvacuos.lightengine.client.rendering.opengl.pipeline.shaders.LocalLightsShader;
-import net.luxvacuos.lightengine.client.rendering.opengl.v2.DeferredPass;
-import net.luxvacuos.lightengine.client.rendering.opengl.v2.DeferredPipeline;
-import net.luxvacuos.lightengine.client.rendering.opengl.v2.lights.Light;
+import engine.glv2.RendererData;
+import engine.glv2.objects.Texture;
+import engine.glv2.pipeline.shaders.LocalLightsShader;
+import engine.glv2.v2.DeferredPass;
+import engine.glv2.v2.DeferredPipeline;
+import engine.glv2.v2.IRenderingData;
 
 public class LocalLightsPass extends DeferredPass<LocalLightsShader> {
 
@@ -51,8 +49,8 @@ public class LocalLightsPass extends DeferredPass<LocalLightsShader> {
 
 	@Override
 	protected void setupShaderData(RendererData rnd, IRenderingData rd, LocalLightsShader shader) {
-		shader.loadCameraData(rd.getCamera());
-		shader.loadPointLightsPos(rnd.lights);
+		shader.loadCameraData(rd.camera, rd.projectionMatrix);
+		shader.loadPointLightsPos(rnd.plh.getLights());
 	}
 
 	@Override
@@ -64,12 +62,11 @@ public class LocalLightsPass extends DeferredPass<LocalLightsShader> {
 		super.activateTexture(GL_TEXTURE4, GL_TEXTURE_2D, dp.getPbrTex().getTexture());
 		super.activateTexture(GL_TEXTURE5, GL_TEXTURE_2D, dp.getMaskTex().getTexture());
 		super.activateTexture(GL_TEXTURE6, GL_TEXTURE_2D, auxTex[0].getTexture());
-		for (int x = 0; x < rnd.lights.size(); x++) {
-			Light l = rnd.lights.get(x);
-			if (l.useShadows()) {
-				super.activateTexture(GL_TEXTURE7 + x, GL_TEXTURE_2D, l.getShadowMap().getShadowMap().getTexture());
-			}
-		}
+		/*
+		 * for (int x = 0; x < rnd.lights.size(); x++) { Light l = rnd.lights.get(x); if
+		 * (l.useShadows()) { super.activateTexture(GL_TEXTURE7 + x, GL_TEXTURE_2D,
+		 * l.getShadowMap().getShadowMap().getTexture()); } }
+		 */
 	}
 	/*
 	 * private FBO fbos[];

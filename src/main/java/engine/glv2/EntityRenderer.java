@@ -35,10 +35,7 @@ import java.util.List;
 
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
-import org.luaj.vm2.LuaValue;
-import org.lwjgl.glfw.GLFW;
 
-import engine.Game;
 import engine.gl.MaterialGL;
 import engine.gl.Resources;
 import engine.gl.mesh.BufferedMesh;
@@ -127,6 +124,10 @@ public class EntityRenderer implements IObjectRenderer {
 
 	private void renderInstance(Instance inst) {
 		GameObject go = (GameObject) inst;
+		if (go.getParent().isnil())
+			return;
+		if (go.getPrefab().isnil())
+			return;
 		PrefabRenderer pfr = go.getPrefab().getPrefab();
 
 		Matrix4f mat = go.getWorldMatrix().toJoml();

@@ -48,6 +48,7 @@ import org.lwjgl.opengl.ARBClipControl;
 import engine.Game;
 import engine.application.RenderableApplication;
 import engine.gl.IPipeline;
+import engine.gl.Pipeline;
 import engine.gl.Surface;
 import engine.glv2.entities.Sun;
 import engine.glv2.entities.SunCamera;
@@ -61,7 +62,6 @@ import engine.glv2.v2.IrradianceCapture;
 import engine.glv2.v2.PostProcessPipeline;
 import engine.glv2.v2.lights.DirectionalLightShadowMap;
 import engine.lua.type.object.insts.Camera;
-import engine.observer.Renderable;
 import engine.observer.RenderableWorld;
 
 public class GLRenderer implements IPipeline {
@@ -77,6 +77,7 @@ public class GLRenderer implements IPipeline {
 	private SkydomeRenderer skydomeRenderer;
 	// private WaterRenderer waterRenderer;
 	// private LightRenderer lightRenderer;
+	private PointLightHandler pointLightHandler;
 	private RenderingManager renderingManager;
 
 	private DirectionalLightShadowMap dlsm;
@@ -107,7 +108,7 @@ public class GLRenderer implements IPipeline {
 
 	private int width, height;
 
-	private float time = 19000, globalTime = 0;
+	private float time = 21000, globalTime = 0;
 
 	public GLRenderer() {
 
@@ -116,6 +117,7 @@ public class GLRenderer implements IPipeline {
 		sun = new Sun();
 		rd = new IRenderingData();
 		rs = new RenderingSettings();
+		pointLightHandler = new PointLightHandler();
 		glEnable(GL_DEPTH_TEST);
 		glEnable(GL_CULL_FACE);
 		glCullFace(GL_BACK);
@@ -167,6 +169,7 @@ public class GLRenderer implements IPipeline {
 
 		// rnd.lights = lightRenderer.getLights();
 		rnd.exposure = exposure;
+		rnd.plh = pointLightHandler;
 
 		enabled = true;
 	}
@@ -333,9 +336,6 @@ public class GLRenderer implements IPipeline {
 				currentCamera == null ? 90 : currentCamera.getFov(), 0.1f, Float.POSITIVE_INFINITY, true);
 		dp.resize(width, height);
 		pp.resize(width, height);
-		// EventSubsystem.triggerEvent("lightengine.renderer.postresize");
-		// if (surface != null)
-		// surface.setImage(pp.getNVGTexture());
 	}
 
 	public void dispose() {
@@ -355,20 +355,30 @@ public class GLRenderer implements IPipeline {
 		// lightRenderer.dispose();
 	}
 
+	@Override
 	public void setRenderableWorld(RenderableWorld instance) {
 		this.renderableWorld = instance;
+		Pipeline.set(this, instance);
 	}
 
+	@Override
 	public RenderableWorld getRenderableWorld() {
 		return this.renderableWorld;
 	}
 
+	@Override
 	public void setEnabled(boolean enabled) {
 		this.enabled = enabled;
 	}
 
+	@Override
 	public Surface getPipelineBuffer() {
 		return pp.getFinalSurface();
+	}
+
+	@Override
+	public IPointLightHandler getPointLightHandler() {
+		return pointLightHandler;
 	}
 
 	public void resetState() {

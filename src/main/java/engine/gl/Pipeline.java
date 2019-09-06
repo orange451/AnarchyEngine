@@ -25,6 +25,7 @@ import engine.gl.mesh.BufferedMesh;
 import engine.gl.renderer.GBuffer;
 import engine.gl.renderer.TransparencyRenderer;
 import engine.gl.shader.BaseShader;
+import engine.glv2.IPointLightHandler;
 import engine.lua.type.object.Instance;
 import engine.lua.type.object.PrefabRenderer;
 import engine.lua.type.object.insts.AnimationController;
@@ -56,8 +57,8 @@ public class Pipeline implements IPipeline {
 	private BaseShader currentShader;
 	private List<Renderable> renderables;
 	
-	private static Pipeline currentPipeline;
-	private static HashMap<RenderableWorld, Pipeline> pipelineMap = new HashMap<>();
+	private static IPipeline currentPipeline;
+	private static HashMap<RenderableWorld, IPipeline> pipelineMap = new HashMap<>();
 	
 	private boolean debug;
 	
@@ -86,7 +87,11 @@ public class Pipeline implements IPipeline {
 		return this.renderableWorld;
 	}
 	
-	public static Pipeline get(RenderableWorld world) {
+	public static void set(IPipeline pipeline, RenderableWorld instance) {
+		pipelineMap.put(instance, pipeline);
+	}
+	
+	public static IPipeline get(RenderableWorld world) {
 		return pipelineMap.get(world);
 	}
 	
@@ -392,6 +397,10 @@ public class Pipeline implements IPipeline {
 	 * @return
 	 */
 	public static Pipeline pipeline_get() {
+		return (Pipeline) currentPipeline;
+	}
+	
+	public static IPipeline pipeline_get_v2() {
 		return currentPipeline;
 	}
 	
@@ -401,6 +410,11 @@ public class Pipeline implements IPipeline {
 	
 	public BaseShader shader_get() {
 		return this.currentShader;
+	}
+	
+	@Override
+	public IPointLightHandler getPointLightHandler() {
+		return gbuffer.getLightProcessor().getPointLightHandler();
 	}
 
 	/**

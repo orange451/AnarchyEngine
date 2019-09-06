@@ -18,22 +18,28 @@
  * 
  */
 
-package engine.glv2;
+package engine.glv2.shaders.data;
 
-import org.joml.Matrix4f;
-import org.joml.Vector3f;
+import engine.gl.light.PointLightInternal;
 
-import engine.glv2.objects.Texture;
-import engine.glv2.v2.lights.DirectionalLightShadowMap;
+public class UniformPointLight extends UniformObject {
 
-public class RendererData {
+	private UniformVec3 position, color;
+	private UniformFloat radius, intensity;
 
-	public Texture irradianceCapture, environmentMap;
-	public Texture brdfLUT;
-	public DirectionalLightShadowMap dlsm;
-	public float exposure;
-	public Matrix4f previousViewMatrix = new Matrix4f();
-	public Vector3f previousCameraPosition = new Vector3f();
-	public PointLightHandler plh;
+	public UniformPointLight(String name) {
+		position = new UniformVec3(name + ".position");
+		color = new UniformVec3(name + ".color");
+		radius = new UniformFloat(name + ".radius");
+		intensity = new UniformFloat(name + ".intensity");
+		super.init(position, color, radius, intensity);
+	}
+
+	public void loadLight(PointLightInternal light) {
+		position.loadVec3(light.x, light.y, light.z);
+		color.loadVec3(light.color);
+		intensity.loadFloat(light.intensity);
+		radius.loadFloat(light.radius);
+	}
 
 }

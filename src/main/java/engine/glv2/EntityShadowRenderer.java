@@ -54,6 +54,10 @@ public class EntityShadowRenderer {
 
 	private void renderInstance(Instance inst) {
 		GameObject go = (GameObject) inst;
+		if (go.getParent().isnil())
+			return;
+		if (go.getPrefab().isnil())
+			return;
 		PrefabRenderer pfr = go.getPrefab().getPrefab();
 
 		Matrix4f mat = go.getWorldMatrix().toJoml();

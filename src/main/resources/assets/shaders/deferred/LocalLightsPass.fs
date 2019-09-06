@@ -59,15 +59,15 @@ vec3 calcLight(Light light, vec3 position, vec3 diffuse, vec3 L, vec3 N, vec3 V,
 			   float roughness, float metallic) {
 	vec3 H = normalize(V + L);
 	float distance = length(light.position - position);
-	float attenuation = 1.0 / (distance * distance);
-	vec3 radiance = light.color * attenuation;
+	float attenuation = max(1.0 - distance / light.radius, 0.0) / distance;
+	vec3 radiance = light.color * attenuation * light.intensity;
 
 	float NDF = DistributionGGX(N, H, roughness);
 	float G = GeometrySmith(N, V, L, roughness);
 	vec3 F = fresnelSchlick(max(dot(H, V), 0.0), F0);
 
 	vec3 nominator = NDF * G * F;
-	float denominator = totalLights * max(dot(N, V), 0.0) * max(dot(N, L), 0.0) + 0.001;
+	float denominator = max(dot(N, V), 0.0) * max(dot(N, L), 0.0) + 0.001;
 	vec3 brdf = nominator / denominator;
 
 	vec3 kS = F;
@@ -101,28 +101,28 @@ void main() {
 		vec3 Lo = vec3(0.0);
 		for (int i = 0; i < totalLights; i++) {
 			vec3 L = normalize(lights[i].position - position);
-			switch (lights[i].type) {
-			case 0:
-				Lo += calcLight(lights[i], position, diffuse.rgb, L, N, V, F0, roughness, metallic);
-				break;
-			case 1:
-				float theta = dot(L, normalize(-lights[i].direction));
-				float epsilon = lights[i].inRadius - lights[i].radius;
-				float intensity = clamp((theta - lights[i].radius) / epsilon, 0.0, 1.0);
-				if (intensity > 0.0) {
-					float shadow = 1.0;
-					if (lights[i].useShadows == 1 && useShadows == 1) {
-						vec4 posLight = lights[i].viewMatrix * vec4(position, 1.0);
-						vec4 shadowCoord =
-							biasMatrix * (lights[i].projectionMatrix * posLight);
-						shadow = texture(lights[i].shadowMap, (shadowCoord.xyz / shadowCoord.w), 0);
-					}
-					Lo += calcLight(lights[i], position, diffuse.rgb, L, N, V, F0, roughness,
-									metallic) *
-						  intensity * shadow;
-				}
-				break;
-			}
+			// switch (lights[i].type) {
+			//	case 0:
+			Lo += calcLight(lights[i], position, diffuse.rgb, L, N, V, F0, roughness, metallic);
+			//	break;
+			//case 1:
+			//	float theta = dot(L, normalize(-lights[i].direction));
+			//	float epsilon = lights[i].inRadius - lights[i].radius;
+			//	float intensity = clamp((theta - lights[i].radius) / epsilon, 0.0, 1.0);
+			//	if (intensity > 0.0) {
+			//		float shadow = 1.0;
+			//		if (lights[i].useShadows == 1 && useShadows == 1) {
+			//			vec4 posLight = lights[i].viewMatrix * vec4(position, 1.0);
+			//			vec4 shadowCoord =
+			//				biasMatrix * (lights[i].projectionMatrix * posLight);
+			//			shadow = texture(lights[i].shadowMap, (shadowCoord.xyz / shadowCoord.w), 0);
+			//		}
+			//		Lo += calcLight(lights[i], position, diffuse.rgb, L, N, V, F0, roughness,
+			//						metallic) *
+			//			  intensity * shadow;
+			//	}
+			//	break;
+			//}
 		}
 		composite.rgb += Lo;
 	}

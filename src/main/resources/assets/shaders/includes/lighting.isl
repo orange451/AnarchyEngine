@@ -18,6 +18,15 @@
 //
 //
 
+#struct Light
+struct Light {
+	vec3 position;
+	vec3 color;
+	float radius;
+	float intensity;
+};
+#end
+
 #function DistributionGGX
 float DistributionGGX(vec3 N, vec3 H, float roughness) {
 	float a = roughness * roughness;
@@ -156,21 +165,6 @@ float getDepth(mat4 proj, sampler2D depth, vec2 texcoord) {
 	float B = proj[3][2];
 	return B / (A + zndc);
 }
-#end
-
-#struct Light
-struct Light {
-	int type;
-	vec3 position;
-	vec3 color;
-	vec3 direction;
-	float radius;
-	float inRadius;
-	int useShadows;
-	sampler2DShadow shadowMap;
-	mat4 viewMatrix;
-	mat4 projectionMatrix;
-};
 #end
 
 #function positionFromDepth

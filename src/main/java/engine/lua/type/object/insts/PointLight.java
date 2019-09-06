@@ -5,7 +5,7 @@ import org.luaj.vm2.LuaValue;
 
 import engine.Game;
 import engine.GameSubscriber;
-import engine.application.RenderableApplication;
+import engine.gl.IPipeline;
 import engine.gl.Pipeline;
 import engine.gl.light.Light;
 import engine.lua.type.NumberClampPreferred;
@@ -15,14 +15,13 @@ import engine.lua.type.object.Instance;
 import engine.lua.type.object.LightBase;
 import engine.lua.type.object.TreeViewable;
 import engine.observer.RenderableWorld;
-import ide.IDE;
 import ide.layout.windows.icons.Icons;
 import lwjgui.paint.Color;
 
 public class PointLight extends LightBase implements TreeViewable,GameSubscriber {
 
 	private engine.gl.light.PointLightInternal light;
-	private Pipeline pipeline;
+	private IPipeline pipeline;
 
 	private static final LuaValue C_RADIUS = LuaValue.valueOf("Radius");
 
@@ -67,7 +66,7 @@ public class PointLight extends LightBase implements TreeViewable,GameSubscriber
 		
 		while ( t != null && !t.isnil() ) {
 			if ( t instanceof RenderableWorld ) {
-				Pipeline tempPipeline = Pipeline.get((RenderableWorld)t);
+				IPipeline tempPipeline = Pipeline.get((RenderableWorld)t);
 				if ( pipeline != null && pipeline.equals(tempPipeline) )
 					break;
 				
@@ -94,7 +93,7 @@ public class PointLight extends LightBase implements TreeViewable,GameSubscriber
 	@Override
 	public void onDestroy() {
 		if ( light != null ) {
-			pipeline.getGBuffer().getLightProcessor().getPointLightHandler().removeLight(light);
+			pipeline.getPointLightHandler().removeLight(light);
 			light = null;
 			System.out.println("Destroyed light");
 		}
@@ -118,7 +117,7 @@ public class PointLight extends LightBase implements TreeViewable,GameSubscriber
 		light.color = new Vector3f( Math.max( color.getRed(),1 )/255f, Math.max( color.getGreen(),1 )/255f, Math.max( color.getBlue(),1 )/255f );
 		
 		// Add it to pipeline
-		pipeline.getGBuffer().getLightProcessor().getPointLightHandler().addLight(light);
+		pipeline.getPointLightHandler().addLight(light);
 	}
 	
 	@Override

@@ -37,7 +37,7 @@ public class MultiPass extends DeferredPipeline {
 	private LensFlares lensFlares; // Done
 	private LensFlareMod lensFlareMod; // Done
 	private Bloom bloom; // Done
-	//private LocalLightsPass localLightsPass; // Done
+	private LocalLightsPass localLightsPass; // Done
 	private TAA taa; // Done
 
 	public void setupPasses() {
@@ -53,8 +53,8 @@ public class MultiPass extends DeferredPipeline {
 		lighting = new Lighting();
 		super.passes.add(lighting);
 
-		//localLightsPass = new LocalLightsPass();
-		//super.passes.add(localLightsPass);
+		localLightsPass = new LocalLightsPass();
+		super.passes.add(localLightsPass);
 
 		reflections = new Reflections();
 		super.passes.add(reflections);
