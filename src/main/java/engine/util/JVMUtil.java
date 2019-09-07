@@ -8,6 +8,8 @@ import java.lang.management.ManagementFactory;
 import java.util.ArrayList;
 import java.util.List;
 
+import engine.InternalGameThread;
+
 public class JVMUtil {
 	public static boolean restartJVM(boolean startFirstThread, boolean needsOutput, Class<?> customClass, String... args) {
 		if ( startFirstThread ) {
@@ -132,11 +134,11 @@ public class JVMUtil {
 					BufferedReader br = new BufferedReader(isr);
 					String line;
 
-					while ((line = br.readLine()) != null) {
+					while ((line = br.readLine()) != null && InternalGameThread.isRunning()) {
 						Thread.sleep(10);
 						System.out.println(line);
 					}
-					process.waitFor();
+					//process.waitFor();
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
