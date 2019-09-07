@@ -296,6 +296,10 @@ public class GLRenderer implements IPipeline {
 
 		this.time += 0.016f * 1;
 		this.time %= 24000;
+		
+		// Update Projection
+		Maths.createProjectionMatrix(projMatrix, this.width, this.height, currentCamera.getFov(), 0.1f, Float.POSITIVE_INFINITY, true);
+		
 		// Set global time for clouds
 		this.globalTime += 0.016f * 10;
 		float res = time * 0.015f;
@@ -340,8 +344,6 @@ public class GLRenderer implements IPipeline {
 			return;
 		this.width = width;
 		this.height = height;
-		projMatrix = Maths.createProjectionMatrix(this.width, this.height,
-				currentCamera == null ? 90 : currentCamera.getFov(), 0.1f, Float.POSITIVE_INFINITY, true);
 		dp.resize(width, height);
 		pp.resize(width, height);
 	}

@@ -58,7 +58,7 @@ public class TestPBR extends ClientApplication {
 		
 		// Mesh
 		Mesh mesh = new Mesh();
-		mesh.setFilePath("Resources/Testing/Sphere.mesh");
+		mesh.sphere(1);
 		mesh.setParent(Game.assets().meshes());
 		
 		// Textures
