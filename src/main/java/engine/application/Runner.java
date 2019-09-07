@@ -1,5 +1,6 @@
 package engine.application;
 
+import org.joml.Matrix4f;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
 
@@ -7,16 +8,19 @@ import engine.Game;
 import engine.InternalGameThread;
 import engine.InternalRenderThread;
 import engine.gl.Pipeline;
+import engine.glv2.GLRenderer;
 import engine.lua.type.object.services.UserInputService;
 import lwjgui.LWJGUI;
 import lwjgui.event.ScrollEvent;
 import lwjgui.geometry.Insets;
 import lwjgui.geometry.Pos;
+import lwjgui.gl.GenericShader;
 import lwjgui.scene.Window;
 import lwjgui.scene.layout.StackPane;
 
 public abstract class Runner extends RenderableApplication {
 	private static StackPane rootPane;
+	private static GenericShader shader;
 	
 	public StackPane getRootPane() {
 		return rootPane;
@@ -25,7 +29,9 @@ public abstract class Runner extends RenderableApplication {
 	@Override
 	public void initialize(String[] args) {
 		// Add rendering pipeline
-		pipeline = new Pipeline();
+		//pipeline = new Pipeline();
+		pipeline = new GLRenderer();
+		shader = new GenericShader();
 		
 		// Enable LWJGUI on this window (used for UI drawing)
 		Window win = LWJGUI.initialize(window);
@@ -97,6 +103,8 @@ public abstract class Runner extends RenderableApplication {
 			pp.shader_reset(); // Set shader
 			pp.getPipelineBuffer().getTextureDiffuse().bind(); // Bind buffer
 			pp.fullscreenQuad(); // draw it to screen
+		} else {
+			pipeline.getPipelineBuffer().render(shader, true);
 		}
 
 		LWJGUI.render(); // Gets directly rendered on-top of buffer (in same FBO)

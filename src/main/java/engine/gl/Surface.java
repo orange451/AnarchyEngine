@@ -239,11 +239,18 @@ public class Surface {
 	
 	private TexturedQuad quad;
 	public void render(GenericShader shader) {
+		render(shader, false);
+	}
+	
+	public void render(GenericShader shader, boolean flipY) {
 		int w = width;
 		int h = height;
 		
 		shader.bind();
-		shader.projectOrtho(0, 0, w, h);
+		if ( flipY )
+			shader.projectOrtho(0, h, w, -h);
+		else
+			shader.projectOrtho(0, 0, w, h);
 		
 		if ( quad == null ) {
 			quad = new TexturedQuad(0, 0, w, h, getTextureId());
