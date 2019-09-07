@@ -30,7 +30,7 @@ uniform mat4 viewMatrix;
 uniform mat4 inverseProjectionMatrix;
 uniform mat4 inverseViewMatrix;
 
-uniform Light lights[18];
+uniform Light lights[256];
 uniform int totalLights;
 uniform mat4 biasMatrix;
 
