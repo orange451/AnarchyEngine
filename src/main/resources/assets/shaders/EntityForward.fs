@@ -127,9 +127,10 @@ void main() {
 	vec3 ambient = kD * diffuse + specular;
 	vec3 color = ambient + emissive + Lo;
 	if (colorCorrect == 1) {
-		vec3 final = vec3(1.0) - exp(-color * exposure);
-		final = pow(final, vec3(1.0 / gamma));
-		out_Color = vec4(final, 1.0 - transparency);
-	} else
-		out_Color = vec4(color, 1.0 - transparency);
+		vec3 tempColor = vec3(1.0) - exp(-color * exposure);
+		tempColor = pow(tempColor, vec3(1.0 / gamma));
+		color = tempColor;
+	}
+	
+	out_Color = vec4(color, 1.0 - transparency);
 }

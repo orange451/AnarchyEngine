@@ -130,7 +130,8 @@ public class EntityForwardRenderer {
 			shader.loadMaterial(material);
 			float iMatTrans = 1.0f - material.getTransparency();
 			float iObjTrans = 1.0f - go.getTransparency();
-			shader.loadTransparency(1.0f - (iMatTrans*iObjTrans));
+			float trans = iMatTrans*iObjTrans;
+			shader.loadTransparency(trans);
 			m.render(null, null, null);
 		}
 	}
