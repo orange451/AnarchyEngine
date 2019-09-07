@@ -17,6 +17,10 @@ public class AsynchronousResourceLoader {
 		THREAD_POOL.schedule(new AsynchronousLoadTask(res), 2, TimeUnit.MILLISECONDS);
 	}
 	
+	public void shutdown() {
+		THREAD_POOL.shutdown();
+	}
+	
 	class AsynchronousLoadTask implements Runnable {
 		private AsynchronousResource<?> resource;
 

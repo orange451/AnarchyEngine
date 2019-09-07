@@ -115,6 +115,7 @@ public class InternalGameThread extends Observable implements Runnable {
 		
 		// Disable scripts
 		ScriptData.shutdown();
+		Game.resourceLoader().shutdown();
 	}
 
 	public static void terminate() {
