@@ -59,6 +59,7 @@ import engine.glv2.v2.DeferredPipeline;
 import engine.glv2.v2.EnvironmentRenderer;
 import engine.glv2.v2.IRenderingData;
 import engine.glv2.v2.IrradianceCapture;
+import engine.glv2.v2.OutlineRenderer;
 import engine.glv2.v2.PostProcessPipeline;
 import engine.glv2.v2.lights.DirectionalLightShadowMap;
 import engine.lua.type.object.insts.Camera;
@@ -79,6 +80,7 @@ public class GLRenderer implements IPipeline {
 	// private LightRenderer lightRenderer;
 	private PointLightHandler pointLightHandler;
 	private RenderingManager renderingManager;
+	private OutlineRenderer outlineRenderer;
 
 	private DirectionalLightShadowMap dlsm;
 
@@ -159,6 +161,7 @@ public class GLRenderer implements IPipeline {
 		skydomeRenderer = new SkydomeRenderer(loader);
 		// waterRenderer = new WaterRenderer(loader);
 		renderingManager.addRenderer(new EntityRenderer());
+		outlineRenderer = new OutlineRenderer();
 		rnd.dlsm = dlsm = new DirectionalLightShadowMap(rs.shadowsResolution);
 		dp = new MultiPass(RenderableApplication.windowWidth, RenderableApplication.windowHeight);
 		pp = new PostProcess(RenderableApplication.windowWidth, RenderableApplication.windowHeight);
@@ -270,6 +273,7 @@ public class GLRenderer implements IPipeline {
 		// forwardPass.forwardPass(rd, rnd);
 		// particleRenderer.render(ParticleDomain.getParticles(), camera);
 		renderingManager.renderForward(rd, rnd);
+		outlineRenderer.render(currentCamera, projMatrix, Game.selectedExtended());
 		glClearDepth(1.0);
 		glDepthFunc(GL_LESS);
 		pp.unbind();
@@ -352,6 +356,7 @@ public class GLRenderer implements IPipeline {
 		preFilteredEnvironment.dispose();
 		// waterRenderer.dispose();
 		renderingManager.dispose();
+		outlineRenderer.dispose();
 		// lightRenderer.dispose();
 	}
 

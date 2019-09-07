@@ -28,6 +28,8 @@ out vec4[5] out_Color;
 
 uniform Material material;
 
+#include variable MASK
+
 void main() {
 
 	vec3 diffuseF = texture(material.diffuseTex, pass_textureCoords).rgb;
@@ -52,5 +54,5 @@ void main() {
 	out_Color[1] = vec4(pass_position, 0.0);
 	out_Color[2] = vec4(normal, 0.0);
 	out_Color[3] = vec4(roughnessF, metallicF, 0.0, 0.0);
-	out_Color[4] = vec4(material.emissive.rgb * diffuseF.rgb, 0.0);
+	out_Color[4] = vec4(material.emissive.rgb * diffuseF.rgb, PBR_OBJECT);
 }

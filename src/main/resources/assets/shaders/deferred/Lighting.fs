@@ -67,6 +67,8 @@ uniform sampler2DShadow shadowMap[4];
 
 #include function computeShadow
 
+#include variable MASK
+
 // Linear depth
 // float zndc = texture(gDepth, textureCoords).r;
 // float A = projectionMatrix[2][2];
@@ -150,7 +152,7 @@ float computeContactShadows(vec3 pos, vec3 N, vec3 L, float imageDepth) {
 void main() {
 	vec4 mask = texture(gMask, textureCoords);
 	vec4 image = texture(gDiffuse, textureCoords);
-	if (mask.a != 1) {
+	if (mask.a == PBR_OBJECT) {
 		vec2 pbr = texture(gPBR, textureCoords).rg;
 		float depth = texture(gDepth, textureCoords).r;
 		vec3 position =

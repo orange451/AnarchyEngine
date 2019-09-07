@@ -31,6 +31,8 @@ uniform vec3 cameraPosition;
 
 #include function noise
 
+#include variable MASK
+
 #define SUN_LOWER_LIMIT 0.51
 #define SUN_UPPER_LIMIT 0.5
 
@@ -237,5 +239,5 @@ void main() {
 	out_Color[1] = vec4(pass_position.xyz, 0);
 	out_Color[2] = vec4(0.0);
 	out_Color[3] = vec4(0.0);
-	out_Color[4] = vec4(0, 0, 0, 1);
+	out_Color[4] = vec4(0, 0, 0, PBR_BACKGROUND_DYNAMIC);
 }

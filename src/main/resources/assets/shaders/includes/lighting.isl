@@ -18,6 +18,12 @@
 //
 //
 
+#variable MASK
+#define PBR_OBJECT 0x0
+#define PBR_BACKGROUND 0x1
+#define PBR_BACKGROUND_DYNAMIC 0x2
+#end
+
 #struct Light
 struct Light {
 	vec3 position;

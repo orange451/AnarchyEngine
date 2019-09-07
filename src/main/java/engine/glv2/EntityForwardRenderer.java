@@ -98,6 +98,8 @@ public class EntityForwardRenderer {
 			return;
 		if (go.getPrefab().isnil())
 			return;
+		if (go.getTransparency() == 0 && transparentOnly)
+			return;
 		PrefabRenderer pfr = go.getPrefab().getPrefab();
 
 		Matrix4f mat = go.getWorldMatrix().toJoml();
@@ -123,7 +125,7 @@ public class EntityForwardRenderer {
 
 			prepareMaterial(material);
 			shader.loadMaterial(material);
-			shader.loadTransparency(material.getTransparency());
+			shader.loadTransparency(material.getTransparency() * go.getTransparency());
 			m.render(null, null, null);
 		}
 	}

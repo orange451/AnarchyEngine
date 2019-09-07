@@ -128,6 +128,8 @@ public class EntityRenderer implements IObjectRenderer {
 			return;
 		if (go.getPrefab().isnil())
 			return;
+		if (go.getTransparency() != 0)
+			return;
 		PrefabRenderer pfr = go.getPrefab().getPrefab();
 
 		Matrix4f mat = go.getWorldMatrix().toJoml();
