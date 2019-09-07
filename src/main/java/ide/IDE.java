@@ -76,10 +76,11 @@ public class IDE extends RenderableApplication {
 			// Load project
 			if ( tempArgs.length > 0 ) {
 				Load.load(tempArgs[0]);
-				
-				InternalGameThread.runLater(() -> {
-					Game.setRunning(true);
-					InternalGameThread.desiredTPS = 60;
+				InternalRenderThread.runLater(()->{
+					InternalGameThread.runLater(() -> {
+						Game.setRunning(true);
+						InternalGameThread.desiredTPS = 60;
+					});
 				});
 			}
 		}
