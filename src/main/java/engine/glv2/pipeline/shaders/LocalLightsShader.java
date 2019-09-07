@@ -56,8 +56,8 @@ public class LocalLightsShader extends BasePipelineShader {
 
 	public LocalLightsShader(String name) {
 		super("deferred/" + name);
-		lights = new UniformPointLight[256];
-		for (int x = 0; x < 256; x++) {
+		lights = new UniformPointLight[128];
+		for (int x = 0; x < 128; x++) {
 			lights[x] = new UniformPointLight("lights[" + x + "]");
 		}
 		super.storeUniforms(lights);
@@ -81,9 +81,9 @@ public class LocalLightsShader extends BasePipelineShader {
 	}
 
 	public void loadPointLightsPos(List<PointLightInternal> lights) {
-		for (int x = 0; x < lights.size(); x++)
+		for (int x = 0; x < Math.min(128, lights.size()); x++)
 			this.lights[x].loadLight(lights.get(x));
-		totalLights.loadInteger(lights.size());
+		totalLights.loadInteger(Math.min(128, lights.size()));
 	}
 
 	public void loadCameraData(Camera camera, Matrix4f projection) {
