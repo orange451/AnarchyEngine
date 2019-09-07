@@ -21,6 +21,7 @@ import org.lwjgl.opengl.GL15;
 import org.lwjgl.opengl.GL30;
 import org.lwjgl.system.MemoryUtil;
 
+import engine.InternalRenderThread;
 import engine.gl.MaterialGL;
 import engine.gl.shader.BaseShader;
 import engine.io.BinaryInputStream;
@@ -294,8 +295,10 @@ public class BufferedMesh implements RenderableMesh {
 	 * It must be re-filled with vertex data.
 	 */
 	public void cleanup() {
-		GL30.glDeleteVertexArrays(vaoId);
-		GL15.glDeleteBuffers(vboId);
+		InternalRenderThread.runLater(()->{
+			GL30.glDeleteVertexArrays(vaoId);
+			GL15.glDeleteBuffers(vboId);
+		});
 		vertices = null;
 	}
 
