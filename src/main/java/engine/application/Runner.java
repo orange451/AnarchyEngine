@@ -97,15 +97,7 @@ public abstract class Runner extends RenderableApplication {
 		GL11.glViewport(0, 0, viewportWidth, viewportHeight);
 
 		// Draw pipeline's buffer to screen
-		if (pipeline instanceof Pipeline) {
-			Pipeline pp = (Pipeline) pipeline;
-			pp.ortho(); // Setup 2d drawing
-			pp.shader_reset(); // Set shader
-			pp.getPipelineBuffer().getTextureDiffuse().bind(); // Bind buffer
-			pp.fullscreenQuad(); // draw it to screen
-		} else {
-			pipeline.getPipelineBuffer().render(shader, true);
-		}
+		pipeline.getPipelineBuffer().render(shader, true);
 
 		LWJGUI.render(); // Gets directly rendered on-top of buffer (in same FBO)
 	}
