@@ -24,6 +24,7 @@ out vec4 out_Color;
 
 uniform vec3 cameraPosition;
 uniform vec3 lightPosition;
+uniform vec3 uAmbient;
 uniform sampler2D gDiffuse;
 uniform sampler2D gPosition;
 uniform sampler2D gNormal;
@@ -196,6 +197,7 @@ void main() {
 		kD *= 1.0 - metallic;
 
 		vec3 irradiance = texture(irradianceCube, N).rgb;
+		irradiance *= uAmbient;
 		vec3 diffuse = irradiance * image.rgb;
 
 		vec3 ambient = kD * diffuse;

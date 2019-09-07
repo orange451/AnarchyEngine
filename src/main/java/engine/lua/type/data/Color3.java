@@ -1,5 +1,6 @@
 package engine.lua.type.data;
 
+import org.joml.Vector3f;
 import org.json.simple.JSONObject;
 import org.luaj.vm2.LuaTable;
 import org.luaj.vm2.LuaValue;
@@ -213,5 +214,9 @@ public class Color3 extends LuaValuetype {
 	@Override
 	public LuaValuetype clone() {
 		return newInstance(this.getR(), this.getG(), this.getB());
+	}
+
+	public Vector3f toJOML() {
+		return new Vector3f( getR()/255f, getG()/255f, getB()/255f );
 	}
 }

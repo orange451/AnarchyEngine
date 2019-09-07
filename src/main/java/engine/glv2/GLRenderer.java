@@ -302,6 +302,7 @@ public class GLRenderer implements IPipeline {
 		sun.update(res, 0);
 		
 		// Update lighting data
+		rnd.ambient = Game.lighting().getAmbient().toJOML();
 		rnd.exposure = Game.lighting().getExposure();
 		rnd.gamma = Game.lighting().getGamma();
 		rnd.saturation = Game.lighting().getSaturation();

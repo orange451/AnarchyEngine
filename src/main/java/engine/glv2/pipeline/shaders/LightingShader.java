@@ -39,6 +39,7 @@ public class LightingShader extends BasePipelineShader {
 	private UniformVec3 cameraPosition = new UniformVec3("cameraPosition");
 	private UniformVec3 lightPosition = new UniformVec3("lightPosition");
 	private UniformVec3 invertedLightPosition = new UniformVec3("invertedLightPosition");
+	private UniformVec3 uAmbient = new UniformVec3("uAmbient");
 
 	private UniformSampler gDiffuse = new UniformSampler("gDiffuse");
 	private UniformSampler gPosition = new UniformSampler("gPosition");
@@ -68,7 +69,7 @@ public class LightingShader extends BasePipelineShader {
 		for (int x = 0; x < 4; x++)
 			shadowMap[x] = new UniformSampler("shadowMap[" + x + "]");
 		super.storeUniforms(shadowMap);
-		super.storeUniforms(projectionMatrix, viewMatrix, cameraPosition, lightPosition, invertedLightPosition,
+		super.storeUniforms(projectionMatrix, viewMatrix, cameraPosition, lightPosition, invertedLightPosition, uAmbient,
 				gDiffuse, gPosition, gNormal, gDepth, gPBR, gMask, volumetric, irradianceCube, environmentCube, brdfLUT,
 				biasMatrix, viewLightMatrix, inverseProjectionMatrix, inverseViewMatrix);
 		super.validate();
@@ -111,6 +112,10 @@ public class LightingShader extends BasePipelineShader {
 		for (int x = 0; x < 4; x++)
 			this.projectionLightMatrix[x].loadMatrix(camera.getProjectionArray()[x]);
 		viewLightMatrix.loadMatrix(camera.getViewMatrix());
+	}
+	
+	public void loadAmbient(Vector3f ambient) {
+		this.uAmbient.loadVec3(ambient);
 	}
 
 	public void loadCameraData(Camera camera, Matrix4f projection) {

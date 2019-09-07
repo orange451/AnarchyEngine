@@ -47,6 +47,7 @@ public class EntityFowardShader extends ShaderProgram {
 	private UniformSampler brdfLUT = new UniformSampler("brdfLUT");
 	private UniformBoolean colorCorrect = new UniformBoolean("colorCorrect");
 
+	private UniformVec3 uAmbient = new UniformVec3("uAmbient");
 	private UniformFloat transparency = new UniformFloat("transparency");
 	private UniformFloat gamma = new UniformFloat("gamma");
 	private UniformFloat exposure = new UniformFloat("exposure");
@@ -69,7 +70,7 @@ public class EntityFowardShader extends ShaderProgram {
 		for (int x = 0; x < 4; x++)
 			shadowMap[x] = new UniformSampler("shadowMap[" + x + "]");
 		super.storeUniforms(shadowMap);
-		super.storeUniforms(transformationMatrix, projectionMatrix, viewMatrix, material, cameraPosition, lightPosition,
+		super.storeUniforms(transformationMatrix, projectionMatrix, viewMatrix, material, cameraPosition, lightPosition, uAmbient,
 				irradianceMap, preFilterEnv, brdfLUT, colorCorrect, biasMatrix, viewLightMatrix, useShadows,
 				transparency, gamma, exposure);
 		super.validate();
@@ -128,6 +129,10 @@ public class EntityFowardShader extends ShaderProgram {
 	public void loadBiasMatrix(Matrix4f[] shadowProjectionMatrix) {
 		for (int x = 0; x < 4; x++)
 			this.projectionLightMatrix[x].loadMatrix(shadowProjectionMatrix[x]);
+	}
+	
+	public void loadAmbient(Vector3f ambient) {
+		this.uAmbient.loadVec3(ambient);
 	}
 
 	public void loadLightMatrix(Matrix4f sunCameraViewMatrix) {

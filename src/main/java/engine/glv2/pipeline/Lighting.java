@@ -57,6 +57,7 @@ public class Lighting extends DeferredPass<LightingShader> {
 
 	@Override
 	protected void setupShaderData(RendererData rnd, IRenderingData rd, LightingShader shader) {
+		shader.loadAmbient(rnd.ambient);
 		shader.loadLightPosition(rd.sun.getSunPosition());
 		shader.loadCameraData(rd.camera, rd.projectionMatrix);
 		shader.loadSunCameraData(rd.sun.getCamera());
