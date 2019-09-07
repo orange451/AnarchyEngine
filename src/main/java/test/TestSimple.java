@@ -20,7 +20,7 @@ public class TestSimple extends ClientApplication {
 	public void loadScene(String[] args) {
 		
 		// Set ambient
-		Game.lighting().setAmbient(Color3.newInstance(64, 64, 64));
+		Game.lighting().setAmbient(Color3.newInstance(32,32,32));
 		
 		// Make a sphere
 		Mesh mesh = Game.assets().newMesh();
