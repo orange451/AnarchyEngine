@@ -72,6 +72,8 @@ public class EntityForwardRenderer {
 		shader.loadSettings(true);
 		shader.loadBiasMatrix(rd.sun.getCamera().getProjectionArray());
 		shader.loadLightMatrix(rd.sun.getCamera().getViewMatrix());
+		shader.loadExposure(rnd.exposure);
+		shader.loadGamma(rnd.gamma);
 		glActiveTexture(GL_TEXTURE4);
 		glBindTexture(GL_TEXTURE_CUBE_MAP, rnd.irradianceCapture.getTexture());
 		glActiveTexture(GL_TEXTURE5);
@@ -125,7 +127,9 @@ public class EntityForwardRenderer {
 
 			prepareMaterial(material);
 			shader.loadMaterial(material);
-			shader.loadTransparency(material.getTransparency() * go.getTransparency());
+			float iMatTrans = 1.0f - material.getTransparency();
+			float iObjTrans = 1.0f - go.getTransparency();
+			shader.loadTransparency(1.0f - (iMatTrans*iObjTrans));
 			m.render(null, null, null);
 		}
 	}

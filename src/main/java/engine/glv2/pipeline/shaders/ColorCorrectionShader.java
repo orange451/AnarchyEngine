@@ -27,10 +27,12 @@ public class ColorCorrectionShader extends BasePipelineShader {
 
 	private UniformSampler image = new UniformSampler("image");
 	private UniformFloat exposure = new UniformFloat("exposure");
+	private UniformFloat gamma = new UniformFloat("gamma");
+	private UniformFloat saturation = new UniformFloat("saturation");
 
 	public ColorCorrectionShader(String name) {
 		super("deferred/" + name);
-		this.storeUniforms(image, exposure);
+		this.storeUniforms(image, exposure, gamma, saturation);
 		this.validate();
 		this.loadInitialData();
 	}
@@ -44,6 +46,14 @@ public class ColorCorrectionShader extends BasePipelineShader {
 
 	public void loadExposure(float exposure) {
 		this.exposure.loadFloat(exposure);
+	}
+
+	public void loadGamma(float gamma) {
+		this.gamma.loadFloat(gamma);
+	}
+
+	public void loadSaturation(float gamma) {
+		this.saturation.loadFloat(gamma);
 	}
 
 }

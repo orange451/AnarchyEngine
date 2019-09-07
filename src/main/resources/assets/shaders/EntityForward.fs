@@ -39,6 +39,8 @@ uniform mat4 viewLightMatrix;
 uniform mat4 biasMatrix;
 uniform sampler2DShadow shadowMap[4];
 uniform float transparency;
+uniform float exposure;
+uniform float gamma;
 
 #include variable pi
 
@@ -53,8 +55,6 @@ uniform float transparency;
 #include function fresnelSchlick
 
 #include function computeShadow
-
-#define exposure 1.0
 
 #include variable GLOBAL
 
@@ -126,7 +126,7 @@ void main() {
 	vec3 color = ambient + emissive + Lo;
 	if (colorCorrect == 1) {
 		vec3 final = vec3(1.0) - exp(-color * exposure);
-		final = pow(final, vec3(1.0 / GAMMA));
+		final = pow(final, vec3(1.0 / gamma));
 		out_Color = vec4(final, 1.0 - transparency);
 	} else
 		out_Color = vec4(color, 1.0 - transparency);

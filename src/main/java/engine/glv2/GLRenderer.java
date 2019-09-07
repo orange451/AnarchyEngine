@@ -92,8 +92,6 @@ public class GLRenderer implements IPipeline {
 	 * = (a) -> { }; private IForwardPass forwardPass = (a, b) -> { };
 	 */
 
-	private float exposure = 1;
-
 	private Matrix4f projMatrix;
 	private Camera currentCamera;
 	private Sun sun;
@@ -171,7 +169,7 @@ public class GLRenderer implements IPipeline {
 				90, 0.1f, Float.POSITIVE_INFINITY, true);
 
 		// rnd.lights = lightRenderer.getLights();
-		rnd.exposure = exposure;
+		rnd.exposure = Game.lighting().getExposure();
 		rnd.plh = pointLightHandler;
 
 		enabled = true;
@@ -302,6 +300,11 @@ public class GLRenderer implements IPipeline {
 		this.globalTime += 0.016f * 10;
 		float res = time * 0.015f;
 		sun.update(res, 0);
+		
+		// Update lighting data
+		rnd.exposure = Game.lighting().getExposure();
+		rnd.gamma = Game.lighting().getGamma();
+		rnd.saturation = Game.lighting().getSaturation();
 
 		rd.camera = currentCamera;
 		rd.sun = sun;

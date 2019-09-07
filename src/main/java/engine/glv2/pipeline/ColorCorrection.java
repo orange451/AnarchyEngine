@@ -44,6 +44,8 @@ public class ColorCorrection extends DeferredPass<ColorCorrectionShader> {
 	@Override
 	protected void setupShaderData(RendererData rnd, IRenderingData rd, ColorCorrectionShader shader) {
 		shader.loadExposure(rnd.exposure);
+		shader.loadGamma(rnd.gamma);
+		shader.loadSaturation(rnd.saturation);
 	}
 
 	@Override

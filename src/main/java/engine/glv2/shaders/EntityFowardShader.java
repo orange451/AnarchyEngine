@@ -48,6 +48,8 @@ public class EntityFowardShader extends ShaderProgram {
 	private UniformBoolean colorCorrect = new UniformBoolean("colorCorrect");
 
 	private UniformFloat transparency = new UniformFloat("transparency");
+	private UniformFloat gamma = new UniformFloat("gamma");
+	private UniformFloat exposure = new UniformFloat("exposure");
 
 	private UniformBoolean useShadows = new UniformBoolean("useShadows");
 
@@ -69,7 +71,7 @@ public class EntityFowardShader extends ShaderProgram {
 		super.storeUniforms(shadowMap);
 		super.storeUniforms(transformationMatrix, projectionMatrix, viewMatrix, material, cameraPosition, lightPosition,
 				irradianceMap, preFilterEnv, brdfLUT, colorCorrect, biasMatrix, viewLightMatrix, useShadows,
-				transparency);
+				transparency, gamma, exposure);
 		super.validate();
 		this.loadInitialData();
 	}
@@ -138,6 +140,14 @@ public class EntityFowardShader extends ShaderProgram {
 
 	public void loadTransparency(float t) {
 		transparency.loadFloat(t);
+	}
+
+	public void loadGamma(float t) {
+		gamma.loadFloat(t);
+	}
+
+	public void loadExposure(float t) {
+		exposure.loadFloat(t);
 	}
 
 }

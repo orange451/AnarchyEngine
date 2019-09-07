@@ -32,6 +32,8 @@ public class RendererData {
 	public Texture brdfLUT;
 	public DirectionalLightShadowMap dlsm;
 	public float exposure;
+	public float gamma;
+	public float saturation;
 	public Matrix4f previousViewMatrix = new Matrix4f();
 	public Vector3f previousCameraPosition = new Vector3f();
 	public PointLightHandler plh;
