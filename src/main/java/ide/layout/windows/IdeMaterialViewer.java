@@ -87,7 +87,7 @@ public class IdeMaterialViewer extends IdePane {
 				}
 				
 				// Material added
-				Game.assets().materials().descendantAddedEvent().connect((materialArgs)->{
+				Game.assets().descendantAddedEvent().connect((materialArgs)->{
 					Instance child = (Instance) materialArgs[0];
 					if ( child instanceof Material ) {
 						attachMaterial((Material) child);
@@ -95,7 +95,7 @@ public class IdeMaterialViewer extends IdePane {
 				});
 				
 				// Material removed
-				Game.assets().materials().descendantRemovedEvent().connect((materialArgs)->{
+				Game.assets().descendantRemovedEvent().connect((materialArgs)->{
 					Instance child = (Instance) materialArgs[0];
 					if ( child instanceof Material ) {
 						dettachMaterial((Material) child);

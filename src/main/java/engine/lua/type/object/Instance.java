@@ -325,6 +325,9 @@ public abstract class Instance extends DataModel {
 		
 		destroyed = true;
 		
+		// Force parent to nil (to make sure child/descendant removed events fire)
+		this.forceSetParent(LuaValue.NIL);
+		
 		if ( initialized ) {
 			// Destroy children
 			List<Instance> ch = getChildren();

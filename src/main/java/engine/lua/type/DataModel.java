@@ -254,7 +254,7 @@ public abstract class DataModel extends LuaDatatype {
 			if ( current.equals(arg) ) {
 				return true;
 			}
-			current = current.get(C_PARENT);
+			current = current.rawget(C_PARENT);
 		}
 
 		return false;
@@ -362,22 +362,15 @@ public abstract class DataModel extends LuaDatatype {
 			return;
 		
 		DataModel r = (Instance)root;
-		if ( r.descendents.contains(this) && !this.computeDescendant(r) ) {
-			descendantRemovedForce(root);
-		}
-	}
-	
-	private void descendantRemovedForce(LuaValue root) {
-		if ( root == null || root.isnil() || !(root instanceof Instance) )
-			return;
-		
-		DataModel r = (Instance)root;
 		if ( r.descendents.contains(this) ) {
-			if ( !destroyed )
+			boolean isStillDescendent = this.computeDescendant(r);
+			
+			if (!isStillDescendent) {
 				r.descendantRemovedEvent().fire(this);
-			r.descendents.remove(this);
-			r.descendentsList.remove(this);
-			descendantRemovedForce(r.getParent());
+				r.descendents.remove(this);
+				r.descendentsList.remove(this);
+				descendantRemoved(r.getParent());
+			}
 		}
 	}
 
