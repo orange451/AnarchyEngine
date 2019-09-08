@@ -45,7 +45,7 @@ public class DirectionalLightShadowMap {
 
 	private Texture shadowMaps[];
 
-	private int size;
+	private int size = 256;
 
 	public DirectionalLightShadowMap(int size) {
 		this.size = size;
@@ -131,7 +131,6 @@ public class DirectionalLightShadowMap {
 		shadowMaps[4] = tb.endTexture();
 
 		FramebufferBuilder fb = new FramebufferBuilder();
-
 		fb.genFramebuffer().bindFramebuffer().sizeFramebuffer(size, size);
 		fb.framebufferTexture(GL_DEPTH_ATTACHMENT, shadowMaps[0], 0);
 		framebuffer = fb.endFramebuffer();

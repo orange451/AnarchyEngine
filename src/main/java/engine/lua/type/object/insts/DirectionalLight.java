@@ -138,7 +138,11 @@ public class DirectionalLight extends LightBase implements TreeViewable,GameSubs
 		light.color = new Vector3f( Math.max( color.getRed(),1 )/255f, Math.max( color.getGreen(),1 )/255f, Math.max( color.getBlue(),1 )/255f );
 		
 		// Add it to pipeline
-		pipeline.getDirectionalLightHandler().addLight(light);
+		InternalGameThread.runLater(()->{
+			InternalRenderThread.runLater(()->{
+				pipeline.getDirectionalLightHandler().addLight(light);
+			});
+		});
 	}
 	
 	@Override

@@ -291,6 +291,9 @@ public class GLRenderer implements IPipeline {
 			return;
 		if (this.renderableWorld == null)
 			return;
+		if ( !Game.isLoaded() )
+			return;
+		
 		currentCamera = renderableWorld.getCurrentCamera();
 		if (currentCamera == null)
 			return;

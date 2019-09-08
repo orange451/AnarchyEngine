@@ -43,7 +43,7 @@ public class Lighting extends Service implements TreeViewable {
 		this.defineField(C_GAMMA.toString(), LuaValue.valueOf(2.2f), false);
 		this.getField(C_GAMMA).setClamp(new NumberClampPreferred(0, 10, 0, 4));
 		
-		this.defineField(C_SHADOWMAPSIZE.toString(), LuaValue.valueOf("s1024"), false);
+		this.defineField(C_SHADOWMAPSIZE.toString(), LuaValue.valueOf(1024), false);
 		this.getField(C_SHADOWMAPSIZE).setEnum(new EnumType("TextureSize"));
 	}
 	
