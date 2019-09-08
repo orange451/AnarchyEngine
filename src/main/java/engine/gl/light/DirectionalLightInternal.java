@@ -2,6 +2,9 @@ package engine.gl.light;
 
 import org.joml.Vector3f;
 
+import engine.Game;
+import engine.InternalGameThread;
+import engine.InternalRenderThread;
 import engine.glv2.v2.lights.DirectionalLightCamera;
 import engine.glv2.v2.lights.DirectionalLightShadowMap;
 
@@ -15,12 +18,22 @@ public class DirectionalLightInternal extends Light {
 	public DirectionalLightInternal(Vector3f direction, float intensity) {
 		this.direction.set(direction);
 		this.intensity = intensity;
+		InternalGameThread.runLater(()->{
+			this.shadowResolution = Game.lighting().getShadowMapSize();
+		});
 	}
 
 	public void init() {
 		shadowMap = new DirectionalLightShadowMap(shadowResolution);
 		lightCamera = new DirectionalLightCamera(distance);
 		lightCamera.update(direction);
+	}
+	
+	public void setSize(int size) {
+		this.shadowResolution = size;
+		InternalRenderThread.runLater(()->{
+			shadowMap.resize(size);
+		});
 	}
 
 	public void dispose() {

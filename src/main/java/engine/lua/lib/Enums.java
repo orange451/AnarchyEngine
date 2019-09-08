@@ -21,6 +21,17 @@ public class Enums extends TwoArgFunction {
 	public static class EnumTable extends LuaTableReadOnly {
 		public EnumTable() {
 			
+			// Shadow size
+			this.rawset("TextureSize", new LuaTableReadOnly() {
+				{
+					this.rawset("256", 256);
+					this.rawset("512", 512);
+					this.rawset("1024", 1024);
+					this.rawset("2048", 2048);
+					this.rawset("4096", 4096);
+				}
+			});
+			
 			// Mouse Enum
 			this.rawset("Mouse", new LuaTableReadOnly() {
 				{

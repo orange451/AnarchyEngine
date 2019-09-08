@@ -5,8 +5,11 @@ import org.luaj.vm2.LuaValue;
 
 import engine.Game;
 import engine.GameSubscriber;
+import engine.InternalGameThread;
+import engine.InternalRenderThread;
 import engine.gl.IPipeline;
 import engine.gl.Pipeline;
+import engine.gl.light.DirectionalLightInternal;
 import engine.gl.light.Light;
 import engine.lua.type.data.Color3;
 import engine.lua.type.data.Vector3;
@@ -19,17 +22,23 @@ import lwjgui.paint.Color;
 
 public class DirectionalLight extends LightBase implements TreeViewable,GameSubscriber {
 
-	private engine.gl.light.DirectionalLightInternal light;
+	private DirectionalLightInternal light;
 	private IPipeline pipeline;
+
+	private static final LuaValue C_SHADOWDISTANCE = LuaValue.valueOf("ShadowDistance");
+	private static final LuaValue C_DIRECTION = LuaValue.valueOf("Direction");
 
 	public DirectionalLight() {
 		super("DirectionalLight");
 		
-		// Remove position field (from LightBase)
-		this.undefineField(C_POSITION);
+		// Lock position field (from LightBase)
+		this.getField(C_POSITION).setLocked(true);
 		
 		// Define direction field
-		this.defineField("Direction", new Vector3(1,1,-1), false);
+		this.defineField(C_DIRECTION.toString(), new Vector3(1,1,-1), false);
+		
+		// Shadow distance
+		this.defineField(C_SHADOWDISTANCE.toString(), LuaValue.valueOf(50), false);
 		
 		// Update on game update
 		Game.getGame().subscribe(this);
@@ -46,8 +55,26 @@ public class DirectionalLight extends LightBase implements TreeViewable,GameSubs
 					light.color = new Vector3f( Math.max( color.getRed(),1 )/255f, Math.max( color.getGreen(),1 )/255f, Math.max( color.getBlue(),1 )/255f );
 				} else if ( key.eq_b(C_PARENT) ) {
 					onParentChange();
+				} else if ( key.eq_b(C_SHADOWDISTANCE) ) {
+					light.distance = value.toint();
+				} else if ( key.eq_b(C_DIRECTION) ) {
+					light.direction = ((Vector3)value).toJoml();
 				}
 			}
+		});
+		
+		InternalGameThread.runLater(()->{
+			Game.lighting().changedEvent().connect((args)->{
+				if ( light == null )
+					return;
+	
+				LuaValue key = args[0];
+				LuaValue value = args[1];
+				
+				if ( key.eq_b(LuaValue.valueOf("ShadowMapSize")) ) {
+					light.setSize(value.toint());
+				}
+			});
 		});
 	}
 	
@@ -83,8 +110,12 @@ public class DirectionalLight extends LightBase implements TreeViewable,GameSubs
 	@Override
 	public void onDestroy() {
 		if ( light != null ) {
-			pipeline.getDirectionalLightHandler().removeLight(light);
+			DirectionalLightInternal tempLight = light;
+			InternalRenderThread.runLater(()->{
+				pipeline.getDirectionalLightHandler().removeLight(tempLight);
+			});
 			light = null;
+			
 			System.out.println("Destroyed light");
 		}
 	}
@@ -100,6 +131,7 @@ public class DirectionalLight extends LightBase implements TreeViewable,GameSubs
 		Vector3f direction = ((Vector3)this.get("Direction")).toJoml();
 		float intensity = this.get("Intensity").tofloat();
 		light = new engine.gl.light.DirectionalLightInternal(direction, intensity);
+		light.distance = this.get(C_SHADOWDISTANCE).toint();
 		
 		// Color it
 		Color color = ((Color3)this.get("Color")).toColor();
