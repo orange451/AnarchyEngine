@@ -38,5 +38,6 @@ public class RendererData {
 	public Matrix4f previousViewMatrix = new Matrix4f();
 	public Vector3f previousCameraPosition = new Vector3f();
 	public PointLightHandler plh;
+	public DirectionalLightHandler dlh;
 
 }

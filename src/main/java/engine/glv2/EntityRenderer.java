@@ -128,8 +128,6 @@ public class EntityRenderer implements IObjectRenderer {
 			return;
 		if (go.getPrefab().isnil())
 			return;
-		if (go.getTransparency() != 0)
-			return;
 		PrefabRenderer pfr = go.getPrefab().getPrefab();
 
 		Matrix4f mat = go.getWorldMatrix().toJoml();
@@ -150,7 +148,10 @@ public class EntityRenderer implements IObjectRenderer {
 					material = GLMat;
 				}
 			}
-			if (material.getTransparency() != 0)
+			float iMatTrans = 1.0f - material.getTransparency();
+			float iObjTrans = 1.0f - go.getTransparency();
+			float trans = iMatTrans * iObjTrans;
+			if (trans != 1.0)
 				continue;
 
 			prepareMaterial(material);

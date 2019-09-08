@@ -101,8 +101,6 @@ public class EntityForwardRenderer {
 			return;
 		if (go.getPrefab().isnil())
 			return;
-		if (go.getTransparency() == 0 && transparentOnly)
-			return;
 		PrefabRenderer pfr = go.getPrefab().getPrefab();
 
 		Matrix4f mat = go.getWorldMatrix().toJoml();
@@ -123,14 +121,14 @@ public class EntityForwardRenderer {
 					material = GLMat;
 				}
 			}
-			if (material.getTransparency() == 0 && transparentOnly)
+			float iMatTrans = 1.0f - material.getTransparency();
+			float iObjTrans = 1.0f - go.getTransparency();
+			float trans = iMatTrans * iObjTrans;
+			if (trans == 1.0 && transparentOnly)
 				continue;
 
 			prepareMaterial(material);
 			shader.loadMaterial(material);
-			float iMatTrans = 1.0f - material.getTransparency();
-			float iObjTrans = 1.0f - go.getTransparency();
-			float trans = iMatTrans*iObjTrans;
 			shader.loadTransparency(trans);
 			m.render(null, null, null);
 		}

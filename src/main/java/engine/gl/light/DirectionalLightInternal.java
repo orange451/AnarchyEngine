@@ -2,11 +2,36 @@ package engine.gl.light;
 
 import org.joml.Vector3f;
 
+import engine.glv2.v2.lights.DirectionalLightCamera;
+import engine.glv2.v2.lights.DirectionalLightShadowMap;
+
 public class DirectionalLightInternal extends Light {
-	public Vector3f direction = new Vector3f(1,1,1);
-	
+	public Vector3f direction = new Vector3f(1, 1, 1);
+	public int distance = 100;
+	public int shadowResolution = 1024;
+	private DirectionalLightShadowMap shadowMap;
+	private DirectionalLightCamera lightCamera;
+
 	public DirectionalLightInternal(Vector3f direction, float intensity) {
 		this.direction.set(direction);
 		this.intensity = intensity;
+	}
+
+	public void init() {
+		shadowMap = new DirectionalLightShadowMap(shadowResolution);
+		lightCamera = new DirectionalLightCamera(distance);
+		lightCamera.update(direction);
+	}
+
+	public void dispose() {
+		shadowMap.dispose();
+	}
+
+	public DirectionalLightShadowMap getShadowMap() {
+		return shadowMap;
+	}
+
+	public DirectionalLightCamera getLightCamera() {
+		return lightCamera;
 	}
 }

@@ -79,6 +79,7 @@ public class GLRenderer implements IPipeline {
 	// private WaterRenderer waterRenderer;
 	// private LightRenderer lightRenderer;
 	private PointLightHandler pointLightHandler;
+	private DirectionalLightHandler directionalLightHandler;
 	private RenderingManager renderingManager;
 	private OutlineRenderer outlineRenderer;
 
@@ -118,6 +119,7 @@ public class GLRenderer implements IPipeline {
 		rd = new IRenderingData();
 		rs = new RenderingSettings();
 		pointLightHandler = new PointLightHandler();
+		directionalLightHandler = new DirectionalLightHandler();
 		glEnable(GL_DEPTH_TEST);
 		glEnable(GL_CULL_FACE);
 		glCullFace(GL_BACK);
@@ -171,6 +173,7 @@ public class GLRenderer implements IPipeline {
 		// rnd.lights = lightRenderer.getLights();
 		rnd.exposure = Game.lighting().getExposure();
 		rnd.plh = pointLightHandler;
+		rnd.dlh = directionalLightHandler;
 
 		enabled = true;
 	}
@@ -296,15 +299,16 @@ public class GLRenderer implements IPipeline {
 
 		this.time += 0.016f * 1;
 		this.time %= 24000;
-		
+
 		// Update Projection
-		Maths.createProjectionMatrix(projMatrix, this.width, this.height, currentCamera.getFov(), 0.1f, Float.POSITIVE_INFINITY, true);
-		
+		Maths.createProjectionMatrix(projMatrix, this.width, this.height, currentCamera.getFov(), 0.1f,
+				Float.POSITIVE_INFINITY, true);
+
 		// Set global time for clouds
 		this.globalTime += 0.016f * 10;
 		float res = time * 0.015f;
 		sun.update(res, 0);
-		
+
 		// Update lighting data
 		rnd.ambient = Game.lighting().getAmbient().toJOML();
 		rnd.exposure = Game.lighting().getExposure();
@@ -390,6 +394,11 @@ public class GLRenderer implements IPipeline {
 	@Override
 	public IPointLightHandler getPointLightHandler() {
 		return pointLightHandler;
+	}
+
+	@Override
+	public IDirectionalLightHandler getDirectionalLightHandler() {
+		return directionalLightHandler;
 	}
 
 	public void resetState() {

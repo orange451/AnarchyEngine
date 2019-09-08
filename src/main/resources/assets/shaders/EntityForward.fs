@@ -132,5 +132,5 @@ void main() {
 		color = tempColor;
 	}
 	
-	out_Color = vec4(color, 1.0 - transparency);
+	out_Color = vec4(color, transparency);
 }
