@@ -23,6 +23,7 @@ import engine.lua.type.object.ScriptBase;
 import engine.lua.type.object.TreeViewable;
 import engine.lua.type.object.insts.AnimationController;
 import engine.lua.type.object.insts.Camera;
+import engine.lua.type.object.insts.DirectionalLight;
 import engine.lua.type.object.insts.Folder;
 import engine.lua.type.object.insts.GameObject;
 import engine.lua.type.object.insts.GlobalScript;
@@ -30,6 +31,7 @@ import engine.lua.type.object.insts.LocalScript;
 import engine.lua.type.object.insts.Mesh;
 import engine.lua.type.object.insts.PhysicsObject;
 import engine.lua.type.object.insts.PlayerPhysics;
+import engine.lua.type.object.insts.PointLight;
 import engine.lua.type.object.insts.Prefab;
 import engine.lua.type.object.insts.Script;
 import engine.lua.type.object.insts.Texture;
@@ -71,6 +73,9 @@ public class IdeExplorer extends IdePane implements GameSubscriber {
 		priority.put(LocalScript.class, 35);
 		priority.put(GlobalScript.class, 35);
 
+		priority.put(DirectionalLight.class, 25);
+		priority.put(PointLight.class, 25);
+		
 		priority.put(Folder.class, 20);
 
 		priority.put(GameObject.class, 8);
