@@ -90,7 +90,9 @@ public class IdeMaterialViewer extends IdePane {
 				Game.assets().descendantAddedEvent().connect((materialArgs)->{
 					Instance child = (Instance) materialArgs[0];
 					if ( child instanceof Material ) {
-						attachMaterial((Material) child);
+						InternalRenderThread.runLater(()->{
+							attachMaterial((Material) child);
+						});
 					}
 				});
 				
