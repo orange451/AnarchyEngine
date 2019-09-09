@@ -56,7 +56,7 @@ public class EntityShadowRenderer {
 		GameObject go = (GameObject) inst;
 		if (go.getParent().isnil())
 			return;
-		if (go.getPrefab().isnil())
+		if (go.getPrefab() == null)
 			return;
 		PrefabRenderer pfr = go.getPrefab().getPrefab();
 
