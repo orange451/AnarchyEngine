@@ -25,6 +25,7 @@ import engine.gl.mesh.BufferedMesh;
 import engine.gl.renderer.GBuffer;
 import engine.gl.renderer.TransparencyRenderer;
 import engine.gl.shader.BaseShader;
+import engine.glv2.IDirectionalLightHandler;
 import engine.glv2.IPointLightHandler;
 import engine.lua.type.object.Instance;
 import engine.lua.type.object.PrefabRenderer;
@@ -471,5 +472,11 @@ public class Pipeline implements IPipeline {
 	 */
 	public int getHeight() {
 		return size.y;
+	}
+
+	@Override
+	public IDirectionalLightHandler getDirectionalLightHandler() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }
