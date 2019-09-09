@@ -144,10 +144,12 @@ public class IdeConsole extends IdePane {
 
 	@Override
 	public void render(Context context) {
-		GPUTaskProfile tp;
-		while ((tp = GPUProfiler.getFrameResults()) != null) {
+		if (GPUProfiler.PROFILING_ENABLED) {
+			GPUTaskProfile tp;
+			while ((tp = GPUProfiler.getFrameResults()) != null) {
 				console.setText(tp.dumpS());
-			GPUProfiler.recycle(tp);
+				GPUProfiler.recycle(tp);
+			}
 		}
 		super.render(context);
 	}

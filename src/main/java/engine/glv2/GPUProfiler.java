@@ -9,7 +9,7 @@ import static org.lwjgl.opengl.GL33.*;
 
 public class GPUProfiler {
 
-	private static final boolean PROFILING_ENABLED = true;
+	public static final boolean PROFILING_ENABLED = false;
 
 	private static Pool<GPUTaskProfile> taskPool;
 	private static ArrayList<Integer> queryObjects;
