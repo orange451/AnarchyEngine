@@ -149,10 +149,14 @@ float computeShadow(vec3 position) {
 	if (useShadows == 1) {
 		float shadow = 0.0;
 		vec4 posLight = viewLightMatrix * vec4(position, 1.0);
-		for (int i = 0; i < 4; i++) {
-			ShadowCoord[i] = biasMatrix * (projectionLightMatrix[i] * posLight);
-			multTex[i] = 1.0 / textureSize(shadowMap[i], 0);
-		}
+		ShadowCoord[0] = biasMatrix * (projectionLightMatrix[0] * posLight);
+		multTex[0] = 1.0 / textureSize(shadowMap[0], 0);
+		ShadowCoord[1] = biasMatrix * (projectionLightMatrix[1] * posLight);
+		multTex[1] = 1.0 / textureSize(shadowMap[1], 0);
+		ShadowCoord[2] = biasMatrix * (projectionLightMatrix[2] * posLight);
+		multTex[2] = 1.0 / textureSize(shadowMap[2], 0);
+		ShadowCoord[3] = biasMatrix * (projectionLightMatrix[3] * posLight);
+		multTex[3] = 1.0 / textureSize(shadowMap[3], 0);
 		for (int x = -1; x <= 1; ++x) {
 			for (int y = -1; y <= 1; ++y) {
 				shadow += lookup(vec2(x, y));
