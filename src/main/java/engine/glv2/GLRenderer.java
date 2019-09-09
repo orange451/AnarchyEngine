@@ -188,6 +188,7 @@ public class GLRenderer implements IPipeline {
 		SunCamera sunCamera = sun.getCamera();
 		sunCamera.setPosition(currentCamera.getPosition().getInternal());
 		if (rs.shadowsEnabled) {
+			GPUProfiler.start("Shadow Pass");
 			sunCamera.switchProjectionMatrix(0);
 			// frustum.calculateFrustum(sunCamera);
 
@@ -221,6 +222,7 @@ public class GLRenderer implements IPipeline {
 			renderingManager.renderShadow(sunCamera);
 			// shadowPass.shadowPass(sunCamera);
 			dlsm.unbind();
+			GPUProfiler.end();
 			glCullFace(GL_FRONT);
 			/*
 			 * for (Light light : lightRenderer.getLights()) { if (light.useShadows()) { //
@@ -234,12 +236,26 @@ public class GLRenderer implements IPipeline {
 	}
 
 	private void environmentPass() {
+		GPUProfiler.start("Environment Pass");
+		GPUProfiler.start("Irradiance");
+		GPUProfiler.start("CubeMap Render");
 		envRenderer.renderEnvironmentMap(currentCamera.getPosition().getInternal(), skydomeRenderer,
 				sun.getSunPosition());
+		GPUProfiler.end();
+		GPUProfiler.start("Irradiance Capture");
 		irradianceCapture.render(envRenderer.getCubeTexture());
+		GPUProfiler.end();
+		GPUProfiler.end();
+		GPUProfiler.start("Reflections");
+		GPUProfiler.start("CubeMap Render");
 		envRendererEntities.renderEnvironmentMap(currentCamera.getPosition().getInternal(), skydomeRenderer,
 				renderingManager, rd, rnd);
-		preFilteredEnvironment.render(envRendererEntities.getCubeTexture().getTexture()); // Use entities here
+		GPUProfiler.end();
+		GPUProfiler.start("PreFilteredEnvironment");
+		preFilteredEnvironment.render(envRendererEntities.getCubeTexture().getTexture());
+		GPUProfiler.end();
+		GPUProfiler.end();
+		GPUProfiler.end();
 	}
 
 	private void occlusionPass() {
@@ -248,6 +264,7 @@ public class GLRenderer implements IPipeline {
 	}
 
 	private void gBufferPass() {
+		GPUProfiler.start("G-Buffer pass");
 		if (useARBClipControl) {
 			ARBClipControl.glClipControl(ARBClipControl.GL_LOWER_LEFT, ARBClipControl.GL_ZERO_TO_ONE);
 			glDepthFunc(GL_GREATER);
@@ -256,23 +273,31 @@ public class GLRenderer implements IPipeline {
 		dp.bind();
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		// gbufferPass.gBufferPass(camera);
+		GPUProfiler.start("RenderingManager");
 		renderingManager.render(currentCamera, projMatrix);
+		GPUProfiler.end();
 		// waterRenderer.render(rd.getEngine().getEntitiesFor(waterFam), camera,
 		// worldSimulation.getGlobalTime(), frustum);
+		GPUProfiler.start("Skybox");
 		skydomeRenderer.render(currentCamera, projMatrix, /* worldSimulation, */ sun.getSunPosition(), true, true);
+		GPUProfiler.end();
 		dp.unbind();
 		if (useARBClipControl) {
 			glClearDepth(1.0);
 			glDepthFunc(GL_LESS);
 			ARBClipControl.glClipControl(ARBClipControl.GL_LOWER_LEFT, ARBClipControl.GL_NEGATIVE_ONE_TO_ONE);
 		}
+		GPUProfiler.end();
 	}
 
 	private void deferredPass() {
+		GPUProfiler.start("Deferred Pass");
 		dp.process(rs, rnd, rd);
+		GPUProfiler.end();
 	}
 
 	private void forwardPass() {
+		GPUProfiler.start("Forward Pass");
 		if (useARBClipControl) {
 			ARBClipControl.glClipControl(ARBClipControl.GL_LOWER_LEFT, ARBClipControl.GL_ZERO_TO_ONE);
 			glDepthFunc(GL_GREATER);
@@ -283,18 +308,25 @@ public class GLRenderer implements IPipeline {
 		dp.render(pp.getMain());
 		// forwardPass.forwardPass(rd, rnd);
 		// particleRenderer.render(ParticleDomain.getParticles(), camera);
+		GPUProfiler.start("RenderingManager");
 		renderingManager.renderForward(rd, rnd);
+		GPUProfiler.end();
+		GPUProfiler.start("OutlineRendering");
 		outlineRenderer.render(currentCamera, projMatrix, Game.selectedExtended());
+		GPUProfiler.end();
 		pp.unbind();
 		if (useARBClipControl) {
 			glClearDepth(1.0);
 			glDepthFunc(GL_LESS);
 			ARBClipControl.glClipControl(ARBClipControl.GL_LOWER_LEFT, ARBClipControl.GL_NEGATIVE_ONE_TO_ONE);
 		}
+		GPUProfiler.end();
 	}
 
 	private void postFXPass() {
+		GPUProfiler.start("PostFX");
 		pp.process(rs, rnd, rd);
+		GPUProfiler.end();
 	}
 
 	@Override
@@ -337,6 +369,7 @@ public class GLRenderer implements IPipeline {
 		rd.camera = currentCamera;
 		rd.sun = sun;
 		rd.projectionMatrix = projMatrix;
+		GPUProfiler.startFrame();
 
 		shadowPass();
 
@@ -355,6 +388,8 @@ public class GLRenderer implements IPipeline {
 		renderingManager.end();
 
 		pp.render();
+
+		GPUProfiler.endFrame();
 
 		rnd.previousCameraPosition.set(currentCamera.getPosition().getInternal());
 		rnd.previousViewMatrix.set(currentCamera.getViewMatrix().getInternal());

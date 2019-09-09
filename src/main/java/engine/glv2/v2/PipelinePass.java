@@ -29,6 +29,7 @@ import static org.lwjgl.opengl.GL13C.glActiveTexture;
 
 import org.joml.Vector2f;
 
+import engine.glv2.GPUProfiler;
 import engine.glv2.RendererData;
 import engine.glv2.RenderingSettings;
 import engine.glv2.objects.Framebuffer;
@@ -72,6 +73,7 @@ public abstract class PipelinePass<T extends BasePipelineShader, P> {
 	public void process(RenderingSettings rs, RendererData rnd, IRenderingData rd, P pl, Texture[] auxTex, VAO quad) {
 		frameCont += 1;
 		frameCont %= Integer.MAX_VALUE;
+		GPUProfiler.start(name);
 		mainBuf.bind();
 		glClear(GL_COLOR_BUFFER_BIT);
 		shader.start();
@@ -82,6 +84,7 @@ public abstract class PipelinePass<T extends BasePipelineShader, P> {
 		glDrawArrays(GL_TRIANGLE_STRIP, 0, quad.getVertexCount());
 		shader.stop();
 		mainBuf.unbind();
+		GPUProfiler.end();
 		auxTex[0] = mainTex;
 	}
 
