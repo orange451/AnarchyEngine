@@ -153,13 +153,13 @@ float GetDist(vec3 p) {
 }
 
 float RayMarch(vec3 ro, vec3 rd) {
-	float dO = 0.;
+	float dO = 0.0;
 	for (int i = 0; i < MAX_STEPS; i++) {
 		vec3 p = ro + rd * dO;
 		float dS = GetDist(p);
 		dO += dS;
 		if (dO > MAX_DIST)
-			return -1;
+			return -1.0;
 		if (dS < SURF_DIST)
 			break;
 	}
