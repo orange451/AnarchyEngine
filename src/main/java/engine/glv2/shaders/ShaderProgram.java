@@ -48,6 +48,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.lwjgl.opengl.GL;
+
 import engine.glv2.exceptions.CompileShaderException;
 import engine.glv2.exceptions.LoadShaderException;
 import engine.glv2.shaders.data.Attribute;
@@ -145,6 +147,8 @@ public abstract class ShaderProgram {
 			System.out.println("Loading Shader: " + shader.file);
 
 			shaderSource.append("#version 330 core").append("//\n");
+			if (!GL.getCapabilities().GL_ARB_clip_control)
+				shaderSource.append("#define OneToOneDepth").append("//\n");
 			String line;
 			while ((line = reader.readLine()) != null) {
 				if (line.startsWith("#include")) {

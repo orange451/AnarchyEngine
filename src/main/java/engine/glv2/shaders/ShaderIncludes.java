@@ -50,7 +50,7 @@ public final class ShaderIncludes {
 			String line;
 			boolean var = false, struct = false, func = false;
 			while ((line = reader.readLine()) != null) {
-				if (line.startsWith("#end") && (var || func || struct)) {
+				if (line.equals("#end") && (var || func || struct)) {
 					System.out.println("Parsed ISL Object '" + includeName + "'");
 					if (var) {
 						var = false;

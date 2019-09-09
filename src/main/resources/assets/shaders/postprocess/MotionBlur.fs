@@ -39,7 +39,11 @@ void main() {
 	if (useMotionBlur == 1) {
 		vec3 sum = textureColor;
 		float depthSample = texture(depth, textureCoords).x;
+#ifdef OneToOneDepth
+		vec4 currentPosition = vec4(textureCoords * 2.0 - 1.0, depthSample * 2.0 - 1.0, 1.0);
+#else
 		vec4 currentPosition = vec4(textureCoords * 2.0 - 1.0, depthSample, 1.0);
+#endif
 		vec4 fragposition = inverseProjectionMatrix * currentPosition;
 		fragposition = inverseViewMatrix * fragposition;
 		fragposition /= fragposition.w;

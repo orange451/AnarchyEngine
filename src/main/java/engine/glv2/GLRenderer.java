@@ -44,6 +44,7 @@ import org.joml.Matrix4f;
 import org.luaj.vm2.LuaValue;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.ARBClipControl;
+import org.lwjgl.opengl.GL;
 
 import engine.Game;
 import engine.application.RenderableApplication;
@@ -111,7 +112,11 @@ public class GLRenderer implements IPipeline {
 
 	private float time = 21000, globalTime = 0;
 
+	private boolean useARBClipControl = false;
+
 	public GLRenderer() {
+
+		useARBClipControl = GL.getCapabilities().GL_ARB_clip_control;
 
 		rnd = new RendererData();
 		loader = new GLResourceLoader();
@@ -243,21 +248,24 @@ public class GLRenderer implements IPipeline {
 	}
 
 	private void gBufferPass() {
-
-		ARBClipControl.glClipControl(ARBClipControl.GL_LOWER_LEFT, ARBClipControl.GL_ZERO_TO_ONE);
+		if (useARBClipControl) {
+			ARBClipControl.glClipControl(ARBClipControl.GL_LOWER_LEFT, ARBClipControl.GL_ZERO_TO_ONE);
+			glDepthFunc(GL_GREATER);
+			glClearDepth(0.0);
+		}
 		dp.bind();
-		glDepthFunc(GL_GREATER);
-		glClearDepth(0.0);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		// gbufferPass.gBufferPass(camera);
 		renderingManager.render(currentCamera, projMatrix);
 		// waterRenderer.render(rd.getEngine().getEntitiesFor(waterFam), camera,
 		// worldSimulation.getGlobalTime(), frustum);
 		skydomeRenderer.render(currentCamera, projMatrix, /* worldSimulation, */ sun.getSunPosition(), true, true);
-		glClearDepth(1.0);
-		glDepthFunc(GL_LESS);
 		dp.unbind();
-		ARBClipControl.glClipControl(ARBClipControl.GL_LOWER_LEFT, ARBClipControl.GL_NEGATIVE_ONE_TO_ONE);
+		if (useARBClipControl) {
+			glClearDepth(1.0);
+			glDepthFunc(GL_LESS);
+			ARBClipControl.glClipControl(ARBClipControl.GL_LOWER_LEFT, ARBClipControl.GL_NEGATIVE_ONE_TO_ONE);
+		}
 	}
 
 	private void deferredPass() {
@@ -265,20 +273,24 @@ public class GLRenderer implements IPipeline {
 	}
 
 	private void forwardPass() {
-		ARBClipControl.glClipControl(ARBClipControl.GL_LOWER_LEFT, ARBClipControl.GL_ZERO_TO_ONE);
+		if (useARBClipControl) {
+			ARBClipControl.glClipControl(ARBClipControl.GL_LOWER_LEFT, ARBClipControl.GL_ZERO_TO_ONE);
+			glDepthFunc(GL_GREATER);
+			glClearDepth(0.0);
+		}
 		pp.bind();
-		glDepthFunc(GL_GREATER);
-		glClearDepth(0.0);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		dp.render(pp.getMain());
 		// forwardPass.forwardPass(rd, rnd);
 		// particleRenderer.render(ParticleDomain.getParticles(), camera);
 		renderingManager.renderForward(rd, rnd);
 		outlineRenderer.render(currentCamera, projMatrix, Game.selectedExtended());
-		glClearDepth(1.0);
-		glDepthFunc(GL_LESS);
 		pp.unbind();
-		ARBClipControl.glClipControl(ARBClipControl.GL_LOWER_LEFT, ARBClipControl.GL_NEGATIVE_ONE_TO_ONE);
+		if (useARBClipControl) {
+			glClearDepth(1.0);
+			glDepthFunc(GL_LESS);
+			ARBClipControl.glClipControl(ARBClipControl.GL_LOWER_LEFT, ARBClipControl.GL_NEGATIVE_ONE_TO_ONE);
+		}
 	}
 
 	private void postFXPass() {
@@ -291,9 +303,9 @@ public class GLRenderer implements IPipeline {
 			return;
 		if (this.renderableWorld == null)
 			return;
-		if ( !Game.isLoaded() )
+		if (!Game.isLoaded())
 			return;
-		
+
 		currentCamera = renderableWorld.getCurrentCamera();
 		if (currentCamera == null)
 			return;
@@ -304,8 +316,12 @@ public class GLRenderer implements IPipeline {
 		this.time %= 24000;
 
 		// Update Projection
-		Maths.createProjectionMatrix(projMatrix, this.width, this.height, currentCamera.getFov(), 0.1f,
-				Float.POSITIVE_INFINITY, true);
+		if (useARBClipControl)
+			Maths.createProjectionMatrix(projMatrix, this.width, this.height, currentCamera.getFov(), 0.1f,
+					Float.POSITIVE_INFINITY, true);
+		else
+			Maths.createProjectionMatrix(projMatrix, this.width, this.height, currentCamera.getFov(), 0.1f,
+					Float.POSITIVE_INFINITY, false);
 
 		// Set global time for clouds
 		this.globalTime += 0.016f * 10;
@@ -356,9 +372,6 @@ public class GLRenderer implements IPipeline {
 	}
 
 	public void dispose() {
-		if (!enabled)
-			return;
-		enabled = false;
 		envRenderer.dispose();
 		envRendererEntities.dispose();
 		dlsm.dispose();

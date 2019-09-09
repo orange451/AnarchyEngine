@@ -56,7 +56,11 @@ void main() {
 	}
 
 	float depthSample = texture(depth, textureCoords).r;
+#ifdef OneToOneDepth
+	vec4 currentPosition = vec4(textureCoords * 2.0 - 1.0, depthSample * 2.0 - 1.0, 1.0);
+#else
 	vec4 currentPosition = vec4(textureCoords * 2.0 - 1.0, depthSample, 1.0);
+#endif
 	vec4 fragposition = inverseProjectionMatrix * currentPosition;
 	fragposition = inverseViewMatrix * fragposition;
 	fragposition /= fragposition.w;
