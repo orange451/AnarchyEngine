@@ -15,6 +15,7 @@ import engine.Game;
 import engine.InternalGameThread;
 import engine.InternalRenderThread;
 import engine.io.Load;
+import engine.lua.lib.LuaUtil;
 import engine.lua.network.internal.ClientProcessable;
 import engine.lua.network.internal.GZIPUtil;
 import engine.lua.network.internal.PingRequest;
@@ -42,7 +43,7 @@ public class InternalClient extends Client {
 			this.connect(5000, ip, port, port);
 			connected = true;
 			
-			this.sendTCP(new ClientConnectTCP(username, Game.version()));
+			this.sendTCP(new ClientConnectTCP(username, Game.version(), LuaUtil.tableToJson(data).toString()));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

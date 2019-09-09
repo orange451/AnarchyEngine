@@ -3,6 +3,9 @@ package engine.lua.network;
 import java.io.IOException;
 import java.util.List;
 
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 import org.luaj.vm2.LuaValue;
 
 import com.esotericsoftware.kryonet.Connection;
@@ -12,6 +15,7 @@ import com.esotericsoftware.kryonet.Server;
 import engine.Game;
 import engine.InternalGameThread;
 import engine.io.Save;
+import engine.lua.lib.LuaUtil;
 import engine.lua.network.internal.GZIPUtil;
 import engine.lua.network.internal.NonReplicatable;
 import engine.lua.network.internal.PingRequest;
@@ -64,6 +68,16 @@ public class InternalServer extends Server {
 					}
 					
 					conInst.forceSetName(username);
+					
+					// Load in data
+					try {
+						JSONParser parser = new JSONParser();
+						JSONObject obj = (JSONObject) parser.parse(((ClientConnectTCP)object).data);
+						conInst.forceset(LuaValue.valueOf("Data"), LuaUtil.jsonToTable(obj));
+					} catch (ParseException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
 					
 					// Stream game to client
 					String gameJSON = Save.getGameJSON().toJSONString();
