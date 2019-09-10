@@ -23,8 +23,6 @@ layout(triangle_strip, max_vertices = 12) out;
 
 uniform mat4 projectionMatrix[4];
 
-out int gl_Layer;
-
 void main() {
 	for (int i = 0; i < 4; i++) {
 		gl_Layer = i;
