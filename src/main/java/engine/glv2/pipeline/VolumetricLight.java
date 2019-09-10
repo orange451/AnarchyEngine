@@ -24,9 +24,7 @@ import static org.lwjgl.opengl.GL11C.GL_TEXTURE_2D;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE0;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE1;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE2;
-import static org.lwjgl.opengl.GL13C.GL_TEXTURE3;
-import static org.lwjgl.opengl.GL13C.GL_TEXTURE4;
-import static org.lwjgl.opengl.GL13C.GL_TEXTURE5;
+import static org.lwjgl.opengl.GL30C.GL_TEXTURE_2D_ARRAY;
 
 import engine.glv2.RendererData;
 import engine.glv2.objects.Texture;
@@ -58,10 +56,7 @@ public class VolumetricLight extends DeferredPass<VolumetricLightShader> {
 	protected void setupTextures(RendererData rnd, DeferredPipeline dp, Texture[] auxTex) {
 		super.activateTexture(GL_TEXTURE0, GL_TEXTURE_2D, dp.getPositionTex().getTexture());
 		super.activateTexture(GL_TEXTURE1, GL_TEXTURE_2D, dp.getNormalTex().getTexture());
-		super.activateTexture(GL_TEXTURE2, GL_TEXTURE_2D, rnd.dlsm.getShadowMaps()[0].getTexture());
-		super.activateTexture(GL_TEXTURE3, GL_TEXTURE_2D, rnd.dlsm.getShadowMaps()[1].getTexture());
-		super.activateTexture(GL_TEXTURE4, GL_TEXTURE_2D, rnd.dlsm.getShadowMaps()[2].getTexture());
-		super.activateTexture(GL_TEXTURE5, GL_TEXTURE_2D, rnd.dlsm.getShadowMaps()[3].getTexture());
+		super.activateTexture(GL_TEXTURE2, GL_TEXTURE_2D_ARRAY, rnd.dlsm.getShadowMaps().getTexture());
 	}
 
 }

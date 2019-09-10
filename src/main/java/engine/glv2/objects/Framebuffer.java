@@ -25,7 +25,9 @@ import static org.lwjgl.opengl.GL11C.glGetIntegerv;
 import static org.lwjgl.opengl.GL11C.glViewport;
 import static org.lwjgl.opengl.GL30C.GL_FRAMEBUFFER;
 import static org.lwjgl.opengl.GL30C.glBindFramebuffer;
-import static org.lwjgl.opengl.GL33C.*;
+import static org.lwjgl.opengl.GL30C.glDeleteFramebuffers;
+import static org.lwjgl.opengl.GL30C.glFramebufferTextureLayer;
+import static org.lwjgl.opengl.GL32C.glFramebufferTexture;
 
 public class Framebuffer implements IObject {
 
@@ -60,6 +62,10 @@ public class Framebuffer implements IObject {
 
 	public void swapTexture(int attachment, Texture texture, int level) {
 		glFramebufferTexture(GL_FRAMEBUFFER, attachment, texture.getTexture(), level);
+	}
+
+	public void swapTextureLayer(int attachment, Texture texture, int level, int layer) {
+		glFramebufferTextureLayer(GL_FRAMEBUFFER, attachment, texture.getTexture(), level, layer);
 	}
 
 	public int getFramebuffer() {

@@ -22,8 +22,6 @@ package engine.glv2.v2.lights;
 
 import static org.lwjgl.opengl.GL11C.GL_DEPTH_COMPONENT;
 import static org.lwjgl.opengl.GL11C.GL_LINEAR;
-import static org.lwjgl.opengl.GL11C.GL_TEXTURE_2D;
-import static org.lwjgl.opengl.GL11C.GL_TEXTURE_BORDER_COLOR;
 import static org.lwjgl.opengl.GL11C.GL_TEXTURE_MAG_FILTER;
 import static org.lwjgl.opengl.GL11C.GL_TEXTURE_MIN_FILTER;
 import static org.lwjgl.opengl.GL11C.GL_TEXTURE_WRAP_S;
@@ -33,6 +31,7 @@ import static org.lwjgl.opengl.GL12C.GL_CLAMP_TO_EDGE;
 import static org.lwjgl.opengl.GL14C.GL_TEXTURE_COMPARE_MODE;
 import static org.lwjgl.opengl.GL30C.GL_COMPARE_REF_TO_TEXTURE;
 import static org.lwjgl.opengl.GL30C.GL_DEPTH_ATTACHMENT;
+import static org.lwjgl.opengl.GL30C.GL_TEXTURE_2D_ARRAY;
 
 import engine.glv2.objects.Framebuffer;
 import engine.glv2.objects.FramebufferBuilder;
@@ -43,13 +42,12 @@ public class DirectionalLightShadowMap {
 
 	private Framebuffer framebuffer;
 
-	private Texture shadowMaps[];
+	private Texture shadowMaps;
 
 	private int size = 256;
 
 	public DirectionalLightShadowMap(int size) {
 		this.size = size;
-		shadowMaps = new Texture[5];
 		generateFramebuffer();
 	}
 
@@ -72,74 +70,34 @@ public class DirectionalLightShadowMap {
 	}
 
 	public void swapTexture(int index) {
-		framebuffer.swapTexture(GL_DEPTH_ATTACHMENT, shadowMaps[index], 0);
+		framebuffer.swapTextureLayer(GL_DEPTH_ATTACHMENT, shadowMaps, 0, index);
 	}
 
-	public Texture[] getShadowMaps() {
+	public Texture getShadowMaps() {
 		return shadowMaps;
 	}
 
 	private void generateFramebuffer() {
 		TextureBuilder tb = new TextureBuilder();
 
-		tb.genTexture(GL_TEXTURE_2D).bindTexture();
-		tb.sizeTexture(size, size).texImage2D(0, GL_DEPTH_COMPONENT, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_BYTE, 0);
+		tb.genTexture(GL_TEXTURE_2D_ARRAY).bindTexture();
+		tb.sizeTexture(size, size, 4).texImage3D(0, GL_DEPTH_COMPONENT, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_BYTE, 0);
 		tb.texParameteri(GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		tb.texParameteri(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		tb.texParameteri(GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 		tb.texParameteri(GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 		tb.texParameteri(GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
-		shadowMaps[0] = tb.endTexture();
-
-		tb.genTexture(GL_TEXTURE_2D).bindTexture();
-		tb.sizeTexture(size, size).texImage2D(0, GL_DEPTH_COMPONENT, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_BYTE, 0);
-		tb.texParameteri(GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		tb.texParameteri(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		tb.texParameteri(GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-		tb.texParameteri(GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-		tb.texParameteri(GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
-		shadowMaps[1] = tb.endTexture();
-
-		tb.genTexture(GL_TEXTURE_2D).bindTexture();
-		tb.sizeTexture(size, size).texImage2D(0, GL_DEPTH_COMPONENT, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_BYTE, 0);
-		tb.texParameteri(GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		tb.texParameteri(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		tb.texParameteri(GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-		tb.texParameteri(GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-		tb.texParameteri(GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
-		shadowMaps[2] = tb.endTexture();
-
-		tb.genTexture(GL_TEXTURE_2D).bindTexture();
-		tb.sizeTexture(size, size).texImage2D(0, GL_DEPTH_COMPONENT, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_BYTE, 0);
-		tb.texParameteri(GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		tb.texParameteri(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		tb.texParameteri(GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-		tb.texParameteri(GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-		tb.texParameteri(GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
-		float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
-		tb.texParameterfv(GL_TEXTURE_BORDER_COLOR, borderColor);
-		shadowMaps[3] = tb.endTexture();
-
-		tb.genTexture(GL_TEXTURE_2D).bindTexture();
-		tb.sizeTexture(size, size).texImage2D(0, GL_DEPTH_COMPONENT, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_BYTE, 0);
-		tb.texParameteri(GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		tb.texParameteri(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		tb.texParameteri(GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-		tb.texParameteri(GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-		tb.texParameteri(GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
-		tb.texParameterfv(GL_TEXTURE_BORDER_COLOR, borderColor);
-		shadowMaps[4] = tb.endTexture();
+		shadowMaps = tb.endTexture();
 
 		FramebufferBuilder fb = new FramebufferBuilder();
 		fb.genFramebuffer().bindFramebuffer().sizeFramebuffer(size, size);
-		fb.framebufferTexture(GL_DEPTH_ATTACHMENT, shadowMaps[0], 0);
+		fb.framebufferTextureLayer(GL_DEPTH_ATTACHMENT, shadowMaps, 0, 0);
 		framebuffer = fb.endFramebuffer();
 	}
 
 	private void disposeFramebuffer() {
 		framebuffer.dispose();
-		for (Texture t : shadowMaps)
-			t.dispose();
+		shadowMaps.dispose();
 	}
 
 }

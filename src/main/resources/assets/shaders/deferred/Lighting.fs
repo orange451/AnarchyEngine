@@ -46,7 +46,7 @@ uniform mat4 projectionMatrix;
 uniform mat4 viewMatrix;
 uniform mat4 inverseProjectionMatrix;
 uniform mat4 inverseViewMatrix;
-uniform sampler2DShadow shadowMap[4];
+uniform sampler2DArrayShadow shadowMap;
 
 #include variable GLOBAL
 
@@ -187,7 +187,7 @@ void main() {
 		kD *= 1.0 - metallic;
 
 		float NdotL = max(dot(N, L), 0.0) *
-					  computeShadow(position) * computeContactShadows(position, N, L, depth);
+					  computeShadow(position);// * computeContactShadows(position, N, L, depth);
 		Lo += (kD * image.rgb / PI + brdf) * radiance * NdotL;
 
 		F = fresnelSchlickRoughness(max(dot(N, V), 0.0), F0, roughness);

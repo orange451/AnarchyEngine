@@ -55,28 +55,7 @@ uniform sampler2D image;
 
 #include function fresnelSchlick
 
-vec3 calcLight(Light light, vec3 position, vec3 diffuse, vec3 L, vec3 N, vec3 V, vec3 F0,
-			   float roughness, float metallic) {
-	vec3 H = normalize(V + L);
-	float distance = length(light.position - position);
-	float attenuation = max(1.0 - distance / light.radius, 0.0) / distance;
-	vec3 radiance = light.color * attenuation * light.intensity;
-
-	float NDF = DistributionGGX(N, H, roughness);
-	float G = GeometrySmith(N, V, L, roughness);
-	vec3 F = fresnelSchlick(max(dot(H, V), 0.0), F0);
-
-	vec3 nominator = NDF * G * F;
-	float denominator = max(dot(N, V), 0.0) * max(dot(N, L), 0.0) + 0.001;
-	vec3 brdf = nominator / denominator;
-
-	vec3 kS = F;
-	vec3 kD = vec3(1.0) - kS;
-	kD *= 1.0 - metallic;
-
-	float NdotL = max(dot(N, L), 0.0);
-	return (kD * diffuse / PI + brdf) * radiance * NdotL;
-}
+#include function calcLight
 
 void main() {
 	vec4 composite = texture(image, textureCoords);

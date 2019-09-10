@@ -25,13 +25,14 @@ import static org.lwjgl.opengl.GL11C.glGenTextures;
 import static org.lwjgl.opengl.GL11C.glTexImage2D;
 import static org.lwjgl.opengl.GL11C.glTexParameterfv;
 import static org.lwjgl.opengl.GL11C.glTexParameteri;
+import static org.lwjgl.opengl.GL12C.glTexImage3D;
 import static org.lwjgl.opengl.GL30C.glGenerateMipmap;
 
 public class TextureBuilder {
 
 	private int texture, target;
 	private boolean working;
-	private int width, height;
+	private int width, height, depth;
 
 	public TextureBuilder() {
 	}
@@ -58,6 +59,14 @@ public class TextureBuilder {
 		return this;
 	}
 
+	public TextureBuilder sizeTexture(int width, int height, int depth) {
+		check();
+		this.width = width;
+		this.height = height;
+		this.depth = depth;
+		return this;
+	}
+
 	public TextureBuilder texImage2D(int level, int internalformat, int border, int format, int type, int pixels) {
 		check();
 		glTexImage2D(target, level, internalformat, width, height, border, format, type, pixels);
@@ -68,6 +77,12 @@ public class TextureBuilder {
 			int pixels) {
 		check();
 		glTexImage2D(target, level, internalformat, width, height, border, format, type, pixels);
+		return this;
+	}
+
+	public TextureBuilder texImage3D(int level, int internalformat, int border, int format, int type, int pixel) {
+		check();
+		glTexImage3D(target, level, internalformat, width, height, depth, border, format, type, pixel);
 		return this;
 	}
 

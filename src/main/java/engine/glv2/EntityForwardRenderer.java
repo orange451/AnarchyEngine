@@ -24,24 +24,27 @@ import static org.lwjgl.opengl.GL11C.GL_TEXTURE_2D;
 import static org.lwjgl.opengl.GL11C.glBindTexture;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE0;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE1;
-import static org.lwjgl.opengl.GL13C.GL_TEXTURE10;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE2;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE3;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE4;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE5;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE6;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE7;
-import static org.lwjgl.opengl.GL13C.GL_TEXTURE8;
-import static org.lwjgl.opengl.GL13C.GL_TEXTURE9;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE_CUBE_MAP;
 import static org.lwjgl.opengl.GL13C.glActiveTexture;
+import static org.lwjgl.opengl.GL30C.GL_TEXTURE_2D_ARRAY;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import org.joml.Matrix4f;
+import org.joml.Vector3f;
 
 import engine.gl.MaterialGL;
 import engine.gl.Resources;
+import engine.gl.light.PointLightInternal;
 import engine.gl.mesh.BufferedMesh;
 import engine.glv2.entities.CubeMapCamera;
 import engine.glv2.shaders.EntityFowardShader;
@@ -82,20 +85,14 @@ public class EntityForwardRenderer {
 		glActiveTexture(GL_TEXTURE6);
 		glBindTexture(GL_TEXTURE_2D, rnd.brdfLUT.getTexture());
 		glActiveTexture(GL_TEXTURE7);
-		glBindTexture(GL_TEXTURE_2D, rnd.dlsm.getShadowMaps()[0].getTexture());
-		glActiveTexture(GL_TEXTURE8);
-		glBindTexture(GL_TEXTURE_2D, rnd.dlsm.getShadowMaps()[1].getTexture());
-		glActiveTexture(GL_TEXTURE9);
-		glBindTexture(GL_TEXTURE_2D, rnd.dlsm.getShadowMaps()[2].getTexture());
-		glActiveTexture(GL_TEXTURE10);
-		glBindTexture(GL_TEXTURE_2D, rnd.dlsm.getShadowMaps()[3].getTexture());
+		glBindTexture(GL_TEXTURE_2D_ARRAY, rnd.dlsm.getShadowMaps().getTexture());
 		for (Instance instance : instances) {
-			renderInstance(instance, transparentOnly);
+			renderInstance(instance, rnd, transparentOnly);
 		}
 		shader.stop();
 	}
 
-	private void renderInstance(Instance inst, boolean transparentOnly) {
+	private void renderInstance(Instance inst, RendererData rnd, boolean transparentOnly) {
 		GameObject go = (GameObject) inst;
 		if (go.getParent().isnil())
 			return;
@@ -106,6 +103,25 @@ public class EntityForwardRenderer {
 		Matrix4f mat = go.getWorldMatrix().toJoml();
 		mat.scale(pfr.getParent().getScale());
 		shader.loadTransformationMatrix(mat);
+
+		Vector3f gop = go.getPosition().toJoml();
+
+		List<PointLightInternal> pl = new ArrayList<>();
+		for (PointLightInternal p : rnd.plh.getLights()) {
+			if (p.getPosition().distance(gop) < p.radius)
+				pl.add(p);
+		}
+		pl = pl.subList(0, Math.min(4, pl.size()));
+		Collections.sort(pl, new Comparator<PointLightInternal>() {
+			@Override
+			public int compare(PointLightInternal o1, PointLightInternal o2) {
+				float d1 = o1.getPosition().distanceSquared(gop);
+				float d2 = o1.getPosition().distanceSquared(gop);
+				return (int) (d2 - d1);
+			}
+		});
+
+		shader.loadPointLightsPos(pl);
 		for (int i = 0; i < pfr.size(); i++) {
 			Model p = pfr.getModel(i);
 			BufferedMesh m = p.getMesh();

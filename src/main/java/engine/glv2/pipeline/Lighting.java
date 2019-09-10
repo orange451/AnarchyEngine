@@ -24,9 +24,6 @@ import static org.lwjgl.opengl.GL11C.GL_TEXTURE_2D;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE0;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE1;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE10;
-import static org.lwjgl.opengl.GL13C.GL_TEXTURE11;
-import static org.lwjgl.opengl.GL13C.GL_TEXTURE12;
-import static org.lwjgl.opengl.GL13C.GL_TEXTURE13;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE2;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE3;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE4;
@@ -36,6 +33,7 @@ import static org.lwjgl.opengl.GL13C.GL_TEXTURE7;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE8;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE9;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE_CUBE_MAP;
+import static org.lwjgl.opengl.GL30C.GL_TEXTURE_2D_ARRAY;
 
 import engine.glv2.RendererData;
 import engine.glv2.objects.Texture;
@@ -75,10 +73,7 @@ public class Lighting extends DeferredPass<LightingShader> {
 		super.activateTexture(GL_TEXTURE7, GL_TEXTURE_CUBE_MAP, rnd.irradianceCapture.getTexture());
 		super.activateTexture(GL_TEXTURE8, GL_TEXTURE_CUBE_MAP, rnd.environmentMap.getTexture());
 		super.activateTexture(GL_TEXTURE9, GL_TEXTURE_2D, rnd.brdfLUT.getTexture());
-		super.activateTexture(GL_TEXTURE10, GL_TEXTURE_2D, rnd.dlsm.getShadowMaps()[0].getTexture());
-		super.activateTexture(GL_TEXTURE11, GL_TEXTURE_2D, rnd.dlsm.getShadowMaps()[1].getTexture());
-		super.activateTexture(GL_TEXTURE12, GL_TEXTURE_2D, rnd.dlsm.getShadowMaps()[2].getTexture());
-		super.activateTexture(GL_TEXTURE13, GL_TEXTURE_2D, rnd.dlsm.getShadowMaps()[3].getTexture());
+		super.activateTexture(GL_TEXTURE10, GL_TEXTURE_2D_ARRAY, rnd.dlsm.getShadowMaps().getTexture());
 	}
 
 }

@@ -20,6 +20,8 @@
 
 #include struct Material
 
+#include struct Light
+
 in vec2 pass_textureCoords;
 in vec4 pass_position;
 in mat3 TBN;
@@ -38,10 +40,13 @@ uniform int useShadows;
 uniform mat4 projectionLightMatrix[4];
 uniform mat4 viewLightMatrix;
 uniform mat4 biasMatrix;
-uniform sampler2DShadow shadowMap[4];
+uniform sampler2DArrayShadow shadowMap;
 uniform float transparency;
 uniform float exposure;
 uniform float gamma;
+
+uniform Light lights[4];
+uniform int totalLights;
 
 #include variable pi
 
@@ -57,6 +62,8 @@ uniform float gamma;
 
 #include function computeShadow
 
+#include function calcLight
+
 #include variable GLOBAL
 
 void main() {
@@ -68,15 +75,15 @@ void main() {
 	diffuseF *= material.diffuse;
 	roughness *= material.roughness;
 	metallic *= material.metallic;
-	
-	//if (diffuseF.a == 0.0)
+
+	// if (diffuseF.a == 0.0)
 	//	discard;
 
 	vec3 norm = texture(material.normalTex, pass_textureCoords).rgb;
 	vec3 map = vec3(norm.x, norm.y, 1.0);
-    map = map * -2.0 + 1.0;
-    map.z = sqrt(1.0 - dot( map.xx, map.yy ));
-    map.y = map.y;
+	map = map * -2.0 + 1.0;
+	map.z = sqrt(1.0 - dot(map.xx, map.yy));
+	map.y = map.y;
 	vec3 normal = normalize(TBN * map);
 
 	vec3 position = pass_position.xyz;
@@ -108,6 +115,11 @@ void main() {
 	float NdotL = max(dot(N, L), 0.0) * computeShadow(position);
 	Lo += (kD * diffuseF.rgb / PI + brdf) * radiance * NdotL;
 
+	for (int i = 0; i < totalLights; i++) {
+		vec3 L = normalize(lights[i].position - position);
+		Lo += calcLight(lights[i], position, diffuseF.rgb, L, N, V, F0, roughness, metallic);
+	}
+
 	F = fresnelSchlickRoughness(max(dot(N, V), 0.0), F0, roughness);
 
 	kS = F;
@@ -131,6 +143,6 @@ void main() {
 		tempColor = pow(tempColor, vec3(1.0 / gamma));
 		color = tempColor;
 	}
-	
+
 	out_Color = vec4(color, transparency);
 }

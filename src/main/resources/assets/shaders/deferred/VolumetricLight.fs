@@ -31,7 +31,7 @@ uniform mat4 projectionLightMatrix[4];
 uniform mat4 viewLightMatrix;
 uniform mat4 biasMatrix;
 uniform vec3 lightPosition;
-uniform sampler2DShadow shadowMap[4];
+uniform sampler2DArrayShadow shadowMap;
 
 uniform int useShadows;
 uniform int useVolumetricLight;

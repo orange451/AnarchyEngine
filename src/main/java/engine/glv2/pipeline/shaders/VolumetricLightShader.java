@@ -46,7 +46,7 @@ public class VolumetricLightShader extends BasePipelineShader {
 	private UniformMatrix4 projectionLightMatrix[];
 	private UniformMatrix4 viewLightMatrix = new UniformMatrix4("viewLightMatrix");
 	private UniformMatrix4 biasMatrix = new UniformMatrix4("biasMatrix");
-	private UniformSampler shadowMap[];
+	private UniformSampler shadowMap = new UniformSampler("shadowMap");
 
 	public VolumetricLightShader(String name) {
 		super("deferred/" + name);
@@ -54,12 +54,8 @@ public class VolumetricLightShader extends BasePipelineShader {
 		for (int x = 0; x < 4; x++)
 			projectionLightMatrix[x] = new UniformMatrix4("projectionLightMatrix[" + x + "]");
 		super.storeUniforms(projectionLightMatrix);
-		shadowMap = new UniformSampler[4];
-		for (int x = 0; x < 4; x++)
-			shadowMap[x] = new UniformSampler("shadowMap[" + x + "]");
-		super.storeUniforms(shadowMap);
 		super.storeUniforms(projectionMatrix, viewMatrix, cameraPosition, lightPosition, gPosition, gNormal, biasMatrix,
-				viewLightMatrix, time);
+				viewLightMatrix, time, shadowMap);
 		super.validate();
 		this.loadInitialData();
 	}
@@ -69,10 +65,7 @@ public class VolumetricLightShader extends BasePipelineShader {
 		super.start();
 		gPosition.loadTexUnit(0);
 		gNormal.loadTexUnit(1);
-		shadowMap[0].loadTexUnit(2);
-		shadowMap[1].loadTexUnit(3);
-		shadowMap[2].loadTexUnit(4);
-		shadowMap[3].loadTexUnit(5);
+		shadowMap.loadTexUnit(2);
 		Matrix4f biasM = new Matrix4f();
 		biasM.m00(0.5f);
 		biasM.m11(0.5f);

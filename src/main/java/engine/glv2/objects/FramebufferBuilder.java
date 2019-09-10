@@ -28,6 +28,7 @@ import static org.lwjgl.opengl.GL30C.glBindFramebuffer;
 import static org.lwjgl.opengl.GL30C.glCheckFramebufferStatus;
 import static org.lwjgl.opengl.GL30C.glFramebufferRenderbuffer;
 import static org.lwjgl.opengl.GL30C.glFramebufferTexture2D;
+import static org.lwjgl.opengl.GL30C.glFramebufferTextureLayer;
 import static org.lwjgl.opengl.GL30C.glGenFramebuffers;
 import static org.lwjgl.opengl.GL32C.glFramebufferTexture;
 
@@ -66,6 +67,12 @@ public class FramebufferBuilder {
 	public FramebufferBuilder framebufferTexture(int attachment, Texture texture, int level) {
 		check();
 		glFramebufferTexture(GL_FRAMEBUFFER, attachment, texture.getTexture(), level);
+		return this;
+	}
+
+	public FramebufferBuilder framebufferTextureLayer(int attachment, Texture texture, int level, int layer) {
+		check();
+		glFramebufferTextureLayer(GL_FRAMEBUFFER, attachment, texture.getTexture(), level, layer);
 		return this;
 	}
 

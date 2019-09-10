@@ -55,7 +55,7 @@ public class LightingShader extends BasePipelineShader {
 	private UniformMatrix4 projectionLightMatrix[];
 	private UniformMatrix4 viewLightMatrix = new UniformMatrix4("viewLightMatrix");
 	private UniformMatrix4 biasMatrix = new UniformMatrix4("biasMatrix");
-	private UniformSampler shadowMap[];
+	private UniformSampler shadowMap = new UniformSampler("shadowMap");
 
 	private Matrix4f projInv = new Matrix4f(), viewInv = new Matrix4f();
 
@@ -65,13 +65,9 @@ public class LightingShader extends BasePipelineShader {
 		for (int x = 0; x < 4; x++)
 			projectionLightMatrix[x] = new UniformMatrix4("projectionLightMatrix[" + x + "]");
 		super.storeUniforms(projectionLightMatrix);
-		shadowMap = new UniformSampler[4];
-		for (int x = 0; x < 4; x++)
-			shadowMap[x] = new UniformSampler("shadowMap[" + x + "]");
-		super.storeUniforms(shadowMap);
 		super.storeUniforms(projectionMatrix, viewMatrix, cameraPosition, lightPosition, invertedLightPosition, uAmbient,
 				gDiffuse, gPosition, gNormal, gDepth, gPBR, gMask, volumetric, irradianceCube, environmentCube, brdfLUT,
-				biasMatrix, viewLightMatrix, inverseProjectionMatrix, inverseViewMatrix);
+				biasMatrix, viewLightMatrix, inverseProjectionMatrix, inverseViewMatrix, shadowMap);
 		super.validate();
 		this.loadInitialData();
 	}
@@ -89,10 +85,7 @@ public class LightingShader extends BasePipelineShader {
 		irradianceCube.loadTexUnit(7);
 		environmentCube.loadTexUnit(8);
 		brdfLUT.loadTexUnit(9);
-		shadowMap[0].loadTexUnit(10);
-		shadowMap[1].loadTexUnit(11);
-		shadowMap[2].loadTexUnit(12);
-		shadowMap[3].loadTexUnit(13);
+		shadowMap.loadTexUnit(10);
 		Matrix4f bias = new Matrix4f();
 		bias.m00(0.5f);
 		bias.m11(0.5f);
