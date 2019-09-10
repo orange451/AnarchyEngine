@@ -31,13 +31,17 @@ import engine.lua.type.object.insts.Camera;
 public class EntityBasicShader extends ShaderProgram {
 
 	private UniformMatrix4 transformationMatrix = new UniformMatrix4("transformationMatrix");
-	private UniformMatrix4 projectionMatrix = new UniformMatrix4("projectionMatrix");
+	private UniformMatrix4 projectionMatrix[] = new UniformMatrix4[4];
 	private UniformMatrix4 viewMatrix = new UniformMatrix4("viewMatrix");
 	private UniformFloat transparency = new UniformFloat("transparency");
 
 	public EntityBasicShader() {
-		super("assets/shaders/EntityBasic.vs", "assets/shaders/EntityBasic.fs", new Attribute(0, "position"));
-		super.storeUniforms(transformationMatrix, projectionMatrix, viewMatrix, transparency);
+		super("assets/shaders/EntityBasic.vs", "assets/shaders/EntityBasic.gs", "assets/shaders/EntityBasic.fs",
+				new Attribute(0, "position"));
+		for (int i = 0; i < 4; i++)
+			projectionMatrix[i] = new UniformMatrix4("projectionMatrix[" + i + "]");
+		super.storeUniforms(projectionMatrix);
+		super.storeUniforms(transformationMatrix, viewMatrix, transparency);
 		super.validate();
 	}
 
@@ -51,11 +55,8 @@ public class EntityBasicShader extends ShaderProgram {
 
 	public void loadsunCamera(SunCamera camera) {
 		viewMatrix.loadMatrix(camera.getViewMatrix());
-		projectionMatrix.loadMatrix(camera.getProjectionMatrix());
-	}
-
-	public void loadProjectionMatrix(Matrix4f projection) {
-		projectionMatrix.loadMatrix(projection);
+		for (int i = 0; i < 4; i++)
+			projectionMatrix[i].loadMatrix(camera.getProjectionArray()[i]);
 	}
 
 	public void loadTransparency(float t) {

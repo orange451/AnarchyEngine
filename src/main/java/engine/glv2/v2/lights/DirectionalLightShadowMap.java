@@ -69,10 +69,6 @@ public class DirectionalLightShadowMap {
 		disposeFramebuffer();
 	}
 
-	public void swapTexture(int index) {
-		framebuffer.swapTextureLayer(GL_DEPTH_ATTACHMENT, shadowMaps, 0, index);
-	}
-
 	public Texture getShadowMaps() {
 		return shadowMaps;
 	}
@@ -91,7 +87,7 @@ public class DirectionalLightShadowMap {
 
 		FramebufferBuilder fb = new FramebufferBuilder();
 		fb.genFramebuffer().bindFramebuffer().sizeFramebuffer(size, size);
-		fb.framebufferTextureLayer(GL_DEPTH_ATTACHMENT, shadowMaps, 0, 0);
+		fb.framebufferTexture(GL_DEPTH_ATTACHMENT, shadowMaps, 0);
 		framebuffer = fb.endFramebuffer();
 	}
 

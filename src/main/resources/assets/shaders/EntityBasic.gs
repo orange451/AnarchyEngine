@@ -18,13 +18,25 @@
 //
 //
 
-layout(location = 0) in vec3 position;
+layout(triangles) in;
+layout(triangle_strip, max_vertices = 12) out;
 
-uniform mat4 transformationMatrix;
-uniform mat4 viewMatrix;
+uniform mat4 projectionMatrix[4];
+
+out int gl_Layer;
 
 void main() {
-	vec4 worldPosition = transformationMatrix * vec4(position, 1.0);
-	vec4 positionRelativeToCam = viewMatrix * worldPosition;
-	gl_Position = positionRelativeToCam;
+	for (int i = 0; i < 4; i++) {
+		gl_Layer = i;
+		gl_Position = projectionMatrix[i] * gl_in[0].gl_Position;
+		EmitVertex();
+
+		gl_Position = projectionMatrix[i] * gl_in[1].gl_Position;
+		EmitVertex();
+
+		gl_Position = projectionMatrix[i] * gl_in[2].gl_Position;
+		EmitVertex();
+
+		EndPrimitive();
+	}
 }

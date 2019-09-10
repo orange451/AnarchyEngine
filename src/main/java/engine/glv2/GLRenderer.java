@@ -194,31 +194,6 @@ public class GLRenderer implements IPipeline {
 			// frustum.calculateFrustum(sunCamera);
 
 			dlsm.bind();
-			dlsm.swapTexture(0);
-			glClear(GL_DEPTH_BUFFER_BIT);
-			renderingManager.renderShadow(sunCamera);
-			// shadowPass.shadowPass(sunCamera);
-
-			sunCamera.switchProjectionMatrix(1);
-			// frustum.calculateFrustum(sunCamera);
-
-			dlsm.swapTexture(1);
-			glClear(GL_DEPTH_BUFFER_BIT);
-			renderingManager.renderShadow(sunCamera);
-			// shadowPass.shadowPass(sunCamera);
-
-			sunCamera.switchProjectionMatrix(2);
-			// frustum.calculateFrustum(sunCamera);
-
-			dlsm.swapTexture(2);
-			glClear(GL_DEPTH_BUFFER_BIT);
-			renderingManager.renderShadow(sunCamera);
-			// shadowPass.shadowPass(sunCamera);
-
-			sunCamera.switchProjectionMatrix(3);
-			// frustum.calculateFrustum(sunCamera);
-
-			dlsm.swapTexture(3);
 			glClear(GL_DEPTH_BUFFER_BIT);
 			renderingManager.renderShadow(sunCamera);
 			// shadowPass.shadowPass(sunCamera);
