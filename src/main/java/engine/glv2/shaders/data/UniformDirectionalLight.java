@@ -24,18 +24,23 @@ import engine.gl.light.DirectionalLightInternal;
 
 public class UniformDirectionalLight extends UniformObject {
 
-	private UniformVec3 direction;
+	private UniformVec3 direction, color;
 	private UniformFloat intensity;
+	private UniformBoolean visible;
 
 	public UniformDirectionalLight(String name) {
 		direction = new UniformVec3(name + ".direction");
+		color = new UniformVec3(name + ".color");
 		intensity = new UniformFloat(name + ".intensity");
-		super.init(direction, intensity);
+		visible = new UniformBoolean(name + ".visible");
+		super.init(direction, intensity, visible, color);
 	}
 
 	public void loadLight(DirectionalLightInternal light) {
 		direction.loadVec3(light.direction);
+		color.loadVec3(light.color);
 		intensity.loadFloat(light.intensity);
+		visible.loadBoolean(light.visible);
 	}
 
 }

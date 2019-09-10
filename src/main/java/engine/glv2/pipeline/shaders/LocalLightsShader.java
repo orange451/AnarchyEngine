@@ -41,8 +41,8 @@ public class LocalLightsShader extends BasePipelineShader {
 
 	private UniformVec3 cameraPosition = new UniformVec3("cameraPosition");
 
-	private UniformPointLight lights[];
-	private UniformInteger totalLights = new UniformInteger("totalLights");
+	private UniformPointLight pointLights[] = new UniformPointLight[128];
+	private UniformInteger totalPointLights = new UniformInteger("totalPointLights");
 
 	private UniformSampler gDiffuse = new UniformSampler("gDiffuse");
 	private UniformSampler gPosition = new UniformSampler("gPosition");
@@ -56,13 +56,12 @@ public class LocalLightsShader extends BasePipelineShader {
 
 	public LocalLightsShader(String name) {
 		super("deferred/" + name);
-		lights = new UniformPointLight[128];
 		for (int x = 0; x < 128; x++) {
-			lights[x] = new UniformPointLight("lights[" + x + "]");
+			pointLights[x] = new UniformPointLight("pointLights[" + x + "]");
 		}
-		super.storeUniforms(lights);
+		super.storeUniforms(pointLights);
 		super.storeUniforms(projectionMatrix, viewMatrix, cameraPosition, gDiffuse, gPosition, gNormal, gDepth, gPBR,
-				gMask, image, totalLights, inverseProjectionMatrix, inverseViewMatrix);
+				gMask, image, totalPointLights, inverseProjectionMatrix, inverseViewMatrix);
 		super.validate();
 		this.loadInitialData();
 	}
@@ -80,10 +79,10 @@ public class LocalLightsShader extends BasePipelineShader {
 		super.stop();
 	}
 
-	public void loadPointLightsPos(List<PointLightInternal> lights) {
+	public void loadPointLights(List<PointLightInternal> lights) {
 		for (int x = 0; x < Math.min(128, lights.size()); x++)
-			this.lights[x].loadLight(lights.get(x));
-		totalLights.loadInteger(Math.min(128, lights.size()));
+			this.pointLights[x].loadLight(lights.get(x));
+		totalPointLights.loadInteger(Math.min(128, lights.size()));
 	}
 
 	public void loadCameraData(Camera camera, Matrix4f projection) {

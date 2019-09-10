@@ -20,10 +20,15 @@
 
 package engine.glv2.pipeline.shaders;
 
+import java.util.List;
+
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
+import engine.gl.light.DirectionalLightInternal;
 import engine.glv2.entities.SunCamera;
+import engine.glv2.shaders.data.UniformDirectionalLight;
+import engine.glv2.shaders.data.UniformInteger;
 import engine.glv2.shaders.data.UniformMatrix4;
 import engine.glv2.shaders.data.UniformSampler;
 import engine.glv2.shaders.data.UniformVec3;
@@ -57,6 +62,9 @@ public class LightingShader extends BasePipelineShader {
 	private UniformMatrix4 biasMatrix = new UniformMatrix4("biasMatrix");
 	private UniformSampler shadowMap = new UniformSampler("shadowMap");
 
+	private UniformDirectionalLight directionalLights[] = new UniformDirectionalLight[8];
+	private UniformInteger totalDirectionalLights = new UniformInteger("totalDirectionalLights");
+
 	private Matrix4f projInv = new Matrix4f(), viewInv = new Matrix4f();
 
 	public LightingShader(String name) {
@@ -65,9 +73,14 @@ public class LightingShader extends BasePipelineShader {
 		for (int x = 0; x < 4; x++)
 			projectionLightMatrix[x] = new UniformMatrix4("projectionLightMatrix[" + x + "]");
 		super.storeUniforms(projectionLightMatrix);
-		super.storeUniforms(projectionMatrix, viewMatrix, cameraPosition, lightPosition, invertedLightPosition, uAmbient,
-				gDiffuse, gPosition, gNormal, gDepth, gPBR, gMask, volumetric, irradianceCube, environmentCube, brdfLUT,
-				biasMatrix, viewLightMatrix, inverseProjectionMatrix, inverseViewMatrix, shadowMap);
+		for (int x = 0; x < 8; x++) {
+			directionalLights[x] = new UniformDirectionalLight("directionalLights[" + x + "]");
+		}
+		super.storeUniforms(directionalLights);
+		super.storeUniforms(projectionMatrix, viewMatrix, cameraPosition, lightPosition, invertedLightPosition,
+				uAmbient, gDiffuse, gPosition, gNormal, gDepth, gPBR, gMask, volumetric, irradianceCube,
+				environmentCube, brdfLUT, biasMatrix, viewLightMatrix, inverseProjectionMatrix, inverseViewMatrix,
+				shadowMap, totalDirectionalLights);
 		super.validate();
 		this.loadInitialData();
 	}
@@ -106,9 +119,15 @@ public class LightingShader extends BasePipelineShader {
 			this.projectionLightMatrix[x].loadMatrix(camera.getProjectionArray()[x]);
 		viewLightMatrix.loadMatrix(camera.getViewMatrix());
 	}
-	
+
 	public void loadAmbient(Vector3f ambient) {
 		this.uAmbient.loadVec3(ambient);
+	}
+
+	public void loadDirectionalLights(List<DirectionalLightInternal> lights) {
+		for (int x = 0; x < Math.min(8, lights.size()); x++)
+			this.directionalLights[x].loadLight(lights.get(x));
+		totalDirectionalLights.loadInteger(Math.min(8, lights.size()));
 	}
 
 	public void loadCameraData(Camera camera, Matrix4f projection) {

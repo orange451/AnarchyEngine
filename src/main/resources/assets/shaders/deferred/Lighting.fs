@@ -18,6 +18,8 @@
 //
 //
 
+#include struct DirectionalLight
+
 in vec2 textureCoords;
 
 out vec4 out_Color;
@@ -48,6 +50,9 @@ uniform mat4 inverseProjectionMatrix;
 uniform mat4 inverseViewMatrix;
 uniform sampler2DArrayShadow shadowMap;
 
+uniform DirectionalLight directionalLights[8];
+uniform int totalDirectionalLights;
+
 #include variable GLOBAL
 
 #include variable pi
@@ -67,6 +72,8 @@ uniform sampler2DArrayShadow shadowMap;
 #include function computeAmbientOcclusionV2
 
 #include function computeShadow
+
+#include function calcDirectionalLight
 
 #include variable MASK
 
@@ -165,13 +172,14 @@ void main() {
 		vec3 N = normalize(normal);
 		vec3 V = normalize(cameraPosition - position);
 		vec3 R = reflect(-V, N);
-		vec3 L = normalize(lightPosition);
-		vec3 H = normalize(V + L);
 
 		vec3 F0 = vec3(0.04);
 		F0 = mix(F0, image.rgb, metallic);
-
 		vec3 Lo = vec3(0.0);
+
+		vec3 L = normalize(lightPosition);
+		vec3 H = normalize(V + L);
+
 		vec3 radiance = vec3(1.0);
 
 		float NDF = DistributionGGX(N, H, roughness);
@@ -183,12 +191,19 @@ void main() {
 		vec3 brdf = nominator / denominator;
 
 		vec3 kS = F;
-		vec3 kD = 1.0 - kS;
+		vec3 kD = vec3(1.0) - kS;
 		kD *= 1.0 - metallic;
 
 		float NdotL = max(dot(N, L), 0.0) *
-					  computeShadow(position);// * computeContactShadows(position, N, L, depth);
+					  computeShadow(position); // * computeContactShadows(position, N, L, depth);
 		Lo += (kD * image.rgb / PI + brdf) * radiance * NdotL;
+
+		for (int i = 0; i < totalDirectionalLights; i++) {
+			if (directionalLights[i].visible) {
+				Lo += calcDirectionalLight(directionalLights[i], position, image.rgb, N, V, F0,
+										   roughness, metallic);
+			}
+		}
 
 		F = fresnelSchlickRoughness(max(dot(N, V), 0.0), F0, roughness);
 
@@ -219,7 +234,7 @@ void main() {
 		vec3 color = ambient + emissive + Lo;
 		image.rgb = color;
 
-		//image.rgb = vec3(computeContactShadows(position, N, L, depth));
+		// image.rgb = vec3(computeContactShadows(position, N, L, depth));
 	}
 	vec4 vol = texture(volumetric, textureCoords);
 	image.rgb += vol.rgb;

@@ -30,8 +30,8 @@ uniform mat4 viewMatrix;
 uniform mat4 inverseProjectionMatrix;
 uniform mat4 inverseViewMatrix;
 
-uniform Light lights[128];
-uniform int totalLights;
+uniform Light pointLights[128];
+uniform int totalPointLights;
 uniform mat4 biasMatrix;
 
 uniform int useShadows;
@@ -78,13 +78,14 @@ void main() {
 		F0 = mix(F0, diffuse.rgb, metallic);
 
 		vec3 Lo = vec3(0.0);
-		for (int i = 0; i < totalLights; i++) {
-			vec3 L = normalize(lights[i].position - position);
+		for (int i = 0; i < totalPointLights; i++) {
+			if (pointLights[i].visible) {
+				Lo += calcLight(pointLights[i], position, diffuse.rgb, N, V, F0, roughness, metallic);
+			}
 			// switch (lights[i].type) {
 			//	case 0:
-			Lo += calcLight(lights[i], position, diffuse.rgb, L, N, V, F0, roughness, metallic);
 			//	break;
-			//case 1:
+			// case 1:
 			//	float theta = dot(L, normalize(-lights[i].direction));
 			//	float epsilon = lights[i].inRadius - lights[i].radius;
 			//	float intensity = clamp((theta - lights[i].radius) / epsilon, 0.0, 1.0);

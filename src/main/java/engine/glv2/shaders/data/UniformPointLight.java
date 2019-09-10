@@ -26,13 +26,15 @@ public class UniformPointLight extends UniformObject {
 
 	private UniformVec3 position, color;
 	private UniformFloat radius, intensity;
+	private UniformBoolean visible;
 
 	public UniformPointLight(String name) {
 		position = new UniformVec3(name + ".position");
 		color = new UniformVec3(name + ".color");
 		radius = new UniformFloat(name + ".radius");
 		intensity = new UniformFloat(name + ".intensity");
-		super.init(position, color, radius, intensity);
+		visible = new UniformBoolean(name + ".visible");
+		super.init(position, color, radius, intensity, visible);
 	}
 
 	public void loadLight(PointLightInternal light) {
@@ -40,6 +42,7 @@ public class UniformPointLight extends UniformObject {
 		color.loadVec3(light.color);
 		intensity.loadFloat(light.intensity);
 		radius.loadFloat(light.radius);
+		visible.loadBoolean(light.visible);
 	}
 
 }

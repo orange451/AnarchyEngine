@@ -110,7 +110,7 @@ public class GLRenderer implements IPipeline {
 
 	private int width, height;
 
-	private float time = 21000, globalTime = 0;
+	private float time = 12000, globalTime = 0;
 
 	private boolean useARBClipControl = false;
 

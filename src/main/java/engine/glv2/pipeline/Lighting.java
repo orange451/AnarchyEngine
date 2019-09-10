@@ -59,6 +59,7 @@ public class Lighting extends DeferredPass<LightingShader> {
 		shader.loadLightPosition(rd.sun.getSunPosition());
 		shader.loadCameraData(rd.camera, rd.projectionMatrix);
 		shader.loadSunCameraData(rd.sun.getCamera());
+		shader.loadDirectionalLights(rnd.dlh.getLights());
 	}
 
 	@Override

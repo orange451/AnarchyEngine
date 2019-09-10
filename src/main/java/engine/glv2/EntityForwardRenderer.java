@@ -78,6 +78,7 @@ public class EntityForwardRenderer {
 		shader.loadExposure(rnd.exposure);
 		shader.loadGamma(rnd.gamma);
 		shader.loadAmbient(rnd.ambient);
+		shader.loadDirectionalLights(rnd.dlh.getLights());
 		glActiveTexture(GL_TEXTURE4);
 		glBindTexture(GL_TEXTURE_CUBE_MAP, rnd.irradianceCapture.getTexture());
 		glActiveTexture(GL_TEXTURE5);
@@ -111,7 +112,7 @@ public class EntityForwardRenderer {
 			if (p.getPosition().distance(gop) < p.radius)
 				pl.add(p);
 		}
-		pl = pl.subList(0, Math.min(4, pl.size()));
+		pl = pl.subList(0, Math.min(8, pl.size()));
 		Collections.sort(pl, new Comparator<PointLightInternal>() {
 			@Override
 			public int compare(PointLightInternal o1, PointLightInternal o2) {
@@ -121,7 +122,7 @@ public class EntityForwardRenderer {
 			}
 		});
 
-		shader.loadPointLightsPos(pl);
+		shader.loadPointLights(pl);
 		for (int i = 0; i < pfr.size(); i++) {
 			Model p = pfr.getModel(i);
 			BufferedMesh m = p.getMesh();

@@ -50,7 +50,7 @@ public class LocalLightsPass extends DeferredPass<LocalLightsShader> {
 	@Override
 	protected void setupShaderData(RendererData rnd, IRenderingData rd, LocalLightsShader shader) {
 		shader.loadCameraData(rd.camera, rd.projectionMatrix);
-		shader.loadPointLightsPos(rnd.plh.getLights());
+		shader.loadPointLights(rnd.plh.getLights());
 	}
 
 	@Override

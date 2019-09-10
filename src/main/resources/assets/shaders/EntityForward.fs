@@ -22,6 +22,8 @@
 
 #include struct Light
 
+#include struct DirectionalLight
+
 in vec2 pass_textureCoords;
 in vec4 pass_position;
 in mat3 TBN;
@@ -45,8 +47,11 @@ uniform float transparency;
 uniform float exposure;
 uniform float gamma;
 
-uniform Light lights[4];
-uniform int totalLights;
+uniform Light pointLights[8];
+uniform int totalPointLights;
+
+uniform DirectionalLight directionalLights[8];
+uniform int totalDirectionalLights;
 
 #include variable pi
 
@@ -63,6 +68,8 @@ uniform int totalLights;
 #include function computeShadow
 
 #include function calcLight
+
+#include function calcDirectionalLight
 
 #include variable GLOBAL
 
@@ -115,9 +122,17 @@ void main() {
 	float NdotL = max(dot(N, L), 0.0) * computeShadow(position);
 	Lo += (kD * diffuseF.rgb / PI + brdf) * radiance * NdotL;
 
-	for (int i = 0; i < totalLights; i++) {
-		vec3 L = normalize(lights[i].position - position);
-		Lo += calcLight(lights[i], position, diffuseF.rgb, L, N, V, F0, roughness, metallic);
+	for (int i = 0; i < totalDirectionalLights; i++) {
+		if (directionalLights[i].visible) {
+			Lo += calcDirectionalLight(directionalLights[i], position, diffuseF.rgb, N, V, F0,
+									   roughness, metallic);
+		}
+	}
+
+	for (int i = 0; i < totalPointLights; i++) {
+		if (pointLights[i].visible) {
+			Lo += calcLight(pointLights[i], position, diffuseF.rgb, N, V, F0, roughness, metallic);
+		}
 	}
 
 	F = fresnelSchlickRoughness(max(dot(N, V), 0.0), F0, roughness);

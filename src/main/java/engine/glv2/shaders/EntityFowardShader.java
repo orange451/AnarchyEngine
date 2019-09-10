@@ -26,10 +26,12 @@ import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
 import engine.gl.MaterialGL;
+import engine.gl.light.DirectionalLightInternal;
 import engine.gl.light.PointLightInternal;
 import engine.glv2.entities.CubeMapCamera;
 import engine.glv2.shaders.data.Attribute;
 import engine.glv2.shaders.data.UniformBoolean;
+import engine.glv2.shaders.data.UniformDirectionalLight;
 import engine.glv2.shaders.data.UniformFloat;
 import engine.glv2.shaders.data.UniformInteger;
 import engine.glv2.shaders.data.UniformMaterial;
@@ -64,8 +66,11 @@ public class EntityFowardShader extends ShaderProgram {
 	private UniformMatrix4 biasMatrix = new UniformMatrix4("biasMatrix");
 	private UniformSampler shadowMap = new UniformSampler("shadowMap");
 
-	private UniformPointLight lights[];
-	private UniformInteger totalLights = new UniformInteger("totalLights");
+	private UniformPointLight pointLights[] = new UniformPointLight[8];
+	private UniformInteger totalPointLights = new UniformInteger("totalPointLights");
+
+	private UniformDirectionalLight directionalLights[] = new UniformDirectionalLight[8];
+	private UniformInteger totalDirectionalLights = new UniformInteger("totalDirectionalLights");
 
 	public EntityFowardShader() {
 		super("assets/shaders/EntityForward.vs", "assets/shaders/EntityForward.fs", new Attribute(0, "position"),
@@ -74,14 +79,17 @@ public class EntityFowardShader extends ShaderProgram {
 		for (int x = 0; x < 4; x++)
 			projectionLightMatrix[x] = new UniformMatrix4("projectionLightMatrix[" + x + "]");
 		super.storeUniforms(projectionLightMatrix);
-		lights = new UniformPointLight[4];
-		for (int x = 0; x < 4; x++) {
-			lights[x] = new UniformPointLight("lights[" + x + "]");
+		for (int x = 0; x < 8; x++) {
+			pointLights[x] = new UniformPointLight("pointLights[" + x + "]");
 		}
-		super.storeUniforms(lights);
+		super.storeUniforms(pointLights);
+		for (int x = 0; x < 8; x++) {
+			directionalLights[x] = new UniformDirectionalLight("directionalLights[" + x + "]");
+		}
+		super.storeUniforms(directionalLights);
 		super.storeUniforms(transformationMatrix, projectionMatrix, viewMatrix, material, cameraPosition, lightPosition,
 				uAmbient, irradianceMap, preFilterEnv, brdfLUT, colorCorrect, biasMatrix, viewLightMatrix, useShadows,
-				transparency, gamma, exposure, totalLights, shadowMap);
+				transparency, gamma, exposure, totalPointLights, shadowMap, totalDirectionalLights);
 		super.validate();
 		this.loadInitialData();
 	}
@@ -137,10 +145,16 @@ public class EntityFowardShader extends ShaderProgram {
 			this.projectionLightMatrix[x].loadMatrix(shadowProjectionMatrix[x]);
 	}
 
-	public void loadPointLightsPos(List<PointLightInternal> lights) {
-		for (int x = 0; x < Math.min(4, lights.size()); x++)
-			this.lights[x].loadLight(lights.get(x));
-		totalLights.loadInteger(Math.min(4, lights.size()));
+	public void loadPointLights(List<PointLightInternal> lights) {
+		for (int x = 0; x < Math.min(8, lights.size()); x++)
+			this.pointLights[x].loadLight(lights.get(x));
+		totalPointLights.loadInteger(Math.min(8, lights.size()));
+	}
+
+	public void loadDirectionalLights(List<DirectionalLightInternal> lights) {
+		for (int x = 0; x < Math.min(8, lights.size()); x++)
+			this.directionalLights[x].loadLight(lights.get(x));
+		totalDirectionalLights.loadInteger(Math.min(8, lights.size()));
 	}
 
 	public void loadAmbient(Vector3f ambient) {

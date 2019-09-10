@@ -30,6 +30,16 @@ struct Light {
 	vec3 color;
 	float radius;
 	float intensity;
+	bool visible;
+};
+#end
+
+#struct DirectionalLight
+struct DirectionalLight {
+	vec3 direction;
+	vec3 color;
+	float intensity;
+	bool visible;
 };
 #end
 
@@ -228,12 +238,38 @@ float computeAmbientOcclusion(vec2 texCoords, vec3 position, vec3 normal, sample
 #end
 
 #function calcLight
-vec3 calcLight(Light light, vec3 position, vec3 diffuse, vec3 L, vec3 N, vec3 V, vec3 F0,
-			   float roughness, float metallic) {
+vec3 calcLight(Light light, vec3 position, vec3 diffuse, vec3 N, vec3 V, vec3 F0, float roughness,
+			   float metallic) {
+	vec3 L = normalize(light.position - position);
 	vec3 H = normalize(V + L);
 	float distance = length(light.position - position);
 	float attenuation = max(1.0 - distance / light.radius, 0.0) / distance;
 	vec3 radiance = light.color * attenuation * light.intensity;
+
+	float NDF = DistributionGGX(N, H, roughness);
+	float G = GeometrySmith(N, V, L, roughness);
+	vec3 F = fresnelSchlick(max(dot(H, V), 0.0), F0);
+
+	vec3 nominator = NDF * G * F;
+	float denominator = max(dot(N, V), 0.0) * max(dot(N, L), 0.0) + 0.001;
+	vec3 brdf = nominator / denominator;
+
+	vec3 kS = F;
+	vec3 kD = vec3(1.0) - kS;
+	kD *= 1.0 - metallic;
+
+	float NdotL = max(dot(N, L), 0.0);
+	return (kD * diffuse / PI + brdf) * radiance * NdotL;
+}
+#end
+
+#function calcDirectionalLight
+vec3 calcDirectionalLight(DirectionalLight light, vec3 position, vec3 diffuse, vec3 N, vec3 V,
+						  vec3 F0, float roughness, float metallic) {
+	vec3 L = normalize(light.direction);
+	vec3 H = normalize(V + L);
+
+	vec3 radiance = light.color * light.intensity;
 
 	float NDF = DistributionGGX(N, H, roughness);
 	float G = GeometrySmith(N, V, L, roughness);
