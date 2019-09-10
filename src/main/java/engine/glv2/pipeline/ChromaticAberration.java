@@ -42,7 +42,7 @@ public class ChromaticAberration extends PostProcesPass<BasicPostProcessShader> 
 
 	@Override
 	protected void setupTextures(RendererData rnd, PostProcessPipeline pp, Texture[] auxTex) {
-		super.activateTexture(GL_TEXTURE0, GL_TEXTURE_2D, pp.getMainTex().getTexture());
+		super.activateTexture(GL_TEXTURE0, GL_TEXTURE_2D, auxTex[0].getTexture());
 	}
 
 }

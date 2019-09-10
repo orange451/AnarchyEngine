@@ -110,7 +110,7 @@ public class GLRenderer implements IPipeline {
 
 	private int width, height;
 
-	private float time = 12000, globalTime = 0;
+	private float time = 20000, globalTime = 0;
 
 	private boolean useARBClipControl = false;
 
@@ -135,6 +135,7 @@ public class GLRenderer implements IPipeline {
 		ShaderIncludes.processIncludeFile("assets/shaders/includes/materials.isl");
 		ShaderIncludes.processIncludeFile("assets/shaders/includes/common.isl");
 		ShaderIncludes.processIncludeFile("assets/shaders/includes/global.isl");
+		ShaderIncludes.processIncludeFile("assets/shaders/includes/color.isl");
 
 		Game.userInputService().inputBeganEvent().connect((args) -> {
 			if (args[0].get("KeyCode").eq_b(LuaValue.valueOf(GLFW.GLFW_KEY_F5))) {

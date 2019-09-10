@@ -23,15 +23,14 @@ package engine.glv2.pipeline.shaders;
 import engine.glv2.shaders.data.UniformFloat;
 import engine.glv2.shaders.data.UniformSampler;
 
-public class ColorCorrectionShader extends BasePipelineShader {
+public class FinalColorCorrectionShader extends BasePipelineShader {
 
 	private UniformSampler image = new UniformSampler("image");
-	private UniformFloat exposure = new UniformFloat("exposure");
-	private UniformFloat gamma = new UniformFloat("gamma");
+	private UniformFloat saturation = new UniformFloat("saturation");
 
-	public ColorCorrectionShader(String name) {
-		super("deferred/" + name);
-		this.storeUniforms(image, exposure, gamma);
+	public FinalColorCorrectionShader(String name) {
+		super("postprocess/" + name);
+		this.storeUniforms(image, saturation);
 		this.validate();
 		this.loadInitialData();
 	}
@@ -43,12 +42,8 @@ public class ColorCorrectionShader extends BasePipelineShader {
 		super.stop();
 	}
 
-	public void loadExposure(float exposure) {
-		this.exposure.loadFloat(exposure);
-	}
-
-	public void loadGamma(float gamma) {
-		this.gamma.loadFloat(gamma);
+	public void loadSaturation(float gamma) {
+		this.saturation.loadFloat(gamma);
 	}
 
 }

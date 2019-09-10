@@ -32,9 +32,13 @@ public class PostProcess extends PostProcessPipeline {
 	private ChromaticAberration chromaticAberration; // Done
 	private MotionBlur motionBlur; // Done
 	private DepthOfField depthOfField;
+	private FinalColorCorrection finalColorCorrection;
 
 	@Override
 	public void setupPasses() {
+		finalColorCorrection = new FinalColorCorrection();
+		super.passes.add(finalColorCorrection);
+
 		chromaticAberration = new ChromaticAberration();
 		super.passes.add(chromaticAberration);
 

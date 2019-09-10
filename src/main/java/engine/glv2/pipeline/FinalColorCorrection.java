@@ -25,31 +25,30 @@ import static org.lwjgl.opengl.GL13C.GL_TEXTURE0;
 
 import engine.glv2.RendererData;
 import engine.glv2.objects.Texture;
-import engine.glv2.pipeline.shaders.ColorCorrectionShader;
-import engine.glv2.v2.DeferredPass;
-import engine.glv2.v2.DeferredPipeline;
+import engine.glv2.pipeline.shaders.FinalColorCorrectionShader;
 import engine.glv2.v2.IRenderingData;
+import engine.glv2.v2.PostProcesPass;
+import engine.glv2.v2.PostProcessPipeline;
 
-public class ColorCorrection extends DeferredPass<ColorCorrectionShader> {
+public class FinalColorCorrection extends PostProcesPass<FinalColorCorrectionShader> {
 
-	public ColorCorrection() {
-		super("ColorCorrection");
+	public FinalColorCorrection() {
+		super("FinalColorCorrection");
 	}
 
 	@Override
-	protected ColorCorrectionShader setupShader() {
-		return new ColorCorrectionShader(name);
+	protected FinalColorCorrectionShader setupShader() {
+		return new FinalColorCorrectionShader(name);
 	}
 
 	@Override
-	protected void setupShaderData(RendererData rnd, IRenderingData rd, ColorCorrectionShader shader) {
-		shader.loadExposure(rnd.exposure);
-		shader.loadGamma(rnd.gamma);
+	protected void setupShaderData(RendererData rnd, IRenderingData rd, FinalColorCorrectionShader shader) {
+		shader.loadSaturation(rnd.saturation);
 	}
 
 	@Override
-	protected void setupTextures(RendererData rnd, DeferredPipeline dp, Texture[] auxTex) {
-		super.activateTexture(GL_TEXTURE0, GL_TEXTURE_2D, auxTex[0].getTexture());
+	protected void setupTextures(RendererData rnd, PostProcessPipeline pp, Texture[] auxTex) {
+		super.activateTexture(GL_TEXTURE0, GL_TEXTURE_2D, pp.getMainTex().getTexture());
 	}
 
 }

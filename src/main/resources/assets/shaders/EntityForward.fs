@@ -71,6 +71,8 @@ uniform int totalDirectionalLights;
 
 #include function calcDirectionalLight
 
+#include function toneMap
+
 #include variable GLOBAL
 
 void main() {
@@ -154,9 +156,15 @@ void main() {
 	vec3 ambient = kD * diffuse + specular;
 	vec3 color = ambient + emissive + Lo;
 	if (colorCorrect == 1) {
-		vec3 tempColor = vec3(1.0) - exp(-color * exposure);
-		tempColor = pow(tempColor, vec3(1.0 / gamma));
-		color = tempColor;
+		vec3 final = vec3(1.0) - exp(-color * exposure);
+
+		// Apply tone-mapping
+		final = toneMap(final);
+
+		// Apply Gamma
+		vec3 whiteScale = 1.0 / toneMap(vec3(W));
+		final = pow(final * whiteScale, vec3(1.0 / gamma));
+		color = final;
 	}
 
 	out_Color = vec4(color, transparency);

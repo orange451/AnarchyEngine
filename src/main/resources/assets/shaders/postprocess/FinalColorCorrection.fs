@@ -23,22 +23,31 @@ in vec2 textureCoords;
 out vec4 out_Color;
 
 uniform sampler2D image;
-uniform float exposure;
-uniform float gamma;
+uniform float saturation;
 
-#include function toneMap
+#include variable GLOBAL
+
+#include function luma
+
+float rand(vec2 co){
+    return fract(sin(dot(co.xy, vec2(12.9898, 78.233))) * 43758.5453);
+}
+
+float dither(){
+	return (-0.5 + rand(textureCoords)) * (1.0 / 100.0); //Noise dithering
+}
 
 void main() {
 	vec3 color = texture(image, textureCoords).rgb;
-	vec3 final = vec3(1.0) - exp(-color * exposure);
-
-	// Apply tone-mapping
-	final = toneMap(final);
-
-	// Apply Gamma
-	vec3 whiteScale = 1.0 / toneMap(vec3(W));
-	final = pow(final * whiteScale, vec3(1.0 / gamma));
-
+	vec3 final = color;
+	
+	// Apply Dithering
+	float lum = luma(final);
+	final += dither()/2.0;
+	
+	// Apply saturation
+	final = mix(vec3(lum), final, saturation);
+	
 	// Write
 	out_Color.rgb = final;
 	out_Color.a = 1;

@@ -18,28 +18,11 @@
 //
 //
 
-in vec2 textureCoords;
+layout(location = 0) in vec2 position;
 
-out vec4 out_Color;
-
-uniform sampler2D image;
-uniform float exposure;
-uniform float gamma;
-
-#include function toneMap
+out vec2 textureCoords;
 
 void main() {
-	vec3 color = texture(image, textureCoords).rgb;
-	vec3 final = vec3(1.0) - exp(-color * exposure);
-
-	// Apply tone-mapping
-	final = toneMap(final);
-
-	// Apply Gamma
-	vec3 whiteScale = 1.0 / toneMap(vec3(W));
-	final = pow(final * whiteScale, vec3(1.0 / gamma));
-
-	// Write
-	out_Color.rgb = final;
-	out_Color.a = 1;
+	gl_Position = vec4(position, -0.8, 1.0);
+	textureCoords = vec2((position.x + 1.0) / 2.0, (position.y + 1.0) / 2.0);
 }
