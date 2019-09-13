@@ -3,6 +3,8 @@ package ide.layout.windows;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.util.ArrayList;
+import java.util.Stack;
 
 import org.lwjgl.glfw.GLFW;
 
@@ -25,6 +27,8 @@ import lwjgui.scene.layout.BorderPane;
 public class IdeConsole extends IdePane {
 
 	private TextArea console;
+	private ArrayList<String> history = new ArrayList<String>();
+	private int history_index = -1;
 
 	public IdeConsole() {
 		super("Console", true);
@@ -104,17 +108,48 @@ public class IdeConsole extends IdePane {
 		}
 
 		this.setOnKeyPressed(event -> {
-			if (event.getKey() != GLFW.GLFW_KEY_ENTER)
-				return;
+			if (event.getKey() == GLFW.GLFW_KEY_UP) {
+				if (cached_context.getSelected().isDescendentOf(luaInput)) {
+					int index = (history_index + 1 <= history.size()) ? ++history_index : 0; 
+					if (index == 0)
+						history_index = 0;
 
-			if (cached_context.getSelected() == null)
-				return;
+					String lua = history.get(history.size() - index);
+					luaInput.setText(lua);
 
-			if (cached_context.getSelected().isDescendentOf(luaInput)) {
-				String lua = luaInput.getText();
-				console.appendText("> " + lua + "\n");
-				LuaEngine.runLua(lua);
-				luaInput.setText("");
+					return;
+				}
+			}
+
+			if (event.getKey() == GLFW.GLFW_KEY_DOWN) {
+				if (cached_context.getSelected().isDescendentOf(luaInput)) {
+					int index = (history_index - 1 >= 0) ? --history_index : history.size();
+					if (index == 0)
+						history_index = 0;
+
+					String lua = history.get(history.size() - index);
+					luaInput.setText(lua);
+					
+					return;
+				}
+			}
+
+			if (event.getKey() == GLFW.GLFW_KEY_ENTER) {
+				if (cached_context.getSelected() == null)
+					return;
+
+				if (cached_context.getSelected().isDescendentOf(luaInput)) {
+					String lua = luaInput.getText();
+					console.appendText("> " + lua + "\n");
+					LuaEngine.runLua(lua);
+					luaInput.setText("");
+					if (!history.get(history.size() - 1).equals(lua)) {
+						history.add(lua);
+					}
+					history_index = 0;
+
+					return;
+				}
 			}
 		});
 

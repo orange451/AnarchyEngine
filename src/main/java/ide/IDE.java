@@ -10,7 +10,6 @@ import engine.Game;
 import engine.InternalGameThread;
 import engine.InternalRenderThread;
 import engine.application.RenderableApplication;
-import engine.gl.Pipeline;
 import engine.glv2.GLRenderer;
 import engine.io.Load;
 import ide.layout.IdeLayout;

@@ -10,7 +10,6 @@ import engine.util.JVMUtil;
 import ide.IDE;
 import ide.layout.windows.IdeConsole;
 import ide.layout.windows.IdeExplorer;
-import ide.layout.windows.IdeExplorer;
 import ide.layout.windows.IdeGameView;
 import ide.layout.windows.IdeMaterialViewer;
 import ide.layout.windows.IdeProperties;
