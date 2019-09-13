@@ -80,9 +80,11 @@ public class LocalLightsShader extends BasePipelineShader {
 	}
 
 	public void loadPointLights(List<PointLightInternal> lights) {
-		for (int x = 0; x < Math.min(128, lights.size()); x++)
-			this.pointLights[x].loadLight(lights.get(x));
-		totalPointLights.loadInteger(Math.min(128, lights.size()));
+		synchronized(lights) {
+			for (int x = 0; x < Math.min(128, lights.size()); x++)
+				this.pointLights[x].loadLight(lights.get(x));
+			totalPointLights.loadInteger(Math.min(128, lights.size()));
+		}
 	}
 
 	public void loadCameraData(Camera camera, Matrix4f projection) {

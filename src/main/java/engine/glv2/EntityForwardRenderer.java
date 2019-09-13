@@ -108,9 +108,11 @@ public class EntityForwardRenderer {
 		Vector3f gop = go.getPosition().toJoml();
 
 		List<PointLightInternal> pl = new ArrayList<>();
-		for (PointLightInternal p : rnd.plh.getLights()) {
-			if (p.getPosition().distance(gop) < p.radius)
-				pl.add(p);
+		synchronized(rnd.plh.getLights()) {
+			for (PointLightInternal p : rnd.plh.getLights()) {
+				if (p.getPosition().distance(gop) < p.radius)
+					pl.add(p);
+			}
 		}
 		pl = pl.subList(0, Math.min(8, pl.size()));
 		Collections.sort(pl, new Comparator<PointLightInternal>() {

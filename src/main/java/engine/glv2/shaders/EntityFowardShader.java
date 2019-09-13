@@ -152,9 +152,11 @@ public class EntityFowardShader extends ShaderProgram {
 	}
 
 	public void loadDirectionalLights(List<DirectionalLightInternal> lights) {
-		for (int x = 0; x < Math.min(8, lights.size()); x++)
-			this.directionalLights[x].loadLight(lights.get(x));
-		totalDirectionalLights.loadInteger(Math.min(8, lights.size()));
+		synchronized(lights) {
+			for (int x = 0; x < Math.min(8, lights.size()); x++)
+				this.directionalLights[x].loadLight(lights.get(x));
+			totalDirectionalLights.loadInteger(Math.min(8, lights.size()));
+		}
 	}
 
 	public void loadAmbient(Vector3f ambient) {
