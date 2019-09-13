@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
-import java.util.Stack;
 
 import org.lwjgl.glfw.GLFW;
 
@@ -110,14 +109,16 @@ public class IdeConsole extends IdePane {
 		this.setOnKeyPressed(event -> {
 			if (event.getKey() == GLFW.GLFW_KEY_UP) {
 				if (cached_context.getSelected().isDescendentOf(luaInput)) {
-					int index = (history_index - 1 >= 0) ? --history_index : history.size() - 1;
-					if (index == history.size() - 1)
-						history_index = history.size() - 1;
-					
-					System.out.println(index);
+					int index = history_index++;
+					if (index > history.size() - 1) {
+						index = 0;
+						history_index = history.size() >= 1 ? 1 : 0;
+					}
 
-					String lua = history.get((history.size() - 1) - index);
+					String lua = history.get(Math.min((history.size() - 1) - index, history.size() - 1));
 					luaInput.setText(lua);
+
+					luaInput.setCaretPosition(lua.length());
 
 					return;
 				}
@@ -125,15 +126,17 @@ public class IdeConsole extends IdePane {
 
 			if (event.getKey() == GLFW.GLFW_KEY_DOWN) {
 				if (cached_context.getSelected().isDescendentOf(luaInput)) {
-					int index = (history_index + 1 <= history.size() - 1) ? ++history_index : 0; 
-					if (index == 0)
-						history_index = 0;
-					
-					System.out.println(index);
+					int index = history_index--;
+					if (index < 0) {
+						index = history.size() - 1;
+						history_index = history.size() > 1 ? history.size() - 2 : index;
+					}
 
-					String lua = history.get((history.size() - 1) - index);
+					String lua = history.get(Math.max((history.size() - 1) - index, 0));
 					luaInput.setText(lua);
 					
+					luaInput.setCaretPosition(lua.length());
+
 					return;
 				}
 			}
@@ -151,7 +154,7 @@ public class IdeConsole extends IdePane {
 						history.add(lua);
 					}
 					
-					history_index = history.size() - 1;
+					history_index = 0;
 
 					return;
 				}
