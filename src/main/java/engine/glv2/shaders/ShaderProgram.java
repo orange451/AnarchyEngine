@@ -170,6 +170,7 @@ public abstract class ShaderProgram {
 		int shaderID = shader.id = glCreateShader(shader.type);
 		glShaderSource(shaderID, shaderSource);
 		glCompileShader(shaderID);
+		System.out.println("test");
 		if (glGetShaderi(shaderID, GL_COMPILE_STATUS) == GL_FALSE) {
 			System.out.println(glGetShaderInfoLog(shaderID, 500));
 			throw new CompileShaderException(glGetShaderInfoLog(shaderID, 500));

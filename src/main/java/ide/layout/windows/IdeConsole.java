@@ -110,11 +110,13 @@ public class IdeConsole extends IdePane {
 		this.setOnKeyPressed(event -> {
 			if (event.getKey() == GLFW.GLFW_KEY_UP) {
 				if (cached_context.getSelected().isDescendentOf(luaInput)) {
-					int index = (history_index + 1 <= history.size()) ? ++history_index : 0; 
-					if (index == 0)
-						history_index = 0;
+					int index = (history_index - 1 >= 0) ? --history_index : history.size() - 1;
+					if (index == history.size() - 1)
+						history_index = history.size() - 1;
+					
+					System.out.println(index);
 
-					String lua = history.get(history.size() - index);
+					String lua = history.get((history.size() - 1) - index);
 					luaInput.setText(lua);
 
 					return;
@@ -123,11 +125,13 @@ public class IdeConsole extends IdePane {
 
 			if (event.getKey() == GLFW.GLFW_KEY_DOWN) {
 				if (cached_context.getSelected().isDescendentOf(luaInput)) {
-					int index = (history_index - 1 >= 0) ? --history_index : history.size();
+					int index = (history_index + 1 <= history.size() - 1) ? ++history_index : 0; 
 					if (index == 0)
 						history_index = 0;
+					
+					System.out.println(index);
 
-					String lua = history.get(history.size() - index);
+					String lua = history.get((history.size() - 1) - index);
 					luaInput.setText(lua);
 					
 					return;
@@ -143,10 +147,11 @@ public class IdeConsole extends IdePane {
 					console.appendText("> " + lua + "\n");
 					LuaEngine.runLua(lua);
 					luaInput.setText("");
-					if (!history.get(history.size() - 1).equals(lua)) {
+					if (history.size() == 0 || !history.get(history.size() - 1).equals(lua)) {
 						history.add(lua);
 					}
-					history_index = 0;
+					
+					history_index = history.size() - 1;
 
 					return;
 				}
