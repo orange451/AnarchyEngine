@@ -562,7 +562,7 @@ public class Game implements Tickable {
 				sc.forceSetParent(p);
 				
 				// Set him as local
-				new engine.lua.network.internal.protocol.ClientConnectFinishTCP().clientProcess();
+				new engine.lua.network.internal.protocol.ClientConnectFinishTCP().clientProcess(null);
 			}
 			
 			Game.runLater(()->{
@@ -571,10 +571,18 @@ public class Game implements Tickable {
 		}
 	}
 	
+	/**
+	 * Returns whether or not the game is currently running. A running game will have scripts executed and physics updated.
+	 * @return
+	 */
 	public static boolean isRunning() {
 		return running;
 	}
 
+	/**
+	 * Returns whether or not the game is marked as a server. A server cannot run LocalScripts, and it used to house multiple player-connections.
+	 * @return
+	 */
 	public static boolean isServer() {
 		return game.isServer;
 	}

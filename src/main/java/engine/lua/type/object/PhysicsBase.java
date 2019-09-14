@@ -1,5 +1,6 @@
 package engine.lua.type.object;
 
+import java.io.IOException;
 import java.util.List;
 
 import org.joml.Matrix4f;
@@ -9,6 +10,7 @@ import org.luaj.vm2.LuaValue;
 import engine.Game;
 import engine.GameSubscriber;
 import engine.InternalRenderThread;
+import engine.lua.LuaEngine;
 import engine.lua.lib.EnumType;
 import engine.lua.network.InternalClient;
 import engine.lua.network.InternalServer;
@@ -35,6 +37,7 @@ public abstract class PhysicsBase extends Instance implements GameSubscriber {
 	public Player playerOwns;
 
 	protected static final LuaValue C_WORLDMATRIX = LuaValue.valueOf("WorldMatrix");
+	protected static final LuaValue C_POSITION = LuaValue.valueOf("Position");
 	protected static final LuaValue C_VELOCITY = LuaValue.valueOf("Velocity");
 	protected static final LuaValue C_ANGULARVELOCITY = LuaValue.valueOf("AngularVelocity");
 	protected static final LuaValue C_PREFAB = LuaValue.valueOf("Prefab");
@@ -94,6 +97,13 @@ public abstract class PhysicsBase extends Instance implements GameSubscriber {
 					this.rawset(C_WORLDMATRIX, linked.get(C_WORLDMATRIX));
 				}
 			});
+		});
+		
+		this.changedEvent().connect((args)->{
+			if ( args[0].eq_b(C_PARENT) ) {
+				playerOwns = null;
+				checkNetworkOwnership();
+			}
 		});
 	}
 	
@@ -250,10 +260,10 @@ public abstract class PhysicsBase extends Instance implements GameSubscriber {
 		
 		// Check for changes within parented physics object
 		connection = linked.changedEvent().connect((args)->{
-			String property = args[0].toString();
+			LuaValue property = args[0];
 			
 			// Game object had its own matrix changed. Replicate to physics.
-			if ( property.equals(C_WORLDMATRIX.toString()) || property.equals("Position") ) {
+			if ( property.eq_b(C_WORLDMATRIX) || property.eq_b(C_POSITION) ) {
 				if ( physics == null )
 					return;
 				
@@ -480,12 +490,15 @@ public abstract class PhysicsBase extends Instance implements GameSubscriber {
 	private void checkNetworkOwnership() {
 		if ( playerOwns == null ) {
 			if ( Game.isServer() ) {
-				Connections connections = Game.connections();
-				List<GameObject> ownedCharacters = connections.ownedCharacters;
-				for (int i = 0; i < ownedCharacters.size(); i++) {
-					GameObject character = ownedCharacters.get(i);
+				// This needs to be optimized some way... It's called every step BIG NO NO.
+				List<Player> players = Game.players().getPlayers();
+				for (int i = 0; i < players.size(); i++) {
+					Player player = players.get(i);
+					Instance character = player.getCharacter();
+					if ( character == null )
+						continue;
+					
 					if ( this.isDescendantOf(character) ) {
-						Player player = Game.players().getPlayerFromCharacter(character);
 						playerOwns = player;
 					}
 				}
@@ -493,13 +506,16 @@ public abstract class PhysicsBase extends Instance implements GameSubscriber {
 				LuaValue localPlayer = Game.players().getLocalPlayer();
 				if ( localPlayer != null && localPlayer instanceof Player ) {
 					Player player = (Player) localPlayer;
+					Instance character = player.getCharacter();
+					if ( character == null )
+						return;
 					
-					if (player.doesClientOwnPhysics()) {
-						Instance character = player.getCharacter();
-						if ( character != null && character instanceof GameObject && this.isDescendantOf((GameObject)character) ) {
+					//if (player.doesClientOwnPhysics()) {
+						if ( this.isDescendantOf(character) ) {
 							playerOwns = player;
+							System.out.println("I own this");
 						}
-					}
+					//}
 				}
 			}
 		}

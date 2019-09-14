@@ -88,6 +88,10 @@ public class Players extends Service implements TreeViewable {
 		return Icons.icon_players;
 	}
 	
+	/**
+	 * Returns a list of all players currently in the Players service.
+	 * @return
+	 */
 	public List<Player> getPlayers() {
 		List<Instance> players = this.getChildrenOfClass(C_PLAYER);
 		List<Player> ret = new ArrayList<Player>();
@@ -97,6 +101,11 @@ public class Players extends Service implements TreeViewable {
 		return ret;
 	}
 
+	/**
+	 * Matches a player to a given character instance in the workspace. If no such player exists, null is returned.
+	 * @param character
+	 * @return
+	 */
 	public Player getPlayerFromCharacter(Instance character) {
 		List<Player> players = getPlayers();
 		for (int i = 0; i < players.size(); i++) {
@@ -108,16 +117,29 @@ public class Players extends Service implements TreeViewable {
 		return null;
 	}
 
+	/**
+	 * Returns the event that is called when a player is added to the game.
+	 * @return
+	 */
 	public LuaEvent playerAddedEvent() {
 		return (LuaEvent) this.get(C_PLAYERADDED);
 	}
 
+	/**
+	 * Returns the event that is called when a player is removed from the game.
+	 * @return
+	 */
 	public LuaEvent playerRemovedEvent() {
 		return (LuaEvent) this.get(C_PLAYERREMOVED);
 	}
 	
+	/**
+	 * Returns the local player. The local player points to the player object that belongs to you in the current game instance.
+	 * There can be multiple players within the players service, use LocalPlayer reference your player.
+	 * @return
+	 */
 	public Player getLocalPlayer() {
 		LuaValue p = this.get(C_LOCALPLAYER);
-		return (!p.isnil()&&p instanceof Player)?(Player)p:null;
+		return !p.isnil()?(Player)p:null;
 	}
 }

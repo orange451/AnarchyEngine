@@ -30,13 +30,7 @@ public class Player extends Instance implements TreeViewable {
 		this.changedEvent().connect((args)->{
 			if ( args[0].eq_b(C_CHARACTER)) {
 				
-				// Check if we can give this player ownership
-				boolean can = false;
-				if ( Game.isServer() || (!Game.isServer() && Game.players().getLocalPlayer().equals(this)))
-					can = true;
-				
-				// If we can't, get out.
-				if ( !can )
+				if ( !Game.isServer() )
 					return;
 				
 				Connections c = (Connections)Game.connections();

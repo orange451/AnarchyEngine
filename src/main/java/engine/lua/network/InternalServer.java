@@ -43,7 +43,7 @@ public class InternalServer extends Server {
 		
 		System.out.println("Server started");
 		this.addListener(new Listener() {
-			public void received (Connection connection, Object object) {
+			public void received(Connection connection, Object object) {
 				
 				final int CHUNK_SIZE = 512;
 
@@ -126,7 +126,7 @@ public class InternalServer extends Server {
 				}
 				
 				if ( object instanceof ServerProcessable ) {
-					((ServerProcessable)object).serverProcess();
+					((ServerProcessable)object).serverProcess(connection);
 				}
 				
 				// Ping request
@@ -148,7 +148,10 @@ public class InternalServer extends Server {
 			@Override
 			public void disconnected(Connection connection) {
 				System.out.println("Disconnecting: " + connection);
-				Connections connections = ((Connections)Game.getService("Connections"));
+				Connections connections = Game.connections();
+				if ( connections == null )
+					return;
+				
 				engine.lua.type.object.insts.Connection conInst = connections.getConnectionFromKryo(connection);
 				if ( conInst == null )
 					return;

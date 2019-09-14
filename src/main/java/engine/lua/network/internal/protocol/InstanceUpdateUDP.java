@@ -1,20 +1,20 @@
 package engine.lua.network.internal.protocol;
 
-import java.util.List;
-
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.luaj.vm2.LuaValue;
+
+import com.esotericsoftware.kryonet.Connection;
 
 import engine.Game;
 import engine.lua.network.internal.ClientProcessable;
 import engine.lua.network.internal.PacketUtility;
 import engine.lua.network.internal.ServerProcessable;
 import engine.lua.type.object.Instance;
-import engine.lua.type.object.insts.GameObject;
+import engine.lua.type.object.PhysicsBase;
 import engine.lua.type.object.insts.PhysicsObject;
-import engine.lua.type.object.services.Connections;
+import engine.lua.type.object.insts.Player;
 
 public class InstanceUpdateUDP implements ClientProcessable,ServerProcessable {
 	public long instanceId;
@@ -44,35 +44,51 @@ public class InstanceUpdateUDP implements ClientProcessable,ServerProcessable {
 	}
 	
 	@Override
-	public void serverProcess() {
+	public void serverProcess(Connection connection) {
 		Instance instance = Game.getInstanceFromSID(instanceId);
-		if ( instance == null )
+		if ( instance == null ) {
 			return;
-		
-		// We only let the client control physics objects FOR NOW.
-		if ( !(instance instanceof PhysicsObject) )
-			return;
-		
-		// Check if we can process this request
-		boolean can = false;
-		Connections con = (Connections) Game.getService("Connections");
-		List<GameObject> characters = con.ownedCharacters;
-		for (int i = 0; i < characters.size(); i++) {
-			GameObject character = characters.get(i);
-			if ( instance.isDescendantOf(character) || instance.equals(character) )
-				can = true;
 		}
 		
-		if ( !can )
+		// We only let the client control physics objects FOR NOW.
+		if ( !(instance instanceof PhysicsBase) ) {
 			return;
+		}
 		
-		// Get the field being modified
+		// Check if we can process this request
+		if ( instance instanceof PhysicsBase ) {
+			
+			// Get connection object
+			engine.lua.type.object.insts.Connection luaConnection = Game.connections().getConnectionFromKryo(connection);
+			if ( luaConnection == null ) {
+				return;
+			}
+			
+			// Get player from connection
+			Player player = luaConnection.getPlayer();
+			if ( player == null ) {
+				return;
+			}
+			
+			// Get players character
+			Instance character = player.getCharacter();
+			if ( character == null ) {
+				return;
+			}
+			
+			// If physics object belongs to this player...
+			if ( !instance.isDescendantOf(character) && !instance.equals(character) ) {
+				return;
+			}
+		}
+		
+		// Prevent client from modifying Name, Parent, Classname, or SID.
 		try {
 			JSONParser parser = new JSONParser();
 			JSONObject obj = (JSONObject) parser.parse(instanceData);
 			String field = (String) obj.keySet().iterator().next();
 			
-			if ( field.equals("Name") || field.equals("Parent") || field.equals("ClassName") || field.equals("SID") )
+			if ( field.equals(C_NAME) || field.equals(C_PARENT) || field.equals(C_CLASSNAME) || field.equals(C_SID) )
 				return;
 		} catch (ParseException e) {
 			e.printStackTrace();
@@ -83,13 +99,18 @@ public class InstanceUpdateUDP implements ClientProcessable,ServerProcessable {
 	}
 
 	@Override
-	public void clientProcess() {
+	public void clientProcess(Connection Connection) {
 		Instance instance = Game.getInstanceFromSID(instanceId);
 		if ( instance == null )
 			return;
 		
 		process( instance );
 	}
+	
+	private static final String C_NAME = "Name";
+	private static final String C_PARENT = "Parent";
+	private static final String C_CLASSNAME = "ClassName";
+	private static final String C_SID = "SID";
 	
 	private void process(Instance instance) {
 		JSONParser parser = new JSONParser();
@@ -99,17 +120,17 @@ public class InstanceUpdateUDP implements ClientProcessable,ServerProcessable {
 			LuaValue value = PacketUtility.JSONToField( obj.get(field) );
 			
 			if ( value != null ) {
-				if ( field.equals("Name") )
+				if ( field.equals(C_NAME) )
 					instance.forceSetName(value.toString());
-				else if ( field.equals("Parent") )
+				else if ( field.equals(C_PARENT) )
 					instance.forceSetParent(value);
 				else {
 					if ( !rawOnly ) {
 						try { instance.set(field, value); } catch(Exception e) {}
 					} else {
 						if ( Game.isServer() ) {
-							if ( instance instanceof PhysicsObject ) {
-								((PhysicsObject)instance).updatePhysics(LuaValue.valueOf(field), value);
+							if ( instance instanceof PhysicsBase ) {
+								((PhysicsBase)instance).updatePhysics(LuaValue.valueOf(field), value);
 							}
 						} else {
 							try { instance.set(field, value); } catch(Exception e) {}

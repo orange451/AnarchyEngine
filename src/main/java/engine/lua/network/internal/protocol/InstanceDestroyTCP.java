@@ -1,5 +1,7 @@
 package engine.lua.network.internal.protocol;
 
+import com.esotericsoftware.kryonet.Connection;
+
 import engine.Game;
 import engine.lua.network.internal.ClientProcessable;
 import engine.lua.type.object.Instance;
@@ -16,7 +18,7 @@ public class InstanceDestroyTCP implements ClientProcessable {
 	}
 
 	@Override
-	public void clientProcess() {
+	public void clientProcess(Connection Connection) {
 		Instance instance = Game.getInstanceFromSID(instanceId);
 		if ( instance != null )
 			instance.destroy();

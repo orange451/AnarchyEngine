@@ -7,6 +7,8 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.luaj.vm2.LuaValue;
 
+import com.esotericsoftware.kryonet.Connection;
+
 import engine.lua.network.internal.ClientProcessable;
 import engine.lua.network.internal.NonReplicatable;
 import engine.lua.network.internal.PacketUtility;
@@ -52,7 +54,7 @@ public class InstanceCreateTCP implements ClientProcessable {
 	}
 
 	@Override
-	public void clientProcess() {
+	public void clientProcess(Connection Connection) {
 		LuaValue toParent = LuaValue.NIL;
 		//System.out.println("Attempting to create: " + instanceType);
 		Instance internalInstance = (Instance) Instance.instance(instanceType);
