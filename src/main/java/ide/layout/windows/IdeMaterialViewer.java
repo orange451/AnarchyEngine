@@ -90,9 +90,7 @@ public class IdeMaterialViewer extends IdePane {
 				Game.assets().descendantAddedEvent().connect((materialArgs)->{
 					Instance child = (Instance) materialArgs[0];
 					if ( child instanceof Material ) {
-						InternalRenderThread.runLater(()->{
-							attachMaterial((Material) child);
-						});
+						attachMaterial((Material) child);
 					}
 				});
 				
@@ -135,11 +133,6 @@ public class IdeMaterialViewer extends IdePane {
 			// Create secondary world
 			RenderableWorld renderableWorld = new Workspace();
 			((Workspace)renderableWorld).forceSetParent(LuaValue.NIL);
-
-			// Create secondary pipeline
-			materialPipeline = new Pipeline();
-			materialPipeline.setRenderableWorld(renderableWorld);
-			materialPipeline.setSize(NODE_SIZE, NODE_SIZE);
 			
 			// Setup pipeline world
 			{
@@ -186,49 +179,6 @@ public class IdeMaterialViewer extends IdePane {
 					BG.setPrefab(BGPREFAB);
 					BG.forceSetParent((LuaValue) renderableWorld);
 				}
-
-				// Lights
-				{
-					int close = 4;
-					int r = 18;
-					int b = 6;
-					int xx = 4;
-					PointLight l1 = new PointLight();
-					l1.setPosition(-xx, close, xx);
-					l1.setRadius(r);
-					l1.setIntensity(b);
-					l1.setParent( renderableWorld.getInstance() );
-
-					PointLight l2 = new PointLight();
-					l2.setPosition(xx, close, xx);
-					l2.setRadius(r);
-					l2.setIntensity(b);
-					l2.setParent(renderableWorld.getInstance() );
-
-					PointLight l3 = new PointLight();
-					l3.setPosition(-xx, close, -xx);
-					l3.setRadius(r);
-					l3.setIntensity(b);
-					l3.setParent(renderableWorld.getInstance() );
-
-					PointLight l4 = new PointLight();
-					l4.setPosition(xx, close, -xx);
-					l4.setRadius(r);
-					l4.setIntensity(b);
-					l4.setParent(renderableWorld.getInstance() );
-
-					PointLight l5 = new PointLight();
-					l5.setPosition(xx, -close*2, -xx);
-					l5.setRadius(r);
-					l5.setIntensity(b/2);
-					l5.setParent(renderableWorld.getInstance() );
-
-					PointLight l6 = new PointLight();
-					l6.setPosition(-xx, -xx, xx);
-					l6.setRadius(r);
-					l6.setIntensity(b*0.77f);
-					l6.setParent(renderableWorld.getInstance() );
-				}
 			}
 			
 			// OpenGL rendering pane
@@ -237,12 +187,62 @@ public class IdeMaterialViewer extends IdePane {
 			this.oglPane.setFlipY(true);
 			this.oglPane.setRendererCallback(new Renderer() {
 				GenericShader shader;
-				{
-					shader = new GenericShader();
-				}
-				
+
 				@Override
 				public void render(Context context) {
+					if ( shader == null ) {
+						shader = new GenericShader();
+					}
+					
+					if ( materialPipeline == null ) {
+						materialPipeline = new Pipeline();
+						materialPipeline.setRenderableWorld(renderableWorld);
+						materialPipeline.setSize(NODE_SIZE, NODE_SIZE);
+						materialPipeline.render();
+						
+						// Lights
+						{
+							int close = 4;
+							int r = 18;
+							int b = 6;
+							int xx = 4;
+							PointLight l1 = new PointLight();
+							l1.setPosition(-xx, close, xx);
+							l1.setRadius(r);
+							l1.setIntensity(b);
+							l1.setParent( renderableWorld.getInstance() );
+
+							PointLight l2 = new PointLight();
+							l2.setPosition(xx, close, xx);
+							l2.setRadius(r);
+							l2.setIntensity(b);
+							l2.setParent(renderableWorld.getInstance() );
+
+							PointLight l3 = new PointLight();
+							l3.setPosition(-xx, close, -xx);
+							l3.setRadius(r);
+							l3.setIntensity(b);
+							l3.setParent(renderableWorld.getInstance() );
+
+							PointLight l4 = new PointLight();
+							l4.setPosition(xx, close, -xx);
+							l4.setRadius(r);
+							l4.setIntensity(b);
+							l4.setParent(renderableWorld.getInstance() );
+
+							PointLight l5 = new PointLight();
+							l5.setPosition(xx, -close*2, -xx);
+							l5.setRadius(r);
+							l5.setIntensity(b/2);
+							l5.setParent(renderableWorld.getInstance() );
+
+							PointLight l6 = new PointLight();
+							l6.setPosition(-xx, -xx, xx);
+							l6.setRadius(r);
+							l6.setIntensity(b*0.77f);
+							l6.setParent(renderableWorld.getInstance() );
+						}
+					}
 					Surface surface = materialPipeline.getPipelineBuffer();
 					surface.render(shader);
 				}
@@ -274,6 +274,8 @@ public class IdeMaterialViewer extends IdePane {
 		}
 
 		private void renderMaterial() {
+			if ( materialPipeline == null )
+				return;
 			materialPipeline.render();
 		}
 	}
