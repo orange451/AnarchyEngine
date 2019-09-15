@@ -37,6 +37,7 @@ public class UniformMatrix3 extends Uniform {
 		if (!used || !matrix.equals(current)) {
 			matrix.get(fm);
 			glUniformMatrix3fv(super.getLocation(), false, fm);
+			used = true;
 		}
 	}
 

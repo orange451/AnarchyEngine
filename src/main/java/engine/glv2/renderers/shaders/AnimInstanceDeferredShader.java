@@ -18,24 +18,29 @@
  * 
  */
 
-package engine.glv2.shaders;
+package engine.glv2.renderers.shaders;
+
+import java.nio.FloatBuffer;
 
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
 
 import engine.gl.MaterialGL;
+import engine.glv2.shaders.ShaderProgram;
 import engine.glv2.shaders.data.Attribute;
 import engine.glv2.shaders.data.UniformMaterial;
 import engine.glv2.shaders.data.UniformMatrix4;
 import engine.lua.type.object.insts.Camera;
 
-public class EntityDeferredShader extends ShaderProgram {
+public class AnimInstanceDeferredShader extends ShaderProgram {
 
 	private UniformMatrix4 transformationMatrix = new UniformMatrix4("transformationMatrix");
 	private UniformMatrix4 projectionMatrix = new UniformMatrix4("projectionMatrix");
 	private UniformMatrix4 viewMatrix = new UniformMatrix4("viewMatrix");
 	private UniformMatrix4 jitterMatrix = new UniformMatrix4("jitterMatrix");
 	private UniformMaterial material = new UniformMaterial("material");
+
+	private UniformMatrix4 boneMat = new UniformMatrix4("boneMat");
 
 	private Matrix4f jitter = new Matrix4f();
 
@@ -50,10 +55,11 @@ public class EntityDeferredShader extends ShaderProgram {
 
 	private Vector2f tmp = new Vector2f();
 
-	public EntityDeferredShader() {
-		super("assets/shaders/EntityDeferred.vs", "assets/shaders/EntityDeferred.fs", new Attribute(0, "position"),
-				new Attribute(1, "normals"), new Attribute(2, "textureCoords"), new Attribute(3, "inColor"));
-		super.storeUniforms(transformationMatrix, material, projectionMatrix, viewMatrix, jitterMatrix);
+	public AnimInstanceDeferredShader() {
+		super("assets/shaders/renderers/AnimInstanceDeferred.vs", "assets/shaders/renderers/InstanceDeferred.fs",
+				new Attribute(0, "position"), new Attribute(1, "normals"), new Attribute(2, "textureCoords"),
+				new Attribute(3, "inColor"), new Attribute(4, "boneIndices"), new Attribute(5, "boneWeights"));
+		super.storeUniforms(transformationMatrix, material, projectionMatrix, viewMatrix, jitterMatrix, boneMat);
 		super.validate();
 	}
 
@@ -63,6 +69,10 @@ public class EntityDeferredShader extends ShaderProgram {
 
 	public void loadMaterial(MaterialGL mat) {
 		material.loadMaterial(mat);
+	}
+
+	public void loadBoneMat(FloatBuffer mat) {
+		boneMat.loadMatrix(mat);
 	}
 
 	public void loadCamera(Camera camera, Matrix4f projection, Vector2f resolution) {

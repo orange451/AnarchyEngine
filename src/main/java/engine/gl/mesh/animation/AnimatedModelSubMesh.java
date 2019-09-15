@@ -71,6 +71,10 @@ public class AnimatedModelSubMesh {
 		glBindVertexArray(vaoId);
 	}
 
+	public void unbind() {
+		glBindVertexArray(0);
+	}
+
 	private void sendToGPU() {
 		// Create new vertex buffer
 		if (this.verticesBuffer == null) {

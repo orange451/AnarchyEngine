@@ -234,4 +234,8 @@ public class AnimationController extends Instance {
 		return boneAbsolutePositions;
 	}
 
+	public AnimatedModel getAnimatedModel() {
+		return animatedModel;
+	}
+
 }

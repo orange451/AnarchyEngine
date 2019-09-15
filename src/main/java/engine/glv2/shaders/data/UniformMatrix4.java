@@ -22,6 +22,8 @@ package engine.glv2.shaders.data;
 
 import static org.lwjgl.opengl.GL20C.glUniformMatrix4fv;
 
+import java.nio.FloatBuffer;
+
 import org.joml.Matrix4f;
 
 public class UniformMatrix4 extends Uniform {
@@ -37,7 +39,13 @@ public class UniformMatrix4 extends Uniform {
 		if (!used || !matrix.equals(current)) {
 			matrix.get(fm);
 			glUniformMatrix4fv(super.getLocation(), false, fm);
+			used = true;
 		}
+	}
+
+	//TODO: Optimize
+	public void loadMatrix(FloatBuffer matrix) {
+		glUniformMatrix4fv(super.getLocation(), false, matrix);
 	}
 
 }

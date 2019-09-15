@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.joml.Matrix4f;
+import org.luaj.vm2.LuaValue;
 
 import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.IntMap.Entry;
@@ -42,6 +43,9 @@ import engine.observer.RenderableInstance;
 
 public class RenderingManager {
 
+	// TODO: this should NOT be here
+	private static final LuaValue C_ANIMATIONCONTROLLER = LuaValue.valueOf("AnimationController");
+
 	private final IntMap<IObjectRenderer> objectRenderers = new IntMap<>();
 	private final ObjectIntMap<List<Instance>> entitiesToRenderers = new ObjectIntMap<>();
 
@@ -54,7 +58,7 @@ public class RenderingManager {
 
 	public void preProcess(Instance world) {
 		List<Instance> entities = world.getChildren();
-		synchronized(entities) {
+		synchronized (entities) {
 			for (Instance entity : entities)
 				process(entity);
 		}
@@ -105,7 +109,8 @@ public class RenderingManager {
 			process(inst);
 		}
 		if (root instanceof RenderableInstance) {
-			int id = 1; // TODO: Poll current instance renderer id
+			int id = root.findFirstChildOfClass(C_ANIMATIONCONTROLLER) == null ? 1 : 2; // TODO: Poll current instance
+																						// renderer id
 			List<Instance> batch = entitiesToRenderers.findKey(id);
 			if (batch != null)
 				batch.add(root);

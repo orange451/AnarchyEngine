@@ -18,10 +18,12 @@
  * 
  */
 
-package engine.glv2;
+package engine.glv2.renderers;
 
 import static org.lwjgl.opengl.GL11C.GL_TEXTURE_2D;
+import static org.lwjgl.opengl.GL11C.GL_TRIANGLES;
 import static org.lwjgl.opengl.GL11C.glBindTexture;
+import static org.lwjgl.opengl.GL11C.glDrawArrays;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE0;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE1;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE2;
@@ -41,26 +43,31 @@ import java.util.List;
 
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
+import org.luaj.vm2.LuaValue;
 
 import engine.gl.MaterialGL;
 import engine.gl.Resources;
 import engine.gl.light.PointLightInternal;
-import engine.gl.mesh.BufferedMesh;
+import engine.gl.mesh.animation.AnimatedModel;
+import engine.gl.mesh.animation.AnimatedModelSubMesh;
+import engine.glv2.RendererData;
 import engine.glv2.entities.CubeMapCamera;
-import engine.glv2.shaders.EntityFowardShader;
+import engine.glv2.renderers.shaders.AnimInstanceFowardShader;
 import engine.glv2.v2.IRenderingData;
 import engine.lua.type.object.Instance;
-import engine.lua.type.object.PrefabRenderer;
+import engine.lua.type.object.insts.AnimationController;
 import engine.lua.type.object.insts.GameObject;
 import engine.lua.type.object.insts.Material;
-import engine.lua.type.object.insts.Model;
 
-public class EntityForwardRenderer {
+public class AnimInstanceForwardRenderer {
 
-	private EntityFowardShader shader;
+	private AnimInstanceFowardShader shader;
 
-	public EntityForwardRenderer() {
-		shader = new EntityFowardShader();
+	// TODO: this should NOT be here
+	private static final LuaValue C_ANIMATIONCONTROLLER = LuaValue.valueOf("AnimationController");
+
+	public AnimInstanceForwardRenderer() {
+		shader = new AnimInstanceFowardShader();
 	}
 
 	public void render(List<Instance> instances, IRenderingData rd, RendererData rnd, CubeMapCamera cubeCamera,
@@ -94,18 +101,21 @@ public class EntityForwardRenderer {
 	}
 
 	private void renderInstance(Instance inst, RendererData rnd, boolean transparentOnly) {
-		GameObject go = (GameObject) inst;
+		AnimationController anim = (AnimationController) inst.findFirstChildOfClass(C_ANIMATIONCONTROLLER);
+
+		GameObject go = anim.getLinkedInstance();
 		if (go.isDestroyed())
 			return;
 		if (go.getParent().isnil())
 			return;
 		if (go.getPrefab() == null)
 			return;
-		PrefabRenderer pfr = go.getPrefab().getPrefab();
+		AnimatedModel model = anim.getAnimatedModel();
 
 		Matrix4f mat = go.getWorldMatrix().toJoml();
-		mat.scale(pfr.getParent().getScale());
+		mat.scale(go.getPrefab().getScale());
 		shader.loadTransformationMatrix(mat);
+		shader.loadBoneMat(model.getBoneBuffer());
 
 		Vector3f gop = go.getPosition().toJoml();
 
@@ -127,15 +137,11 @@ public class EntityForwardRenderer {
 		});
 
 		shader.loadPointLights(pl);
-		for (int i = 0; i < pfr.size(); i++) {
-			Model p = pfr.getModel(i);
-			BufferedMesh m = p.getMesh();
-
-			if (m == null)
-				m = Resources.MESH_SPHERE;
+		for (int i = 0; i < model.getMeshes().size(); i++) {
+			AnimatedModelSubMesh mesh = model.getMeshes().get(i);
 
 			engine.gl.MaterialGL material = Resources.MATERIAL_BLANK;
-			Material ECSMat = p.getMaterial();
+			Material ECSMat = model.getMeshToModelMap().get(mesh).getMaterial();
 			if (ECSMat != null) {
 				MaterialGL GLMat = ECSMat.getMaterial();
 				if (GLMat != null) {
@@ -151,7 +157,9 @@ public class EntityForwardRenderer {
 			prepareMaterial(material);
 			shader.loadMaterial(material);
 			shader.loadTransparency(trans);
-			m.render(null, null, null);
+			mesh.bind();
+			glDrawArrays(GL_TRIANGLES, 0, mesh.size());
+			mesh.unbind();
 		}
 	}
 

@@ -18,29 +18,36 @@
  * 
  */
 
-package engine.glv2;
+package engine.glv2.renderers;
+
+import static org.lwjgl.opengl.GL11C.GL_TRIANGLES;
+import static org.lwjgl.opengl.GL11C.glDrawArrays;
 
 import java.util.List;
 
 import org.joml.Matrix4f;
+import org.luaj.vm2.LuaValue;
 
 import engine.gl.MaterialGL;
 import engine.gl.Resources;
-import engine.gl.mesh.BufferedMesh;
+import engine.gl.mesh.animation.AnimatedModel;
+import engine.gl.mesh.animation.AnimatedModelSubMesh;
 import engine.glv2.entities.SunCamera;
-import engine.glv2.shaders.EntityBasicShader;
+import engine.glv2.renderers.shaders.AnimInstanceBasicShader;
 import engine.lua.type.object.Instance;
-import engine.lua.type.object.PrefabRenderer;
+import engine.lua.type.object.insts.AnimationController;
 import engine.lua.type.object.insts.GameObject;
 import engine.lua.type.object.insts.Material;
-import engine.lua.type.object.insts.Model;
 
-public class EntityShadowRenderer {
+public class AnimInstanceShadowRenderer {
 
-	private EntityBasicShader shader;
+	private AnimInstanceBasicShader shader;
 
-	public EntityShadowRenderer() {
-		shader = new EntityBasicShader();
+	// TODO: this should NOT be here
+	private static final LuaValue C_ANIMATIONCONTROLLER = LuaValue.valueOf("AnimationController");
+
+	public AnimInstanceShadowRenderer() {
+		shader = new AnimInstanceBasicShader();
 	}
 
 	protected void renderShadow(List<Instance> instances, SunCamera sunCamera) {
@@ -53,27 +60,26 @@ public class EntityShadowRenderer {
 	}
 
 	private void renderInstance(Instance inst) {
-		GameObject go = (GameObject) inst;
+		AnimationController anim = (AnimationController) inst.findFirstChildOfClass(C_ANIMATIONCONTROLLER);
+
+		GameObject go = anim.getLinkedInstance();
 		if (go.isDestroyed())
 			return;
 		if (go.getParent().isnil())
 			return;
 		if (go.getPrefab() == null)
 			return;
-		PrefabRenderer pfr = go.getPrefab().getPrefab();
+		AnimatedModel model = anim.getAnimatedModel();
 
 		Matrix4f mat = go.getWorldMatrix().toJoml();
-		mat.scale(pfr.getParent().getScale());
+		mat.scale(go.getPrefab().getScale());
 		shader.loadTransformationMatrix(mat);
-		for (int i = 0; i < pfr.size(); i++) {
-			Model p = pfr.getModel(i);
-			BufferedMesh m = p.getMesh();
-
-			if (m == null)
-				m = Resources.MESH_SPHERE;
+		shader.loadBoneMat(model.getBoneBuffer());
+		for (int i = 0; i < model.getMeshes().size(); i++) {
+			AnimatedModelSubMesh mesh = model.getMeshes().get(i);
 
 			engine.gl.MaterialGL material = Resources.MATERIAL_BLANK;
-			Material ECSMat = p.getMaterial();
+			Material ECSMat = model.getMeshToModelMap().get(mesh).getMaterial();
 			if (ECSMat != null) {
 				MaterialGL GLMat = ECSMat.getMaterial();
 				if (GLMat != null) {
@@ -85,7 +91,10 @@ public class EntityShadowRenderer {
 			float trans = iMatTrans * iObjTrans;
 			if (trans != 1.0)
 				continue;
-			m.render(null, null, null);
+
+			mesh.bind();
+			glDrawArrays(GL_TRIANGLES, 0, mesh.size());
+			mesh.unbind();
 		}
 	}
 

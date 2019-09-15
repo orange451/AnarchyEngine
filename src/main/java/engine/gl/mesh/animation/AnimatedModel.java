@@ -304,9 +304,29 @@ public class AnimatedModel {
 			
 			// Draw mesh
 			GL11.glDrawArrays(GL11.GL_TRIANGLES, 0, mesh.size());
+			mesh.unbind();
 		}
 		
 		Pipeline.pipeline_get().shader_set(oldShader);
+	}
+	
+	// TODO: In fact, only rebuilds the buffers
+	public void renderV2() {
+		if (meshes.size() == 0)
+			rebuild();
+		updateBones();
+	}
+
+	public FloatBuffer getBoneBuffer() {
+		return boneBuffer;
+	}
+
+	public List<AnimatedModelSubMesh> getMeshes() {
+		return meshes;
+	}
+
+	public HashMap<AnimatedModelSubMesh, Model> getMeshToModelMap() {
+		return meshToModelMap;
 	}
 	
 	static class BoneData {

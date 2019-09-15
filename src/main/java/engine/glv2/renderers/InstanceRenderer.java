@@ -18,7 +18,7 @@
  * 
  */
 
-package engine.glv2;
+package engine.glv2.renderers;
 
 import static org.lwjgl.opengl.GL11C.GL_TEXTURE_2D;
 import static org.lwjgl.opengl.GL11C.GL_VIEWPORT;
@@ -39,9 +39,11 @@ import org.joml.Vector2f;
 import engine.gl.MaterialGL;
 import engine.gl.Resources;
 import engine.gl.mesh.BufferedMesh;
+import engine.glv2.IObjectRenderer;
+import engine.glv2.RendererData;
 import engine.glv2.entities.CubeMapCamera;
 import engine.glv2.entities.SunCamera;
-import engine.glv2.shaders.EntityDeferredShader;
+import engine.glv2.renderers.shaders.InstanceDeferredShader;
 import engine.glv2.v2.IRenderingData;
 import engine.lua.type.object.Instance;
 import engine.lua.type.object.PrefabRenderer;
@@ -50,29 +52,29 @@ import engine.lua.type.object.insts.GameObject;
 import engine.lua.type.object.insts.Material;
 import engine.lua.type.object.insts.Model;
 
-public class EntityRenderer implements IObjectRenderer {
+public class InstanceRenderer implements IObjectRenderer {
 
 	public static final int ENTITY_RENDERER_ID = 1;
 
-	private EntityDeferredShader shader;
-	private List<Instance> entities = new ArrayList<>();
-	private EntityShadowRenderer shadowRenderer;
-	private EntityForwardRenderer forwardRenderer;
+	private InstanceDeferredShader shader;
+	private List<Instance> instances = new ArrayList<>();
+	private InstanceShadowRenderer shadowRenderer;
+	private InstanceForwardRenderer forwardRenderer;
 
 	// TODO: Temporary res storage
 	private int[] viewport = new int[4];
 	private Vector2f resolution = new Vector2f();
 
-	public EntityRenderer() {
-		shader = new EntityDeferredShader();
-		shadowRenderer = new EntityShadowRenderer();
-		forwardRenderer = new EntityForwardRenderer();
+	public InstanceRenderer() {
+		shader = new InstanceDeferredShader();
+		shadowRenderer = new InstanceShadowRenderer();
+		forwardRenderer = new InstanceForwardRenderer();
 	}
 
 	@Override
-	public void preProcess(List<Instance> entities) {
-		for (Instance entity : entities) {
-			processEntity(entity);
+	public void preProcess(List<Instance> instances) {
+		for (Instance instance : instances) {
+			processEntity(instance);
 		}
 	}
 
@@ -82,7 +84,7 @@ public class EntityRenderer implements IObjectRenderer {
 		resolution.set(viewport[2], viewport[3]);
 		shader.start();
 		shader.loadCamera(camera, projection, resolution);
-		for (Instance instance : entities) {
+		for (Instance instance : instances) {
 			renderInstance(instance);
 		}
 		shader.stop();
@@ -90,36 +92,26 @@ public class EntityRenderer implements IObjectRenderer {
 
 	@Override
 	public void renderReflections(IRenderingData rd, RendererData rnd, CubeMapCamera cubeCamera) {
-		forwardRenderer.render(entities, rd, rnd, cubeCamera, false/* ,MaterialType.OPAQUE */, false);
+		forwardRenderer.render(instances, rd, rnd, cubeCamera, false/* ,MaterialType.OPAQUE */, false);
 	}
 
 	@Override
 	public void renderForward(IRenderingData rd, RendererData rnd) {
-		forwardRenderer.render(entities, rd, rnd, null, true/* ,MaterialType.TRANSPARENT */, true);
+		forwardRenderer.render(instances, rd, rnd, null, true/* ,MaterialType.TRANSPARENT */, true);
 	}
 
 	@Override
 	public void renderShadow(SunCamera sun) {
-		shadowRenderer.renderShadow(entities, sun);
+		shadowRenderer.renderShadow(instances, sun);
 	}
 
 	@Override
 	public void end() {
-		entities.clear();
+		instances.clear();
 	}
 
 	private void processEntity(Instance entity) {
-		/*
-		 * Model model = ClientComponents.RENDERABLE.get(entity).getModel(); for (Mesh
-		 * mesh : model.getMeshes()) { Material mat =
-		 * model.getMaterials().get(mesh.getAiMesh().mMaterialIndex());
-		 * 
-		 * EntityRendererObject obj = new EntityRendererObject(); obj.entity = entity;
-		 * obj.mesh = mesh; List<EntityRendererObject> batch = entities.get(mat); if
-		 * (batch != null) batch.add(obj); else { List<EntityRendererObject> newBatch =
-		 * new ArrayList<>(); newBatch.add(obj); entities.put(mat, newBatch); } }
-		 */
-		entities.add(entity);
+		instances.add(entity);
 	}
 
 	private void renderInstance(Instance inst) {
@@ -172,34 +164,6 @@ public class EntityRenderer implements IObjectRenderer {
 		glActiveTexture(GL_TEXTURE3);
 		glBindTexture(GL_TEXTURE_2D, mat.getRoughnessTexture().getID());
 	}
-
-	/*
-	 * private void renderEntity(Map<Material, List<EntityRendererObject>> entities)
-	 * { for (Material mat : entities.keySet()) { if (mat.getType() !=
-	 * MaterialType.OPAQUE) continue; List<EntityRendererObject> batch =
-	 * entities.get(mat); for (EntityRendererObject obj : batch) {
-	 * prepareInstance(obj.entity); prepareTexturedModel(obj.mesh, mat);
-	 * shader.loadMaterial(mat); glDrawElements(GL_TRIANGLES,
-	 * obj.mesh.getMesh().getIndexCount(), GL_UNSIGNED_INT, 0);
-	 * unbindTexturedModel(obj.mesh); } } }
-	 * 
-	 * private void prepareTexturedModel(Mesh mesh, Material material) {
-	 * mesh.getMesh().bind(0, 1, 2, 3); glActiveTexture(GL_TEXTURE0);
-	 * glBindTexture(GL_TEXTURE_2D, material.getDiffuseTexture().getTexture());
-	 * glActiveTexture(GL_TEXTURE1); glBindTexture(GL_TEXTURE_2D,
-	 * material.getNormalTexture().getTexture()); glActiveTexture(GL_TEXTURE2);
-	 * glBindTexture(GL_TEXTURE_2D, material.getRoughnessTexture().getTexture());
-	 * glActiveTexture(GL_TEXTURE3); glBindTexture(GL_TEXTURE_2D,
-	 * material.getMetallicTexture().getTexture()); }
-	 * 
-	 * private void unbindTexturedModel(Mesh mesh) { mesh.getMesh().unbind(0, 1, 2,
-	 * 3); }
-	 * 
-	 * private void prepareInstance(BasicEntity entity) { Matrix4f
-	 * transformationMatrix = Maths.createTransformationMatrix(entity.getPosition(),
-	 * entity.getRX(), entity.getRY(), entity.getRZ(), entity.getScale());
-	 * shader.loadTransformationMatrix(transformationMatrix); }
-	 */
 
 	@Override
 	public void dispose() {

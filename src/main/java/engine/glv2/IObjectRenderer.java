@@ -32,7 +32,7 @@ import engine.lua.type.object.insts.Camera;
 
 public interface IObjectRenderer {
 
-	public void preProcess(List<Instance> entities);
+	public void preProcess(List<Instance> instances);
 
 	public void render(Camera camera, Matrix4f projection);
 
@@ -41,12 +41,11 @@ public interface IObjectRenderer {
 	public void renderForward(IRenderingData rd, RendererData rnd);
 
 	public void renderShadow(SunCamera sun);
-	
+
 	public void dispose();
 
 	public void end();
 
 	public int getID();
-	
 
 }

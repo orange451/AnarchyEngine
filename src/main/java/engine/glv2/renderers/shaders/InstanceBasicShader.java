@@ -18,26 +18,27 @@
  * 
  */
 
-package engine.glv2.shaders;
+package engine.glv2.renderers.shaders;
 
 import org.joml.Matrix4f;
 
 import engine.glv2.entities.SunCamera;
+import engine.glv2.shaders.ShaderProgram;
 import engine.glv2.shaders.data.Attribute;
 import engine.glv2.shaders.data.UniformFloat;
 import engine.glv2.shaders.data.UniformMatrix4;
 import engine.lua.type.object.insts.Camera;
 
-public class EntityBasicShader extends ShaderProgram {
+public class InstanceBasicShader extends ShaderProgram {
 
 	private UniformMatrix4 transformationMatrix = new UniformMatrix4("transformationMatrix");
 	private UniformMatrix4 projectionMatrix[] = new UniformMatrix4[4];
 	private UniformMatrix4 viewMatrix = new UniformMatrix4("viewMatrix");
 	private UniformFloat transparency = new UniformFloat("transparency");
 
-	public EntityBasicShader() {
-		super("assets/shaders/EntityBasic.vs", "assets/shaders/EntityBasic.gs", "assets/shaders/EntityBasic.fs",
-				new Attribute(0, "position"));
+	public InstanceBasicShader() {
+		super("assets/shaders/renderers/InstanceBasic.vs", "assets/shaders/renderers/InstanceBasic.gs",
+				"assets/shaders/renderers/InstanceBasic.fs", new Attribute(0, "position"));
 		for (int i = 0; i < 4; i++)
 			projectionMatrix[i] = new UniformMatrix4("projectionMatrix[" + i + "]");
 		super.storeUniforms(projectionMatrix);

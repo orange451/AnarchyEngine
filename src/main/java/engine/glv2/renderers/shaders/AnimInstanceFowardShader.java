@@ -18,8 +18,9 @@
  * 
  */
 
-package engine.glv2.shaders;
+package engine.glv2.renderers.shaders;
 
+import java.nio.FloatBuffer;
 import java.util.List;
 
 import org.joml.Matrix4f;
@@ -29,6 +30,7 @@ import engine.gl.MaterialGL;
 import engine.gl.light.DirectionalLightInternal;
 import engine.gl.light.PointLightInternal;
 import engine.glv2.entities.CubeMapCamera;
+import engine.glv2.shaders.ShaderProgram;
 import engine.glv2.shaders.data.Attribute;
 import engine.glv2.shaders.data.UniformBoolean;
 import engine.glv2.shaders.data.UniformDirectionalLight;
@@ -41,7 +43,7 @@ import engine.glv2.shaders.data.UniformSampler;
 import engine.glv2.shaders.data.UniformVec3;
 import engine.lua.type.object.insts.Camera;
 
-public class EntityFowardShader extends ShaderProgram {
+public class AnimInstanceFowardShader extends ShaderProgram {
 
 	private UniformMatrix4 transformationMatrix = new UniformMatrix4("transformationMatrix");
 	private UniformMatrix4 projectionMatrix = new UniformMatrix4("projectionMatrix");
@@ -72,9 +74,12 @@ public class EntityFowardShader extends ShaderProgram {
 	private UniformDirectionalLight directionalLights[] = new UniformDirectionalLight[8];
 	private UniformInteger totalDirectionalLights = new UniformInteger("totalDirectionalLights");
 
-	public EntityFowardShader() {
-		super("assets/shaders/EntityForward.vs", "assets/shaders/EntityForward.fs", new Attribute(0, "position"),
-				new Attribute(1, "normals"), new Attribute(2, "textureCoords"), new Attribute(3, "inColor"));
+	private UniformMatrix4 boneMat = new UniformMatrix4("boneMat");
+
+	public AnimInstanceFowardShader() {
+		super("assets/shaders/renderers/AnimInstanceForward.vs", "assets/shaders/renderers/InstanceForward.fs",
+				new Attribute(0, "position"), new Attribute(1, "normals"), new Attribute(2, "textureCoords"),
+				new Attribute(3, "inColor"), new Attribute(4, "boneIndices"), new Attribute(5, "boneWeights"));
 		projectionLightMatrix = new UniformMatrix4[4];
 		for (int x = 0; x < 4; x++)
 			projectionLightMatrix[x] = new UniformMatrix4("projectionLightMatrix[" + x + "]");
@@ -89,7 +94,7 @@ public class EntityFowardShader extends ShaderProgram {
 		super.storeUniforms(directionalLights);
 		super.storeUniforms(transformationMatrix, projectionMatrix, viewMatrix, material, cameraPosition, lightPosition,
 				uAmbient, irradianceMap, preFilterEnv, brdfLUT, colorCorrect, biasMatrix, viewLightMatrix, useShadows,
-				transparency, gamma, exposure, totalPointLights, shadowMap, totalDirectionalLights);
+				transparency, gamma, exposure, totalPointLights, shadowMap, totalDirectionalLights, boneMat);
 		super.validate();
 		this.loadInitialData();
 	}
@@ -152,7 +157,7 @@ public class EntityFowardShader extends ShaderProgram {
 	}
 
 	public void loadDirectionalLights(List<DirectionalLightInternal> lights) {
-		synchronized(lights) {
+		synchronized (lights) {
 			for (int x = 0; x < Math.min(8, lights.size()); x++)
 				this.directionalLights[x].loadLight(lights.get(x));
 			totalDirectionalLights.loadInteger(Math.min(8, lights.size()));
@@ -181,6 +186,10 @@ public class EntityFowardShader extends ShaderProgram {
 
 	public void loadExposure(float t) {
 		exposure.loadFloat(t);
+	}
+
+	public void loadBoneMat(FloatBuffer mat) {
+		boneMat.loadMatrix(mat);
 	}
 
 }

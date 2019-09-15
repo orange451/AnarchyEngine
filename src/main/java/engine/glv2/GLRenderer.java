@@ -55,6 +55,8 @@ import engine.glv2.entities.Sun;
 import engine.glv2.entities.SunCamera;
 import engine.glv2.pipeline.MultiPass;
 import engine.glv2.pipeline.PostProcess;
+import engine.glv2.renderers.AnimInstanceRenderer;
+import engine.glv2.renderers.InstanceRenderer;
 import engine.glv2.shaders.ShaderIncludes;
 import engine.glv2.v2.DeferredPipeline;
 import engine.glv2.v2.EnvironmentRenderer;
@@ -166,7 +168,8 @@ public class GLRenderer implements IPipeline {
 		// particleRenderer = new ParticleRenderer(loader);
 		skydomeRenderer = new SkydomeRenderer(loader);
 		// waterRenderer = new WaterRenderer(loader);
-		renderingManager.addRenderer(new EntityRenderer());
+		renderingManager.addRenderer(new InstanceRenderer());
+		renderingManager.addRenderer(new AnimInstanceRenderer());
 		outlineRenderer = new OutlineRenderer();
 		rnd.dlsm = dlsm = new DirectionalLightShadowMap(rs.shadowsResolution);
 		dp = new MultiPass(RenderableApplication.windowWidth, RenderableApplication.windowHeight);
@@ -324,12 +327,8 @@ public class GLRenderer implements IPipeline {
 		this.time %= 24000;
 
 		// Update Projection
-		if (useARBClipControl)
-			Maths.createProjectionMatrix(projMatrix, this.width, this.height, currentCamera.getFov(), 0.1f,
-					Float.POSITIVE_INFINITY, true);
-		else
-			Maths.createProjectionMatrix(projMatrix, this.width, this.height, currentCamera.getFov(), 0.1f,
-					Float.POSITIVE_INFINITY, false);
+		Maths.createProjectionMatrix(projMatrix, this.width, this.height, currentCamera.getFov(), 0.1f,
+				Float.POSITIVE_INFINITY, useARBClipControl);
 
 		// Set global time for clouds
 		this.globalTime += 0.016f * 10;
