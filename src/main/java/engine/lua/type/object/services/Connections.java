@@ -27,15 +27,12 @@ public class Connections extends Service implements TreeViewable,GameSubscriber 
 	private InternalServer internalServer;
 	private InternalClient internalClient;
 	private boolean enabled;
-	public List<GameObject> ownedCharacters;
 	
 	private static final LuaValue C_DEFAULTPORT = LuaValue.valueOf("DefaultPort");
 	private static final LuaValue C_LOCALCONNECTION = LuaValue.valueOf("LocalConnection");
 	
 	public Connections() {
 		super("Connections");
-		
-		ownedCharacters = new ArrayList<GameObject>();
 		
 		this.defineField(C_DEFAULTPORT.toString(), LuaValue.valueOf(36545), false);
 		this.defineField(C_LOCALCONNECTION.toString(), LuaValue.NIL, true);

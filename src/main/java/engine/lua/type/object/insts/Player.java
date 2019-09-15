@@ -35,15 +35,9 @@ public class Player extends Instance implements TreeViewable {
 				
 				Connections c = (Connections)Game.connections();
 				
-				// Remove the last character
-				if ( lastCharacter != null ) {
-					c.ownedCharacters.remove(lastCharacter);
-				}
-				
 				// Add new character
 				LuaValue character = args[1];
 				if ( !character.isnil() && character instanceof GameObject ) {
-					c.ownedCharacters.add((GameObject) character);
 					lastCharacter = (Instance) character;
 				} else {
 					lastCharacter = null;
