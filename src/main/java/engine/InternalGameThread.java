@@ -10,6 +10,7 @@ import org.luaj.vm2.LuaValue;
 
 import engine.application.Application;
 import engine.lua.type.ScriptData;
+import engine.lua.type.object.Service;
 import engine.lua.type.object.services.RunService;
 import engine.observer.Tickable;
 import engine.util.Sync;
@@ -112,6 +113,13 @@ public class InternalGameThread extends Observable implements Runnable {
 	private void cleanup() {
 		// Clean up all lua objects
 		Game.unload();
+		Game.setRunning(false);
+		
+		// Stop services
+		ArrayList<Service> services = Game.getServices();
+		for (int i = 0; i < services.size(); i++) {
+			services.get(i).destroy();
+		}
 		
 		// Disable scripts
 		ScriptData.shutdown();

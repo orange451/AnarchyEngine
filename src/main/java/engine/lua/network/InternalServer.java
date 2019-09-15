@@ -38,7 +38,7 @@ public class InternalServer extends Server {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-
+		
 		InternalRegister.register(this.getKryo());
 		
 		System.out.println("Server started");

@@ -131,6 +131,9 @@ public class InternalClient extends Client {
 			@Override
 			public void disconnected(Connection connection) {
 				Connections connections = ((Connections)Game.getService("Connections"));
+				if ( connections == null )
+					return;
+				
 				engine.lua.type.object.insts.Connection conInst = connections.getConnectionFromKryo(connection);
 				if ( conInst == null )
 					return;
