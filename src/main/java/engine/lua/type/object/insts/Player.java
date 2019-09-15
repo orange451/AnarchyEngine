@@ -9,7 +9,6 @@ import engine.lua.type.object.services.Connections;
 import ide.layout.windows.icons.Icons;
 
 public class Player extends Instance implements TreeViewable {
-	private Instance lastCharacter;
 	
 	private static final LuaValue C_CHARACTER = LuaValue.valueOf("Character");
 	private static final LuaValue C_CONNECTION = LuaValue.valueOf("Connection");
@@ -26,24 +25,6 @@ public class Player extends Instance implements TreeViewable {
 		
 		this.setInstanceable(false);
 		this.setLocked(true);
-		
-		this.changedEvent().connect((args)->{
-			if ( args[0].eq_b(C_CHARACTER)) {
-				
-				if ( !Game.isServer() )
-					return;
-				
-				Connections c = (Connections)Game.connections();
-				
-				// Add new character
-				LuaValue character = args[1];
-				if ( !character.isnil() && character instanceof GameObject ) {
-					lastCharacter = (Instance) character;
-				} else {
-					lastCharacter = null;
-				}
-			}
-		});
 	}
 
 	@Override
