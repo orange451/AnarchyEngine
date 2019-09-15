@@ -54,8 +54,10 @@ public class RenderingManager {
 
 	public void preProcess(Instance world) {
 		List<Instance> entities = world.getChildren();
-		for (Instance entity : entities)
-			process(entity);
+		synchronized(entities) {
+			for (Instance entity : entities)
+				process(entity);
+		}
 		for (Entry<IObjectRenderer> rendererEntry : objectRenderers) {
 			IObjectRenderer objectRenderer = rendererEntry.value;
 			List<Instance> batch = entitiesToRenderers.findKey(objectRenderer.getID());
