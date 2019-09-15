@@ -124,6 +124,8 @@ public class EntityRenderer implements IObjectRenderer {
 
 	private void renderInstance(Instance inst) {
 		GameObject go = (GameObject) inst;
+		if (go.isDestroyed())
+			return;
 		if (go.getParent().isnil())
 			return;
 		if (go.getPrefab() == null)

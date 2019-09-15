@@ -95,6 +95,8 @@ public class EntityForwardRenderer {
 
 	private void renderInstance(Instance inst, RendererData rnd, boolean transparentOnly) {
 		GameObject go = (GameObject) inst;
+		if (go.isDestroyed())
+			return;
 		if (go.getParent().isnil())
 			return;
 		if (go.getPrefab() == null)
@@ -108,7 +110,7 @@ public class EntityForwardRenderer {
 		Vector3f gop = go.getPosition().toJoml();
 
 		List<PointLightInternal> pl = new ArrayList<>();
-		synchronized(rnd.plh.getLights()) {
+		synchronized (rnd.plh.getLights()) {
 			for (PointLightInternal p : rnd.plh.getLights()) {
 				if (p.getPosition().distance(gop) < p.radius)
 					pl.add(p);
