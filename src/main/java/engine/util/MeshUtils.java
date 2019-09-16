@@ -280,7 +280,8 @@ public class MeshUtils {
 				if ( t1.getXYZ()[2] > OFFSET.z || t2.getXYZ()[2] > OFFSET.z || t3.getXYZ()[2] > OFFSET.z )
 					continue;
 			} else {
-				if ( t1.getXYZ()[2] < OFFSET.z || t2.getXYZ()[2] < OFFSET.z || t3.getXYZ()[2] < OFFSET.z )
+				float t = radius/(float)slices;
+				if ( t1.getXYZ()[2] < OFFSET.z-t || t2.getXYZ()[2] < OFFSET.z-t || t3.getXYZ()[2] < OFFSET.z-t )
 					continue;
 			}
 
@@ -417,12 +418,10 @@ public class MeshUtils {
 
 	public static BufferedMesh capsule( float radius, float height, int steps ) {
 		height -= radius*2;
-		if ( height < 0 )
-			return null;
 
 		float offsetOriginal = OFFSET.z;
 		BufferedMesh mesh2 = cylinder( radius, height, steps, false );
-		OFFSET.z += height/2;
+		OFFSET.z += height/2f;
 		BufferedMesh mesh1 = hemisphere( radius, steps, steps, false );
 		OFFSET.z -= height;
 		BufferedMesh mesh3 = hemisphere( radius, steps, steps, true );
