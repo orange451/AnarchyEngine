@@ -187,7 +187,9 @@ public abstract class DataModel extends LuaDatatype {
 				System.out.println();*/
 			//}
 			
-			this.internalName = value.toString();
+			if ( key.eq_b(C_NAME)) {
+				this.internalName = value.toString();
+			}
 			onKeyChange( key, this.get(key) );
 		}
 	}
