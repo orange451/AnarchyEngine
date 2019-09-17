@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
+import org.luaj.vm2.LuaError;
 import org.luaj.vm2.LuaNumber;
 import org.luaj.vm2.LuaTable;
 import org.luaj.vm2.LuaValue;
@@ -309,6 +310,9 @@ public abstract class DataModel extends LuaDatatype {
 	private void checkSetParent(LuaValue key, LuaValue oldParent, LuaValue newParent) {
 		if ( key.eq_b(C_PARENT) ) {
 			
+			if ( newParent == this )
+				new LuaError("Instance can not be its own parent");
+			
 			// If the parent hasen't changed, don't run code.
 			if ( oldParent.equals(newParent) ) {
 				return;
@@ -477,6 +481,9 @@ public abstract class DataModel extends LuaDatatype {
 		if ( parent == null )
 			parent = LuaValue.NIL;
 		
+		if ( parent == this )
+			new LuaError("Instance can not be its own parent");
+		
 		this.set(C_PARENT, parent);
 	}
 	
@@ -487,6 +494,9 @@ public abstract class DataModel extends LuaDatatype {
 	public void forceSetParent(LuaValue parent) {
 		if ( parent == null )
 			parent = LuaValue.NIL;
+
+		if ( parent == this )
+			new LuaError("Instance can not be its own parent");
 		
 		//boolean l = this.locked;
 		//boolean l2 = !this.getField("Parent").canModify();
