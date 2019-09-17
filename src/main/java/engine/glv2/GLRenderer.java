@@ -41,6 +41,7 @@ import static org.lwjgl.opengl.GL11C.glEnable;
 import static org.lwjgl.opengl.GL32C.GL_TEXTURE_CUBE_MAP_SEAMLESS;
 
 import org.joml.Matrix4f;
+import org.joml.Vector2f;
 import org.luaj.vm2.LuaValue;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.ARBClipControl;
@@ -62,7 +63,7 @@ import engine.glv2.v2.DeferredPipeline;
 import engine.glv2.v2.EnvironmentRenderer;
 import engine.glv2.v2.IRenderingData;
 import engine.glv2.v2.IrradianceCapture;
-import engine.glv2.v2.OutlineRenderer;
+import engine.glv2.v2.HandlesRenderer;
 import engine.glv2.v2.PostProcessPipeline;
 import engine.glv2.v2.lights.DirectionalLightShadowMap;
 import engine.lua.type.object.insts.Camera;
@@ -84,7 +85,7 @@ public class GLRenderer implements IPipeline {
 	private PointLightHandler pointLightHandler;
 	private DirectionalLightHandler directionalLightHandler;
 	private RenderingManager renderingManager;
-	private OutlineRenderer outlineRenderer;
+	private HandlesRenderer handlesRenderer;
 
 	private DirectionalLightShadowMap dlsm;
 
@@ -111,6 +112,7 @@ public class GLRenderer implements IPipeline {
 	private RenderableWorld renderableWorld;
 
 	private int width, height;
+	private Vector2f size = new Vector2f();
 
 	private float time = 20000, globalTime = 0;
 
@@ -151,9 +153,6 @@ public class GLRenderer implements IPipeline {
 	}
 
 	public void init() {
-		if (enabled)
-			return;
-
 		renderingManager = new RenderingManager();
 		// lightRenderer = new LightRenderer();
 		// frustum = new Frustum();
@@ -170,7 +169,7 @@ public class GLRenderer implements IPipeline {
 		// waterRenderer = new WaterRenderer(loader);
 		renderingManager.addRenderer(new InstanceRenderer());
 		renderingManager.addRenderer(new AnimInstanceRenderer());
-		outlineRenderer = new OutlineRenderer();
+		handlesRenderer = new HandlesRenderer();
 		rnd.dlsm = dlsm = new DirectionalLightShadowMap(rs.shadowsResolution);
 		dp = new MultiPass(RenderableApplication.windowWidth, RenderableApplication.windowHeight);
 		pp = new PostProcess(RenderableApplication.windowWidth, RenderableApplication.windowHeight);
@@ -183,7 +182,7 @@ public class GLRenderer implements IPipeline {
 		rnd.exposure = Game.lighting().getExposure();
 		rnd.plh = pointLightHandler;
 		rnd.dlh = directionalLightHandler;
-
+		size.set(RenderableApplication.windowWidth, RenderableApplication.windowHeight);
 		enabled = true;
 	}
 
@@ -291,7 +290,7 @@ public class GLRenderer implements IPipeline {
 		renderingManager.renderForward(rd, rnd);
 		GPUProfiler.end();
 		GPUProfiler.start("OutlineRendering");
-		outlineRenderer.render(currentCamera, projMatrix, Game.selectedExtended());
+		handlesRenderer.render(currentCamera, projMatrix, Game.selectedExtended(), size);
 		GPUProfiler.end();
 		pp.unbind();
 		if (useARBClipControl) {
@@ -377,6 +376,7 @@ public class GLRenderer implements IPipeline {
 			return;
 		this.width = width;
 		this.height = height;
+		this.size.set(width, height);
 		dp.resize(width, height);
 		pp.resize(width, height);
 	}
@@ -392,7 +392,7 @@ public class GLRenderer implements IPipeline {
 		preFilteredEnvironment.dispose();
 		// waterRenderer.dispose();
 		renderingManager.dispose();
-		outlineRenderer.dispose();
+		handlesRenderer.dispose();
 		// lightRenderer.dispose();
 	}
 

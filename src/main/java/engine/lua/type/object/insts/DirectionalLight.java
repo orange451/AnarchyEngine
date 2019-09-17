@@ -31,9 +31,6 @@ public class DirectionalLight extends LightBase implements TreeViewable,GameSubs
 	public DirectionalLight() {
 		super("DirectionalLight");
 		
-		// Lock position field (from LightBase)
-		this.getField(C_POSITION).setLocked(true);
-		
 		// Define direction field
 		this.defineField(C_DIRECTION.toString(), new Vector3(1,1,-1), false);
 		

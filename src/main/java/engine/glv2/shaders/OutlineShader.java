@@ -46,7 +46,7 @@ public class OutlineShader extends ShaderProgram {
 	}
 
 	public void loadMaterial(MaterialGL mat) {
-		color.loadVec3(mat.getEmissive());
+		color.loadVec3(mat.getColor());
 	}
 
 	public void loadCamera(Camera camera, Matrix4f projection) {
