@@ -182,7 +182,7 @@ public class InternalServer extends Server {
 		});
 		
 		// This should be replaced in the future. Inherent problem with ALREADY existent instances (bandaid)
-		List<Instance> objects = Game.game().getDescendents();
+		List<Instance> objects = Game.game().getDescendants();
 		for (int i = 0; i < objects.size(); i++) {
 			syncInstances(objects.get(i));
 		}

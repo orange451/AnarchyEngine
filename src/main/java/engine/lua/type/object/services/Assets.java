@@ -151,7 +151,7 @@ public class Assets extends Service implements TreeViewable {
 	
 	private List<AssetLoadable> getAssets(Instance directory) {
 		List<AssetLoadable> ret = new ArrayList<AssetLoadable>();
-		List<Instance> c = directory.getDescendents();
+		List<Instance> c = directory.getDescendants();
 		
 		for (int i = 0; i < c.size(); i++) {
 			Instance in = c.get(i);

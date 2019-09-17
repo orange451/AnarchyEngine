@@ -521,7 +521,7 @@ public class Game implements Tickable {
 		synchronized(selectedInstances) {
 			for (int i = 0; i < selectedInstances.size(); i++) {
 				Instance t = selectedInstances.get(i);
-				List<Instance> desc = t.getDescendents();
+				List<Instance> desc = t.getDescendants();
 				extended.add(t);
 				sel.remove(t);
 				

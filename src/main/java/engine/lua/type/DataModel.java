@@ -116,14 +116,26 @@ public abstract class DataModel extends LuaDatatype {
 		this.initialized = true;
 	}
 	
-	public boolean isArhivable() {
+	/**
+	 * Returns whether or not the DataModel is archivable. An archivable DataModel will not be written to disk when saved.
+	 * @return
+	 */
+	public boolean isArchivable() {
 		return this.get(C_ARCHIVABLE).toboolean();
 	}
 	
+	/**
+	 * Sets the archivable flag of the DataModel. See {@link #isArchivable()}.
+	 * @param archivable
+	 */
 	public void setArchivable(boolean archivable) {
 		this.set(C_ARCHIVABLE, LuaValue.valueOf(archivable));
 	}
 	
+	/**
+	 * Get the full name for the Datamodel. This includes the names of all ancestors.
+	 * @return
+	 */
 	public String getFullName() {
 		String ret = "";
 		LuaValue p = this;
@@ -169,6 +181,7 @@ public abstract class DataModel extends LuaDatatype {
 				System.out.println();*/
 			//}
 			
+			this.internalName = value.toString();
 			onKeyChange( key, this.get(key) );
 		}
 	}
@@ -205,6 +218,11 @@ public abstract class DataModel extends LuaDatatype {
 		}
 	}
 	
+	/**
+	 * returns whether a DataModel is the descendant of a LuaValue. This should be checked against an Instance, but nil also works.
+	 * @param object
+	 * @return
+	 */
 	public boolean isDescendantOf( LuaValue object ) {
 		if ( object == null )
 			return false;
@@ -219,7 +237,11 @@ public abstract class DataModel extends LuaDatatype {
 		return inst.descendents.contains(this);
 	}
 	
-	public List<Instance> getDescendents() {
+	/**
+	 * Returns an un-modifyable list of descendants.
+	 * @return
+	 */
+	public List<Instance> getDescendants() {
 		/*ArrayList<Instance> d = new ArrayList<Instance>();
 		synchronized(descendents) {
 			Iterator<Instance> it = descendents.iterator();
@@ -396,6 +418,10 @@ public abstract class DataModel extends LuaDatatype {
 		this.rawset(name, value);
 	}
 	
+	/**
+	 * Force set the name flag of the DataModel even if it is locked.
+	 * @param name
+	 */
 	public void forceSetName(String name) {
 		boolean l = this.locked;
 		boolean l2 = !this.getField(C_NAME).canModify();
@@ -410,23 +436,43 @@ public abstract class DataModel extends LuaDatatype {
 		this.internalName = name;
 	}
 
+	/**
+	 * Returns the name of the DataModel as a String.
+	 * @return
+	 */
 	public String getName() {
 		return internalName;
 	}
 	
+	/**
+	 * Sets the name of the DataModel.
+	 * @param name
+	 */
 	public void setName(String name) {
 		this.set(C_NAME, LuaValue.valueOf(name));
 		this.internalName = name;
 	}
 	
+	/**
+	 * Returns the class-name of the DataModel as LuaValue.
+	 * @return
+	 */
 	public LuaValue getClassName() {
 		return this.get(C_CLASSNAME);
 	}
 
+	/**
+	 * Returns the parent of the DataModel. Normally this returns an Instance, but nil works too.
+	 * @return
+	 */
 	public LuaValue getParent() {
 		return this.get(C_PARENT);
 	}
 	
+	/**
+	 * Sets the parent of the DataModel. The parent must be either another DataModel or nil.
+	 * @param parent
+	 */
 	public void setParent(LuaValue parent) {
 		if ( parent == null )
 			parent = LuaValue.NIL;
@@ -434,6 +480,10 @@ public abstract class DataModel extends LuaDatatype {
 		this.set(C_PARENT, parent);
 	}
 	
+	/**
+	 * Force set the parent of the DataModel. 
+	 * @param parent
+	 */
 	public void forceSetParent(LuaValue parent) {
 		if ( parent == null )
 			parent = LuaValue.NIL;
@@ -459,22 +509,42 @@ public abstract class DataModel extends LuaDatatype {
 		this.onValueUpdated(C_PARENT, parent);
 	}
 	
+	/**
+	 * Returns the ServerID of the DataModel. This Identifier is used when sending packets across the network to reference the DataModel. Each DataModel should be given a unique ID.
+	 * @return
+	 */
 	public Long getSID() {
 		return this.get(C_SID).tolong();
 	}
 	
+	/**
+	 * The change-event for the DataModel. Whenever a field in this DataModel changes, the event will fire.
+	 * @return
+	 */
 	public LuaEvent changedEvent() {
 		return (LuaEvent)this.rawget(C_CHANGED);
 	}
 	
+	/**
+	 * The destroy-event for the DataModel. When the datamodel is destroyed, this event will fire.
+	 * @return
+	 */
 	public LuaEvent destroyedEvent() {
 		return (LuaEvent)this.rawget(C_DESTROYED);
 	}
 	
+	/**
+	 * The child-added event for the DataModel. When a child is added directly to this DataModel, the event will fire.
+	 * @return
+	 */
 	public LuaEvent childAddedEvent() {
 		return (LuaEvent)this.rawget(C_CHILDADDED);
 	}
 	
+	/**
+	 * The child-removed event for the DataModel. When a child is removed directly from this DataModel, the event will fire.
+	 * @return
+	 */
 	public LuaEvent childRemovedEvent() {
 		return (LuaEvent)this.rawget(C_CHILDREMOVED);
 	}
@@ -487,6 +557,10 @@ public abstract class DataModel extends LuaDatatype {
 		return (LuaEvent)this.rawget(C_DESCENDANTREMOVED);
 	}
 
+	/**
+	 * Sets whether this DataModel is instanceable. A non-instanceable DataModel will not be able to be created via lua's: Instance.new() method.
+	 * @param instanceable
+	 */
 	public void setInstanceable( boolean instanceable ) {
 		TYPES.get(this.get(C_CLASSNAME).toString()).instanceable = instanceable;
 	}

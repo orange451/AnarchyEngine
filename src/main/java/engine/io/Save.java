@@ -223,7 +223,7 @@ public class Save {
 		JSONObject ret = null;
 		try {
 			
-			if ( !instance.isArhivable() )
+			if ( !instance.isArchivable() )
 				return ret;
 
 			ret = new SavedInstance(instance).toJSON();
@@ -237,7 +237,7 @@ public class Save {
 	private static LinkedList<SavedInstance> getSavedInstances(Instance root) {
 		LinkedList<SavedInstance> ret = new LinkedList<SavedInstance>();
 		
-		if ( !root.isArhivable() )
+		if ( !root.isArchivable() )
 			return ret;
 
 		ret.add(new SavedInstance(root));
@@ -273,7 +273,7 @@ public class Save {
 
 		@SuppressWarnings("unchecked")
 		public JSONObject toJSON() {
-			if ( !instance.isArhivable() )
+			if ( !instance.isArchivable() )
 				return null;
 			
 			SavedInstance parent = null;

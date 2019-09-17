@@ -273,6 +273,9 @@ public abstract class Instance extends DataModel {
 		}
 	}
 	
+	/**
+	 * Clones the instance. A cloned instance will be it's own unique Instance, but all its fields will be a copy of the source Instance.
+	 */
 	@Override
 	public Instance clone() {
 		try {
@@ -337,6 +340,9 @@ public abstract class Instance extends DataModel {
 		//
 	}
 
+	/**
+	 * This method destroys the Instance. Its parent is set to nil, all of its fields are cleared, and it is no longer able to be modifyied or referenced.
+	 */
 	public void destroy() {
 		if ( destroyed )
 			return;
@@ -366,12 +372,20 @@ public abstract class Instance extends DataModel {
 		Game.deselect(this);
 	}
 	
+	/**
+	 * Returns if the instance has been destroyed.
+	 * @return
+	 */
 	public boolean isDestroyed() {
 		return this.destroyed;
 	}
 
 	public abstract void onDestroy();
 
+	/**
+	 * Returns a modifyable list of children. Warning, since this is modifyable be careful to not modify it.
+	 * @return
+	 */
 	public List<Instance> getChildren() {
 		return children;
 	}
@@ -476,10 +490,20 @@ public abstract class Instance extends DataModel {
 		return this.getChildrenOfClass(LuaValue.valueOf(className));
 	}
 
+	/**
+	 * Returns a list of instances where each instance is a direct descendant and has a name matching the desired name.
+	 * @param name
+	 * @return
+	 */
 	public List<Instance> getChildrenWithName(String name) {
 		return getChildrenWithName(LuaValue.valueOf(name));
 	}
 
+	/**
+	 * Returns a list of instances where each instance is a direct descendant and has a name matching the desired name.
+	 * @param name
+	 * @return
+	 */
 	public List<Instance> getChildrenWithName(LuaValue name) {
 		List<Instance> ret = new ArrayList<Instance>();
 		
@@ -499,6 +523,9 @@ public abstract class Instance extends DataModel {
 		return ret;
 	}
 	
+	/**
+	 * Returns the name of the Instance.
+	 */
 	@Override
 	public String toString() {
 		return getName();
