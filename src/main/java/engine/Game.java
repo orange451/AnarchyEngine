@@ -109,19 +109,19 @@ public class Game implements Tickable {
 			new Assets();
 			
 		if ( Game.getService("Assets").findFirstChild("Prefabs") == null )
-			((Assets)Game.getService("Assets")).newPackage("Prefabs");
+			Assets.newPackage("Prefabs", Game.getService("Assets"));
 
 		if ( Game.getService("Assets").findFirstChild("Meshes") == null )
-			((Assets)Game.getService("Assets")).newPackage("Meshes");
+			Assets.newPackage("Meshes", Game.getService("Assets"));
 
 		if ( Game.getService("Assets").findFirstChild("Materials") == null )
-			((Assets)Game.getService("Assets")).newPackage("Materials");
+			Assets.newPackage("Materials", Game.getService("Assets"));
 
 		if ( Game.getService("Assets").findFirstChild("Textures") == null )
-			((Assets)Game.getService("Assets")).newPackage("Textures");
+			Assets.newPackage("Textures", Game.getService("Assets"));
 
 		if ( Game.getService("Assets").findFirstChild("Audio") == null )
-			((Assets)Game.getService("Assets")).newPackage("Audio");
+			Assets.newPackage("Audio", Game.getService("Assets"));
 
 		if ( Game.getService("UserInputService") == null )
 			new UserInputService();
@@ -379,6 +379,7 @@ public class Game implements Tickable {
 		ArrayList<Service> services = Game.getServices();
 		for (int i = 0; i < services.size(); i++) {
 			services.get(i).clearAllChildren();
+			services.get(i).clearAllConnections();
 		}
 	}
 	

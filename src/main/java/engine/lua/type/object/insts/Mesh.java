@@ -222,12 +222,8 @@ public class Mesh extends AssetLoadable implements TreeViewable {
 	}
 
 	@Override
-	public Instance getPreferredParent() {
-		Service assets = Game.assets();
-		if ( assets == null )
-			return null;
-		
-		return assets.findFirstChild(C_MESHES);
+	public LuaValue getPreferredParent() {
+		return C_MESHES;
 	}
 
 	public static String getFileTypes() {

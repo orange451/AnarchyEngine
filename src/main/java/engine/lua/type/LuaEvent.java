@@ -124,4 +124,11 @@ public class LuaEvent extends LuaDatatype {
 	public void disconnect(LuaConnection value) {
 		disconnectQueue.add(value);
 	}
+
+	public void disconnectAll() {
+		synchronized(connections) {
+			connections.clear();
+			disconnectQueue.clear();
+		}
+	}
 }

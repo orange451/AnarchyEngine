@@ -25,6 +25,7 @@ import org.lwjgl.assimp.AIString;
 import org.lwjgl.assimp.AIVector3D;
 import org.lwjgl.assimp.Assimp;
 
+import engine.Game;
 import engine.gl.mesh.BufferedMesh;
 import engine.gl.mesh.Vertex;
 import engine.lua.type.data.Color3;
@@ -58,7 +59,7 @@ public class Assets extends Service implements TreeViewable {
 			public LuaValue call(LuaValue myself, LuaValue path) {
 				Mesh m = new Mesh();
 				m.set("FilePath", path.toString());
-				m.forceSetParent(m.getPreferredParent());
+				m.forceSetParent(meshes());
 				return m;
 			}
 		});
@@ -81,7 +82,7 @@ public class Assets extends Service implements TreeViewable {
 			@Override
 			public LuaValue call() {
 				Mesh t = new Mesh();
-				t.forceSetParent(t.getPreferredParent());
+				t.forceSetParent(meshes());
 				return t;
 			}
 		});
@@ -90,7 +91,7 @@ public class Assets extends Service implements TreeViewable {
 			@Override
 			public LuaValue call() {
 				Texture t = new Texture();
-				t.forceSetParent(t.getPreferredParent());
+				t.forceSetParent(textures());
 				return t;
 			}
 		});
@@ -99,7 +100,7 @@ public class Assets extends Service implements TreeViewable {
 			@Override
 			public LuaValue call() {
 				Material m = new Material();
-				m.forceSetParent(m.getPreferredParent());
+				m.forceSetParent(materials());
 				return m;
 			}
 		});
@@ -108,7 +109,7 @@ public class Assets extends Service implements TreeViewable {
 			@Override
 			public LuaValue call() {
 				Prefab p = new Prefab();
-				p.forceSetParent(p.getPreferredParent());
+				p.forceSetParent(prefabs());
 				return p;
 			}
 		});
@@ -125,10 +126,12 @@ public class Assets extends Service implements TreeViewable {
 		return importPrefab(filePath, 1, -1);
 	}
 
-	public void newPackage(String name) {
+	public static Instance newPackage(String name, Instance parent) {
 		AssetFolder folder = new AssetFolder();
 		folder.rawset("Name", name);
-		folder.forceSetParent(this);
+		folder.forceSetParent(parent);
+		
+		return folder;
 	}
 
 	@Override
@@ -280,13 +283,24 @@ public class Assets extends Service implements TreeViewable {
 	
 				// Load material
 				int materialIndex = mesh.mMaterialIndex();
-				Material tm = (materialIndex >= 0)?getMaterialFromAssimp( fileDir, materials.get(materialIndex) ):new Material();
+				Material tm = (materialIndex >= 0)?getMaterialFromAssimp( fileDir, materials.get(materialIndex), prefab ):new Material();
+				
+				
+				// Get asset folder material
+				Instance materialAssetFolder = prefab.findFirstChild(tm.getPreferredParent());
+				if ( materialAssetFolder == null )
+					materialAssetFolder = newPackage(tm.getPreferredParent().toString(), prefab);
 				tm.setName(fileWithoutExtension+"_"+i);
-				tm.forceSetParent(tm.getPreferredParent());
+				tm.forceSetParent(materialAssetFolder);
+				
+				// Get asset folder mesh
+				Instance meshAssetFolder = prefab.findFirstChild(mm.getPreferredParent());
+				if ( meshAssetFolder == null )
+					meshAssetFolder = newPackage(mm.getPreferredParent().toString(), prefab);
 	
 				// Load mesh
 				mm.setMesh(bm);
-				mm.forceSetParent(mm.getPreferredParent());
+				mm.forceSetParent(meshAssetFolder);
 				
 	
 				// Check for bones
@@ -307,7 +321,7 @@ public class Assets extends Service implements TreeViewable {
 			System.out.println("Loaded");
 			
 			prefab.setName(fileWithoutExtension);
-			prefab.forceSetParent(prefab.getPreferredParent());
+			prefab.forceSetParent(Game.assets().prefabs());
 		} catch(Exception e ) {
 			e.printStackTrace();
 		}
@@ -317,7 +331,7 @@ public class Assets extends Service implements TreeViewable {
 
 	private static HashMap<AIMaterial, Material> materialLookup = new HashMap<AIMaterial, Material>();
 	
-	private static Material getMaterialFromAssimp( String baseDir, AIMaterial material ) {
+	private static Material getMaterialFromAssimp( String baseDir, AIMaterial material, Prefab prefab ) {
 		if ( materialLookup.containsKey(material) ) {
 			Material ret = (Material) materialLookup.get(material).clone();
 			ret.forceSetParent(materialLookup.get(material).getParent());
@@ -337,6 +351,11 @@ public class Assets extends Service implements TreeViewable {
 			specular = baseDir+specular;
 		if ( glossy != null )
 			glossy = baseDir+glossy;
+		
+		Texture TEMPTEXTURE = new Texture();
+		Instance textureAssetFolder = prefab.findFirstChild(TEMPTEXTURE.getPreferredParent());
+		if ( textureAssetFolder == null )
+			textureAssetFolder = newPackage(TEMPTEXTURE.getPreferredParent().toString(), prefab);
 
 		// Create base material
 		Material tm = new Material();
@@ -346,7 +365,7 @@ public class Assets extends Service implements TreeViewable {
 				t1.forceSetName(diffuse.replace(baseDir, ""));
 				t1.setSRGB(true);
 				t1.setFilePath(diffuse);
-				t1.forceSetParent(t1.getPreferredParent());
+				t1.forceSetParent(textureAssetFolder);
 				tm.setDiffuseMap(t1);
 			}
 			
@@ -354,7 +373,7 @@ public class Assets extends Service implements TreeViewable {
 				Texture t2 = new Texture();
 				t2.forceSetName(normal.replace(baseDir, ""));
 				t2.setFilePath(normal);
-				t2.forceSetParent(t2.getPreferredParent());
+				t2.forceSetParent(textureAssetFolder);
 				tm.setNormalMap(t2);
 			}
 			
@@ -362,7 +381,7 @@ public class Assets extends Service implements TreeViewable {
 				Texture t3 = new Texture();
 				t3.forceSetName(specular.replace(baseDir, ""));
 				t3.setFilePath(specular);
-				t3.forceSetParent(t3.getPreferredParent());
+				t3.forceSetParent(textureAssetFolder);
 				tm.setMetalMap(t3);
 			}
 			
@@ -370,7 +389,7 @@ public class Assets extends Service implements TreeViewable {
 				Texture t4 = new Texture();
 				t4.forceSetName(glossy.replace(baseDir, ""));
 				t4.setFilePath(glossy);
-				t4.forceSetParent(t4.getPreferredParent());
+				t4.forceSetParent(textureAssetFolder);
 				tm.setRoughMap(t4);
 			}
 		}

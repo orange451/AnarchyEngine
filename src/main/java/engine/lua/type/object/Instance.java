@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import org.luaj.vm2.LuaTable;
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.ThreeArgFunction;
 import org.luaj.vm2.lib.TwoArgFunction;
@@ -14,6 +13,7 @@ import engine.Game;
 import engine.lua.LuaEngine;
 import engine.lua.lib.LuaUtil;
 import engine.lua.type.DataModel;
+import engine.lua.type.LuaEvent;
 import engine.lua.type.LuaValuetype;
 
 public abstract class Instance extends DataModel {
@@ -245,6 +245,9 @@ public abstract class Instance extends DataModel {
 		return null;
 	}
 	
+	/**
+	 * For every child in the instance, destroy it.
+	 */
 	public void clearAllChildren() {
 		synchronized(children) {
 			for (int i = children.size()-1;i>=0; i--) {
@@ -255,6 +258,21 @@ public abstract class Instance extends DataModel {
 		children.clear();
 	}
 
+
+	/**
+	 * For every lua connection in the instance, disconnect it.
+	 */
+	public void clearAllConnections() {
+		LuaValue[] keys = this.keys();
+		for (int i = 0; i < keys.length; i++) {
+			LuaValue value = this.get(keys[i]);
+			if ( value instanceof LuaEvent ) {
+				LuaEvent event = (LuaEvent) value;
+				event.disconnectAll();
+			}
+		}
+	}
+	
 	@Override
 	public Instance clone() {
 		try {

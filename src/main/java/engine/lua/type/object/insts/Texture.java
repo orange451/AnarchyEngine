@@ -135,12 +135,8 @@ public class Texture extends AssetLoadable implements TreeViewable,FileResource 
 	}
 
 	@Override
-	public Instance getPreferredParent() {
-		Service assets = Game.assets();
-		if ( assets == null )
-			return null;
-		
-		return assets.findFirstChild(C_TEXTURES);
+	public LuaValue getPreferredParent() {
+		return C_TEXTURES;
 	}
 	
 	public static String getFileTypes() {

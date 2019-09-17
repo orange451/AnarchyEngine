@@ -26,6 +26,7 @@ public class Prefab extends Asset implements TreeViewable {
 	private PrefabRenderer prefab;
 	
 	private final static LuaValue C_SCALE = LuaValue.valueOf("Scale");
+	private final static LuaValue C_PREFABS = LuaValue.valueOf("Prefabs");
 	
 	private List<Model> models;
 
@@ -154,11 +155,7 @@ public class Prefab extends Asset implements TreeViewable {
 	}
 
 	@Override
-	public Instance getPreferredParent() {
-		Service assets = Game.getService("Assets");
-		if ( assets == null )
-			return null;
-		
-		return assets.findFirstChild("Prefabs");
+	public LuaValue getPreferredParent() {
+		return C_PREFABS;
 	}
 }

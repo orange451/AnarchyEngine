@@ -14,12 +14,12 @@ public abstract class Asset extends Instance {
 	
 	@Override
 	public void set(LuaValue key, LuaValue value) {
-		Instance preferred = this.getPreferredParent();
+		LuaValue preferred = this.getPreferredParent();
 		if ( key.eq_b(C_PARENT) && preferred != null ) {
 			if ( !value.isnil() ) {
 				Instance newParent = (Instance)value;
-				if ( !value.equals(preferred) && !newParent.isDescendantOf(preferred) ) {
-					LuaEngine.error("Asset type: " + this.typename() + " must exist within: " + this.getPreferredParent().getFullName());
+				if ( !newParent.getName().equals(preferred.toString())) {
+					LuaEngine.error("Asset type: " + this.typename() + " must exist within: " + preferred.toString());
 					return;
 				}
 			}
@@ -27,5 +27,5 @@ public abstract class Asset extends Instance {
 		super.set(key, value);
 	}
 
-	public abstract Instance getPreferredParent();
+	public abstract LuaValue getPreferredParent();
 }
