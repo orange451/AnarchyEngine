@@ -38,6 +38,7 @@ public class IdeMaterialViewer extends IdePane {
 	private GridView materialBox;
 	private ScrollPane scrollPane;
 	private HashMap<Material, MaterialNode> materialToNodeMap;
+	private boolean createdConnections;
 	
 	private static final int NODE_SIZE = 120;
 
@@ -87,20 +88,23 @@ public class IdeMaterialViewer extends IdePane {
 				}
 				
 				// Material added
-				Game.assets().descendantAddedEvent().connect((materialArgs)->{
-					Instance child = (Instance) materialArgs[0];
-					if ( child instanceof Material ) {
-						attachMaterial((Material) child);
-					}
-				});
-				
-				// Material removed
-				Game.assets().descendantRemovedEvent().connect((materialArgs)->{
-					Instance child = (Instance) materialArgs[0];
-					if ( child instanceof Material ) {
-						dettachMaterial((Material) child);
-					}
-				});
+				if (!createdConnections) {
+					createdConnections = true;
+					Game.assets().descendantAddedEvent().connect((materialArgs)->{
+						Instance child = (Instance) materialArgs[0];
+						if ( child instanceof Material ) {
+							attachMaterial((Material) child);
+						}
+					});
+					
+					// Material removed
+					Game.assets().descendantRemovedEvent().connect((materialArgs)->{
+						Instance child = (Instance) materialArgs[0];
+						if ( child instanceof Material ) {
+							dettachMaterial((Material) child);
+						}
+					});
+				}
 			});
 		});
 	}

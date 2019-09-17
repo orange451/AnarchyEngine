@@ -379,7 +379,6 @@ public class Game implements Tickable {
 		ArrayList<Service> services = Game.getServices();
 		for (int i = 0; i < services.size(); i++) {
 			services.get(i).clearAllChildren();
-			services.get(i).clearAllConnections();
 		}
 	}
 	

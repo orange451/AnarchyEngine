@@ -13,7 +13,6 @@ import engine.Game;
 import engine.lua.LuaEngine;
 import engine.lua.lib.LuaUtil;
 import engine.lua.type.DataModel;
-import engine.lua.type.LuaEvent;
 import engine.lua.type.LuaValuetype;
 
 public abstract class Instance extends DataModel {
@@ -256,21 +255,6 @@ public abstract class Instance extends DataModel {
 			}
 		}
 		children.clear();
-	}
-
-
-	/**
-	 * For every lua connection in the instance, disconnect it.
-	 */
-	public void clearAllConnections() {
-		LuaValue[] keys = this.keys();
-		for (int i = 0; i < keys.length; i++) {
-			LuaValue value = this.get(keys[i]);
-			if ( value instanceof LuaEvent ) {
-				LuaEvent event = (LuaEvent) value;
-				event.disconnectAll();
-			}
-		}
 	}
 	
 	/**
