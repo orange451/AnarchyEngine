@@ -167,6 +167,11 @@ public abstract class DataModel extends LuaDatatype {
 				changed = false;
 		}
 		
+		// Prevent setting parent to self
+		if ( key.eq_b(C_PARENT) && value == this ) {
+			throw new LuaError("Instance cannot be its own parent");
+		}
+		
 		super.set( key, value );
 		
 		checkSetParent(key, oldValue, value); // value may have changed
@@ -311,7 +316,7 @@ public abstract class DataModel extends LuaDatatype {
 		if ( key.eq_b(C_PARENT) ) {
 			
 			if ( newParent == this )
-				new LuaError("Instance can not be its own parent");
+				throw new LuaError("Instance can not be its own parent");
 			
 			// If the parent hasen't changed, don't run code.
 			if ( oldParent.equals(newParent) ) {
@@ -482,7 +487,7 @@ public abstract class DataModel extends LuaDatatype {
 			parent = LuaValue.NIL;
 		
 		if ( parent == this )
-			new LuaError("Instance can not be its own parent");
+			throw new LuaError("Instance can not be its own parent");
 		
 		this.set(C_PARENT, parent);
 	}
@@ -496,7 +501,7 @@ public abstract class DataModel extends LuaDatatype {
 			parent = LuaValue.NIL;
 
 		if ( parent == this )
-			new LuaError("Instance can not be its own parent");
+			throw new LuaError("Instance can not be its own parent");
 		
 		//boolean l = this.locked;
 		//boolean l2 = !this.getField("Parent").canModify();
