@@ -1,3 +1,5 @@
+import org.gradle.internal.os.OperatingSystem
+
 plugins {
 	id "eclipse"
 	id "idea"
@@ -7,9 +9,24 @@ plugins {
 }
 
 sourceCompatibility = "8"
-project.ext.lwjglVersion = "3.2.2"
-project.ext.jomlVersion = "1.9.16"
+project.ext.lwjglVersion = "3.2.3"
+project.ext.jomlVersion = "1.9.17"
 project.ext.gdxVersion = "1.9.3"
+
+switch (OperatingSystem.current()) {
+	case OperatingSystem.LINUX:
+		def osArch = System.getProperty("os.arch")
+		project.ext.lwjglNatives = osArch.startsWith("arm") || osArch.startsWith("aarch64")
+			? "natives-linux-${osArch.contains("64") || osArch.startsWith("armv8") ? "arm64" : "arm32"}"
+			: "natives-linux"
+		break
+	case OperatingSystem.MAC_OS:
+		project.ext.lwjglNatives = "natives-macos"
+		break
+	case OperatingSystem.WINDOWS:
+		project.ext.lwjglNatives = System.getProperty("os.arch").contains("64") ? "natives-windows" : "natives-windows-x86"
+		break
+}
 
 sourceSets {
 	main {
@@ -28,58 +45,36 @@ repositories {
 }
 
 dependencies {
-	api "org.joml:joml:$jomlVersion"
 	api "com.badlogicgames.gdx:gdx-bullet:$gdxVersion"
 	runtime "com.badlogicgames.gdx:gdx-bullet-platform:$gdxVersion:natives-desktop"
 	api "com.esotericsoftware:kryonet:2.22.0-RC1"
 	api "com.googlecode.json-simple:json-simple:1.1.1"
 	api "org.luaj:luaj-jse:3.0.1"
 	api files('libs/lwjgui-1.0.0-SNAPSHOT.jar')
-	
-	// LWJGL dependencies
-	api "org.lwjgl:lwjgl:$lwjglVersion"
-	api "org.lwjgl:lwjgl-glfw:$lwjglVersion"
-	api "org.lwjgl:lwjgl-jemalloc:$lwjglVersion"
-	api "org.lwjgl:lwjgl-opengl:$lwjglVersion"
-	api "org.lwjgl:lwjgl-openal:$lwjglVersion"
-	api "org.lwjgl:lwjgl-nanovg:$lwjglVersion"
-	api "org.lwjgl:lwjgl-stb:$lwjglVersion"
-	api "org.lwjgl:lwjgl-assimp:$lwjglVersion"
-	api "org.lwjgl:lwjgl-vulkan:$lwjglVersion"
-	api "org.lwjgl:lwjgl-nfd:$lwjglVersion"
-	api "org.lwjgl:lwjgl-tinyfd:$lwjglVersion"
 
-	// LWJGL natives Windows
-	runtime "org.lwjgl:lwjgl:$lwjglVersion:natives-windows"
-	runtime "org.lwjgl:lwjgl-glfw:$lwjglVersion:natives-windows"
-	runtime "org.lwjgl:lwjgl-jemalloc:$lwjglVersion:natives-windows"
-	runtime "org.lwjgl:lwjgl-opengl:$lwjglVersion:natives-windows"
-	runtime "org.lwjgl:lwjgl-openal:$lwjglVersion:natives-windows"
-	runtime "org.lwjgl:lwjgl-nanovg:$lwjglVersion:natives-windows"
-	runtime "org.lwjgl:lwjgl-stb:$lwjglVersion:natives-windows"
-	runtime "org.lwjgl:lwjgl-assimp:$lwjglVersion:natives-windows"
-	runtime "org.lwjgl:lwjgl-nfd:$lwjglVersion:natives-windows"
-	runtime "org.lwjgl:lwjgl-tinyfd:$lwjglVersion:natives-windows"
-	// LWJGL Natives Linux
-	runtime "org.lwjgl:lwjgl:$lwjglVersion:natives-linux"
-	runtime "org.lwjgl:lwjgl-glfw:$lwjglVersion:natives-linux"
-	runtime "org.lwjgl:lwjgl-jemalloc:$lwjglVersion:natives-linux"
-	runtime "org.lwjgl:lwjgl-opengl:$lwjglVersion:natives-linux"
-	runtime "org.lwjgl:lwjgl-openal:$lwjglVersion:natives-linux"
-	runtime "org.lwjgl:lwjgl-nanovg:$lwjglVersion:natives-linux"
-	runtime "org.lwjgl:lwjgl-stb:$lwjglVersion:natives-linux"
-	runtime "org.lwjgl:lwjgl-assimp:$lwjglVersion:natives-linux"
-	runtime "org.lwjgl:lwjgl-nfd:$lwjglVersion:natives-linux"
-	runtime "org.lwjgl:lwjgl-tinyfd:$lwjglVersion:natives-linux"
-	// LWJGL Natives OSX
-	runtime "org.lwjgl:lwjgl:$lwjglVersion:natives-macos"
-	runtime "org.lwjgl:lwjgl-glfw:$lwjglVersion:natives-macos"
-	runtime "org.lwjgl:lwjgl-jemalloc:$lwjglVersion:natives-macos"
-	runtime "org.lwjgl:lwjgl-opengl:$lwjglVersion:natives-macos"
-	runtime "org.lwjgl:lwjgl-openal:$lwjglVersion:natives-macos"
-	runtime "org.lwjgl:lwjgl-nanovg:$lwjglVersion:natives-macos"
-	runtime "org.lwjgl:lwjgl-stb:$lwjglVersion:natives-macos"
-	runtime "org.lwjgl:lwjgl-assimp:$lwjglVersion:natives-macos"
-	runtime "org.lwjgl:lwjgl-nfd:$lwjglVersion:natives-macos"
-	runtime "org.lwjgl:lwjgl-tinyfd:$lwjglVersion:natives-macos"
+	// LWJGL dependencies
+	implementation platform("org.lwjgl:lwjgl-bom:$lwjglVersion")
+
+	api "org.lwjgl:lwjgl"
+	api "org.lwjgl:lwjgl-assimp"
+	api "org.lwjgl:lwjgl-glfw"
+	api "org.lwjgl:lwjgl-jemalloc"
+	api "org.lwjgl:lwjgl-nanovg"
+	api "org.lwjgl:lwjgl-nfd"
+	api "org.lwjgl:lwjgl-openal"
+	api "org.lwjgl:lwjgl-opengl"
+	api "org.lwjgl:lwjgl-stb"
+	api "org.lwjgl:lwjgl-tinyfd"
+	runtimeOnly "org.lwjgl:lwjgl::$lwjglNatives"
+	runtimeOnly "org.lwjgl:lwjgl-assimp::$lwjglNatives"
+	runtimeOnly "org.lwjgl:lwjgl-glfw::$lwjglNatives"
+	runtimeOnly "org.lwjgl:lwjgl-jemalloc::$lwjglNatives"
+	runtimeOnly "org.lwjgl:lwjgl-nanovg::$lwjglNatives"
+	runtimeOnly "org.lwjgl:lwjgl-nfd::$lwjglNatives"
+	runtimeOnly "org.lwjgl:lwjgl-openal::$lwjglNatives"
+	runtimeOnly "org.lwjgl:lwjgl-opengl::$lwjglNatives"
+	runtimeOnly "org.lwjgl:lwjgl-stb::$lwjglNatives"
+	runtimeOnly "org.lwjgl:lwjgl-tinyfd::$lwjglNatives"
+
+	api "org.joml:joml:${jomlVersion}"
 }
