@@ -684,6 +684,7 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 		@Override
 		public void resize() {
 			this.setPrefSize(scroller.getViewportWidth(), scroller.getViewportHeight());
+			internal.forceWidth(this.getPrefWidth());
 			super.resize();
 		}
 		
