@@ -34,7 +34,7 @@ public class UniformPointLight extends UniformObject {
 		radius = new UniformFloat(name + ".radius");
 		intensity = new UniformFloat(name + ".intensity");
 		visible = new UniformBoolean(name + ".visible");
-		super.init(position, color, radius, intensity, visible);
+		super.storeUniforms(position, color, radius, intensity, visible);
 	}
 
 	public void loadLight(PointLightInternal light) {

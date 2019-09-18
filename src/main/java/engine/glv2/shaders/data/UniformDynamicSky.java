@@ -31,7 +31,7 @@ public class UniformDynamicSky extends UniformObject {
 		time = new UniformFloat(name + ".time");
 		cloudHeight = new UniformFloat(name + ".cloudHeight");
 		cloudSpeed = new UniformFloat(name + ".cloudSpeed");
-		super.init(brightness, time, cloudHeight, cloudSpeed);
+		super.storeUniforms(brightness, time, cloudHeight, cloudSpeed);
 	}
 
 	public void loadLight(DynamicSkybox sky) {

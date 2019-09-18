@@ -159,7 +159,7 @@ public class AnimInstanceFowardShader extends ShaderProgram {
 	public void loadDirectionalLights(List<DirectionalLightInternal> lights) {
 		synchronized (lights) {
 			for (int x = 0; x < Math.min(8, lights.size()); x++)
-				this.directionalLights[x].loadLight(lights.get(x));
+				this.directionalLights[x].loadLight(lights.get(x), 8, x);
 			totalDirectionalLights.loadInteger(Math.min(8, lights.size()));
 		}
 	}

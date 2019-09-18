@@ -29,6 +29,7 @@ import engine.glv2.entities.CubeMapCamera;
 import engine.glv2.entities.SunCamera;
 import engine.glv2.renderers.shaders.AnimInstanceDeferredShader;
 import engine.glv2.v2.IRenderingData;
+import engine.glv2.v2.lights.DirectionalLightCamera;
 import engine.lua.type.object.Instance;
 import engine.lua.type.object.insts.AnimationController;
 import engine.lua.type.object.insts.Camera;
@@ -89,6 +90,11 @@ public class AnimInstanceRenderer implements IObjectRenderer {
 	@Override
 	public void renderShadow(SunCamera sun) {
 		shadowRenderer.renderShadow(instances, sun);
+	}
+
+	@Override
+	public void renderShadow(DirectionalLightCamera camera) {
+		shadowRenderer.renderShadow(instances, camera);
 	}
 
 	@Override

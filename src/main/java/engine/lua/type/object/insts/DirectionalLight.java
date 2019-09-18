@@ -51,9 +51,10 @@ public class DirectionalLight extends LightBase implements TreeViewable,GameSubs
 					Color color = ((Color3)value).toColor();
 					light.color = new Vector3f( Math.max( color.getRed(),1 )/255f, Math.max( color.getGreen(),1 )/255f, Math.max( color.getBlue(),1 )/255f );
 				} else if ( key.eq_b(C_SHADOWDISTANCE) ) {
-					light.distance = value.toint();
+					light.setShadowDistance(value.toint());
 				} else if ( key.eq_b(C_DIRECTION) ) {
 					light.direction = ((Vector3)value).toJoml();
+					light.update();
 				}
 			}
 			

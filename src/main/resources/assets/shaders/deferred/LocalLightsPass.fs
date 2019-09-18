@@ -55,7 +55,7 @@ uniform sampler2D image;
 
 #include function fresnelSchlick
 
-#include function calcLight
+#include function calcPointLight
 
 #include variable MASK
 
@@ -81,30 +81,7 @@ void main() {
 
 		vec3 Lo = vec3(0.0);
 		for (int i = 0; i < totalPointLights; i++) {
-			if (pointLights[i].visible) {
-				Lo += calcLight(pointLights[i], position, diffuse.rgb, N, V, F0, roughness, metallic);
-			}
-			// switch (lights[i].type) {
-			//	case 0:
-			//	break;
-			// case 1:
-			//	float theta = dot(L, normalize(-lights[i].direction));
-			//	float epsilon = lights[i].inRadius - lights[i].radius;
-			//	float intensity = clamp((theta - lights[i].radius) / epsilon, 0.0, 1.0);
-			//	if (intensity > 0.0) {
-			//		float shadow = 1.0;
-			//		if (lights[i].useShadows == 1 && useShadows == 1) {
-			//			vec4 posLight = lights[i].viewMatrix * vec4(position, 1.0);
-			//			vec4 shadowCoord =
-			//				biasMatrix * (lights[i].projectionMatrix * posLight);
-			//			shadow = texture(lights[i].shadowMap, (shadowCoord.xyz / shadowCoord.w), 0);
-			//		}
-			//		Lo += calcLight(lights[i], position, diffuse.rgb, L, N, V, F0, roughness,
-			//						metallic) *
-			//			  intensity * shadow;
-			//	}
-			//	break;
-			//}
+			Lo += calcPointLight(pointLights[i], position, diffuse.rgb, N, V, F0, roughness, metallic);
 		}
 		composite.rgb += Lo;
 	}

@@ -41,6 +41,9 @@ struct DirectionalLight {
 	vec3 color;
 	float intensity;
 	bool visible;
+	mat4 viewMatrix;
+	mat4 projectionMatrix[4];
+	sampler2DArrayShadow shadowMap;
 };
 #end
 
@@ -247,14 +250,18 @@ float computeAmbientOcclusion(vec2 texCoords, vec3 position, vec3 normal, sample
 }
 #end
 
-#function calcLight
-vec3 calcLight(Light light, vec3 position, vec3 diffuse, vec3 N, vec3 V, vec3 F0, float roughness,
-			   float metallic) {
+#function calcPointLight
+vec3 calcPointLight(Light light, vec3 position, vec3 diffuse, vec3 N, vec3 V, vec3 F0,
+					float roughness, float metallic) {
+	if (!light.visible)
+		return vec3(0.0);
 	vec3 L = normalize(light.position - position);
 	vec3 H = normalize(V + L);
 	float distance = length(light.position - position);
 	float attenuation = max(1.0 - distance / light.radius, 0.0) / distance;
 	vec3 radiance = light.color * attenuation * light.intensity;
+	if (radiance.r <= 0.0 && radiance.g <= 0.0 && radiance.b <= 0.0)
+		return vec3(0.0);
 
 	float NDF = DistributionGGX(N, H, roughness);
 	float G = GeometrySmith(N, V, L, roughness);
@@ -276,6 +283,8 @@ vec3 calcLight(Light light, vec3 position, vec3 diffuse, vec3 N, vec3 V, vec3 F0
 #function calcDirectionalLight
 vec3 calcDirectionalLight(DirectionalLight light, vec3 position, vec3 diffuse, vec3 N, vec3 V,
 						  vec3 F0, float roughness, float metallic) {
+	if (!light.visible)
+		return vec3(0.0);
 	vec3 L = normalize(light.direction);
 	vec3 H = normalize(V + L);
 
@@ -293,7 +302,59 @@ vec3 calcDirectionalLight(DirectionalLight light, vec3 position, vec3 diffuse, v
 	vec3 kD = vec3(1.0) - kS;
 	kD *= 1.0 - metallic;
 
-	float NdotL = max(dot(N, L), 0.0);
+	float NdotL = max(dot(N, L), 0.0) * computeShadowV2(position, light);
 	return (kD * diffuse / PI + brdf) * radiance * NdotL;
+}
+#end
+
+#function computeShadowV2
+float lookupV2(vec2 offsetIn, vec2 multTex, vec4 shadowCoord[4], sampler2DArrayShadow shdmap) {
+	vec4 shadowTexCoord;
+	vec2 offset = offsetIn * multTex;
+	if (shadowCoord[3].x > 0 && shadowCoord[3].x < 1 && shadowCoord[3].y > 0 &&
+		shadowCoord[3].y < 1) {
+		if (shadowCoord[2].x > 0 && shadowCoord[2].x < 1 && shadowCoord[2].y > 0 &&
+			shadowCoord[2].y < 1) {
+			if (shadowCoord[1].x > 0 && shadowCoord[1].x < 1 && shadowCoord[1].y > 0 &&
+				shadowCoord[1].y < 1) {
+				if (shadowCoord[0].x > 0 && shadowCoord[0].x < 1 && shadowCoord[0].y > 0 &&
+					shadowCoord[0].y < 1) {
+					shadowTexCoord.xyw = shadowCoord[0].xyz + vec3(offset.x, offset.y, 0);
+					shadowTexCoord.z = 0;
+					return texture(shdmap, shadowTexCoord);
+				}
+				shadowTexCoord.xyw = shadowCoord[1].xyz + vec3(offset.x, offset.y, 0);
+				shadowTexCoord.z = 1;
+				return texture(shdmap, shadowTexCoord);
+			}
+			shadowTexCoord.xyw = shadowCoord[2].xyz + vec3(offset.x, offset.y, 0);
+			shadowTexCoord.z = 2;
+			return texture(shdmap, shadowTexCoord);
+		}
+		shadowTexCoord.xyw = shadowCoord[3].xyz + vec3(offset.x, offset.y, 0);
+		shadowTexCoord.z = 3;
+		return texture(shdmap, shadowTexCoord);
+	}
+	return 1.0;
+}
+
+float computeShadowV2(vec3 position, DirectionalLight light) {
+	if (useShadows == 1) {
+		float shadow = 0.0;
+		vec4 posLight = light.viewMatrix * vec4(position, 1.0);
+		vec2 multTex = 1.0 / textureSize(light.shadowMap, 0).xy;
+		vec4 shadowCoord[4];
+		shadowCoord[0] = biasMatrix * (light.projectionMatrix[0] * posLight);
+		shadowCoord[1] = biasMatrix * (light.projectionMatrix[1] * posLight);
+		shadowCoord[2] = biasMatrix * (light.projectionMatrix[2] * posLight);
+		shadowCoord[3] = biasMatrix * (light.projectionMatrix[3] * posLight);
+		for (int x = -1; x <= 1; ++x) {
+			for (int y = -1; y <= 1; ++y) {
+				shadow += lookupV2(vec2(x, y), multTex, shadowCoord, light.shadowMap);
+			}
+		}
+		return shadow / 9.0;
+	} else
+		return 1.0;
 }
 #end

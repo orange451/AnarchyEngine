@@ -29,6 +29,7 @@ import engine.gl.Resources;
 import engine.gl.mesh.BufferedMesh;
 import engine.glv2.entities.SunCamera;
 import engine.glv2.renderers.shaders.InstanceBasicShader;
+import engine.glv2.v2.lights.DirectionalLightCamera;
 import engine.lua.type.object.Instance;
 import engine.lua.type.object.PrefabRenderer;
 import engine.lua.type.object.insts.GameObject;
@@ -46,6 +47,15 @@ public class InstanceShadowRenderer {
 	protected void renderShadow(List<Instance> instances, SunCamera sunCamera) {
 		shader.start();
 		shader.loadsunCamera(sunCamera);
+		for (Instance instance : instances) {
+			renderInstance(instance);
+		}
+		shader.stop();
+	}
+
+	protected void renderShadow(List<Instance> instances, DirectionalLightCamera camera) {
+		shader.start();
+		shader.loadDirectionalLight(camera);
 		for (Instance instance : instances) {
 			renderInstance(instance);
 		}

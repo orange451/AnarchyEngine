@@ -24,6 +24,7 @@ import static org.lwjgl.opengl.GL11C.GL_TEXTURE_2D;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE0;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE1;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE10;
+import static org.lwjgl.opengl.GL13C.GL_TEXTURE11;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE2;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE3;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE4;
@@ -75,6 +76,12 @@ public class Lighting extends DeferredPass<LightingShader> {
 		super.activateTexture(GL_TEXTURE8, GL_TEXTURE_CUBE_MAP, rnd.environmentMap.getTexture());
 		super.activateTexture(GL_TEXTURE9, GL_TEXTURE_2D, rnd.brdfLUT.getTexture());
 		super.activateTexture(GL_TEXTURE10, GL_TEXTURE_2D_ARRAY, rnd.dlsm.getShadowMaps().getTexture());
+
+		synchronized (rnd.dlh.getLights()) {
+			for (int x = 0; x < Math.min(8, rnd.dlh.getLights().size()); x++)
+				super.activateTexture(GL_TEXTURE11 + x, GL_TEXTURE_2D_ARRAY,
+						rnd.dlh.getLights().get(x).getShadowMap().getShadowMaps().getTexture());
+		}
 	}
 
 }

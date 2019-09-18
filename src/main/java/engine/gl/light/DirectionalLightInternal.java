@@ -18,7 +18,7 @@ public class DirectionalLightInternal extends Light {
 	public DirectionalLightInternal(Vector3f direction, float intensity) {
 		this.direction.set(direction);
 		this.intensity = intensity;
-		InternalGameThread.runLater(()->{
+		InternalGameThread.runLater(() -> {
 			this.shadowResolution = Game.lighting().getShadowMapSize();
 		});
 	}
@@ -28,10 +28,19 @@ public class DirectionalLightInternal extends Light {
 		lightCamera = new DirectionalLightCamera(distance);
 		lightCamera.update(direction);
 	}
-	
+
+	public void update() {
+		lightCamera.update(direction);
+	}
+
+	public void setShadowDistance(int distance) {
+		this.distance = distance;
+		lightCamera.setShadowDistance(distance);
+	}
+
 	public void setSize(int size) {
 		this.shadowResolution = size;
-		InternalRenderThread.runLater(()->{
+		InternalRenderThread.runLater(() -> {
 			shadowMap.resize(size);
 		});
 	}

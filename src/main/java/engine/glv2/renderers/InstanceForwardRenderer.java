@@ -30,6 +30,7 @@ import static org.lwjgl.opengl.GL13C.GL_TEXTURE4;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE5;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE6;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE7;
+import static org.lwjgl.opengl.GL13C.GL_TEXTURE8;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE_CUBE_MAP;
 import static org.lwjgl.opengl.GL13C.glActiveTexture;
 import static org.lwjgl.opengl.GL30C.GL_TEXTURE_2D_ARRAY;
@@ -88,6 +89,13 @@ public class InstanceForwardRenderer {
 		glBindTexture(GL_TEXTURE_2D, rnd.brdfLUT.getTexture());
 		glActiveTexture(GL_TEXTURE7);
 		glBindTexture(GL_TEXTURE_2D_ARRAY, rnd.dlsm.getShadowMaps().getTexture());
+		synchronized (rnd.dlh.getLights()) {
+			for (int x = 0; x < Math.min(8, rnd.dlh.getLights().size()); x++) {
+				glActiveTexture(GL_TEXTURE8 + x);
+				glBindTexture(GL_TEXTURE_2D_ARRAY,
+						rnd.dlh.getLights().get(x).getShadowMap().getShadowMaps().getTexture());
+			}
+		}
 		for (Instance instance : instances) {
 			renderInstance(instance, rnd, transparentOnly);
 		}

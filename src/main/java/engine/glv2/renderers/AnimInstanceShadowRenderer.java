@@ -34,6 +34,7 @@ import engine.gl.mesh.animation.AnimatedModel;
 import engine.gl.mesh.animation.AnimatedModelSubMesh;
 import engine.glv2.entities.SunCamera;
 import engine.glv2.renderers.shaders.AnimInstanceBasicShader;
+import engine.glv2.v2.lights.DirectionalLightCamera;
 import engine.lua.type.object.Instance;
 import engine.lua.type.object.insts.AnimationController;
 import engine.lua.type.object.insts.GameObject;
@@ -53,6 +54,15 @@ public class AnimInstanceShadowRenderer {
 	protected void renderShadow(List<Instance> instances, SunCamera sunCamera) {
 		shader.start();
 		shader.loadsunCamera(sunCamera);
+		for (Instance instance : instances) {
+			renderInstance(instance);
+		}
+		shader.stop();
+	}
+
+	protected void renderShadow(List<Instance> instances, DirectionalLightCamera camera) {
+		shader.start();
+		shader.loadDirectionalLight(camera);
 		for (Instance instance : instances) {
 			renderInstance(instance);
 		}

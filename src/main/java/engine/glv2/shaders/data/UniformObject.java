@@ -20,12 +20,16 @@
 
 package engine.glv2.shaders.data;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 public class UniformObject implements IUniform {
 
-	private Uniform[] uniforms;
+	private List<Uniform> uniforms = new ArrayList<>();;
 
-	public void init(Uniform... uniforms) {
-		this.uniforms = uniforms;
+	public void storeUniforms(Uniform... uniforms) {
+		this.uniforms.addAll(Arrays.asList(uniforms));
 	}
 
 	@Override

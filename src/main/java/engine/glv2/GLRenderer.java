@@ -52,6 +52,7 @@ import engine.application.RenderableApplication;
 import engine.gl.IPipeline;
 import engine.gl.Pipeline;
 import engine.gl.Surface;
+import engine.gl.light.DirectionalLightInternal;
 import engine.glv2.entities.Sun;
 import engine.glv2.entities.SunCamera;
 import engine.glv2.pipeline.MultiPass;
@@ -202,6 +203,15 @@ public class GLRenderer implements IPipeline {
 			renderingManager.renderShadow(sunCamera);
 			// shadowPass.shadowPass(sunCamera);
 			dlsm.unbind();
+			synchronized (directionalLightHandler.getLights()) {
+				for (DirectionalLightInternal l : directionalLightHandler.getLights()) {
+					l.getShadowMap().bind();
+					glClear(GL_DEPTH_BUFFER_BIT);
+					renderingManager.renderShadow(l.getLightCamera());
+					l.getShadowMap().unbind();
+				}
+			}
+
 			GPUProfiler.end();
 			glCullFace(GL_FRONT);
 			/*

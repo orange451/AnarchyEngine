@@ -67,7 +67,9 @@ uniform int totalDirectionalLights;
 
 #include function computeShadow
 
-#include function calcLight
+#include function computeShadowV2
+
+#include function calcPointLight
 
 #include function calcDirectionalLight
 
@@ -125,16 +127,12 @@ void main() {
 	Lo += (kD * diffuseF.rgb / PI + brdf) * radiance * NdotL;
 
 	for (int i = 0; i < totalDirectionalLights; i++) {
-		if (directionalLights[i].visible) {
-			Lo += calcDirectionalLight(directionalLights[i], position, diffuseF.rgb, N, V, F0,
-									   roughness, metallic);
-		}
+		Lo += calcDirectionalLight(directionalLights[i], position, diffuseF.rgb, N, V, F0,
+								   roughness, metallic);
 	}
 
 	for (int i = 0; i < totalPointLights; i++) {
-		if (pointLights[i].visible) {
-			Lo += calcLight(pointLights[i], position, diffuseF.rgb, N, V, F0, roughness, metallic);
-		}
+		Lo += calcPointLight(pointLights[i], position, diffuseF.rgb, N, V, F0, roughness, metallic);
 	}
 
 	F = fresnelSchlickRoughness(max(dot(N, V), 0.0), F0, roughness);

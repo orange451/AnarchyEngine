@@ -73,6 +73,8 @@ uniform int totalDirectionalLights;
 
 #include function computeShadow
 
+#include function computeShadowV2
+
 #include function calcDirectionalLight
 
 #include variable MASK
@@ -199,10 +201,8 @@ void main() {
 		Lo += (kD * image.rgb / PI + brdf) * radiance * NdotL;
 
 		for (int i = 0; i < totalDirectionalLights; i++) {
-			if (directionalLights[i].visible) {
-				Lo += calcDirectionalLight(directionalLights[i], position, image.rgb, N, V, F0,
-										   roughness, metallic);
-			}
+			Lo += calcDirectionalLight(directionalLights[i], position, image.rgb, N, V, F0,
+									   roughness, metallic);
 		}
 
 		F = fresnelSchlickRoughness(max(dot(N, V), 0.0), F0, roughness);
