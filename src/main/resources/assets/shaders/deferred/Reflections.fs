@@ -47,6 +47,8 @@ uniform int useReflections;
 
 #include function getDepth
 
+#include variable MASK
+
 #define MAX_STEPS 100
 #define MAX_DIST 100.0
 #define SURF_DIST 0.01
@@ -55,7 +57,7 @@ void main(void) {
 	vec2 texcoord = textureCoords;
 	vec4 image = texture(pass, texcoord);
 	vec4 mask = texture(gMask, texcoord);
-	if (mask.a != 1) {
+	if (MASK_COMPARE(mask.a, PBR_OBJECT)) {
 		if (useReflections == 1) {
 			vec4 diffuse = texture(gDiffuse, textureCoords);
 			vec2 pbr = texture(gPBR, textureCoords).rg;
