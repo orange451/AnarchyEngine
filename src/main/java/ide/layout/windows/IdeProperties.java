@@ -268,7 +268,7 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 			
 			if ( editable ) {
 				this.check.setOnAction(event -> {
-					this.check.setChecked(!this.check.isChecked());
+					//this.check.setChecked(!this.check.isChecked());
 					this.instance.set(field, LuaValue.valueOf(this.check.isChecked()));
 					this.check.setText(""+this.check.isChecked());
 				});
@@ -549,6 +549,8 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 		}
 	}
 	
+	private static boolean SELECTING_OBJECT;
+	
 	static class InstancePropertyModifier extends PropertyModifierTemp {
 		private boolean selected;
 		private StackPane t;
@@ -560,6 +562,7 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 				this.setOnMouseReleased(event -> {
 					if ( !selected ) {
 						selected = true;
+						SELECTING_OBJECT = true;
 						t = new StackPane();
 						t.setPrefSize(this.getWidth(),this.getHeight());
 						t.setBackground(new Color(0, 32, 255, 128));
@@ -619,15 +622,18 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 			//Game.deselectAll();
 			//Game.select(this.instance);
 			
-			InternalRenderThread.runLater(()->{
+			//InternalRenderThread.runLater(()->{
 				Game.deselectAll();
 				Game.deselect((Instance) instance);
 				Game.select(this.instance);
-			});
+			//});
 		}
 		
 		public void cancel() {
 			selected = false;
+			InternalRenderThread.runLater(()->{
+				SELECTING_OBJECT = false;
+			});
 			
 			if ( t == null )
 				return;
@@ -736,6 +742,9 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 		}
 
 		public void update(Instance instance, LuaValue property, LuaValue value) {
+			if ( SELECTING_OBJECT )
+				return;
+			
 			if ( inst != null && !instance.equals(inst))
 				return;
 			
