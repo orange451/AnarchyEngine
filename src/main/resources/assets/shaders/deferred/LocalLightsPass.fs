@@ -57,10 +57,12 @@ uniform sampler2D image;
 
 #include function calcLight
 
+#include variable MASK
+
 void main() {
 	vec4 composite = texture(image, textureCoords);
 	vec4 mask = texture(gMask, textureCoords);
-	if (mask.a != 1) {
+	if (mask.a == PBR_OBJECT) {
 		vec4 diffuse = texture(gDiffuse, textureCoords);
 		vec2 pbr = texture(gPBR, textureCoords).rg;
 		float depth = texture(gDepth, textureCoords).r;
