@@ -36,6 +36,7 @@ public class Icons {
 	public static final Icons icon_gameobject = new Icons("GameObject.png");
 	public static final Icons icon_model = new Icons("Model.png");
 	public static final Icons icon_box = new Icons("Box.png");
+	public static final Icons icon_sky = new Icons("icon-sky.png");
 	public static final Icons icon_mesh = new Icons("Mesh.png");
 	public static final Icons icon_texture = new Icons("Texture.png");
 	public static final Icons icon_material = new Icons("Material.png");

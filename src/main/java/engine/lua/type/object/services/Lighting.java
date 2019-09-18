@@ -14,6 +14,7 @@ import engine.lua.type.NumberClampPreferred;
 import engine.lua.type.data.Color3;
 import engine.lua.type.object.Service;
 import engine.lua.type.object.TreeViewable;
+import engine.lua.type.object.insts.DynamicSkybox;
 import engine.lua.type.object.insts.Skybox;
 import engine.lua.type.object.insts.Texture;
 import ide.layout.windows.icons.Icons;
@@ -105,13 +106,21 @@ public class Lighting extends Service implements TreeViewable {
 			if ( value.isnil() ) {
 				pp.getGBuffer().getMergeProcessor().setSkybox(null);
 			} else {
-				if ( value instanceof Skybox) {
+				if ( value instanceof DynamicSkybox ) {
+					// TODO create destroyed event for dynamic skybox to reset it to null
+					// TODO create changed event for dynamic skybox to update changed field values
+				} else if ( value instanceof Skybox) {
 					Skybox skybox = (Skybox)value;
 					
 					if ( skyboxDestroyed != null )
 						skyboxDestroyed.disconnect();
 					skyboxDestroyed = skybox.destroyedEvent().connect((args)->{
 						pp.getGBuffer().getMergeProcessor().setSkybox(null);
+						
+						if ( skyboxChanged != null ) {
+							skyboxChanged.disconnect();
+							skyboxChanged = null;
+						}
 					});
 
 					if ( skyboxChanged != null )
