@@ -25,7 +25,7 @@ public class DynamicSkybox extends Instance implements TreeViewable {
 		this.getField(C_TIME).setClamp(new NumberClamp(0, 24000));
 		
 		this.defineField(C_CLOUDHEIGHT.toString(), LuaValue.valueOf(3500), false);
-		this.getField(C_CLOUDHEIGHT).setClamp(new NumberClampPreferred(1000, 20000, 0, 60000));
+		this.getField(C_CLOUDHEIGHT).setClamp(new NumberClampPreferred(1000, 60000, 0, 10000));
 		
 		this.defineField(C_CLOUDSPEED.toString(), LuaValue.valueOf(1), false);
 		this.getField(C_CLOUDSPEED).setClamp(new NumberClampPreferred(-100, 100, -10, 10));
