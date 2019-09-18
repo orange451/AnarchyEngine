@@ -24,7 +24,7 @@
 #define PBR_BACKGROUND 2.0
 #define PBR_BACKGROUND_DYNAMIC 3.0
 
-#define MASK_COMPARE(a, b) int(a) == int(b)
+#define MASK_COMPARE(a, b) int(a + 0.5f) == int(b + 0.5f)
 #end
 
 #struct Light
