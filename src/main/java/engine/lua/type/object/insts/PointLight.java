@@ -3,8 +3,7 @@ package engine.lua.type.object.insts;
 import org.joml.Vector3f;
 import org.luaj.vm2.LuaValue;
 
-import engine.Game;
-import engine.GameSubscriber;
+import engine.InternalGameThread;
 import engine.gl.IPipeline;
 import engine.gl.Pipeline;
 import engine.gl.light.Light;
@@ -18,7 +17,7 @@ import engine.observer.RenderableWorld;
 import ide.layout.windows.icons.Icons;
 import lwjgui.paint.Color;
 
-public class PointLight extends LightBase implements TreeViewable,GameSubscriber {
+public class PointLight extends LightBase implements TreeViewable {
 
 	private engine.gl.light.PointLightInternal light;
 	private IPipeline pipeline;
@@ -30,8 +29,6 @@ public class PointLight extends LightBase implements TreeViewable,GameSubscriber
 		
 		this.defineField(C_RADIUS.toString(), LuaValue.valueOf(8), false);
 		this.getField(C_RADIUS).setClamp(new NumberClampPreferred(0, 1024, 0, 64));
-		
-		Game.getGame().subscribe(this);
 		
 		this.changedEvent().connect((args)->{
 			LuaValue key = args[0];
@@ -50,35 +47,53 @@ public class PointLight extends LightBase implements TreeViewable,GameSubscriber
 				} else if ( key.eq_b(C_COLOR) ) {
 					Color color = ((Color3)value).toColor();
 					light.color = new Vector3f( Math.max( color.getRed(),1 )/255f, Math.max( color.getGreen(),1 )/255f, Math.max( color.getBlue(),1 )/255f );
-				} else if ( key.eq_b(C_PARENT) ) {
-					onParentChange();
 				}
 			}
+			
+			if ( key.eq_b(C_PARENT) ) {
+				onParentChange();
+			}
+		});
+		
+		InternalGameThread.runLater(()->{
+			onParentChange();
 		});
 	}
 	
 	private void onParentChange() {
 		LuaValue t = this.getParent();
-		if ( t == null ) {
-			onDestroy();
+		if ( t.isnil() ) {
+			destroyLight();
 			return;
 		}
 		
+		// Search for renderable world
 		while ( t != null && !t.isnil() ) {
 			if ( t instanceof RenderableWorld ) {
 				IPipeline tempPipeline = Pipeline.get((RenderableWorld)t);
+				if ( tempPipeline == null )
+					continue;
+				
+				// Light exists inside old pipeline. No need to recreate.
 				if ( pipeline != null && pipeline.equals(tempPipeline) )
 					break;
 				
+				// Destroy old light
 				if ( pipeline != null )
-					onDestroy();
+					destroyLight();
 				
+				// Make new light. Return means we can live for another day!
 				pipeline = tempPipeline;
 				makeLight();
-				break;
+				return;
 			}
+			
+			// Navigate up tree
 			t = ((Instance)t).getParent();
 		}
+		
+		// Cant make light, can't destroy light. SO NO LIGHT!
+		destroyLight();
 	}
 
 	public void setRadius(float radius) {
@@ -92,9 +107,16 @@ public class PointLight extends LightBase implements TreeViewable,GameSubscriber
 
 	@Override
 	public void onDestroy() {
+		destroyLight();
+	}
+	
+	private void destroyLight() {
 		if ( light != null ) {
-			pipeline.getPointLightHandler().removeLight(light);
+			if ( pipeline != null ) {
+				pipeline.getPointLightHandler().removeLight(light);
+			}
 			light = null;
+			pipeline = null;
 			System.out.println("Destroyed light");
 		}
 	}
@@ -124,12 +146,12 @@ public class PointLight extends LightBase implements TreeViewable,GameSubscriber
 	public Icons getIcon() {
 		return Icons.icon_light;
 	}
-
+/*
 	@Override
 	public void gameUpdateEvent(boolean important) {
 		if ( !important )
 			return;
 		
 		onParentChange();
-	}
+	}*/
 }

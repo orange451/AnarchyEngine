@@ -50,14 +50,16 @@ public class DirectionalLight extends LightBase implements TreeViewable,GameSubs
 				} else if ( key.eq_b(C_COLOR) ) {
 					Color color = ((Color3)value).toColor();
 					light.color = new Vector3f( Math.max( color.getRed(),1 )/255f, Math.max( color.getGreen(),1 )/255f, Math.max( color.getBlue(),1 )/255f );
-				} else if ( key.eq_b(C_PARENT) ) {
-					onParentChange();
 				} else if ( key.eq_b(C_SHADOWDISTANCE) ) {
 					light.distance = value.toint();
 				} else if ( key.eq_b(C_DIRECTION) ) {
 					light.direction = ((Vector3)value).toJoml();
 				}
 			}
+			
+			if ( key.eq_b(C_PARENT) ) {
+				onParentChange();
+			} 
 		});
 		
 		InternalGameThread.runLater(()->{
@@ -77,26 +79,38 @@ public class DirectionalLight extends LightBase implements TreeViewable,GameSubs
 	
 	private void onParentChange() {
 		LuaValue t = this.getParent();
-		if ( t == null ) {
+		if ( t.isnil() ) {
 			onDestroy();
 			return;
 		}
 		
+		// Search for renderable world
 		while ( t != null && !t.isnil() ) {
 			if ( t instanceof RenderableWorld ) {
 				IPipeline tempPipeline = Pipeline.get((RenderableWorld)t);
+				if ( tempPipeline == null )
+					continue;
+				
+				// Light exists inside old pipeline. No need to recreate.
 				if ( pipeline != null && pipeline.equals(tempPipeline) )
 					break;
 				
+				// Destroy old light
 				if ( pipeline != null )
 					onDestroy();
 				
+				// Make new light. Return means we can live for another day!
 				pipeline = tempPipeline;
 				makeLight();
-				break;
+				return;
 			}
+			
+			// Navigate up tree
 			t = ((Instance)t).getParent();
 		}
+		
+		// Cant make light, can't destroy light. SO NO LIGHT!
+		onDestroy();
 	}
 
 	@Override
@@ -112,6 +126,7 @@ public class DirectionalLight extends LightBase implements TreeViewable,GameSubs
 				pipeline.getDirectionalLightHandler().removeLight(tempLight);
 			});
 			light = null;
+			pipeline = null;
 			
 			System.out.println("Destroyed light");
 		}
