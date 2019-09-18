@@ -20,7 +20,7 @@ import engine.observer.RenderableWorld;
 import ide.layout.windows.icons.Icons;
 import lwjgui.paint.Color;
 
-public class DirectionalLight extends LightBase implements TreeViewable,GameSubscriber {
+public class DirectionalLight extends LightBase implements TreeViewable {
 
 	private DirectionalLightInternal light;
 	private IPipeline pipeline;
@@ -36,9 +36,6 @@ public class DirectionalLight extends LightBase implements TreeViewable,GameSubs
 		
 		// Shadow distance
 		this.defineField(C_SHADOWDISTANCE.toString(), LuaValue.valueOf(50), false);
-		
-		// Update on game update
-		Game.getGame().subscribe(this);
 		
 		this.changedEvent().connect((args)->{
 			LuaValue key = args[0];
@@ -167,13 +164,5 @@ public class DirectionalLight extends LightBase implements TreeViewable,GameSubs
 	@Override
 	public Icons getIcon() {
 		return Icons.icon_light_directional;
-	}
-
-	@Override
-	public void gameUpdateEvent(boolean important) {
-		if ( !important )
-			return;
-		
-		onParentChange();
 	}
 }
