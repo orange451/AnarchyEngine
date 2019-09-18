@@ -46,6 +46,9 @@ public class DirectionalLightInternal extends Light {
 	}
 
 	public void dispose() {
+		if ( shadowMap == null )
+			return;
+		
 		shadowMap.dispose();
 	}
 

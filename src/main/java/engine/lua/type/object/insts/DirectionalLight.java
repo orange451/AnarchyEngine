@@ -64,6 +64,8 @@ public class DirectionalLight extends LightBase implements TreeViewable,GameSubs
 		});
 		
 		InternalGameThread.runLater(()->{
+			onParentChange();
+			
 			Game.lighting().changedEvent().connect((args)->{
 				if ( light == null )
 					return;
@@ -124,10 +126,12 @@ public class DirectionalLight extends LightBase implements TreeViewable,GameSubs
 		if ( light != null ) {
 			DirectionalLightInternal tempLight = light;
 			InternalRenderThread.runLater(()->{
-				pipeline.getDirectionalLightHandler().removeLight(tempLight);
+				if ( pipeline != null ) {
+					pipeline.getDirectionalLightHandler().removeLight(tempLight);
+					pipeline = null;
+				}
 			});
 			light = null;
-			pipeline = null;
 			
 			System.out.println("Destroyed light");
 		}
@@ -140,6 +144,8 @@ public class DirectionalLight extends LightBase implements TreeViewable,GameSubs
 		if ( light != null )
 			return;
 		
+		System.out.println("Making light");
+		
 		// Create light
 		Vector3f direction = ((Vector3)this.get("Direction")).toJoml();
 		float intensity = this.get("Intensity").tofloat();
@@ -151,10 +157,10 @@ public class DirectionalLight extends LightBase implements TreeViewable,GameSubs
 		light.color = new Vector3f( Math.max( color.getRed(),1 )/255f, Math.max( color.getGreen(),1 )/255f, Math.max( color.getBlue(),1 )/255f );
 		
 		// Add it to pipeline
-		InternalGameThread.runLater(()->{
-			InternalRenderThread.runLater(()->{
-				pipeline.getDirectionalLightHandler().addLight(light);
-			});
+		InternalRenderThread.runLater(()->{
+			if ( pipeline == null )
+				return;
+			pipeline.getDirectionalLightHandler().addLight(light);
 		});
 	}
 	
