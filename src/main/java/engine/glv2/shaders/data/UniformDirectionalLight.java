@@ -40,7 +40,7 @@ public class UniformDirectionalLight extends UniformObject {
 		shadowMap = new UniformSampler(name + ".shadowMap");
 		projectionMatrix = new UniformMatrix4[4];
 		for (int x = 0; x < 4; x++)
-			projectionMatrix[x] = new UniformMatrix4(name + ".projectionMatrix[" + x + "]");
+			projectionMatrix[x] = new UniformMatrix4(name + ".projectionMatrix" + x);
 		super.storeUniforms(projectionMatrix);
 		super.storeUniforms(direction, intensity, visible, color, viewMatrix, shadowMap);
 	}

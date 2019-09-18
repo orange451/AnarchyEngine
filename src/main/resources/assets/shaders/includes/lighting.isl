@@ -24,7 +24,7 @@
 #define PBR_BACKGROUND 2.0
 #define PBR_BACKGROUND_DYNAMIC 3.0
 
-#define MASK_COMPARE(a, b) int(a + 0.5f) == int(b + 0.5f)
+#define MASK_COMPARE(a, b) abs(a - b) < 0.2
 #end
 
 #struct Light
@@ -44,7 +44,10 @@ struct DirectionalLight {
 	float intensity;
 	bool visible;
 	mat4 viewMatrix;
-	mat4 projectionMatrix[4];
+	mat4 projectionMatrix0;
+	mat4 projectionMatrix1;
+	mat4 projectionMatrix2;
+	mat4 projectionMatrix3;
 	sampler2DArrayShadow shadowMap;
 };
 #end
@@ -346,10 +349,10 @@ float computeShadowV2(vec3 position, DirectionalLight light) {
 		vec4 posLight = light.viewMatrix * vec4(position, 1.0);
 		vec2 multTex = 1.0 / textureSize(light.shadowMap, 0).xy;
 		vec4 shadowCoord[4];
-		shadowCoord[0] = biasMatrix * (light.projectionMatrix[0] * posLight);
-		shadowCoord[1] = biasMatrix * (light.projectionMatrix[1] * posLight);
-		shadowCoord[2] = biasMatrix * (light.projectionMatrix[2] * posLight);
-		shadowCoord[3] = biasMatrix * (light.projectionMatrix[3] * posLight);
+		shadowCoord[0] = biasMatrix * (light.projectionMatrix0 * posLight);
+		shadowCoord[1] = biasMatrix * (light.projectionMatrix1 * posLight);
+		shadowCoord[2] = biasMatrix * (light.projectionMatrix2 * posLight);
+		shadowCoord[3] = biasMatrix * (light.projectionMatrix3 * posLight);
 		for (int x = -1; x <= 1; ++x) {
 			for (int y = -1; y <= 1; ++y) {
 				shadow += lookupV2(vec2(x, y), multTex, shadowCoord, light.shadowMap);
