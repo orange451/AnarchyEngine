@@ -5,6 +5,7 @@ import org.luaj.vm2.LuaValue;
 import engine.Game;
 import engine.InternalRenderThread;
 import engine.application.RenderableApplication;
+import engine.gl.IPipeline;
 import engine.gl.Pipeline;
 import engine.gl.ibl.SkySphereIBL;
 import engine.io.Image;
@@ -92,7 +93,6 @@ public class Lighting extends Service implements TreeViewable {
 	
 	@Override
 	protected LuaValue onValueSet(LuaValue key, LuaValue value) {
-		
 		if ( key.eq_b(C_SKYBOX) ) {
 			return onSetSkybox(value);
 		}
@@ -101,62 +101,78 @@ public class Lighting extends Service implements TreeViewable {
 	}
 	
 	private LuaValue onSetSkybox(LuaValue value) {
-		if (RenderableApplication.pipeline instanceof Pipeline) {
-			Pipeline pp = (Pipeline) RenderableApplication.pipeline;
-			if ( value.isnil() ) {
-				pp.getGBuffer().getMergeProcessor().setSkybox(null);
+		IPipeline pp = (IPipeline) Pipeline.pipeline_get_v2();
+		
+		if ( value.isnil() ) {
+			if (RenderableApplication.pipeline instanceof Pipeline) {
+				((Pipeline)pp).getGBuffer().getMergeProcessor().setSkybox(null);
 			} else {
-				if ( value instanceof DynamicSkybox ) {
-					// TODO create destroyed event for dynamic skybox to reset it to null
-					// TODO create changed event for dynamic skybox to update changed field values
-				} else if ( value instanceof Skybox) {
-					Skybox skybox = (Skybox)value;
+				pp.setDyamicSkybox(null);
+			}
+			return value;
+		} else {
+			if ( value instanceof DynamicSkybox ) {
+				DynamicSkybox skybox = (DynamicSkybox)value;
+				pp.setDyamicSkybox(skybox);
+				
+				if ( skyboxDestroyed != null )
+					skyboxDestroyed.disconnect();
+				skyboxDestroyed = skybox.destroyedEvent().connect((args)->{
+					pp.setDyamicSkybox(null);
 					
-					if ( skyboxDestroyed != null )
-						skyboxDestroyed.disconnect();
-					skyboxDestroyed = skybox.destroyedEvent().connect((args)->{
-						pp.getGBuffer().getMergeProcessor().setSkybox(null);
-						
-						if ( skyboxChanged != null ) {
-							skyboxChanged.disconnect();
-							skyboxChanged = null;
-						}
-					});
-
-					if ( skyboxChanged != null )
+					if ( skyboxChanged != null ) {
 						skyboxChanged.disconnect();
-					skyboxChanged = skybox.changedEvent().connect((args)->{
-						String key1 = args[0].toString();
-						LuaValue value1 = args[1];
+						skyboxChanged = null;
+					}
+				});
+			} else if ( value instanceof Skybox) {
+				Skybox skybox = (Skybox)value;
+				
+				if ( skyboxDestroyed != null )
+					skyboxDestroyed.disconnect();
+				skyboxDestroyed = skybox.destroyedEvent().connect((args)->{
+					((Pipeline)pp).getGBuffer().getMergeProcessor().setSkybox(null);
+					
+					if ( skyboxChanged != null ) {
+						skyboxChanged.disconnect();
+						skyboxChanged = null;
+					}
+				});
 
-						if ( key1.equals("Image") ) {
-							if ( !value1.isnil() ) {
-								Texture texture = ((Texture)value1);
-								attachSkybox( skybox, texture);
-							} else {
-								pp.getGBuffer().getMergeProcessor().setSkybox(null);
-							}
+				if ( skyboxChanged != null )
+					skyboxChanged.disconnect();
+				skyboxChanged = skybox.changedEvent().connect((args)->{
+					String key1 = args[0].toString();
+					LuaValue value1 = args[1];
+
+					if ( key1.equals("Image") ) {
+						if ( !value1.isnil() ) {
+							Texture texture = ((Texture)value1);
+							attachSkybox( skybox, texture);
+						} else {
+							((Pipeline)pp).getGBuffer().getMergeProcessor().setSkybox(null);
 						}
+					}
 
-						if ( key1.equals("Power") ) {
-							pp.getGBuffer().getMergeProcessor().getSkybox().setLightPower(value1.tofloat());
-						}
+					if ( key1.equals("Power") ) {
+						((Pipeline)pp).getGBuffer().getMergeProcessor().getSkybox().setLightPower(value1.tofloat());
+					}
 
-						if ( key1.equals("Brightness") ) {
-							pp.getGBuffer().getMergeProcessor().getSkybox().setLightMultiplier(value1.tofloat());
-						}
-					});
+					if ( key1.equals("Brightness") ) {
+						((Pipeline)pp).getGBuffer().getMergeProcessor().getSkybox().setLightMultiplier(value1.tofloat());
+					}
+				});
 
-					// Initial load
-					InternalRenderThread.runLater(()->{
-						attachSkybox(skybox, skybox.getImage());
-					});
-				} else {
-					LuaValue.error("Skybox field must be of type Skybox");
-					return null;
-				}
+				// Initial load
+				InternalRenderThread.runLater(()->{
+					attachSkybox(skybox, skybox.getImage());
+				});
+			} else {
+				LuaValue.error("Skybox field must be of type Skybox");
+				return null;
 			}
 		}
+		
 		return value;
 	}
 
