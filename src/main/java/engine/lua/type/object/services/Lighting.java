@@ -101,7 +101,7 @@ public class Lighting extends Service implements TreeViewable {
 	}
 	
 	private LuaValue onSetSkybox(LuaValue value) {
-		IPipeline pp = (IPipeline) Pipeline.pipeline_get_v2();
+		IPipeline pp = (IPipeline) RenderableApplication.pipeline;
 		
 		if ( value.isnil() ) {
 			if (RenderableApplication.pipeline instanceof Pipeline) {

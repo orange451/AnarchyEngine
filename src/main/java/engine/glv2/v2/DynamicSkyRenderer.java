@@ -50,9 +50,9 @@ public class DynamicSkyRenderer {
 			shader.loadTransformationMatrix(infMat);
 		else
 			shader.loadTransformationMatrix(regMat);
-		dome.bind();
+		dome.bind(0, 1, 2);
 		glDrawElements(GL_TRIANGLES, dome.getIndexCount(), GL_UNSIGNED_INT, 0);
-		dome.unbind();
+		dome.unbind(0, 1, 2);
 		shader.stop();
 		glCullFace(GL_BACK);
 	}
@@ -70,9 +70,9 @@ public class DynamicSkyRenderer {
 			shader.loadTransformationMatrix(infMat);
 		else
 			shader.loadTransformationMatrix(regMat);
-		dome.bind();
+		dome.bind(0, 1, 2);
 		glDrawElements(GL_TRIANGLES, dome.getIndexCount(), GL_UNSIGNED_INT, 0);
-		dome.unbind();
+		dome.unbind(0, 1, 2);
 		shader.stop();
 		glCullFace(GL_BACK);
 	}

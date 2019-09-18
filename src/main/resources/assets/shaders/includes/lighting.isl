@@ -19,10 +19,10 @@
 //
 
 #variable MASK
-#define PBR_NONE 0x0
-#define PBR_OBJECT 0x1
-#define PBR_BACKGROUND 0x2
-#define PBR_BACKGROUND_DYNAMIC 0x3
+#define PBR_NONE 0.0
+#define PBR_OBJECT 1.0
+#define PBR_BACKGROUND 2.0
+#define PBR_BACKGROUND_DYNAMIC 3.0
 #end
 
 #struct Light

@@ -27,7 +27,6 @@ in vec3 pass_normal;
 out vec4[5] out_Color;
 
 uniform int renderSun;
-uniform float time;
 uniform vec3 lightPosition;
 uniform vec3 cameraPosition;
 uniform DynamicSky dynamicSky;
@@ -209,7 +208,7 @@ void main() {
 		vec3 p = ro + rd * d;
 		// color = vec3(fbm(p.xz * 0.005));
 
-		vec2 st = p.xy * 0.00075 + vec2(time * 0.0005, time * 0.00005) * dynamicSky.cloudSpeed;
+		vec2 st = p.xy * 0.00075 + vec2(dynamicSky.time * 0.0005, dynamicSky.time * 0.00005) * dynamicSky.cloudSpeed;
 
 		vec3 cloudColor = vec3(0.0);
 		float cloudTime = dynamicSky.time * 0.025; // Use cloud time instead
