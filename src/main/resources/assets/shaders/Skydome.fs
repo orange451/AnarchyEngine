@@ -18,6 +18,8 @@
 //
 //
 
+#include struct DynamicSky
+
 in vec2 pass_textureCoords;
 in vec3 pass_position;
 in vec3 pass_normal;
@@ -28,6 +30,7 @@ uniform int renderSun;
 uniform float time;
 uniform vec3 lightPosition;
 uniform vec3 cameraPosition;
+uniform DynamicSky dynamicSky;
 
 #include function noise
 
@@ -143,12 +146,12 @@ vec3 atmosphere(vec3 r, vec3 r0, vec3 pSun, float iSun, float rPlanet, float rAt
 	return iSun * (pRlh * kRlh * totalRlh + pMie * kMie * totalMie);
 }
 
-#define MAX_STEPS 100
+#define MAX_STEPS 200
 #define MAX_DIST 50000.
 #define SURF_DIST .01
 
 float GetDist(vec3 p) {
-	float planeDist = abs(2400 - p.z);
+	float planeDist = abs(dynamicSky.cloudHeight - p.z);
 	return planeDist;
 }
 
@@ -206,10 +209,10 @@ void main() {
 		vec3 p = ro + rd * d;
 		// color = vec3(fbm(p.xz * 0.005));
 
-		vec2 st = p.xy * 0.00075 + vec2(time * 0.0005, time * 0.00005);
+		vec2 st = p.xy * 0.00075 + vec2(time * 0.0005, time * 0.00005) * dynamicSky.cloudSpeed;
 
 		vec3 cloudColor = vec3(0.0);
-		float cloudTime = time * 0.025;
+		float cloudTime = dynamicSky.time * 0.025; // Use cloud time instead
 
 		vec2 q = vec2(0.);
 		q.x = fbm(st + 0.00 * cloudTime);

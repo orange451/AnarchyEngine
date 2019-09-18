@@ -26,10 +26,12 @@ import org.joml.Vector3f;
 import engine.glv2.entities.CubeMapCamera;
 import engine.glv2.shaders.data.Attribute;
 import engine.glv2.shaders.data.UniformBoolean;
+import engine.glv2.shaders.data.UniformDynamicSky;
 import engine.glv2.shaders.data.UniformFloat;
 import engine.glv2.shaders.data.UniformMatrix4;
 import engine.glv2.shaders.data.UniformVec3;
 import engine.lua.type.object.insts.Camera;
+import engine.lua.type.object.insts.DynamicSkybox;
 
 public class SkydomeShader extends ShaderProgram {
 
@@ -41,13 +43,15 @@ public class SkydomeShader extends ShaderProgram {
 	private UniformBoolean renderSun = new UniformBoolean("renderSun");
 	private UniformVec3 cameraPosition = new UniformVec3("cameraPosition");
 
+	private UniformDynamicSky dynamicSky = new UniformDynamicSky("dynamicSky");
+
 	private Matrix4f temp = new Matrix4f();
 
 	public SkydomeShader() {
 		super("assets/shaders/Skydome.vs", "assets/shaders/Skydome.fs", new Attribute(0, "position"),
 				new Attribute(1, "textureCoords"), new Attribute(2, "normal"));
 		super.storeUniforms(projectionMatrix, transformationMatrix, viewMatrix, time, lightPosition, renderSun,
-				cameraPosition);
+				cameraPosition, dynamicSky);
 		super.validate();
 	}
 
@@ -83,8 +87,8 @@ public class SkydomeShader extends ShaderProgram {
 		renderSun.loadBoolean(val);
 	}
 
-	public void loadTime(float time) {
-		this.time.loadFloat(time);
+	public void loadDynamicSky(DynamicSkybox sky) {
+		dynamicSky.loadLight(sky);
 	}
 
 }

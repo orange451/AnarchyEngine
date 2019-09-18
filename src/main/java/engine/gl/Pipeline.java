@@ -31,6 +31,7 @@ import engine.lua.type.object.Instance;
 import engine.lua.type.object.PrefabRenderer;
 import engine.lua.type.object.insts.AnimationController;
 import engine.lua.type.object.insts.Camera;
+import engine.lua.type.object.insts.DynamicSkybox;
 import engine.lua.type.object.insts.GameObject;
 import engine.lua.type.object.insts.Model;
 import engine.lua.type.object.insts.Prefab;
@@ -478,5 +479,11 @@ public class Pipeline implements IPipeline {
 	public IDirectionalLightHandler getDirectionalLightHandler() {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public void setDyamicSkybox(DynamicSkybox dynamicSkybox) {
+		// TODO Auto-generated method stub
+		
 	}
 }

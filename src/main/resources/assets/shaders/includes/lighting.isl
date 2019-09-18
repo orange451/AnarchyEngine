@@ -19,9 +19,10 @@
 //
 
 #variable MASK
-#define PBR_OBJECT 0x0
-#define PBR_BACKGROUND 0x1
-#define PBR_BACKGROUND_DYNAMIC 0x2
+#define PBR_NONE 0x0
+#define PBR_OBJECT 0x1
+#define PBR_BACKGROUND 0x2
+#define PBR_BACKGROUND_DYNAMIC 0x3
 #end
 
 #struct Light
@@ -40,6 +41,15 @@ struct DirectionalLight {
 	vec3 color;
 	float intensity;
 	bool visible;
+};
+#end
+
+#struct DynamicSky
+struct DynamicSky {
+	float brightness;
+	float time;
+	float cloudHeight;
+	float cloudSpeed;
 };
 #end
 

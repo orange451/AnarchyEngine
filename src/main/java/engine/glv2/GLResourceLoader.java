@@ -98,6 +98,7 @@ import engine.glv2.objects.CubeMapTexture;
 import engine.glv2.objects.RawModel;
 import engine.glv2.objects.RawTexture;
 import engine.glv2.objects.Texture;
+import engine.glv2.objects.VAO;
 import engine.glv2.objects.VertexNM;
 
 /**
@@ -336,6 +337,7 @@ public class GLResourceLoader {
 		return new RawTexture(image, width, height, component);
 	}
 
+	@Deprecated
 	public RawModel loadObjModel(String fileName) {
 		InputStream file = getClass().getClassLoader().getResourceAsStream("assets/models/" + fileName + ".obj");
 		System.out.println("Loading Model: " + fileName + ".obj");
@@ -395,6 +397,75 @@ public class GLResourceLoader {
 		int[] indicesArray = convertIndicesListToArray(indices);
 
 		return loadToVAO(verticesArray, texturesArray, normalsArray, tangentsArray, indicesArray);
+	}
+
+	public VAO loadObj(String fileName) {
+		InputStream file = getClass().getClassLoader().getResourceAsStream("assets/models/" + fileName + ".obj");
+		System.out.println("Loading Model: " + fileName + ".obj");
+		BufferedReader reader = new BufferedReader(new InputStreamReader(file));
+		String line;
+		List<VertexNM> vertices = new ArrayList<VertexNM>();
+		List<Vector2f> textures = new ArrayList<Vector2f>();
+		List<Vector3f> normals = new ArrayList<Vector3f>();
+		List<Integer> indices = new ArrayList<Integer>();
+		try {
+			while (true) {
+				line = reader.readLine();
+				if (line.startsWith("v ")) {
+					String[] currentLine = line.split(" ");
+					Vector3f vertex = new Vector3f((float) Float.valueOf(currentLine[1]),
+							(float) Float.valueOf(currentLine[2]), (float) Float.valueOf(currentLine[3]));
+					VertexNM newVertex = new VertexNM(vertices.size(), vertex);
+					vertices.add(newVertex);
+
+				} else if (line.startsWith("vt ")) {
+					String[] currentLine = line.split(" ");
+					Vector2f texture = new Vector2f((float) Float.valueOf(currentLine[1]),
+							(float) Float.valueOf(currentLine[2]));
+					textures.add(texture);
+				} else if (line.startsWith("vn ")) {
+					String[] currentLine = line.split(" ");
+					Vector3f normal = new Vector3f((float) Float.valueOf(currentLine[1]),
+							(float) Float.valueOf(currentLine[2]), (float) Float.valueOf(currentLine[3]));
+					normals.add(normal);
+				} else if (line.startsWith("f ")) {
+					break;
+				}
+			}
+			while (line != null && line.startsWith("f ")) {
+				String[] currentLine = line.split(" ");
+				String[] vertex1 = currentLine[1].split("/");
+				String[] vertex2 = currentLine[2].split("/");
+				String[] vertex3 = currentLine[3].split("/");
+				VertexNM v0 = processVertex(vertex1, vertices, indices);
+				VertexNM v1 = processVertex(vertex2, vertices, indices);
+				VertexNM v2 = processVertex(vertex3, vertices, indices);
+				calculateTangents(v0, v1, v2, textures);// NEW
+				line = reader.readLine();
+			}
+			reader.close();
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+
+		removeUnusedVertices(vertices);
+		float[] verticesArray = new float[vertices.size() * 3];
+		float[] texturesArray = new float[vertices.size() * 2];
+		float[] normalsArray = new float[vertices.size() * 3];
+		float[] tangentsArray = new float[vertices.size() * 3];
+		float furthest = convertDataToArrays(vertices, textures, normals, verticesArray, texturesArray, normalsArray,
+				tangentsArray);
+		int[] indicesArray = convertIndicesListToArray(indices);
+
+		VAO vao = VAO.create();
+		vao.bind();
+		vao.createIndexBuffer(indicesArray, GL_STATIC_DRAW);
+		vao.createAttribute(0, verticesArray, 3, GL_STATIC_DRAW);
+		vao.createAttribute(1, texturesArray, 2, GL_STATIC_DRAW);
+		vao.createAttribute(2, normalsArray, 3, GL_STATIC_DRAW);
+		vao.createAttribute(3, tangentsArray, 3, GL_STATIC_DRAW);
+		vao.unbind();
+		return vao;
 	}
 
 	private void calculateTangents(VertexNM v0, VertexNM v1, VertexNM v2, List<Vector2f> textures) {
