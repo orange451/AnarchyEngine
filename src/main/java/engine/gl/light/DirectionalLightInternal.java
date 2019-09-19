@@ -11,13 +11,15 @@ import engine.glv2.v2.lights.DirectionalLightShadowMap;
 public class DirectionalLightInternal extends Light {
 	public Vector3f direction = new Vector3f(1, 1, 1);
 	public int distance = 100;
-	public int shadowResolution = 1024;
+	public int shadowResolution = 512;
 	private DirectionalLightShadowMap shadowMap;
 	private DirectionalLightCamera lightCamera;
 
 	public DirectionalLightInternal(Vector3f direction, float intensity) {
 		this.direction.set(direction);
 		this.intensity = intensity;
+		
+		// Light may be created before game is setup (on load), so Game.Lighting is not available yet. Next frame it will be.
 		InternalGameThread.runLater(() -> {
 			this.shadowResolution = Game.lighting().getShadowMapSize();
 		});
