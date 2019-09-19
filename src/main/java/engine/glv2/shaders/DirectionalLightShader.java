@@ -18,18 +18,20 @@
  * 
  */
 
-package engine.glv2.pipeline.shaders;
+package engine.glv2.shaders;
 
 import org.joml.Matrix4f;
-import org.joml.Vector3f;
 
-import engine.glv2.entities.SunCamera;
+import engine.gl.light.DirectionalLightInternal;
+import engine.glv2.shaders.data.Attribute;
+import engine.glv2.shaders.data.UniformBoolean;
+import engine.glv2.shaders.data.UniformDirectionalLight;
 import engine.glv2.shaders.data.UniformMatrix4;
 import engine.glv2.shaders.data.UniformSampler;
 import engine.glv2.shaders.data.UniformVec3;
 import engine.lua.type.object.insts.Camera;
 
-public class LightingShader extends BasePipelineShader {
+public class DirectionalLightShader extends ShaderProgram {
 
 	private UniformMatrix4 projectionMatrix = new UniformMatrix4("projectionMatrix");
 	private UniformMatrix4 viewMatrix = new UniformMatrix4("viewMatrix");
@@ -37,9 +39,6 @@ public class LightingShader extends BasePipelineShader {
 	private UniformMatrix4 inverseViewMatrix = new UniformMatrix4("inverseViewMatrix");
 
 	private UniformVec3 cameraPosition = new UniformVec3("cameraPosition");
-	private UniformVec3 lightPosition = new UniformVec3("lightPosition");
-	private UniformVec3 invertedLightPosition = new UniformVec3("invertedLightPosition");
-	private UniformVec3 uAmbient = new UniformVec3("uAmbient");
 
 	private UniformSampler gDiffuse = new UniformSampler("gDiffuse");
 	private UniformSampler gPosition = new UniformSampler("gPosition");
@@ -47,29 +46,19 @@ public class LightingShader extends BasePipelineShader {
 	private UniformSampler gDepth = new UniformSampler("gDepth");
 	private UniformSampler gPBR = new UniformSampler("gPBR");
 	private UniformSampler gMask = new UniformSampler("gMask");
-	private UniformSampler volumetric = new UniformSampler("volumetric");
-	private UniformSampler irradianceCube = new UniformSampler("irradianceCube");
-	private UniformSampler environmentCube = new UniformSampler("environmentCube");
-	private UniformSampler brdfLUT = new UniformSampler("brdfLUT");
-	private UniformSampler directionalLightData = new UniformSampler("directionalLightData");
 
-	private UniformMatrix4 projectionLightMatrix[];
-	private UniformMatrix4 viewLightMatrix = new UniformMatrix4("viewLightMatrix");
 	private UniformMatrix4 biasMatrix = new UniformMatrix4("biasMatrix");
-	private UniformSampler shadowMap = new UniformSampler("shadowMap");
+
+	private UniformDirectionalLight light = new UniformDirectionalLight("light");
+
+	private UniformBoolean useShadows = new UniformBoolean("useShadows");
 
 	private Matrix4f projInv = new Matrix4f(), viewInv = new Matrix4f();
 
-	public LightingShader(String name) {
-		super("deferred/" + name);
-		projectionLightMatrix = new UniformMatrix4[4];
-		for (int x = 0; x < 4; x++)
-			projectionLightMatrix[x] = new UniformMatrix4("projectionLightMatrix[" + x + "]");
-		super.storeUniforms(projectionLightMatrix);
-		super.storeUniforms(projectionMatrix, viewMatrix, cameraPosition, lightPosition, invertedLightPosition,
-				uAmbient, gDiffuse, gPosition, gNormal, gDepth, gPBR, gMask, volumetric, irradianceCube,
-				environmentCube, brdfLUT, biasMatrix, viewLightMatrix, inverseProjectionMatrix, inverseViewMatrix,
-				shadowMap, directionalLightData);
+	public DirectionalLightShader() {
+		super("assets/shaders/DirectionalLight.vs", "assets/shaders/DirectionalLight.fs", new Attribute(0, "position"));
+		super.storeUniforms(projectionMatrix, viewMatrix, cameraPosition, gDiffuse, gPosition, gNormal, gDepth, gPBR,
+				gMask, light, inverseProjectionMatrix, inverseViewMatrix, biasMatrix, useShadows);
 		super.validate();
 		this.loadInitialData();
 	}
@@ -83,12 +72,6 @@ public class LightingShader extends BasePipelineShader {
 		gDepth.loadTexUnit(3);
 		gPBR.loadTexUnit(4);
 		gMask.loadTexUnit(5);
-		volumetric.loadTexUnit(6);
-		irradianceCube.loadTexUnit(7);
-		environmentCube.loadTexUnit(8);
-		brdfLUT.loadTexUnit(9);
-		shadowMap.loadTexUnit(10);
-		directionalLightData.loadTexUnit(11);
 		Matrix4f bias = new Matrix4f();
 		bias.m00(0.5f);
 		bias.m11(0.5f);
@@ -100,18 +83,12 @@ public class LightingShader extends BasePipelineShader {
 		super.stop();
 	}
 
-	public void loadLightPosition(Vector3f pos) {
-		lightPosition.loadVec3(pos);
+	public void loadDirectionalLight(DirectionalLightInternal l) {
+		light.loadLight(l, 6);
 	}
-
-	public void loadSunCameraData(SunCamera camera) {
-		for (int x = 0; x < 4; x++)
-			this.projectionLightMatrix[x].loadMatrix(camera.getProjectionArray()[x]);
-		viewLightMatrix.loadMatrix(camera.getViewMatrix());
-	}
-
-	public void loadAmbient(Vector3f ambient) {
-		this.uAmbient.loadVec3(ambient);
+	
+	public void loadUseShadows(boolean shadows) {
+		useShadows.loadBoolean(shadows);
 	}
 
 	public void loadCameraData(Camera camera, Matrix4f projection) {

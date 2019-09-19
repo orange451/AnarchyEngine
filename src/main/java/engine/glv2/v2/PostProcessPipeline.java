@@ -124,7 +124,7 @@ public abstract class PostProcessPipeline {
 		quad.bind(0);
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, auxTex[0].getTexture());
-		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+		glDrawArrays(GL_TRIANGLE_STRIP, 0, quad.getVertexCount());
 		quad.unbind(0);
 		finalShader.stop();
 		finalSurface.unbind();

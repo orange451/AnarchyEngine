@@ -49,9 +49,7 @@ uniform mat4 viewMatrix;
 uniform mat4 inverseProjectionMatrix;
 uniform mat4 inverseViewMatrix;
 uniform sampler2DArrayShadow shadowMap;
-
-uniform DirectionalLight directionalLights[8];
-uniform int totalDirectionalLights;
+uniform sampler2D directionalLightData;
 
 #include variable GLOBAL
 
@@ -72,10 +70,6 @@ uniform int totalDirectionalLights;
 #include function computeAmbientOcclusionV2
 
 #include function computeShadow
-
-#include function computeShadowV2
-
-#include function calcDirectionalLight
 
 #include variable MASK
 
@@ -200,10 +194,7 @@ void main() {
 					  computeShadow(position); // * computeContactShadows(position, N, L, depth);
 		Lo += (kD * image.rgb / PI + brdf) * radiance * NdotL;
 
-		for (int i = 0; i < totalDirectionalLights; i++) {
-			Lo += calcDirectionalLight(directionalLights[i], position, image.rgb, N, V, F0,
-									   roughness, metallic);
-		}
+		Lo += texture(directionalLightData, textureCoords).rgb;
 
 		F = fresnelSchlickRoughness(max(dot(N, V), 0.0), F0, roughness);
 

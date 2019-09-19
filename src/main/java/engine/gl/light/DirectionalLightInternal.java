@@ -26,11 +26,11 @@ public class DirectionalLightInternal extends Light {
 	public void init() {
 		shadowMap = new DirectionalLightShadowMap(shadowResolution);
 		lightCamera = new DirectionalLightCamera(distance);
-		lightCamera.update(direction);
+		lightCamera.update(direction, getPosition());
 	}
 
 	public void update() {
-		lightCamera.update(direction);
+		lightCamera.update(direction, getPosition());
 	}
 
 	public void setShadowDistance(int distance) {
@@ -46,9 +46,9 @@ public class DirectionalLightInternal extends Light {
 	}
 
 	public void dispose() {
-		if ( shadowMap == null )
+		if (shadowMap == null)
 			return;
-		
+
 		shadowMap.dispose();
 	}
 
