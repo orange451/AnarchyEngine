@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
+import org.joml.Vector3fc;
 
 import engine.gl.MaterialGL;
 import engine.gl.Pipeline;
@@ -203,5 +204,9 @@ public class PrefabRenderer {
 	
 	public Prefab getParent() {
 		return parent;
+	}
+
+	public Vector3f getAABBOffset() {
+		return getAABB().value2().add(getAABB().value1(), new Vector3f()).mul(-0.5f);
 	}
 }

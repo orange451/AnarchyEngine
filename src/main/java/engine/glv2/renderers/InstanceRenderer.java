@@ -131,6 +131,7 @@ public class InstanceRenderer implements IObjectRenderer {
 		PrefabRenderer pfr = go.getPrefab().getPrefab();
 
 		Matrix4f mat = go.getWorldMatrix().toJoml();
+		mat.translate(pfr.getAABBOffset());
 		mat.scale(pfr.getParent().getScale());
 		shader.loadTransformationMatrix(mat);
 		for (int i = 0; i < pfr.size(); i++) {

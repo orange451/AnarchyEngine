@@ -1,5 +1,7 @@
 package engine.util;
 
+import org.joml.Vector3f;
+
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.bullet.collision.btBoxShape;
@@ -85,30 +87,30 @@ public class PhysicsUtils {
 	 */
 	public static btRigidBody mesh(float mass, float bouncyness, float friction, BufferedMesh bufferedMesh) {
 		if ( mass == 0 ) {
-			return getBody( mass, bouncyness, friction, meshShapeStatic( bufferedMesh, 1.0f ) );
+			return getBody( mass, bouncyness, friction, meshShapeStatic( bufferedMesh, 1.0f, new Vector3f() ) );
 		} else {
-	        return getBody( mass, bouncyness, friction, meshShapeDynamic( bufferedMesh, 1.0f ) );
+	        return getBody( mass, bouncyness, friction, meshShapeDynamic( bufferedMesh, 1.0f, new Vector3f() ) );
 		}
 	}
 	
-	public static btCollisionShape meshShapeStatic( BufferedMesh bufferedMesh, float scale ) {
+	public static btCollisionShape meshShapeStatic( BufferedMesh bufferedMesh, float scale, Vector3f offset ) {
 		if ( bufferedMesh == null )
 			return null;
 		
-		return new btBvhTriangleMeshShape(meshVertexArray(bufferedMesh, scale), true);
+		return new btBvhTriangleMeshShape(meshVertexArray(bufferedMesh, scale, offset), true);
 	}
 	
-	public static btCollisionShape meshShapeDynamic( BufferedMesh bufferedMesh, float scale ) {
+	public static btCollisionShape meshShapeDynamic( BufferedMesh bufferedMesh, float scale, Vector3f offset ) {
 		if ( bufferedMesh == null )
 			return null;
 
-		btGImpactMeshShape meshShape = new btGImpactMeshShape(meshVertexArray(bufferedMesh, scale));
+		btGImpactMeshShape meshShape = new btGImpactMeshShape(meshVertexArray(bufferedMesh, scale, offset));
 		meshShape.updateBound();
 		
 		return meshShape;
 	}
 	
-	private static btTriangleIndexVertexArray meshVertexArray( BufferedMesh bufferedMesh, float scale ) {
+	private static btTriangleIndexVertexArray meshVertexArray( BufferedMesh bufferedMesh, float scale, Vector3f offset ) {
 		if ( bufferedMesh == null )
 			return null;
 		
@@ -117,16 +119,20 @@ public class PhysicsUtils {
 		int totalVerts = vertices.length;
 		int totalTris = totalVerts / 3;
 		
+		float offx = offset.x;
+		float offy = offset.y;
+		float offz = offset.z;
+		
 		int a = 0;
 		for (int i = 0; i < totalTris; i++) {
 			float[] v0 = vertices[a++].getXYZ();
-			Vector3 vertex0 = new Vector3(v0[0], v0[1], v0[2]);
+			Vector3 vertex0 = new Vector3(v0[0]+offx, v0[1]+offy, v0[2]+offz);
 	
 			float[] v1 = vertices[a++].getXYZ();
-			Vector3 vertex1 = new Vector3(v1[0], v1[1], v1[2]);
+			Vector3 vertex1 = new Vector3(v1[0]+offx, v1[1]+offy, v1[2]+offz);
 	
 			float[] v2 = vertices[a++].getXYZ();
-			Vector3 vertex2 = new Vector3(v2[0], v2[1], v2[2]);
+			Vector3 vertex2 = new Vector3(v2[0]+offx, v2[1]+offy, v2[2]+offz);
 			
 			mesh.addTriangle(vertex0, vertex1, vertex2);
 		}

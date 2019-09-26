@@ -343,6 +343,8 @@ public class PhysicsObjectInternal {
 		}
 	}
 	
+	public static final Vector3f ZERO = new Vector3f(0,0,0);
+	
 	public void setShapeFromMesh(LuaValue customMesh) {
 		if ( luaFrontEnd == null )
 			return;
@@ -353,10 +355,13 @@ public class PhysicsObjectInternal {
 		}
 		
 		float scale = 1.0f;
+		Vector3f offset = ZERO;
 		Prefab prefab = (Prefab) luaFrontEnd.get(C_LINKED).get(C_PREFAB);
 		if ( !prefab.isnil() ) {
 			scale = prefab.getScale();
+			offset = prefab.getPrefab().getAABBOffset();
 		}
+		
 		
 		BufferedMesh mesh = null;
 		if ( customMesh.isnil() ) {
@@ -366,9 +371,9 @@ public class PhysicsObjectInternal {
 		}
 		
 		if ( desiredMass == 0 ) {
-			desiredShape = PhysicsUtils.meshShapeStatic(mesh, scale );
+			desiredShape = PhysicsUtils.meshShapeStatic(mesh, scale, offset);
 		} else {
-			desiredShape = PhysicsUtils.meshShapeDynamic(mesh, scale);
+			desiredShape = PhysicsUtils.meshShapeDynamic(mesh, scale, offset);
 		}
 	}
 	
