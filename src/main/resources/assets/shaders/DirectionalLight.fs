@@ -64,7 +64,7 @@ uniform DirectionalLight light;
 
 void main() {
 	vec4 mask = texture(gMask, textureCoords);
-	vec3 output = vec3(0.0);
+	vec3 result = vec3(0.0);
 	if (MASK_COMPARE(mask.a, PBR_OBJECT)) {
 		vec4 image = texture(gDiffuse, textureCoords);
 		vec2 pbr = texture(gPBR, textureCoords).rg;
@@ -81,7 +81,7 @@ void main() {
 		vec3 F0 = vec3(0.04);
 		F0 = mix(F0, image.rgb, metallic);
 
-		output = calcDirectionalLight(light, position, image.rgb, N, V, F0, roughness, metallic);
+		result = calcDirectionalLight(light, position, image.rgb, N, V, F0, roughness, metallic);
 	}
-	out_Color = output;
+	out_Color = result;
 }
