@@ -57,11 +57,11 @@ public class Prefab extends Asset implements TreeViewable {
 			}
 		});
 		
-		((LuaEvent)this.get("ChildAdded")).connectLua(new OneArgFunction() {
+		this.childAddedEvent().connectLua(new OneArgFunction() {
 			@Override
 			public LuaValue call(LuaValue arg) {
 				if ( arg instanceof Model ) {
-					((Model)arg).getMesh(); // Make sure mesh is loaded
+					((Model)arg).getMeshInternal(); // Make sure mesh is loaded
 					prefab.addModel((Model) arg);
 
 					((Model)arg).changedEvent().connect((args) -> {
@@ -76,7 +76,7 @@ public class Prefab extends Asset implements TreeViewable {
 			}
 		});
 		
-		((LuaEvent)this.get("ChildRemoved")).connectLua(new OneArgFunction() {
+		this.childRemovedEvent().connectLua(new OneArgFunction() {
 			@Override
 			public LuaValue call(LuaValue arg) {
 				if ( arg instanceof Model ) {

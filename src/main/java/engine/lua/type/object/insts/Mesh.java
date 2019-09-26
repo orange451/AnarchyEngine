@@ -14,14 +14,12 @@ import org.lwjgl.assimp.AIScene;
 import org.lwjgl.assimp.AIVector3D;
 import org.lwjgl.assimp.Assimp;
 
-import engine.Game;
 import engine.gl.Resources;
 import engine.gl.mesh.BufferedMesh;
 import engine.gl.mesh.Vertex;
 import engine.lua.lib.FourArgFunction;
+import engine.lua.type.LuaEvent;
 import engine.lua.type.object.AssetLoadable;
-import engine.lua.type.object.Instance;
-import engine.lua.type.object.Service;
 import engine.lua.type.object.TreeViewable;
 import engine.util.MeshUtils;
 import ide.IDEFilePath;
@@ -39,6 +37,8 @@ public class Mesh extends AssetLoadable implements TreeViewable {
 	
 	private static final LuaValue C_MESHES = LuaValue.valueOf("Meshes");
 	private static final LuaValue C_BLANK = LuaValue.valueOf("");
+	
+	private static final LuaValue C_MESHLOADED = LuaValue.valueOf("MeshLoaded");
 	
 	public Mesh() {
 		super("Mesh");
@@ -99,6 +99,8 @@ public class Mesh extends AssetLoadable implements TreeViewable {
 				return LuaValue.NIL;
 			}
 		});
+		
+		this.rawset(C_MESHLOADED, new LuaEvent());
 	}
 	
 	public void teapot(float radius) {
@@ -125,6 +127,7 @@ public class Mesh extends AssetLoadable implements TreeViewable {
 		this.set(C_FILEPATH, C_BLANK);
 		this.mesh = mesh;
 		this.changed = true;
+		this.meshLoaded().fire();
 	}
 	
 	public BufferedMesh getMesh() {
@@ -190,6 +193,7 @@ public class Mesh extends AssetLoadable implements TreeViewable {
 				mesh = bm;
 			}
 			changed = false;
+			this.meshLoaded().fire();
 		}
 		
 		if ( mesh == null )
@@ -214,6 +218,10 @@ public class Mesh extends AssetLoadable implements TreeViewable {
 	@Override
 	public void onDestroy() {
 		//
+	}
+	
+	public LuaEvent meshLoaded() {
+		return (LuaEvent) this.get(C_MESHLOADED);
 	}
 
 	@Override

@@ -156,7 +156,7 @@ public class AnimatedModel {
 			List<Model> models = prefab.getModels();
 			for (int i = 0; i < models.size(); i++) {
 				Model model = models.get(i);
-				if ( model.getMesh().equals(key) ) {
+				if ( model.getMeshInternal().equals(key) ) {
 					meshToModelMap.put(subMesh, model);
 				}
 			}

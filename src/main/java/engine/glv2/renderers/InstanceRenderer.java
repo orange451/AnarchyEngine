@@ -135,7 +135,7 @@ public class InstanceRenderer implements IObjectRenderer {
 		shader.loadTransformationMatrix(mat);
 		for (int i = 0; i < pfr.size(); i++) {
 			Model p = pfr.getModel(i);
-			BufferedMesh m = p.getMesh();
+			BufferedMesh m = p.getMeshInternal();
 
 			if (m == null)
 				m = Resources.MESH_SPHERE;

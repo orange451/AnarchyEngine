@@ -56,7 +56,12 @@ public class Model extends Instance {
 		//
 	}
 	
-	public BufferedMesh getMesh() {
+	public Mesh getMesh() {
+		LuaValue mesh = this.get(C_MESH);
+		return mesh.isnil()?null:(Mesh)mesh;
+	}
+	
+	public BufferedMesh getMeshInternal() {
 		return this.get(C_MESH) instanceof Mesh ? ((Mesh)this.get(C_MESH)).getMesh() : null;
 	}
 	

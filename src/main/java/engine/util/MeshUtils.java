@@ -458,6 +458,7 @@ public class MeshUtils {
 		Vector3f v7 = new Vector3f( x2, y2, z2 );
 		Vector3f v8 = new Vector3f( x1, y2, z2 );
 
+		// Top Face
 		BufferedMesh model = new BufferedMesh( 36 );
 		model.setVertex(0,  new Vertex( v1.x, v1.y, v1.z, 0, 0, 1, 0, repy ) );
 		model.setVertex(1,  new Vertex( v2.x, v2.y, v2.z, 0, 0, 1, repx, repy ) );
@@ -466,16 +467,15 @@ public class MeshUtils {
 		model.setVertex(4,  new Vertex( v4.x, v4.y, v4.z, 0, 0, 1, 0, 0 ) );
 		model.setVertex(5,  new Vertex( v1.x, v1.y, v1.z, 0, 0, 1, 0, repy ) );
 
-
+		// Bottom face
 		model.setVertex(6,  new Vertex( v7.x, v7.y, v7.z, 0, 0, -1, repx, 0 ) );
 		model.setVertex(7,  new Vertex( v6.x, v6.y, v6.z, 0, 0, -1, repx, repy ) );
 		model.setVertex(8,  new Vertex( v5.x, v5.y, v5.z, 0, 0, -1, 0, repy ) );
 		model.setVertex(9,  new Vertex( v5.x, v5.y, v5.z, 0, 0, -1, 0, repy ) );
 		model.setVertex(10, new Vertex( v8.x, v8.y, v8.z, 0, 0, -1, 0, 0 ) );
 		model.setVertex(11, new Vertex( v7.x, v7.y, v7.z, 0, 0, -1, repx, 0 ) );
-
-
-		//
+		
+		// Left Wall
 		model.setVertex(12, new Vertex( v8.x, v8.y, v8.z, -1, 0, 0, repx, repy ) );
 		model.setVertex(13, new Vertex( v5.x, v5.y, v5.z, -1, 0, 0, 0, repy ) );
 		model.setVertex(14, new Vertex( v1.x, v1.y, v1.z, -1, 0, 0, 0, 0 ) );
@@ -483,7 +483,7 @@ public class MeshUtils {
 		model.setVertex(16, new Vertex( v4.x, v4.y, v4.z, -1, 0, 0, repx, 0 ) );
 		model.setVertex(17, new Vertex( v8.x, v8.y, v8.z, -1, 0, 0, repx, repy ) );
 
-		//
+		// Right Wall
 		model.setVertex(18, new Vertex( v2.x, v2.y, v2.z, 1, 0, 0, 0, 0 ) );
 		model.setVertex(19, new Vertex( v6.x, v6.y, v6.z, 1, 0, 0, 0, repy ) );
 		model.setVertex(20, new Vertex( v7.x, v7.y, v7.z, 1, 0, 0, repx, repy ) );
@@ -491,8 +491,7 @@ public class MeshUtils {
 		model.setVertex(22, new Vertex( v3.x, v3.y, v3.z, 1, 0, 0, repx, 0 ) );
 		model.setVertex(23, new Vertex( v2.x, v2.y, v2.z, 1, 0, 0, 0, 0 ) );
 
-
-
+		// Back Wall
 		model.setVertex(24, new Vertex( v6.x, v6.y, v6.z, 0, -1, 0, repx, 0 ) );
 		model.setVertex(25, new Vertex( v2.x, v2.y, v2.z, 0, -1, 0, repx, repy ) );
 		model.setVertex(26, new Vertex( v1.x, v1.y, v1.z, 0, -1, 0, 0, repy ) );
@@ -500,6 +499,7 @@ public class MeshUtils {
 		model.setVertex(28, new Vertex( v5.x, v5.y, v5.z, 0, -1, 0, 0, 0 ) );
 		model.setVertex(29, new Vertex( v6.x, v6.y, v6.z, 0, -1, 0, repx, 0 ) );
 
+		// Front Wall
 		model.setVertex(30, new Vertex( v4.x, v4.y, v4.z, 0, 1, 0, 0, repy ) );
 		model.setVertex(31, new Vertex( v3.x, v3.y, v3.z, 0, 1, 0, repx, repy ) );
 		model.setVertex(32, new Vertex( v7.x, v7.y, v7.z, 0, 1, 0, repx, 0 ) );

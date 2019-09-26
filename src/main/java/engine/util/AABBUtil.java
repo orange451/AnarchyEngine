@@ -55,7 +55,7 @@ public class AABBUtil {
 		Vector3f minTemp = new Vector3f();
 		Vector3f maxTemp = new Vector3f();
 		for (int i = 0; i < models.length; i++) {
-			BufferedMesh mesh = models[i].getMesh();
+			BufferedMesh mesh = models[i].getMeshInternal();
 			if ( mesh == null )
 				mesh = Resources.MESH_SPHERE;
 			

@@ -2,6 +2,7 @@ package engine.lua.type.object;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 
 import org.joml.Matrix4f;
@@ -12,7 +13,9 @@ import engine.gl.Pipeline;
 import engine.gl.Resources;
 import engine.gl.mesh.BufferedMesh;
 import engine.gl.shader.BaseShader;
+import engine.lua.type.LuaConnection;
 import engine.lua.type.object.insts.Material;
+import engine.lua.type.object.insts.Mesh;
 import engine.lua.type.object.insts.Model;
 import engine.lua.type.object.insts.Prefab;
 import engine.util.AABBUtil;
@@ -51,7 +54,7 @@ public class PrefabRenderer {
 				Model p = models.get(i);
 				
 				// Get mesh
-				BufferedMesh mesh = p.getMesh();
+				BufferedMesh mesh = p.getMeshInternal();
 				if ( mesh == null )
 					mesh = Resources.MESH_SPHERE;
 				
@@ -94,6 +97,9 @@ public class PrefabRenderer {
 	public int size() {
 		return this.models.size();
 	}
+	
+
+	private HashMap<Model, LuaConnection> modelChangeMap = new HashMap<>();
 
 	public void addModel(Model model) {
 		synchronized(models) {
@@ -101,6 +107,31 @@ public class PrefabRenderer {
 		}
 		calculateAABB();
 		updated = true;
+		
+		LuaConnection connection = modelChangeMap.get(model);
+		if ( connection == null ) {
+			// Track property change
+			connection = model.changedEvent().connect((args)->{
+				update();
+				
+				// Track mesh changed to new mesh
+				Mesh mesh = model.getMesh();
+				if ( mesh != null ) {
+					model.getMesh().meshLoaded().connect((args2)->{
+						update();
+					});
+				}
+			});	
+			
+			// Track current mesh
+			Mesh mesh = model.getMesh();
+			if ( mesh != null ) {
+				model.getMesh().meshLoaded().connect((args2)->{
+					update();
+				});
+			}
+			modelChangeMap.put(model, connection);
+		}
 	}
 	
 	public void update() {
@@ -114,6 +145,12 @@ public class PrefabRenderer {
 		}
 		calculateAABB();
 		updated = true;
+		
+		LuaConnection con = modelChangeMap.get(model);
+		if ( con != null ) {
+			con.disconnect();
+		}
+		modelChangeMap.remove(model);
 	}
 	
 	private void calculateCombined() {
@@ -137,7 +174,7 @@ public class PrefabRenderer {
 		BufferedMesh[] meshes = new BufferedMesh[m];
 		int a = 0;
 		for (int i = 0; i < models.size(); i++) {
-			BufferedMesh mesh = models.get(i).getMesh();
+			BufferedMesh mesh = models.get(i).getMeshInternal();
 			if ( mesh == null )
 				continue;
 			meshes[a++] = mesh;

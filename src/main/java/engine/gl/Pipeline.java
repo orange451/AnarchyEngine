@@ -313,7 +313,7 @@ public class Pipeline implements IPipeline {
 		if ( material == null )
 			material = Resources.MATERIAL_BLANK;
 		
-		BufferedMesh mesh = model.getMesh();
+		BufferedMesh mesh = model.getMeshInternal();
 		if ( mesh == null )
 			mesh = Resources.MESH_SPHERE;
 		

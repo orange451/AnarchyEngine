@@ -566,10 +566,18 @@ public abstract class DataModel extends LuaDatatype {
 		return (LuaEvent)this.rawget(C_CHILDREMOVED);
 	}
 	
+	/**
+	 * The descendant added event for the DataModel. DescendantAdded fires when a descendant is added to the Instance.
+	 * @return
+	 */
 	public LuaEvent descendantAddedEvent() {
 		return (LuaEvent)this.rawget(C_DESCENDANTADDED);
 	}
-	
+
+	/**
+	 * The descendant removed event for the DataModel. DescendantRemoved fires immediately before the Parent of a descendant of the Instance changes such that the object is no longer a descendant of the Instance.
+	 * @return
+	 */
 	public LuaEvent descendantRemovedEvent() {
 		return (LuaEvent)this.rawget(C_DESCENDANTREMOVED);
 	}
