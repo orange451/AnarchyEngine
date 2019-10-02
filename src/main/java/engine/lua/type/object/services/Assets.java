@@ -167,7 +167,17 @@ public class Assets extends Service implements TreeViewable {
 	 * @return
 	 */
 	public List<AssetLoadable> getTextures() {
-		return getAssets((Instance)this.getChildrenWithName(C_TEXTURES).get(0));
+		List<AssetLoadable> assets = new ArrayList<AssetLoadable>();
+		List<Instance> d = this.getDescendants();
+		
+		for (int i = 0; i < d.size(); i++) {
+			Instance t = d.get(i);
+			if ( t instanceof Texture ) {
+				assets.add((AssetLoadable) t);
+			}
+		}
+		
+		return assets;
 	}
 	
 	/**
@@ -175,7 +185,17 @@ public class Assets extends Service implements TreeViewable {
 	 * @return
 	 */
 	public List<AssetLoadable> getMeshes() {
-		return getAssets((Instance)this.getChildrenWithName(C_MESHES).get(0));
+		List<AssetLoadable> assets = new ArrayList<AssetLoadable>();
+		List<Instance> d = this.getDescendants();
+		
+		for (int i = 0; i < d.size(); i++) {
+			Instance t = d.get(i);
+			if ( t instanceof Mesh ) {
+				assets.add((AssetLoadable) t);
+			}
+		}
+		
+		return assets;
 	}
 	
 	//String fileName = Thread.currentThread().getContextClassLoader().getResource("model.obj").getFile();

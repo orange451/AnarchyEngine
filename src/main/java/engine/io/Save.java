@@ -440,6 +440,7 @@ public class Save {
 			AssetLoadable a = assets.get(i);
 			
 			String filePath = a.getFilePath();
+			boolean localFile = filePath.contains("%PROJECT%");
 			filePath = filePath.replace("%PROJECT%", new File(Game.saveDirectory).getAbsolutePath());
 			
 			if ( filePath != null && filePath.length() > 3 ) {
@@ -482,9 +483,7 @@ public class Save {
 						File d = getFreeFile( path, "Mesh_", ".mesh");
 						if ( d != null ) {
 							String dest = d.getAbsolutePath();
-							
 							BufferedMesh.Export(bufferedMesh, dest);
-							
 							a.rawset("FilePath", dest.replace(p.getParentFile().getParentFile().getAbsolutePath(), "%PROJECT%"));
 						}
 					}
