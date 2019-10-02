@@ -10,6 +10,7 @@ import engine.gl.mesh.BufferedMesh;
 import engine.gl.shader.BaseShader;
 import engine.lua.type.object.Instance;
 import engine.lua.type.object.Positionable;
+import engine.util.AABBUtil;
 import engine.util.Pair;
 import lwjgui.paint.Color;
 
@@ -41,7 +42,7 @@ public class OutlineRenderer {
 		float j = THICKNESS;
 		
 		// Get its original world matrix
-		Matrix4f worldMatrix = object.getWorldMatrix().toJoml();
+		Matrix4f worldMatrix = object.getWorldMatrix().toJoml().translate(AABBUtil.center(aabb).mul(-1));
 		
 		// Stuff
 		float a = (aabb.value2().y+aabb.value1().y)/2f;

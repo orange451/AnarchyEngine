@@ -93,7 +93,7 @@ public class HandlesRenderer {
 		float j = THICKNESS;
 
 		// Get its original world matrix
-		Matrix4f worldMatrix = object.getWorldMatrix().toJoml();
+		Matrix4f worldMatrix = object.getWorldMatrix().toJoml().translate(AABBUtil.center(aabb).mul(-1));
 
 		// Stuff
 		float a = (aabb.value2().y + aabb.value1().y) / 2f;
