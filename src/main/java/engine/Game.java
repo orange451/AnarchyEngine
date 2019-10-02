@@ -567,6 +567,7 @@ public class Game implements Tickable {
 			
 			Game.runLater(()->{
 				startEvent().fire();
+				loadEvent().fire();
 			});
 		}
 	}
