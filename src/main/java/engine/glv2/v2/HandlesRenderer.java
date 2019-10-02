@@ -60,14 +60,18 @@ public class HandlesRenderer {
 	public HandlesRenderer() {
 		shader = new OutlineShader();
 		
-		/*Game.runLater(()->{
+		Game.loadEvent().connect((loadargs)->{
 			Game.userInputService().inputBeganEvent().connect((args)->{
 				LuaTable input = (LuaTable) args[0];
-				if ( input.get("") != null ) {
-					
+				if ( input.get("KeyCode").toint() == GLFW.GLFW_KEY_T ) {
+					if ( moveType == MoveType.LOCAL_SPACE ) {
+						moveType = MoveType.WORLD_SPACE;
+					} else {
+						moveType = MoveType.LOCAL_SPACE;
+					}
 				}
 			});
-		});*/
+		});
 	}
 
 	public void render(Camera camera, Matrix4f projection, List<Instance> instances, Vector2f size) {
