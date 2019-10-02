@@ -5,6 +5,7 @@ import org.json.simple.JSONObject;
 import org.luaj.vm2.LuaTable;
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.ThreeArgFunction;
+import org.luaj.vm2.lib.TwoArgFunction;
 import org.luaj.vm2.lib.ZeroArgFunction;
 
 import engine.lua.type.LuaValuetype;
@@ -24,12 +25,66 @@ public class Color3 extends LuaValuetype {
 			}
 		});
 		
+		this.getmetatable().set(LuaValue.ADD, new TwoArgFunction() {
+			public LuaValue call(LuaValue left, LuaValue right) {
+				Color3 left2 = getColor(left);
+				Color3 right2 = getColor(right);
+				return newInstance(left2.getR() + right2.getR(), left2.getG() + right2.getG(), left2.getB() + right2.getB());
+			}
+		});
+		
+		this.getmetatable().set(LuaValue.SUB, new TwoArgFunction() {
+			public LuaValue call(LuaValue left, LuaValue right) {
+				Color3 left2 = getColor(left);
+				Color3 right2 = getColor(right);
+				return newInstance(left2.getR() - right2.getR(), left2.getG() - right2.getG(), left2.getB() - right2.getB());
+			}
+		});
+		
+		this.getmetatable().set(LuaValue.MUL, new TwoArgFunction() {
+			public LuaValue call(LuaValue left, LuaValue right) {
+				Color3 left2 = getColor(left);
+				Color3 right2 = getColor(right);
+				return newInstance(
+					(int)(((left2.getR()/255f) * (right2.getR()/255f)) * 255),
+					(int)(((left2.getG()/255f) * (right2.getG()/255f)) * 255),
+					(int)(((left2.getB()/255f) * (right2.getB()/255f)) * 255)
+				);
+			}
+		});
+		
+		this.getmetatable().set(LuaValue.DIV, new TwoArgFunction() {
+			public LuaValue call(LuaValue left, LuaValue right) {
+				Color3 left2 = getColor(left);
+				Color3 right2 = getColor(right);
+				return newInstance(
+						(int)(((left2.getR()/255f) / (right2.getR()/255f)) * 255),
+						(int)(((left2.getG()/255f) / (right2.getG()/255f)) * 255),
+						(int)(((left2.getB()/255f) / (right2.getB()/255f)) * 255)
+					);
+			}
+		});
+		
 		// Define fields
 		defineField("R", LuaValue.valueOf(0), true);
 		defineField("G", LuaValue.valueOf(0), true);
 		defineField("B", LuaValue.valueOf(0), true);
 	}
 	
+	private Color3 getColor(LuaValue value) {
+		if ( value instanceof Color3 )
+			return ((Color3)value);
+		
+		if ( value.isnumber() ) {
+			int t = (int) (value.tofloat() * 255);
+			return newInstance(t, t, t);
+		}
+		
+		// Cant get color...
+		LuaValue.error("Error casting value to type Vector3");
+		return null;
+	}
+
 	public static Color3 red() {
 		return Color3.newInstance(255, 0, 0);
 	}

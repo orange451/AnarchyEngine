@@ -146,8 +146,8 @@ public class DirectionalLight extends LightBase implements TreeViewable {
 		System.out.println("Making light");
 		
 		// Create light
-		Vector3f direction = ((Vector3)this.get("Direction")).toJoml();
-		float intensity = this.get("Intensity").tofloat();
+		Vector3f direction = ((Vector3)this.get(C_DIRECTION)).toJoml();
+		float intensity = this.get(C_INTENSITY).tofloat();
 		light = new engine.gl.light.DirectionalLightInternal(direction, intensity);
 		light.distance = this.get(C_SHADOWDISTANCE).toint();
 		
@@ -160,7 +160,7 @@ public class DirectionalLight extends LightBase implements TreeViewable {
 			if ( pipeline == null )
 				return;
 			pipeline.getDirectionalLightHandler().addLight(light);
-			//light.update();
+			light.update();
 		});
 	}
 	
