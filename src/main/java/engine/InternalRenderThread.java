@@ -1,6 +1,5 @@
 package engine;
 
-import static org.lwjgl.glfw.GLFW.glfwDestroyWindow;
 import static org.lwjgl.glfw.GLFW.glfwTerminate;
 
 import java.util.ArrayList;
@@ -114,6 +113,9 @@ public class InternalRenderThread {
 	}
 
 	public static void runLater(Runnable runnable) {
+		if ( runnables == null )
+			return;
+		
 		synchronized(runnables) {
 			runnables.add(runnable);
 		}

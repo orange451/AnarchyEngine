@@ -10,8 +10,10 @@ import java.util.List;
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
+import org.luaj.vm2.LuaTable;
 import org.lwjgl.glfw.GLFW;
 
+import engine.Game;
 import engine.application.RenderableApplication;
 import engine.gl.MaterialGL;
 import engine.gl.Resources;
@@ -57,6 +59,15 @@ public class HandlesRenderer {
 
 	public HandlesRenderer() {
 		shader = new OutlineShader();
+		
+		/*Game.runLater(()->{
+			Game.userInputService().inputBeganEvent().connect((args)->{
+				LuaTable input = (LuaTable) args[0];
+				if ( input.get("") != null ) {
+					
+				}
+			});
+		});*/
 	}
 
 	public void render(Camera camera, Matrix4f projection, List<Instance> instances, Vector2f size) {

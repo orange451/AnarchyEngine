@@ -4,6 +4,7 @@ import org.joml.Vector3f;
 import org.luaj.vm2.LuaValue;
 
 import engine.InternalGameThread;
+import engine.InternalRenderThread;
 import engine.gl.IPipeline;
 import engine.gl.Pipeline;
 import engine.gl.light.Light;
@@ -72,8 +73,7 @@ public class PointLight extends LightBase implements TreeViewable {
 			if ( t instanceof RenderableWorld ) {
 				IPipeline tempPipeline = Pipeline.get((RenderableWorld)t);
 				if ( tempPipeline == null )
-					continue;
-				
+					break;
 				// Light exists inside old pipeline. No need to recreate.
 				if ( pipeline != null && pipeline.equals(tempPipeline) )
 					break;
@@ -89,7 +89,10 @@ public class PointLight extends LightBase implements TreeViewable {
 			}
 			
 			// Navigate up tree
+			LuaValue temp = t;
 			t = ((Instance)t).getParent();
+			if ( t == temp )
+				t = null;
 		}
 		
 		// Cant make light, can't destroy light. SO NO LIGHT!
@@ -113,10 +116,12 @@ public class PointLight extends LightBase implements TreeViewable {
 	private void destroyLight() {
 		if ( light != null ) {
 			if ( pipeline != null ) {
-				pipeline.getPointLightHandler().removeLight(light);
+				InternalRenderThread.runLater(()->{
+					//pipeline.getPointLightHandler().removeLight(light);
+					light = null;
+					pipeline = null;
+				});
 			}
-			light = null;
-			pipeline = null;
 			System.out.println("Destroyed light");
 		}
 	}
@@ -139,7 +144,9 @@ public class PointLight extends LightBase implements TreeViewable {
 		light.color = new Vector3f( Math.max( color.getRed(),1 )/255f, Math.max( color.getGreen(),1 )/255f, Math.max( color.getBlue(),1 )/255f );
 		
 		// Add it to pipeline
-		pipeline.getPointLightHandler().addLight(light);
+		InternalRenderThread.runLater(()->{
+			//pipeline.getPointLightHandler().addLight(light);
+		});
 	}
 	
 	@Override
