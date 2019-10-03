@@ -47,10 +47,9 @@ public class IdeLayout {
 			MenuBar bar = new MenuBar();
 			pane.setTop(bar);
 			
-			// Create File Menu
+			// Create menus
 			fileMenu(bar);
-			
-			// Create Edit Menu
+			editMenu(bar);
 			testMenu(bar);
 		}
 		
@@ -110,6 +109,32 @@ public class IdeLayout {
 		}
 		
 		return mid;
+	}
+	
+	private void editMenu(MenuBar menuBar) {
+		Menu menuEdit = new Menu("Edit");
+		menuEdit.setAutoHide(false);
+		menuBar.getItems().add(menuEdit);
+		
+		MenuItem undo = new MenuItem("Undo");
+		undo.setOnAction( event -> {
+			Game.historyService().undo();
+		});
+		menuEdit.getItems().add(undo);
+		
+		
+		MenuItem redo = new MenuItem("Redo");
+		redo.setOnAction( event -> {
+			Game.historyService().redo();
+		});
+		menuEdit.getItems().add(redo);
+		
+		
+		MenuItem unselect = new MenuItem("Unselect All");
+		unselect.setOnAction( event -> {
+			Game.deselectAll();
+		});
+		menuEdit.getItems().add(unselect);
 	}
 	
 	private void testMenu(MenuBar menuBar) {

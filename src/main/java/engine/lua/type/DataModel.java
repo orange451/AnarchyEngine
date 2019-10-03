@@ -190,7 +190,7 @@ public abstract class DataModel extends LuaDatatype {
 			if ( key.eq_b(C_NAME)) {
 				this.internalName = value.toString();
 			}
-			onKeyChange( key, this.get(key) );
+			onKeyChange( key, this.get(key), oldValue );
 		}
 	}
 	
@@ -211,7 +211,7 @@ public abstract class DataModel extends LuaDatatype {
 		this.rawset(key, value);
 		
 		if ( !oldValue.equals(value) ) {
-			onKeyChange( key, value );
+			onKeyChange( key, value, oldValue );
 		}
 	}
 	
@@ -262,12 +262,12 @@ public abstract class DataModel extends LuaDatatype {
 		return new ArrayList<Instance>(descendentsList);
 	}
 	
-	private void onKeyChange(LuaValue key, LuaValue value) {
+	private void onKeyChange(LuaValue key, LuaValue value, LuaValue oldValue) {
 		this.onValueUpdated(key, value);
 		Game.changes = true;
 		
 		LuaEvent event = this.changedEvent();
-		event.fire(key, value);
+		event.fire(key, value, oldValue);
 		notifyPropertySubscribers(key, value);
 	}
 	
@@ -523,7 +523,8 @@ public abstract class DataModel extends LuaDatatype {
 		//pField.setLocked(l2);
 
 		this.checkSetParent(C_PARENT, oldParent, parent);
-		this.onValueUpdated(C_PARENT, parent);
+		//this.onValueUpdated(C_PARENT, parent);
+		this.onKeyChange(C_PARENT, parent, oldParent);
 	}
 	
 	/**

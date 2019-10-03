@@ -25,6 +25,7 @@ import engine.lua.type.object.services.Assets;
 import engine.lua.type.object.services.Connections;
 import engine.lua.type.object.services.Core;
 import engine.lua.type.object.services.Debris;
+import engine.lua.type.object.services.HistoryService;
 import engine.lua.type.object.services.Lighting;
 import engine.lua.type.object.services.StarterPlayerScripts;
 import engine.lua.type.object.services.Players;
@@ -132,6 +133,10 @@ public class Game implements Tickable {
 		if ( Game.getService("Debris") == null )
 			new Debris();
 		
+
+		if ( Game.getService("HistoryService") == null )
+			new HistoryService();
+		
 		if ( Game.getService("Core") == null )
 			new Core();
 		
@@ -196,6 +201,7 @@ public class Game implements Tickable {
 	private static final LuaValue C_PLAYERS = LuaValue.valueOf("Players");
 	private static final LuaValue C_CONNECTIONS = LuaValue.valueOf("Connections");
 	private static final LuaValue C_CORE = LuaValue.valueOf("Core");
+	private static final LuaValue C_HISTORYSERVICE = LuaValue.valueOf("HistoryService");
 	private static final LuaValue C_ASSETS = LuaValue.valueOf("Assets");
 
 	public static Instance game() {
@@ -240,6 +246,10 @@ public class Game implements Tickable {
 	
 	public static Core core() {
 		return (Core) Game.getService(C_CORE);
+	}
+	
+	public static HistoryService historyService() {
+		return (HistoryService) Game.getService(C_HISTORYSERVICE);
 	}
 
 	public static Game getGame() {
