@@ -1,6 +1,7 @@
 package engine.lua.type.object.services;
 
 import org.luaj.vm2.LuaValue;
+import org.luaj.vm2.lib.ZeroArgFunction;
 import org.lwjgl.glfw.GLFW;
 
 import engine.Game;
@@ -19,6 +20,36 @@ public class HistoryService extends Service {
 		this.setLocked(true);
 		
 		this.historyStack = new HistoryStack();
+		
+		this.getmetatable().set("Undo", new ZeroArgFunction() {
+			@Override
+			public LuaValue call() {
+				undo();
+				return LuaValue.NIL;
+			}
+		});
+		
+		this.getmetatable().set("GetCanUndo", new ZeroArgFunction() {
+			@Override
+			public LuaValue call() {
+				return LuaValue.valueOf(historyStack.canUndo());
+			}
+		});
+		
+		this.getmetatable().set("Redo", new ZeroArgFunction() {
+			@Override
+			public LuaValue call() {
+				redo();
+				return LuaValue.NIL;
+			}
+		});
+		
+		this.getmetatable().set("GetCanRedo", new ZeroArgFunction() {
+			@Override
+			public LuaValue call() {
+				return LuaValue.valueOf(historyStack.canRedo());
+			}
+		});
 		
 		InternalGameThread.runLater(()->{
 			Game.userInputService().inputBeganEvent().connect((args)->{
