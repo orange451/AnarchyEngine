@@ -87,7 +87,11 @@ public class HistoryService extends Service {
 	}
 	
 	public void undo() {
-		historyStack.undo();
+		try {
+			historyStack.undo();
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
 	}
 	
 	public void redo() {

@@ -13,6 +13,8 @@ public class HistoryChange {
 		this.fieldChanged = fieldChanged;
 		this.changedFrom = changedFrom;
 		this.changedTo = changedTo;
+		
+		this.instanceChanged.update();
 	}
 	
 	public HistoryObjectReference getInstance() {
