@@ -57,7 +57,7 @@ public class HistoryStack {
 			HistoryChange change = snapshot.changes.get(i);
 			
 			Instance object = change.getInstance().getInstance();
-			object.rawset(change.getFieldChanged(), change.getValueOld());
+			object.forceset(change.getFieldChanged(), change.getValueOld());
 			
 			Game.getGame().gameUpdate(true);
 		}
@@ -84,7 +84,7 @@ public class HistoryStack {
 			HistoryChange change = snapshot.changes.get(i);
 			
 			Instance object = change.getInstance().getInstance();
-			object.rawset(change.getFieldChanged(), change.getValueNew());
+			object.forceset(change.getFieldChanged(), change.getValueNew());
 		}
 	}
 	

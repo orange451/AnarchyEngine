@@ -153,11 +153,25 @@ public abstract class DataModel extends LuaDatatype {
 		}
 		return ret;
 	}
+	
+	protected boolean checkEquals(LuaValue value1, LuaValue value2) {
+		boolean changed = !value2.equals(value1);
+		
+		// Hacked in double comparison... Since luaJ uses == for comparing doubles :(
+		if ( value1 instanceof LuaNumber || value2 instanceof LuaNumber ) {
+			double v1 = value1.todouble();
+			double v2 = value2.todouble();
+			if (Math.abs(v1 - v2) < 0.001)
+				changed = false;
+		}
+		
+		return !changed;
+	}
 
 	@Override
 	public void set(LuaValue key, LuaValue value) {
 		LuaValue oldValue = this.rawget(key);
-		boolean changed = !oldValue.equals(value);
+		boolean changed = !checkEquals( value, oldValue);
 		
 		// Hacked in double comparison... Since luaJ uses == for comparing doubles :(
 		if ( value instanceof LuaNumber || oldValue instanceof LuaNumber ) {
@@ -208,9 +222,14 @@ public abstract class DataModel extends LuaDatatype {
 	
 	public void forceset(LuaValue key, LuaValue value) {
 		LuaValue oldValue = this.get(key);
+		boolean changed = !checkEquals( value, oldValue);
+		
 		this.rawset(key, value);
 		
-		if ( !oldValue.equals(value) ) {
+		checkSetParent(key, oldValue, value); // value may have changed
+		checkSetName(key, oldValue, value); // value may have changed
+		
+		if ( changed ) {
 			onKeyChange( key, value, oldValue );
 		}
 	}
@@ -263,6 +282,9 @@ public abstract class DataModel extends LuaDatatype {
 	}
 	
 	private void onKeyChange(LuaValue key, LuaValue value, LuaValue oldValue) {
+		if ( value == oldValue )
+			return;
+		
 		this.onValueUpdated(key, value);
 		Game.changes = true;
 		
