@@ -60,30 +60,29 @@ public class HistoryService extends Service {
 					}
 				}
 			});
-			
-			Game.game().descendantAddedEvent().connect((args)->{
-				Instance added = (Instance) args[0];
-				System.out.println("INSTANCE ADDED TO GAME: " + added);
-				
-				added.changedEvent().connect((changedargs)->{
-					System.out.println("Changed " + added + ". " + changedargs[0] + " --> " + changedargs[1] + " / " + changedargs[2]);
-					// Create a history change
-					HistoryChange historyChange = new HistoryChange(
-							historyStack.getObjectReference(added),
-							changedargs[0],
-							changedargs[2],
-							changedargs[1]
-					);
-					
-					// Create a snapshot for this change
-					HistorySnapshot snapshot = new HistorySnapshot();
-					snapshot.changes.add(historyChange);
-					
-					// Push to history
-					this.historyStack.push(snapshot);
-				});
-			});
 		});
+	}
+	
+	public void pushChange(Instance object, LuaValue field, LuaValue oldValue, LuaValue newValue) {
+		if ( this.checkEquals(oldValue, newValue) )
+			return;
+		
+		System.out.println("Changed " + object + ". " + field + " --> " + newValue + " from " + oldValue);
+		
+		// Create a history change
+		HistoryChange historyChange = new HistoryChange(
+				historyStack.getObjectReference(object),
+				field,
+				oldValue,
+				newValue
+		);
+		
+		// Create a snapshot for this change
+		HistorySnapshot snapshot = new HistorySnapshot();
+		snapshot.changes.add(historyChange);
+		
+		// Push to history
+		this.historyStack.push(snapshot);
 	}
 	
 	public void undo() {

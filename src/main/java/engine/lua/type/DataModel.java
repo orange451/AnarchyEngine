@@ -173,14 +173,6 @@ public abstract class DataModel extends LuaDatatype {
 		LuaValue oldValue = this.rawget(key);
 		boolean changed = !checkEquals( value, oldValue);
 		
-		// Hacked in double comparison... Since luaJ uses == for comparing doubles :(
-		if ( value instanceof LuaNumber || oldValue instanceof LuaNumber ) {
-			double v1 = value.todouble();
-			double v2 = oldValue.todouble();
-			if (Math.abs(v1 - v2) < 0.001)
-				changed = false;
-		}
-		
 		// Prevent setting parent to self
 		if ( key.eq_b(C_PARENT) && value == this ) {
 			throw new LuaError("Instance cannot be its own parent");

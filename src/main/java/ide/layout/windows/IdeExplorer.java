@@ -157,7 +157,7 @@ public class IdeExplorer extends IdePane implements GameSubscriber {
 		Game.userInputService().inputBeganEvent().connect((args)->{
 			if ( args[0].get("KeyCode").eq_b(LuaValue.valueOf(GLFW.GLFW_KEY_Q))) {
 				System.out.println("Pressed Q");
-				update(false);
+				update(true);
 			}
 		});
 	}

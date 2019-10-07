@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
+import org.luaj.vm2.LuaBoolean;
 import org.luaj.vm2.LuaValue;
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.glfw.GLFW;
@@ -216,6 +217,12 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 		return new PropertyModifierTemp( instance, field, value, editable );
 	}
 	
+	public static void setWithHistory(Instance instance, String field, LuaValue newValue) {
+		LuaValue oldValue = instance.get(field);
+		instance.set(field, newValue);
+		Game.historyService().pushChange(instance, LuaValue.valueOf(field), oldValue, newValue);
+	}
+	
 	static class PropertyModifier extends StackPane {
 		protected Instance instance;
 		protected String field;
@@ -268,8 +275,7 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 			
 			if ( editable ) {
 				this.check.setOnAction(event -> {
-					//this.check.setChecked(!this.check.isChecked());
-					this.instance.set(field, LuaValue.valueOf(this.check.isChecked()));
+					setWithHistory(this.instance, field, LuaValue.valueOf(this.check.isChecked()));
 					this.check.setText(""+this.check.isChecked());
 				});
 			}
@@ -347,7 +353,7 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 			
 			if ( editable ) {
 				this.picker.setOnAction(event -> {
-					this.instance.set(field, Color3.newInstance(this.picker.getColor()));
+					setWithHistory(this.instance, field, Color3.newInstance(this.picker.getColor()));
 				});
 			}
 		}
@@ -385,7 +391,7 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 			
 			if ( editable ) {
 				this.dropdown.setOnAction((event)->{
-					instance.set(field, LuaValue.valueOf(this.dropdown.getValue()));
+					setWithHistory(this.instance, field, LuaValue.valueOf(this.dropdown.getValue()));
 				});
 			}
 		}
@@ -496,7 +502,7 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 
 		@Override
 		public void onValueSet(String text) {
-			instance.set(field, LuaValue.valueOf(text));
+			setWithHistory(this.instance, field, LuaValue.valueOf(text));
 		}
 	}
 	
@@ -507,7 +513,7 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 
 		@Override
 		public void onValueSet(String text) {
-			instance.set(field, ((LuaValuetype)initialValue).clone().fromString(text));
+			setWithHistory(this.instance, field, ((LuaValuetype)initialValue).clone().fromString(text));
 		}
 	}
 	
@@ -534,7 +540,7 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 						if ( result == NativeFileDialog.NFD_OKAY ) {
 							String path = IDEFilePath.convertToIDE(outPath.getStringUTF8(0));
 							try {
-								this.instance.set(field, path);
+								setWithHistory(this.instance, field, LuaValue.valueOf(path));
 							}catch(Exception e) {
 								e.printStackTrace();
 							}
@@ -614,7 +620,7 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 			
 			this.cancel();
 			try {
-				this.instance.set(field, instance);
+				setWithHistory(this.instance, field, instance);
 			}catch(Exception e) {
 				//
 			}

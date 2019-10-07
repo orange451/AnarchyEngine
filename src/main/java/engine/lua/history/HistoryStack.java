@@ -9,6 +9,7 @@ import engine.lua.type.object.Instance;
 public class HistoryStack {
 	private HashMap<Instance, HistoryObjectReference> objectReferences;
 	private HashMap<HistoryObjectReference, Instance> historyToInstanceMap;
+	private boolean busy;
 	
 	public HistoryStack() {
 		this.objectReferences = new HashMap<>();
@@ -31,6 +32,10 @@ public class HistoryStack {
 	 * @param snapshot
 	 */
 	public void push(HistorySnapshot snapshot) {
+		// Cannot make history changes if we're already processing history changes
+		if ( busy )
+			return;
+		
 		// Delete all snapshots that exist infront of the latest snapshot.
 		while ( snapshots.size() > latestIndex )
 			snapshots.remove(snapshots.size()-1);
@@ -49,6 +54,8 @@ public class HistoryStack {
 			return;
 		}
 		
+		busy = true;
+		
 		// Get the snapshot at this index
 		HistorySnapshot snapshot = snapshots.get(latestIndex-1);
 		
@@ -59,11 +66,13 @@ public class HistoryStack {
 			Instance object = change.getInstance().getInstance();
 			object.forceset(change.getFieldChanged(), change.getValueOld());
 			
-			Game.getGame().gameUpdate(true);
+			System.out.println("UNDO: " + object.getName() + "." + change.getFieldChanged() + " --> " + change.getValueOld());
+			change.getInstance().update();
 		}
 		
 		// Decrease snapshot index
 		latestIndex--;
+		busy = false;
 	}
 	
 	/**
@@ -73,6 +82,7 @@ public class HistoryStack {
 		if ( !canRedo() )
 			return;
 		
+		busy = true;
 		// increase snapshot index
 		latestIndex++;
 		
@@ -86,6 +96,7 @@ public class HistoryStack {
 			Instance object = change.getInstance().getInstance();
 			object.forceset(change.getFieldChanged(), change.getValueNew());
 		}
+		busy = false;
 	}
 	
 	/**

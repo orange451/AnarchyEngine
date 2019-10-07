@@ -13,6 +13,7 @@ import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
 
 import engine.application.RenderableApplication;
+import engine.lua.type.object.services.RunService;
 import engine.observer.InternalRenderable;
 import engine.observer.PostRenderable;
 import engine.observer.Renderable;
@@ -136,10 +137,14 @@ public class InternalRenderThread {
 
 		// Draw event
 		if ( Game.isLoaded() ) {
-			Game.runService().renderPreEvent().fire(LuaValue.valueOf(delta));
-			Game.runService().renderSteppedEvent().fire(LuaValue.valueOf(delta));
+			RunService runService = Game.runService();
+			if ( runService == null )
+				return;
+			
+			runService.renderPreEvent().fire(LuaValue.valueOf(delta));
+			runService.renderSteppedEvent().fire(LuaValue.valueOf(delta));
 			observable.notifyObservers();
-			Game.runService().renderPostEvent().fire(LuaValue.valueOf(delta));
+			runService.renderPostEvent().fire(LuaValue.valueOf(delta));
 		}
 		
 		// Run runnables
