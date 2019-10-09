@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
-import org.luaj.vm2.LuaBoolean;
 import org.luaj.vm2.LuaValue;
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.glfw.GLFW;
@@ -653,7 +652,7 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 		private GridPane internal;
 		private Instance inst;
 		
-		private HashMap<String,PropertyModifier> props = new HashMap<String,PropertyModifier>();
+		private HashMap<LuaValue,PropertyModifier> props = new HashMap<LuaValue,PropertyModifier>();
 		
 		public PropertyGrid() {
 			// Create main underneath pane
@@ -665,7 +664,7 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 			StackPane top = new StackPane();
 			top.setFillToParentWidth(true);
 			top.setPadding(new Insets(2,2,2,2));
-			top.setBackground(Color.DIM_GRAY);
+			top.setBackground(Theme.current().getControlOutline());
 			top.setAlignment(Pos.CENTER_LEFT);
 			top.setPrefSize(1, 1);
 			this.getChildren().add(top);
@@ -683,7 +682,7 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 			
 			// Create grid
 			internal = new GridPane();
-			internal.setBackground(Color.LIGHT_GRAY);
+			internal.setBackground(Theme.current().getBackgroundAlt());
 			internal.setFillToParentWidth(true);
 			internal.setHgap(1);
 			internal.setVgap(1);
@@ -736,7 +735,7 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 				// Add them to grid
 				getInternal().add(t1, 0, i);
 				getInternal().add(t2, 1, i);
-				props.put(field, t2);
+				props.put(LuaValue.valueOf(field), t2);
 			}
 			
 			this.updateChildren();
