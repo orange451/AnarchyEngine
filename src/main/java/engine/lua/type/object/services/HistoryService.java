@@ -63,6 +63,10 @@ public class HistoryService extends Service {
 		});
 	}
 	
+	public HistoryStack getHistoryStack() {
+		return this.historyStack;
+	}
+	
 	public void pushChange(Instance object, LuaValue field, LuaValue oldValue, LuaValue newValue) {
 		if ( this.checkEquals(oldValue, newValue) )
 			return;
@@ -76,11 +80,15 @@ public class HistoryService extends Service {
 				oldValue,
 				newValue
 		);
-		
+
 		// Create a snapshot for this change
 		HistorySnapshot snapshot = new HistorySnapshot();
 		snapshot.changes.add(historyChange);
 		
+		this.pushChange(snapshot);
+	}
+	
+	public void pushChange(HistorySnapshot snapshot) {
 		// Push to history
 		this.historyStack.push(snapshot);
 	}

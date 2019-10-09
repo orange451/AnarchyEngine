@@ -155,6 +155,8 @@ public class DirectionalLightHandler implements IDirectionalLightHandler {
 
 	@Override
 	public void addLight(DirectionalLightInternal l) {
+		if ( l == null )
+			return;
 		lights.add(l);
 		l.init();
 	}

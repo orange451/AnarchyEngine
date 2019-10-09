@@ -65,6 +65,7 @@ public class HistoryStack {
 			
 			Instance object = change.getInstance().getInstance();
 			object.forceset(change.getFieldChanged(), change.getValueOld());
+			object.set(change.getFieldChanged(), change.getValueOld());
 			
 			System.out.println("UNDO: " + object.getName() + "." + change.getFieldChanged() + " --> " + change.getValueOld());
 			change.getInstance().update();

@@ -157,7 +157,7 @@ public class DirectionalLight extends LightBase implements TreeViewable {
 		
 		// Add it to pipeline
 		InternalRenderThread.runLater(()->{
-			if ( pipeline == null )
+			if ( pipeline == null || light == null )
 				return;
 			pipeline.getDirectionalLightHandler().addLight(light);
 			light.update();

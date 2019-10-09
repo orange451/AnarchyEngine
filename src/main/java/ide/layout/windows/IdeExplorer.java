@@ -299,7 +299,9 @@ public class IdeExplorer extends IdePane implements GameSubscriber {
 				if ( t == null || t.isnil() )
 					return;
 				Game.copiedInstance = t;
+				LuaValue p = inst.getParent();
 				inst.destroy();
+				Game.historyService().pushChange(inst, LuaValue.valueOf("Parent"), p, LuaValue.NIL);
 			}
 		});
 		c.getItems().add(cut);
@@ -322,7 +324,9 @@ public class IdeExplorer extends IdePane implements GameSubscriber {
 			Instance t = Game.copiedInstance;
 			if ( t == null )
 				return;
-			t.clone().forceSetParent(inst);
+			Instance cl = t.clone();
+			cl.forceSetParent(inst);
+			Game.historyService().pushChange(cl, LuaValue.valueOf("Parent"), LuaValue.NIL, cl.getParent());
 		});
 		c.getItems().add(paste);
 
@@ -334,6 +338,7 @@ public class IdeExplorer extends IdePane implements GameSubscriber {
 				if ( t == null || t.isnil() )
 					return;
 				t.forceSetParent(inst.getParent());
+				Game.historyService().pushChange(t, LuaValue.valueOf("Parent"), LuaValue.NIL, t.getParent());
 			}
 		});
 		c.getItems().add(duplicate);
@@ -356,6 +361,7 @@ public class IdeExplorer extends IdePane implements GameSubscriber {
 				GameObject g = new GameObject();
 				g.setPrefab((Prefab) inst);
 				g.setParent(Game.workspace());
+				Game.historyService().pushChange(g, LuaValue.valueOf("Parent"), LuaValue.NIL, g.getParent());
 			});
 			c.getItems().add(gobj);
 			
@@ -373,7 +379,8 @@ public class IdeExplorer extends IdePane implements GameSubscriber {
 				int result = NativeFileDialog.NFD_OpenDialog(Mesh.getFileTypes(), new File("").getAbsolutePath(), outPath);
 				if ( result == NativeFileDialog.NFD_OKAY ) {
 					path = outPath.getStringUTF8(0);
-					Game.assets().importPrefab(path);
+					Prefab prefab = Game.assets().importPrefab(path);
+					Game.historyService().pushChange(prefab, LuaValue.valueOf("Parent"), LuaValue.NIL, prefab.getParent());
 				} else {
 					return;
 				}
@@ -394,6 +401,7 @@ public class IdeExplorer extends IdePane implements GameSubscriber {
 						if ( ff.exists() ) {
 							t.forceSetName(FileUtils.getFileNameWithoutExtension(ff.getName()));
 						}
+						Game.historyService().pushChange(t, LuaValue.valueOf("Parent"), LuaValue.NIL, t.getParent());
 					}
 				} else {
 					return;
@@ -407,28 +415,32 @@ public class IdeExplorer extends IdePane implements GameSubscriber {
 			// New Prefab
 			MenuItem pref = new MenuItem("New Prefab", Icons.icon_model.getView());
 			pref.setOnAction(event -> {
-				Game.getService("Assets").get("NewPrefab").invoke();
+				Prefab p = Game.assets().newPrefab();
+				Game.historyService().pushChange(p, LuaValue.valueOf("Parent"), LuaValue.NIL, p.getParent());
 			});
 			c.getItems().add(pref);
 			
 			// New Mesh
 			MenuItem mesh = new MenuItem("New Mesh", Icons.icon_mesh.getView());
 			mesh.setOnAction(event -> {
-				Game.getService("Assets").get("ImportMesh").invoke(LuaValue.NIL);
+				Instance p = Game.assets().newMesh();
+				Game.historyService().pushChange(p, LuaValue.valueOf("Parent"), LuaValue.NIL, p.getParent());
 			});
 			c.getItems().add(mesh);
 
 			// New Material
 			MenuItem mat = new MenuItem("New Material", Icons.icon_material.getView());
 			mat.setOnAction(event -> {
-				Game.getService("Assets").get("NewMaterial").invoke();
+				Instance p = Game.assets().newMaterial();
+				Game.historyService().pushChange(p, LuaValue.valueOf("Parent"), LuaValue.NIL, p.getParent());
 			});
 			c.getItems().add(mat);
 
 			// New Texture
 			MenuItem tex = new MenuItem("New Texture", Icons.icon_texture.getView());
 			tex.setOnAction(event -> {
-				Game.getService("Assets").get("NewTexture").invoke();
+				Instance p = Game.assets().newTexture();
+				Game.historyService().pushChange(p, LuaValue.valueOf("Parent"), LuaValue.NIL, p.getParent());
 			});
 			c.getItems().add(tex);
 			

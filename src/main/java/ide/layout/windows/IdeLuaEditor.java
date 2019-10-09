@@ -3,6 +3,8 @@ package ide.layout.windows;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.lwjgl.glfw.GLFW;
+
 import engine.lua.type.object.ScriptBase;
 import ide.layout.IdePane;
 import lwjgui.font.Font;
@@ -25,6 +27,15 @@ public class IdeLuaEditor extends IdePane {
 		code.setFillToParentHeight(true);
 		code.setFillToParentWidth(true);
 		this.getChildren().add(code);
+		
+		code.setOnKeyPressed((event)->{
+			if ( event.getKey() == GLFW.GLFW_KEY_ENTER ) {
+				boolean spaceThen = code.getText(code.getCaretPosition()-6, code.getCaretPosition()).equals(" then");
+				if ( spaceThen ) {
+					code.insertText(code.getCaretPosition(), "\t");
+				}
+			}
+		});
 		
 		// Syntax highlighting variables
 		final String KEYWORD_PATTERN = "\\b(" + String.join("|", new String[] {

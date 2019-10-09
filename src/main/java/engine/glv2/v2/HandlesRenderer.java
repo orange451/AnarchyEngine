@@ -5,12 +5,15 @@ import static org.lwjgl.opengl.GL11C.glDepthMask;
 import static org.lwjgl.opengl.GL11C.glDisable;
 import static org.lwjgl.opengl.GL11C.glEnable;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.luaj.vm2.LuaTable;
+import org.luaj.vm2.LuaValue;
 import org.lwjgl.glfw.GLFW;
 
 import engine.Game;
@@ -19,6 +22,8 @@ import engine.gl.MaterialGL;
 import engine.gl.Resources;
 import engine.gl.mesh.BufferedMesh;
 import engine.glv2.shaders.OutlineShader;
+import engine.lua.history.HistoryChange;
+import engine.lua.history.HistorySnapshot;
 import engine.lua.type.data.Vector3;
 import engine.lua.type.object.Instance;
 import engine.lua.type.object.Positionable;
@@ -56,6 +61,8 @@ public class HandlesRenderer {
 	}
 
 	private OutlineShader shader;
+	private ArrayList<Instance> DRAGGING_OBJECTS;
+	private HashMap<Instance, Vector3> TRACK_POSITIONS = new HashMap<Instance, Vector3>();
 
 	public HandlesRenderer() {
 		shader = new OutlineShader();
@@ -236,6 +243,7 @@ public class HandlesRenderer {
 					Vector3f reprojectedOffset = origin.add(delta, new Vector3f());
 
 					// Reposition
+					ArrayList<Instance> dragging = new ArrayList<Instance>();
 					for (int i = 0; i < instances.size(); i++) {
 						Instance t = instances.get(i);
 						if (!(t instanceof Positionable))
@@ -244,12 +252,44 @@ public class HandlesRenderer {
 						Vector3f cPos = g.getPosition().toJoml();
 						Vector3f offset = cPos.sub(origin, new Vector3f());
 
+						if ( !TRACK_POSITIONS.containsKey(t) ) {
+							TRACK_POSITIONS.put(t, g.getPosition());
+						}
 						g.setPosition(new Vector3(offset.add(reprojectedOffset)));
+						dragging.add(t);
 					}
+					
+					DRAGGING_OBJECTS = dragging;
 				}
 			}
 		} else {
 			selectedHandleDirection = null;
+			
+			// Update history
+			if ( DRAGGING_OBJECTS != null ) {
+				HistorySnapshot snapshot = new HistorySnapshot();
+				
+				for (int i = 0; i < DRAGGING_OBJECTS.size(); i++) {
+					Instance inst = DRAGGING_OBJECTS.get(i);
+					Vector3 oldPosition = TRACK_POSITIONS.get(inst);
+					if ( oldPosition == null )
+						continue;
+					Vector3 newPosition = ((Positionable)inst).getPosition();
+					
+					HistoryChange change = new HistoryChange(
+							Game.historyService().getHistoryStack().getObjectReference(inst),
+							LuaValue.valueOf("Position"),
+							oldPosition,
+							newPosition
+					);
+					snapshot.changes.add(change);
+				}
+				
+				Game.historyService().pushChange(snapshot);
+				
+				TRACK_POSITIONS.clear();
+				DRAGGING_OBJECTS = null;
+			}
 		}
 	}
 

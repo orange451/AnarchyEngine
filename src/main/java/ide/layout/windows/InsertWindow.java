@@ -5,6 +5,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import org.luaj.vm2.LuaValue;
+
 import engine.Game;
 import engine.lua.type.object.Instance;
 import engine.lua.type.object.TreeViewable;
@@ -103,6 +105,7 @@ public class InsertWindow {
 						if ( event.getClickCount() == 2 ) {
 							Instance inst = (Instance) instClass.newInstance();
 							inst.forceSetParent(getParent());
+							Game.historyService().pushChange(inst, LuaValue.valueOf("Parent"), LuaValue.NIL, inst.getParent());
 							
 							//Game.select(inst);
 						}
