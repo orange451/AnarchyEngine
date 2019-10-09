@@ -15,6 +15,7 @@ import ide.layout.windows.IdeMaterialViewer;
 import ide.layout.windows.IdeProperties;
 import ide.layout.windows.icons.Icons;
 import lwjgui.LWJGUI;
+import lwjgui.collections.ObservableList;
 import lwjgui.geometry.Orientation;
 import lwjgui.geometry.Pos;
 import lwjgui.scene.control.Menu;
@@ -188,10 +189,26 @@ public class IdeLayout {
 		});
 		menuEdit.getItems().add(t);
 		
+		// Normal client test
+		MenuItem tc = new MenuItem("Test Client (IDE)", Icons.icon_play.getView());
+		tc.setOnAction( event -> {
+			if ( Game.isRunning() )
+				return;
+			
+			boolean saved = Save.save();
+			if ( !saved )
+				return;
+			
+			JVMUtil.newJVM(IDE.class, new String[] {"client",Game.saveFile});
+		});
+		menuEdit.getItems().add(tc);
+		
+		// Separator!
+		menuEdit.getItems().add(new SeparatorMenuItem());
+		
 		// Test inside IDE (buggy)
-		/*MenuItem t2 = new MenuItem("Test Internal (buggy)");
-		t2.setGraphic(Icons.icon_play.getView());
-		t2.setOnAction( event -> {
+		MenuItem internalTest = new MenuItem("Test Internal (buggy)", Icons.icon_play.getView());
+		internalTest.setOnAction( event -> {
 			boolean saved = Save.save();
 			if ( !saved )
 				return;
@@ -222,22 +239,7 @@ public class IdeLayout {
 			});
 			menuEdit.getItems().add(endTest);
 		});
-		menuEdit.getItems().add(t2);*/
-		
-		
-		// Normal client test
-		MenuItem tc = new MenuItem("Test Client (IDE)", Icons.icon_play.getView());
-		tc.setOnAction( event -> {
-			if ( Game.isRunning() )
-				return;
-			
-			boolean saved = Save.save();
-			if ( !saved )
-				return;
-			
-			JVMUtil.newJVM(IDE.class, new String[] {"client",Game.saveFile});
-		});
-		menuEdit.getItems().add(tc);
+		menuEdit.getItems().add(internalTest);
 	}
 
 	private void fileMenu(MenuBar menuBar) {
