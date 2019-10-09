@@ -45,6 +45,8 @@ public class Icons {
 	public static final Icons icon_film = new Icons("Film.png");
 	public static final Icons icon_film_timeline = new Icons("FilmTimeline.png");
 	public static final Icons icon_skybox = new Icons("Skybox.png");
+	public static final Icons icon_undo = new Icons("Undo.png");
+	public static final Icons icon_redo = new Icons("Redo.png");
 	
 	private final Image image;
 	

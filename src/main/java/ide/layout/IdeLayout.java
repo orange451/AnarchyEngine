@@ -116,14 +116,14 @@ public class IdeLayout {
 		menuEdit.setAutoHide(false);
 		menuBar.getItems().add(menuEdit);
 		
-		MenuItem undo = new MenuItem("Undo");
+		MenuItem undo = new MenuItem("Undo", Icons.icon_undo.getView());
 		undo.setOnAction( event -> {
 			Game.historyService().undo();
 		});
 		menuEdit.getItems().add(undo);
 		
 		
-		MenuItem redo = new MenuItem("Redo");
+		MenuItem redo = new MenuItem("Redo", Icons.icon_redo.getView());
 		redo.setOnAction( event -> {
 			Game.historyService().redo();
 		});
