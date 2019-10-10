@@ -286,8 +286,12 @@ public class PhysicsObjectInternal {
 			}
 			
 			// Destroy old
-			if ( old != null && world != null ) {
-				world.dynamicsWorld.removeRigidBody(old);
+			if ( old != null && world != null && !world.dynamicsWorld.isDisposed() ) {
+				try {
+					world.dynamicsWorld.removeRigidBody(old);
+				} catch(Exception e) {
+					//
+				}
 				old.dispose();
 			}
 			

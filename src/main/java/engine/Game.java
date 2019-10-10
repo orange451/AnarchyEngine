@@ -25,6 +25,7 @@ import engine.lua.type.object.services.Assets;
 import engine.lua.type.object.services.Connections;
 import engine.lua.type.object.services.Core;
 import engine.lua.type.object.services.Debris;
+import engine.lua.type.object.services.GameLua;
 import engine.lua.type.object.services.HistoryService;
 import engine.lua.type.object.services.Lighting;
 import engine.lua.type.object.services.StarterPlayerScripts;
@@ -53,7 +54,6 @@ public class Game implements Tickable {
 	public static boolean internalTesting;
 	private static boolean running;
 	
-	private static HashMap<Long,Instance> createdInstances = new HashMap<Long,Instance>();
 	private static AtomicLong instanceCounter = new AtomicLong(0);
 	
 	public static final String VERSION = "0.5a";
@@ -67,7 +67,7 @@ public class Game implements Tickable {
 		LuaEngine.initialize();
 		
 		// Create the game instance
-		new GameInstance();
+		setGame(new GameLua());
 		
 		// Start a new project
 		changes = false;
@@ -176,7 +176,7 @@ public class Game implements Tickable {
 		if ( Game.game().isnil() )
 			return servs;
 		
-		List<Instance> children = ((GameInstance)Game.game()).getChildren();
+		List<Instance> children = ((GameLua)Game.game()).getChildren();
 		for (int i = 0; i < children.size(); i++) {
 			Instance child = children.get(i);
 			if ( child instanceof Service ) {
@@ -204,8 +204,12 @@ public class Game implements Tickable {
 	private static final LuaValue C_HISTORYSERVICE = LuaValue.valueOf("HistoryService");
 	private static final LuaValue C_ASSETS = LuaValue.valueOf("Assets");
 
-	public static Instance game() {
-		return (Instance) LuaEngine.globals.get(C_GAME);
+	public static GameLua game() {
+		return (GameLua) LuaEngine.globals.get(C_GAME);
+	}
+	
+	public static void setGame(GameLua game) {
+		LuaEngine.globals.set(C_GAME, game);
 	}
 
 	public static Workspace workspace() {
@@ -281,93 +285,7 @@ public class Game implements Tickable {
 	public static Instance getInstanceFromSID(long sid) {
 		if ( sid == -1 ) 
 			return null;
-		return createdInstances.get(sid);
-	}
-	
-	static class GameInstance extends Instance {
-		
-		public GameInstance() {
-			super("Game");
-			LuaEngine.globals.set("game", this);
-			
-			// On load event
-			this.rawset("Loaded", new LuaEvent());
-			this.rawset("Started", new LuaEvent());
-			
-			// Fields
-			this.defineField("Running", LuaValue.valueOf(false), true);
-			this.defineField("IsServer", LuaValue.valueOf(false), true);
-			
-			// GetService convenience method
-			getmetatable().set("GetService", new TwoArgFunction() {
-				@Override
-				public LuaValue call(LuaValue arg, LuaValue arg2) {
-					Service service = getService(arg2.toString());
-					if ( service == null )
-						return LuaValue.NIL;
-					return service;
-				}
-			});
-			
-			this.descendantRemovedEvent().connectLua(new OneArgFunction() {
-				@Override
-				public LuaValue call(LuaValue object) {
-					synchronized(createdInstances) {
-						if ( object instanceof Instance ) {
-							Instance inst = (Instance) object;
-							long sid = inst.getSID();
-							
-							createdInstances.remove(sid);
-						}
-					}
-					return LuaValue.NIL;
-				}
-			});
-			
-			this.descendantAddedEvent().connectLua(new OneArgFunction() {
-				@Override
-				public LuaValue call(LuaValue object) {
-					synchronized(createdInstances) {
-						if ( object instanceof Instance ) {
-							Instance inst = (Instance)object;
-							if ( Game.isServer() ) {
-								inst.rawset(C_SID, LuaValue.valueOf(Game.generateSID()));
-							}
-							
-							long sid = inst.getSID();
-							
-							if ( sid != -1 ) {
-								createdInstances.put(sid, inst);
-							}
-						}
-					}
-					return LuaValue.NIL;
-				}
-			});
-			
-			// LOCK HER UP
-			setLocked(true);
-			setInstanceable(false);
-		}
-		
-		public String getName() {
-			return this.get(C_NAME).toString().toLowerCase();
-		}
-
-		@Override
-		public void onDestroy() {
-			//
-		}
-
-		@Override
-		protected LuaValue onValueSet(LuaValue key, LuaValue value) {
-			return null;
-		}
-
-		@Override
-		protected boolean onValueGet(LuaValue key) {
-			return true;
-		}
+		return game().createdInstances.get(sid);
 	}
 
 	public static void unload() {
@@ -388,6 +306,12 @@ public class Game implements Tickable {
 	public static void clearServices() {
 		ArrayList<Service> services = Game.getServices();
 		for (int i = 0; i < services.size(); i++) {
+			List<Instance> desc = services.get(i).getDescendants();
+			for (int j = 0; j < desc.size(); j++) {
+				Instance inst = desc.get(j);
+				inst.onDestroy();
+				inst.cleanup();
+			}
 			services.get(i).clearAllChildren();
 		}
 	}
@@ -432,7 +356,7 @@ public class Game implements Tickable {
 		List<Service> children = Game.getServices();
 		for (int i = 0; i < children.size(); i++) {
 			Instance c = children.get(i);
-			createdInstances.put( c.getSID(), c);
+			game().createdInstances.put( c.getSID(), c);
 		}
 		
 		loadEvent().fire();
@@ -602,7 +526,7 @@ public class Game implements Tickable {
 		if ( !Game.isServer() && Game.running )
 			return -1;
 		long t = instanceCounter.incrementAndGet();
-		while (createdInstances.containsKey(t) ) {
+		while (game().createdInstances.containsKey(t) ) {
 			t = instanceCounter.incrementAndGet();
 		}
 		return t;

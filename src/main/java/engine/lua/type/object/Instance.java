@@ -254,7 +254,9 @@ public abstract class Instance extends DataModel {
 				child.destroy();
 			}
 		}
-		children.clear();
+		this.children.clear();
+		this.descendents.clear();
+		this.descendentsList.clear();
 	}
 	
 	/**

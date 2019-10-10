@@ -19,8 +19,8 @@ import engine.lua.type.object.InstancePropertySubscriber;
 
 public abstract class DataModel extends LuaDatatype {
 	protected List<Instance> children = Collections.synchronizedList(new ArrayList<Instance>());
-	private HashSet<Instance> descendents = new HashSet<Instance>();
-	private ArrayList<Instance> descendentsList = new ArrayList<Instance>();
+	protected HashSet<Instance> descendents = new HashSet<Instance>();
+	protected ArrayList<Instance> descendentsList = new ArrayList<Instance>();
 	protected List<InstancePropertySubscriber> propertySubscribers = Collections.synchronizedList(new ArrayList<InstancePropertySubscriber>());
 	
 	protected static HashMap<String,LuaInstancetypeData> TYPES = new HashMap<String,LuaInstancetypeData>();
@@ -374,7 +374,7 @@ public abstract class DataModel extends LuaDatatype {
 			}
 			
 			// Delete self from old parent reference
-			if ( oldParent instanceof Instance ) {
+			if ( oldParent instanceof Instance && !((Instance) oldParent).destroyed ) {
 				List<Instance> oldParentChildren = ((Instance)oldParent).getChildren();
 				synchronized(oldParentChildren) {
 					oldParentChildren.remove(this);
@@ -413,10 +413,12 @@ public abstract class DataModel extends LuaDatatype {
 			boolean isStillDescendent = this.computeDescendant(r);
 			
 			if (!isStillDescendent) {
-				r.descendantRemovedEvent().fire(this);
-				r.descendents.remove(this);
-				r.descendentsList.remove(this);
-				descendantRemoved(r.getParent());
+				if ( !r.destroyed ) {
+					r.descendantRemovedEvent().fire(this);
+					r.descendents.remove(this);
+					r.descendentsList.remove(this);
+					descendantRemoved(r.getParent());
+				}
 			}
 		}
 	}
@@ -621,6 +623,12 @@ public abstract class DataModel extends LuaDatatype {
 			this.getField(C_PARENT).setLocked(false);
 			this.set(C_PARENT, LuaValue.NIL);
 		}
+		
+		this.children.clear();
+		this.descendents.clear();
+		this.descendentsList.clear();
+		this.destroyed = true;
+		this.propertySubscribers.clear();
 		
 		super.cleanup();
 	}

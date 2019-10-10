@@ -23,6 +23,7 @@ import engine.Game;
 import engine.lua.type.LuaValuetype;
 import engine.lua.type.object.Instance;
 import engine.lua.type.object.Service;
+import engine.lua.type.object.services.GameLua;
 import engine.util.FileUtils;
 import ide.IDE;
 import ide.layout.windows.ErrorWindow;
@@ -73,7 +74,7 @@ public class Load {
 		Game.unload();
 		
 		// Load the json
-		if ( !parseJSON(obj) )
+		if ( !parseJSON( Game.game(), obj) )
 			return;
 		
 		// Tell game we're loaded
@@ -84,12 +85,12 @@ public class Load {
 	 * Desearializes a JSONObject into Instances.
 	 * @param obj
 	 */
-	public static boolean parseJSON(JSONObject... obj) {
+	public static boolean parseJSON(GameLua game, JSONObject... obj) {
 		// Read in the objects from JSON
 		instances = new ArrayList<LoadedInstance>();
 		instancesMap = new HashMap<>();
 		for ( int i = 0; i < obj.length; i++) {
-			readObjects(obj[i]);
+			readObjects( game, obj[i]);
 		}
 		
 		try {
@@ -164,7 +165,7 @@ public class Load {
 		}
 	}
 
-	private static void readObjects(JSONObject obj) {
+	private static void readObjects(GameLua game, JSONObject obj) {
 		LoadedInstance root = new LoadedInstance();
 		root.ClassName = (String) obj.get("ClassName");
 		root.Name = (String) obj.get("Name");
@@ -172,7 +173,7 @@ public class Load {
 		root.Parent = loadReference("Parent",obj);
 		
 		if ( root.ClassName.equals("Game") ) {
-			root.instance = (Instance) Game.game();
+			root.instance = game;
 		} else {
 			LuaValue temp = Game.game().get(root.ClassName);
 			if ( temp.isnil() ) {
@@ -198,7 +199,7 @@ public class Load {
 		
 		JSONArray children = (JSONArray) obj.get("Children");
 		for (int i = 0; i < children.size(); i++) {
-			readObjects((JSONObject) children.get(i));
+			readObjects(game, (JSONObject) children.get(i));
 		}
 	}
 	

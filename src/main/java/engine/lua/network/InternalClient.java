@@ -23,6 +23,7 @@ import engine.lua.network.internal.protocol.ClientConnectFinishTCP;
 import engine.lua.network.internal.protocol.ClientConnectTCP;
 import engine.lua.network.internal.protocol.ClientLoadMapTCP;
 import engine.lua.type.object.services.Connections;
+import engine.lua.type.object.services.GameLua;
 import ide.layout.windows.ErrorWindow;
 
 public class InternalClient extends Client {
@@ -74,11 +75,11 @@ public class InternalClient extends Client {
 								JSONParser parser = new JSONParser();
 								final JSONObject obj = (JSONObject) parser.parse(worldJSON);
 								
-								InternalRenderThread.runLater(()->{
+								InternalGameThread.runLater(()->{
 									// Load new game data
-									Game.unload();
-									if ( !Load.parseJSON(obj) )
+									if ( !Load.parseJSON(Game.game(), obj) )
 										return;
+									Game.unload();
 									Game.load();
 									
 									// Create connection object

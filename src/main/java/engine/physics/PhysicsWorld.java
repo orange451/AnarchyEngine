@@ -280,7 +280,7 @@ public class PhysicsWorld {
 		}
 		
 		// Destroy old dynamics world
-		if ( dynamicsWorld != null )
+		if ( dynamicsWorld != null && !dynamicsWorld.isDisposed() )
 			dynamicsWorld.dispose();
 		
 		// Make sure objects list is clear
