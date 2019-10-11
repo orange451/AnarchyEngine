@@ -18,8 +18,9 @@ public class DirectionalLightInternal extends Light {
 	public DirectionalLightInternal(Vector3f direction, float intensity) {
 		this.direction.set(direction);
 		this.intensity = intensity;
-		
-		// Light may be created before game is setup (on load), so Game.Lighting is not available yet. Next frame it will be.
+
+		// Light may be created before game is setup (on load), so Game.Lighting is not
+		// available yet. Next frame it will be.
 		InternalGameThread.runLater(() -> {
 			this.shadowResolution = Game.lighting().getShadowMapSize();
 		});
@@ -27,6 +28,7 @@ public class DirectionalLightInternal extends Light {
 
 	public void init() {
 		shadowMap = new DirectionalLightShadowMap(shadowResolution);
+		System.out.println("init" + shadowMap.getShadowMaps().getTexture());
 		lightCamera = new DirectionalLightCamera(distance);
 		lightCamera.update(direction, getPosition());
 	}
@@ -50,6 +52,8 @@ public class DirectionalLightInternal extends Light {
 	public void dispose() {
 		if (shadowMap == null)
 			return;
+
+		System.out.println("disp" + shadowMap.getShadowMaps().getTexture());
 
 		shadowMap.dispose();
 	}

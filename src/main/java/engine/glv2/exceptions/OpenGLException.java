@@ -20,7 +20,7 @@
 
 package engine.glv2.exceptions;
 
-public class OpenGLException extends RuntimeException {
+public class OpenGLException extends UnknownError {
 	private static final long serialVersionUID = -7380123602100161964L;
 
 	public OpenGLException(String message) {
