@@ -5,6 +5,7 @@ import java.io.FileReader;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -49,6 +50,10 @@ public class Load {
 	}
 	
 	public static void load(String path) {
+		load(Game.game(), path, true);
+	}
+	
+	public static void load(GameLua game, String path, boolean reset) {
 		// Load from JSON file
 		boolean loadedJSON = false;
 		JSONObject obj = null;
@@ -66,19 +71,23 @@ public class Load {
 			return;
 		
 		// Set title
-		Game.saveFile = path;
-		Game.saveDirectory = new File(path).getParent();
-		GLFW.glfwSetWindowTitle(IDE.window, IDE.TITLE + " [" + FileUtils.getFileDirectoryFromPath(path) + "]");
+		if ( reset ) {
+			Game.saveFile = path;
+			Game.saveDirectory = new File(path).getParent();
+			GLFW.glfwSetWindowTitle(IDE.window, IDE.TITLE + " [" + FileUtils.getFileDirectoryFromPath(path) + "]");
+		}
 		
 		// Unload the current game
-		Game.unload();
+		if ( reset )
+			Game.unload();
 		
 		// Load the json
-		if ( !parseJSON( Game.game(), obj) )
+		if ( !parseJSON( game, obj) )
 			return;
 		
 		// Tell game we're loaded
-		Game.load();
+		if ( reset )
+			Game.load();
 	}
 	
 	/**
@@ -94,33 +103,42 @@ public class Load {
 		}
 		
 		try {
+			List<LoadedInstance> services = new ArrayList<LoadedInstance>();
+			
 			// Load in services first
 			for (int i = 0; i < instances.size(); i++) {
 				LoadedInstance inst = instances.get(i);
 				if ( inst.instance instanceof Service ) {
-					loadObject(inst);
+					loadObject(game, inst);
+					services.add(inst);
 				}
 			}
 			
 			// Correct instances (properties and such)
 			for (int i = 0; i < instances.size(); i++) {
 				LoadedInstance inst = instances.get(i);
-				loadObject(inst);
+				loadObject(game, inst);
 			}
 			
 	
-			// Force set parents
+			// Force set parents (of non services)
 			for (int i = 0; i < instances.size(); i++) {
 				LoadedInstance inst = instances.get(i);
 				long parent = inst.Parent;
 
 				if ( parent != -1 && inst.loaded ) {
-					Instance p = getInstanceFromReference(parent);
+					Instance p = getInstanceFromReference(game, parent);
 					//if ( !inst.instance.getParent().equals(p) ) {
 						inst.instance.forceSetParent(p);
-						//System.out.println("Setting parent of: " + inst.instance + "\tto\t" + p.instance);
+						//System.out.println("Setting parent of: " + inst.instance + "\tto\t" + p);
 					//}
 				}
+			}
+			
+			// Parent services
+			for (int i = 0; i < services.size(); i++) {
+				LoadedInstance inst = services.get(i);
+				inst.instance.forceSetParent(game);
 			}
 			
 			return true;
@@ -132,7 +150,7 @@ public class Load {
 		return false;
 	}
 
-	private static void loadObject(LoadedInstance inst) {
+	private static void loadObject(GameLua game, LoadedInstance inst) {
 		if ( inst.loaded )
 			return;
 		
@@ -152,7 +170,7 @@ public class Load {
 			Object value = p.getValue();
 			if ( p.pointer ) {
 				int pointer = ((Integer) value).intValue();
-				value = getInstanceFromReference(pointer);
+				value = getInstanceFromReference(game, pointer);
 			}
 			
 			if ( value != null ) {
@@ -175,7 +193,7 @@ public class Load {
 		if ( root.ClassName.equals("Game") ) {
 			root.instance = game;
 		} else {
-			LuaValue temp = Game.game().get(root.ClassName);
+			LuaValue temp = game.get(root.ClassName);
 			if ( temp.isnil() ) {
 				root.instance = (Instance) Instance.instance(root.ClassName);
 			} else {
@@ -211,13 +229,13 @@ public class Load {
 		return -1;
 	}
 	
-	protected static Instance getInstanceFromReference(long ref) {
+	protected static Instance getInstanceFromReference(GameLua game, long ref) {
 		LoadedInstance loaded = instancesMap.get(ref);
 		if ( loaded != null )
 			return loaded.instance;
 		
 		// Now search for instance by SID if it wasn't found before.
-		return Game.getInstanceFromSID(ref);
+		return Game.getInstanceFromSID(game, ref);
 	}
 	
 	static class LoadedInstance {

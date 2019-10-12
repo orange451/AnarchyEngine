@@ -85,8 +85,8 @@ public class InternalGameThread extends Observable implements Runnable {
 				lastTime = now;
 				
 				if ( Game.isLoaded() ) {
-					RunService runService = (RunService)Game.getService("RunService");
-					if ( runService != null ) {
+					RunService runService = Game.runService();
+					if ( runService != null && Game.isRunning() ) {
 						runService.heartbeatEvent().fire(LuaValue.valueOf(delta));
 					}
 					Game.getGame().tick();

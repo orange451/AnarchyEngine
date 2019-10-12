@@ -23,6 +23,7 @@ import engine.gl.PostProcessor;
 import engine.gl.Surface;
 import engine.gl.Texture2D;
 import engine.gl.shader.BaseShader;
+import engine.lua.type.object.services.Lighting;
 import lwjgui.paint.Color;
 
 public class GBuffer {
@@ -190,6 +191,10 @@ public class GBuffer {
 		pipeline.ortho();
 		
 		if ( Game.isLoaded() ) {
+			Lighting lighting = Game.lighting();
+			if ( lighting == null )
+				return;
+			
 			this.saturation = Game.lighting().getSaturation();
 			this.exposure = Game.lighting().getExposure();
 			this.gamma = Game.lighting().getGamma();

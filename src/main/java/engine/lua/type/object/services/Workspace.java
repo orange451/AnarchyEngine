@@ -27,7 +27,6 @@ public class Workspace extends Service implements RenderableWorld,TreeViewable,T
 
 	public Workspace() {
 		super("Workspace");
-		LuaEngine.globals.set("workspace", this);
 
 		this.defineField(C_CURRENTCAMERA.toString(), new Camera(), false);
 		this.defineField(C_GRAVITY.toString(), LuaValue.valueOf(16), false);

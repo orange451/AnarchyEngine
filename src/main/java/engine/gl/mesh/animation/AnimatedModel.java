@@ -240,6 +240,8 @@ public class AnimatedModel {
 		for (int i = 0; i < boneIndices.size(); i++) {
 			String boneName = indexToBoneMap.get(i);
 			Bone bone = (Bone) bonesFolder.findFirstChild(boneName);
+			if ( bone == null )
+				continue;
 			
 			Matrix4 absoluteMatrix = bones.get(boneName);
 			Matrix4 bindMatrix = bone.getOffsetMatrix();

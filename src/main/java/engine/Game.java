@@ -79,25 +79,25 @@ public class Game implements Tickable {
 
 	private static void services() {
 		if ( Game.getService("Workspace") == null )
-			new Workspace();
+			new Workspace().forceSetParent(Game.game());
 		
 		if ( Game.getService("Lighting") == null )
-			new Lighting();
+			new Lighting().forceSetParent(Game.game());
 		
 		if ( Game.getService("Players") == null )
-			new Players();
+			new Players().forceSetParent(Game.game());
 
 		if ( Game.getService("Connections") == null )
-			new Connections();
+			new Connections().forceSetParent(Game.game());
 		
 		if ( Game.getService("Storage") == null )
-			new Storage();
+			new Storage().forceSetParent(Game.game());
 		
 		if ( Game.getService("ScriptService") == null )
-			new ScriptService();
+			new ScriptService().forceSetParent(Game.game());
 		
 		if ( Game.getService("StarterPlayer") == null )
-			new StarterPlayer();
+			new StarterPlayer().forceSetParent(Game.game());
 		
 		InternalGameThread.runLater(()->{
 			if ( Game.starterPlayer().findFirstChild("StarterPlayerScripts") == null ) {
@@ -107,7 +107,7 @@ public class Game implements Tickable {
 		});
 
 		if ( Game.getService("Assets") == null )
-			new Assets();
+			new Assets().forceSetParent(Game.game());
 			
 		if ( Game.getService("Assets").findFirstChild("Prefabs") == null )
 			Assets.newPackage("Prefabs", Game.getService("Assets"));
@@ -125,20 +125,20 @@ public class Game implements Tickable {
 			Assets.newPackage("Audio", Game.getService("Assets"));
 
 		if ( Game.getService("UserInputService") == null )
-			new UserInputService();
+			new UserInputService().forceSetParent(Game.game());
 
 		if ( Game.getService("RunService") == null )
-			new RunService();
+			new RunService().forceSetParent(Game.game());
 
 		if ( Game.getService("Debris") == null )
-			new Debris();
+			new Debris().forceSetParent(Game.game());
 		
 
 		if ( Game.getService("HistoryService") == null )
-			new HistoryService();
+			new HistoryService().forceSetParent(Game.game());
 		
 		if ( Game.getService("Core") == null )
-			new Core();
+			new Core().forceSetParent(Game.game());
 		
 		if ( Game.getService("Core").findFirstChild("CameraController") == null ) {
 			GlobalScript camera = new GlobalScript();
@@ -282,10 +282,10 @@ public class Game implements Tickable {
 		return loaded;
 	}
 	
-	public static Instance getInstanceFromSID(long sid) {
+	public static Instance getInstanceFromSID(GameLua game, long sid) {
 		if ( sid == -1 ) 
 			return null;
-		return game().createdInstances.get(sid);
+		return game.createdInstances.get(sid);
 	}
 
 	public static void unload() {
@@ -374,6 +374,7 @@ public class Game implements Tickable {
 	
 	@Override
 	public void tick() {
+		LuaEngine.globals.set(C_WORKSPACE, Game.workspace());
 		Game.game().rawset(C_RUNNING, LuaValue.valueOf(running));
 		Game.game().rawset(C_ISSERVER, LuaValue.valueOf(Game.isServer()));
 		
