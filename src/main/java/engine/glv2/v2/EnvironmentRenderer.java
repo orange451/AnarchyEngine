@@ -90,7 +90,7 @@ public class EnvironmentRenderer {
 					cubeTex.getTexture(), 0);
 			camera.switchToFace(i);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-			renderingManager.renderReflections(rd, rnd, camera);
+			renderingManager.renderReflections(rd, rnd, camera); // TODO: Issue here with shadow sampler
 			sr.render(camera, rd.sun.getSunPosition(), false, false);
 		}
 		framebuffer.unbind();

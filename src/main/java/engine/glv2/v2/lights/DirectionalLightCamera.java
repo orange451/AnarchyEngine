@@ -33,7 +33,6 @@ public class DirectionalLightCamera {
 	public void setShadowDistance(int distance) {
 		int shadowDrawDistance = distance;
 		shadowDrawDistance *= 2;
-		projectionArray = new Matrix4f[4];
 		projectionArray[0] = Maths.orthoSymmetric(-shadowDrawDistance / 25, shadowDrawDistance / 25,
 				-shadowDrawDistance, shadowDrawDistance, false);
 		projectionArray[1] = Maths.orthoSymmetric(-shadowDrawDistance / 10, shadowDrawDistance / 10,

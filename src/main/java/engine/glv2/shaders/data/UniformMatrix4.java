@@ -28,7 +28,7 @@ import org.joml.Matrix4f;
 
 public class UniformMatrix4 extends Uniform {
 
-	private Matrix4f current;
+	private Matrix4f current = new Matrix4f();
 	private float[] fm = new float[16];
 
 	public UniformMatrix4(String name) {
@@ -37,6 +37,7 @@ public class UniformMatrix4 extends Uniform {
 
 	public void loadMatrix(Matrix4f matrix) {
 		if (!used || !matrix.equals(current)) {
+			current.set(matrix);
 			matrix.get(fm);
 			glUniformMatrix4fv(super.getLocation(), false, fm);
 			used = true;

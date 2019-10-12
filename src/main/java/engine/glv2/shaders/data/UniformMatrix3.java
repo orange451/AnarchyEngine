@@ -26,7 +26,7 @@ import org.joml.Matrix3f;
 
 public class UniformMatrix3 extends Uniform {
 
-	private Matrix3f current;
+	private Matrix3f current = new Matrix3f();
 	private float[] fm = new float[9];
 
 	public UniformMatrix3(String name) {
@@ -35,6 +35,7 @@ public class UniformMatrix3 extends Uniform {
 
 	public void loadMatrix(Matrix3f matrix) {
 		if (!used || !matrix.equals(current)) {
+			current.set(matrix);
 			matrix.get(fm);
 			glUniformMatrix3fv(super.getLocation(), false, fm);
 			used = true;
