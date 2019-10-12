@@ -28,7 +28,7 @@ public class PingRequest {
 		if ( ack ) {
 			long ping = System.currentTimeMillis() - originalSendTime;
 
-			Instance inst = Game.getInstanceFromSID(instanceId);
+			Instance inst = Game.getInstanceFromSID(Game.game(), instanceId);
 			if ( !Game.isServer() )
 				inst = Game.connections().getLocalConnection();
 			if ( inst == null || !(inst instanceof Connection) )

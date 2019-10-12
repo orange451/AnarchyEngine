@@ -9,7 +9,7 @@ import com.esotericsoftware.kryonet.Connection;
 
 import engine.Game;
 import engine.lua.network.internal.ClientProcessable;
-import engine.lua.network.internal.PacketUtility;
+import engine.lua.network.internal.JSONUtil;
 import engine.lua.network.internal.ServerProcessable;
 import engine.lua.type.object.Instance;
 import engine.lua.type.object.PhysicsBase;
@@ -35,7 +35,7 @@ public class InstanceUpdateUDP implements ClientProcessable,ServerProcessable {
 		this.instanceId = instance.getSID();
 
 		JSONObject j = new JSONObject();
-		j.put(field.toString(), PacketUtility.fieldToJSON(instance.get(field)));
+		j.put(field.toString(), JSONUtil.fieldToJSON(instance.get(field)));
 		this.instanceData = j.toJSONString();
 		
 		this.rawOnly = rawOnly;
@@ -45,7 +45,7 @@ public class InstanceUpdateUDP implements ClientProcessable,ServerProcessable {
 	
 	@Override
 	public void serverProcess(Connection connection) {
-		Instance instance = Game.getInstanceFromSID(instanceId);
+		Instance instance = Game.getInstanceFromSID(Game.game(), instanceId);
 		if ( instance == null ) {
 			return;
 		}
@@ -100,7 +100,7 @@ public class InstanceUpdateUDP implements ClientProcessable,ServerProcessable {
 
 	@Override
 	public void clientProcess(Connection Connection) {
-		Instance instance = Game.getInstanceFromSID(instanceId);
+		Instance instance = Game.getInstanceFromSID(Game.game(), instanceId);
 		if ( instance == null )
 			return;
 		
@@ -117,7 +117,7 @@ public class InstanceUpdateUDP implements ClientProcessable,ServerProcessable {
 		try {
 			JSONObject obj = (JSONObject) parser.parse(instanceData);
 			String field = (String) obj.keySet().iterator().next();
-			LuaValue value = PacketUtility.JSONToField( obj.get(field) );
+			LuaValue value = JSONUtil.JSONToField( obj.get(field) );
 			
 			if ( value != null ) {
 				if ( field.equals(C_NAME) )

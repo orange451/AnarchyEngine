@@ -11,7 +11,7 @@ import com.esotericsoftware.kryonet.Connection;
 
 import engine.lua.network.internal.ClientProcessable;
 import engine.lua.network.internal.NonReplicatable;
-import engine.lua.network.internal.PacketUtility;
+import engine.lua.network.internal.JSONUtil;
 import engine.lua.type.object.Instance;
 
 public class InstanceCreateTCP implements ClientProcessable {
@@ -47,7 +47,7 @@ public class InstanceCreateTCP implements ClientProcessable {
 				}
 			}
 			
-			j.put(field, PacketUtility.fieldToJSON(instance.get(field)));
+			j.put(field, JSONUtil.fieldToJSON(instance.get(field)));
 		}
 		
 		this.instanceData = j.toJSONString();
@@ -70,7 +70,7 @@ public class InstanceCreateTCP implements ClientProcessable {
 			for (int i = 0; i < keyArray.length; i++) {
 				String field = (String) keyArray[i];
 				Object jsonValue = obj.get(field);
-				LuaValue value = PacketUtility.JSONToField(jsonValue);
+				LuaValue value = JSONUtil.JSONToField(jsonValue);
 				//System.out.println(internalInstance + " :: " + field + " / " + value + " / " + jsonValue);
 				if ( value != null ) {
 					if ( field.equals("Parent") ) {

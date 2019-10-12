@@ -9,7 +9,7 @@ import engine.Game;
 import engine.lua.type.LuaValuetype;
 import engine.lua.type.object.Instance;
 
-public class PacketUtility {
+public class JSONUtil {
 	/**
 	 * Serializes a field to a JSON value.
 	 * @param luaValue
@@ -74,7 +74,7 @@ public class PacketUtility {
 			
 			if ( j.get("Type").equals("Reference") ) {
 				long v = Long.parseLong(""+j.get("Value"));
-				return Game.getInstanceFromSID(v);
+				return Game.getInstanceFromSID(Game.game(), v);
 			}
 			
 			if ( j.get("Type").equals("Datatype") ) {
