@@ -35,7 +35,7 @@ public class InstanceUpdateUDP implements ClientProcessable,ServerProcessable {
 		this.instanceId = instance.getSID();
 
 		JSONObject j = new JSONObject();
-		j.put(field.toString(), JSONUtil.fieldToJSON(instance.get(field)));
+		j.put(field.toString(), JSONUtil.serializeField(instance.get(field)));
 		this.instanceData = j.toJSONString();
 		
 		this.rawOnly = rawOnly;
@@ -117,7 +117,7 @@ public class InstanceUpdateUDP implements ClientProcessable,ServerProcessable {
 		try {
 			JSONObject obj = (JSONObject) parser.parse(instanceData);
 			String field = (String) obj.keySet().iterator().next();
-			LuaValue value = JSONUtil.JSONToField( obj.get(field) );
+			LuaValue value = JSONUtil.deserializeField( obj.get(field) );
 			
 			if ( value != null ) {
 				if ( field.equals(C_NAME) )
