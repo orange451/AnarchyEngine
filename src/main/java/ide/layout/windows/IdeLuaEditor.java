@@ -18,6 +18,27 @@ public class IdeLuaEditor extends IdePane {
 	private ScriptBase inst;
 	private CodeArea code;
 	
+	private int getTabs(String t) {
+		int a = 0;
+		for (int i = 0; i < t.length(); i++) {
+			char c = t.charAt(i);
+			if ( c == '\t' )
+				a++;
+			else
+				break;
+		}
+		
+		return a;
+	}
+	
+	private String generateCharacters(int amt, char c) {
+		StringBuilder t = new StringBuilder();
+		for (int i = 0; i < amt; i++) {
+			t.append(""+c);
+		}
+		return t.toString();
+	}
+	
 	public IdeLuaEditor(ScriptBase script) {
 		super(script.getName()+".lua", true);
 		
@@ -30,9 +51,32 @@ public class IdeLuaEditor extends IdePane {
 		
 		code.setOnKeyPressed((event)->{
 			if ( event.getKey() == GLFW.GLFW_KEY_ENTER ) {
-				boolean spaceThen = code.getText(code.getCaretPosition()-6, code.getCaretPosition()).equals(" then");
-				if ( spaceThen ) {
+				String line = code.getLine(code.getCaretPosition()-1);
+				String lineWithoutSpecial = line.replaceAll("[^a-zA-Z0-9]+"," ");
+				boolean ifThen = lineWithoutSpecial.contains("if ") && lineWithoutSpecial.contains(" then");
+				boolean whileDo = lineWithoutSpecial.contains("while ") && lineWithoutSpecial.contains(" do");
+				boolean forDo = lineWithoutSpecial.contains("for ") && lineWithoutSpecial.contains(" do");
+				boolean function = line.contains("function(") && line.contains(")");
+				int closeParenthesisDifference = (int) (line.chars().filter(ch -> ch == '(').count()-line.chars().filter(ch -> ch == ')').count());
+				
+				int amtTabs = getTabs(line);
+				String TABS = generateCharacters(amtTabs, '\t');
+				String CLOSE_PAREN = generateCharacters(closeParenthesisDifference, ')');
+
+				// Indent next line
+				if ( amtTabs > 0 ) {
+					code.insertText(code.getCaretPosition(), TABS);
+					code.setCaretPosition(code.getCaretPosition()+TABS.length());
+				}
+				
+				// Add end block
+				if ( ifThen || function || forDo || whileDo ) {
+					// Tab once more if entering block
 					code.insertText(code.getCaretPosition(), "\t");
+					code.setCaretPosition(code.getCaretPosition()+1);
+					
+					// end
+					code.insertText(code.getCaretPosition(), "\n"+TABS+"end"+CLOSE_PAREN);
 				}
 			}
 		});
