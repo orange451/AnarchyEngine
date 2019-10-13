@@ -10,6 +10,7 @@ import ide.layout.windows.icons.Icons;
 public class Bone extends Instance implements TreeViewable {
 
 	protected static final LuaValue C_MESH = LuaValue.valueOf("Mesh");
+	protected static final LuaValue C_OFFSETMATRIX = LuaValue.valueOf("OffsetMatrix");
 	
 	public Bone() {
 		super("Bone");
@@ -48,6 +49,10 @@ public class Bone extends Instance implements TreeViewable {
 	}
 
 	public Matrix4 getOffsetMatrix() {
-		return (Matrix4) this.get("OffsetMatrix");
+		return (Matrix4) this.get(C_OFFSETMATRIX);
+	}
+
+	public void setOffsetMatrix(Matrix4 matrix4) {
+		this.set(C_OFFSETMATRIX, matrix4);
 	}
 }

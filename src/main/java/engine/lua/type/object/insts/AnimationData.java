@@ -72,7 +72,7 @@ public class AnimationData extends Instance implements TreeViewable {
 
 			Bone b = new Bone();
 			b.rawset("Mesh", mesh);
-			b.rawset("OffsetMatrix", new Matrix4(offsetMat));
+			b.setOffsetMatrix( new Matrix4(offsetMat));
 			b.forceSetName(bone.mName().dataString());
 
 			for (int i = 0; i < bone.mNumWeights(); i++) {

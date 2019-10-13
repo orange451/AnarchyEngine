@@ -18,9 +18,10 @@ public class InstanceCreateTCP implements ClientProcessable {
 	public String instanceType;
 	public String instanceData;
 
+	private static final String C_PARENTs = "Parent";
 	private static final LuaValue C_CLASSNAME = LuaValue.valueOf("ClassName");
 	private static final LuaValue C_NAME = LuaValue.valueOf("Name");
-	private static final LuaValue C_PARENT = LuaValue.valueOf("Parent");
+	private static final LuaValue C_PARENT = LuaValue.valueOf(C_PARENTs);
 	private static final LuaValue C_SID = LuaValue.valueOf("SID");
 	
 	public InstanceCreateTCP() {
@@ -73,7 +74,7 @@ public class InstanceCreateTCP implements ClientProcessable {
 				LuaValue value = JSONUtil.deserializeField(jsonValue);
 				//System.out.println(internalInstance + " :: " + field + " / " + value + " / " + jsonValue);
 				if ( value != null ) {
-					if ( field.equals("Parent") ) {
+					if ( field.equals(C_PARENTs) ) {
 						toParent = value;
 					} else {
 						internalInstance.rawset(field, value);
