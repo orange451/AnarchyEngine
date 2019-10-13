@@ -147,10 +147,10 @@ public class Load {
 
 				if ( parent != -1 && inst.loaded ) {
 					Instance p = getInstanceFromReference(parent);
-					//if ( !inst.instance.getParent().equals(p) ) {
+					if ( !inst.instance.equals(p) ) {
 						inst.instance.forceSetParent(p);
 						//System.out.println("Setting parent of: " + inst.instance + "\tto\t" + p);
-					//}
+					}
 				}
 			}
 			

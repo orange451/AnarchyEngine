@@ -13,6 +13,7 @@ import org.luaj.vm2.lib.TwoArgFunction;
 import engine.io.AsynchronousResourceLoader;
 import engine.io.Save;
 import engine.lua.LuaEngine;
+import engine.lua.network.internal.protocol.ClientConnectFinishTCP;
 import engine.lua.type.LuaEvent;
 import engine.lua.type.ScriptData;
 import engine.lua.type.object.Instance;
@@ -497,6 +498,11 @@ public class Game implements Tickable {
 				// Player scripts folder
 				Instance sc = new PlayerScripts();
 				sc.forceSetParent(p);
+				
+				// Simulate a client connection
+				ClientConnectFinishTCP finishCon = new ClientConnectFinishTCP();
+				finishCon.SID = p.getSID();
+				finishCon.clientProcess(null);
 				
 				// Set him as local
 				new engine.lua.network.internal.protocol.ClientConnectFinishTCP().clientProcess(null);

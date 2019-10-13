@@ -42,12 +42,12 @@ public class ClientConnectFinishTCP implements ClientProcessable {
 				}
 				
 				// Copy starter player scripts in to player
-				Instance starterScripts = Game.starterPlayer().findFirstChild("StarterPlayerScripts");
+				Instance starterScripts = Game.starterPlayer().starterPlayerScripts();
 				List<Instance> cc = starterScripts.getChildren();
 				for (int j = 0; j < cc.size(); j++) {
 					Instance obj = cc.get(j);
 					Instance clo = obj.clone();
-					clo.forceSetParent(player.findFirstChild("PlayerScripts"));
+					clo.forceSetParent(player.playerScripts());
 				}
 				return;
 			}
