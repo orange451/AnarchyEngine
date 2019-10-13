@@ -338,6 +338,10 @@ public class Game implements Tickable {
 	}
 
 	public static void load() {
+		boolean didLoad = false;
+		if ( !loaded ) {
+			didLoad = true;
+		}
 		loaded = true;
 		
 		if ( resourceLoader == null )
@@ -358,7 +362,9 @@ public class Game implements Tickable {
 		}
 		
 		// Fire load event
-		loadEvent().fire();
+		if ( didLoad ) {
+			loadEvent().fire();
+		}
 	}
 
 	public static void runLater(Runnable object) {

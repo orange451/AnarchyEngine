@@ -9,6 +9,7 @@ import engine.InternalGameThread;
 import engine.InternalRenderThread;
 import engine.gl.Pipeline;
 import engine.glv2.GLRenderer;
+import engine.io.Load;
 import engine.lua.type.object.services.UserInputService;
 import lwjgui.LWJGUI;
 import lwjgui.event.ScrollEvent;
@@ -67,15 +68,19 @@ public abstract class Runner extends RenderableApplication {
 			uis.onMouseScroll(((ScrollEvent)event).y > 0 ? 3 : 4 );
 		});
 		
-		// Load the scene
-		loadScene(args);
-		
 		// Tell the game to run
 		InternalGameThread.runLater(()->{
-			Game.setRunning(true);
 			
 			// On first render, throw out an update.
 			InternalRenderThread.runLater(()->{
+				loadScene(args);
+				Game.setRunning(true);
+				Game.load();
+				
+				InternalGameThread.runLater(()->{
+					Game.load();
+				});
+				
 				Game.getGame().gameUpdate(true);
 			});
 		});
