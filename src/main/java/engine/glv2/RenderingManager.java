@@ -71,9 +71,9 @@ public class RenderingManager {
 		}
 	}
 
-	public void render(Camera camera, Matrix4f projection) {
+	public void render(IRenderingData rd, RendererData rnd) {
 		for (Entry<IObjectRenderer> rendererEntry : objectRenderers)
-			rendererEntry.value.render(camera, projection);
+			rendererEntry.value.render(rd, rnd);
 	}
 
 	public void renderReflections(IRenderingData rd, RendererData rnd, CubeMapCamera cubeCamera) {

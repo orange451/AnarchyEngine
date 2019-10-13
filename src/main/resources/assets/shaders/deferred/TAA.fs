@@ -34,8 +34,13 @@ uniform mat4 inverseViewMatrix;
 uniform mat4 previousViewMatrix;
 uniform sampler2D depth;
 
+uniform bool useTAA;
+
 void main() {
 	out_Color = texture(image, textureCoords);
+	out_Color.a = 1;
+	if (!useTAA)
+		return;
 	vec3 neighbourhood[9];
 
 	neighbourhood[0] = texture(image, textureCoords + vec2(-1, -1) * pixelSize).xyz;
@@ -83,7 +88,6 @@ void main() {
 
 	vec3 curSample = neighbourhood[4];
 	out_Color.rgb = mix(histSample, curSample, vec3(blend));
-	out_Color.a = 1;
 
-//	out_Color.rgb = vec3(vel.x, 0, vel.y);
+	//	out_Color.rgb = vec3(vel.x, 0, vel.y);
 }

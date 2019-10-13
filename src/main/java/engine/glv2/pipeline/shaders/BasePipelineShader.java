@@ -44,13 +44,15 @@ public class BasePipelineShader extends ShaderProgram {
 	private UniformBoolean useChromaticAberration = new UniformBoolean("useChromaticAberration");
 	private UniformBoolean useLensFlares = new UniformBoolean("useLensFlares");
 	private UniformBoolean useShadows = new UniformBoolean("useShadows");
+	private UniformBoolean useTAA = new UniformBoolean("useTAA");
 
 	private UniformInteger frame = new UniformInteger("frame");
 
 	public BasePipelineShader(String path) {
 		super("assets/shaders/" + path + ".vs", "assets/shaders/" + path + ".fs", new Attribute(0, "position"));
 		super.storeUniforms(resolution, shadowDrawDistance, useFXAA, useDOF, useMotionBlur, useReflections,
-				useVolumetricLight, useAmbientOcclusion, useChromaticAberration, useLensFlares, useShadows, frame);
+				useVolumetricLight, useAmbientOcclusion, useChromaticAberration, useLensFlares, useShadows, frame,
+				useTAA);
 		super.validate();
 	}
 
@@ -65,6 +67,7 @@ public class BasePipelineShader extends ShaderProgram {
 		this.useChromaticAberration.loadBoolean(rs.chromaticAberrationEnabled);
 		this.useLensFlares.loadBoolean(rs.lensFlaresEnabled);
 		this.useShadows.loadBoolean(rs.shadowsEnabled);
+		this.useTAA.loadBoolean(rs.taaEnabled);
 	}
 
 	public void loadFrame(int frame) {

@@ -37,6 +37,8 @@ uniform mat4 viewMatrix;
 uniform mat4 jitterMatrix;
 uniform int frame;
 
+uniform bool useTAA;
+
 uniform mat4 boneMat[MAX_BONES];
 
 void main() {
@@ -50,8 +52,12 @@ void main() {
 
 	vec4 worldPosition = transformationMatrix * BToP;
 	vec4 positionRelativeToCam = viewMatrix * worldPosition;
-	vec4 preJitter = projectionMatrix * positionRelativeToCam;
-	gl_Position = jitterMatrix * preJitter;
+	if (useTAA) {
+		vec4 preJitter = projectionMatrix * positionRelativeToCam;
+		gl_Position = jitterMatrix * preJitter;
+	} else {
+		gl_Position = projectionMatrix * positionRelativeToCam;
+	}
 	pass_textureCoords = textureCoords;
 
 	vec3 t;

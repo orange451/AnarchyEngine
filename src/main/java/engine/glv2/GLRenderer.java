@@ -104,7 +104,7 @@ public class GLRenderer implements IPipeline {
 	private Camera currentCamera;
 	private Sun sun;
 
-	private RenderingSettings rs;
+	private RenderingSettings renderingSettings;
 
 	private RendererData rnd;
 
@@ -129,7 +129,7 @@ public class GLRenderer implements IPipeline {
 		loader = new GLResourceLoader();
 		sun = new Sun();
 		rd = new IRenderingData();
-		rs = new RenderingSettings();
+		renderingSettings = new RenderingSettings();
 		pointLightHandler = new PointLightHandler();
 		glEnable(GL_DEPTH_TEST);
 		glEnable(GL_CULL_FACE);
@@ -172,7 +172,7 @@ public class GLRenderer implements IPipeline {
 		renderingManager.addRenderer(new InstanceRenderer());
 		renderingManager.addRenderer(new AnimInstanceRenderer());
 		handlesRenderer = new HandlesRenderer();
-		rnd.dlsm = dlsm = new DirectionalLightShadowMap(rs.shadowsResolution);
+		rnd.dlsm = dlsm = new DirectionalLightShadowMap(renderingSettings.shadowsResolution);
 		dp = new MultiPass(RenderableApplication.windowWidth, RenderableApplication.windowHeight);
 		pp = new PostProcess(RenderableApplication.windowWidth, RenderableApplication.windowHeight);
 		width = RenderableApplication.windowWidth;
@@ -186,6 +186,7 @@ public class GLRenderer implements IPipeline {
 				RenderableApplication.windowHeight);
 		rnd.plh = pointLightHandler;
 		rnd.dlh = directionalLightHandler;
+		rnd.rs = renderingSettings;
 		size.set(RenderableApplication.windowWidth, RenderableApplication.windowHeight);
 		enabled = true;
 	}
@@ -194,7 +195,7 @@ public class GLRenderer implements IPipeline {
 		// TODO: Render transparent shadows using an extra texture
 		SunCamera sunCamera = sun.getCamera();
 		sunCamera.setPosition(currentCamera.getPosition().getInternal());
-		if (rs.shadowsEnabled) {
+		if (renderingSettings.shadowsEnabled) {
 			GPUProfiler.start("Shadow Pass");
 			sunCamera.switchProjectionMatrix(0);
 			// frustum.calculateFrustum(sunCamera);
@@ -265,7 +266,7 @@ public class GLRenderer implements IPipeline {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		// gbufferPass.gBufferPass(camera);
 		GPUProfiler.start("RenderingManager");
-		renderingManager.render(currentCamera, projMatrix);
+		renderingManager.render(rd, rnd);
 		GPUProfiler.end();
 		// waterRenderer.render(rd.getEngine().getEntitiesFor(waterFam), camera,
 		// worldSimulation.getGlobalTime(), frustum);
@@ -283,10 +284,10 @@ public class GLRenderer implements IPipeline {
 
 	private void deferredPass() {
 		GPUProfiler.start("Lighting");
-		directionalLightHandler.render(currentCamera, projMatrix, dp, rs);
+		directionalLightHandler.render(currentCamera, projMatrix, dp, renderingSettings);
 		GPUProfiler.end();
 		GPUProfiler.start("Deferred Pass");
-		dp.process(rs, rnd, rd);
+		dp.process(rnd, rd);
 		GPUProfiler.end();
 	}
 
@@ -319,7 +320,7 @@ public class GLRenderer implements IPipeline {
 
 	private void postFXPass() {
 		GPUProfiler.start("PostFX");
-		pp.process(rs, rnd, rd);
+		pp.process(rnd, rd);
 		GPUProfiler.end();
 	}
 

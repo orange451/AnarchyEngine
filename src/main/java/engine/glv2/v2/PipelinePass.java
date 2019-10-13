@@ -31,7 +31,6 @@ import org.joml.Vector2f;
 
 import engine.glv2.GPUProfiler;
 import engine.glv2.RendererData;
-import engine.glv2.RenderingSettings;
 import engine.glv2.objects.Framebuffer;
 import engine.glv2.objects.Texture;
 import engine.glv2.objects.VAO;
@@ -70,14 +69,14 @@ public abstract class PipelinePass<T extends BasePipelineShader, P> {
 		shader.stop();
 	}
 
-	public void process(RenderingSettings rs, RendererData rnd, IRenderingData rd, P pl, Texture[] auxTex, VAO quad) {
+	public void process(RendererData rnd, IRenderingData rd, P pl, Texture[] auxTex, VAO quad) {
 		frameCont += 1;
 		frameCont %= Integer.MAX_VALUE;
 		GPUProfiler.start(name);
 		mainBuf.bind();
 		glClear(GL_COLOR_BUFFER_BIT);
 		shader.start();
-		shader.loadSettings(rs);
+		shader.loadSettings(rnd.rs);
 		shader.loadFrame(frameCont);
 		setupShaderData(rnd, rd, shader);
 		setupTextures(rnd, pl, auxTex);

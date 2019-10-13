@@ -32,7 +32,6 @@ import engine.glv2.v2.IRenderingData;
 import engine.glv2.v2.lights.DirectionalLightCamera;
 import engine.lua.type.object.Instance;
 import engine.lua.type.object.insts.AnimationController;
-import engine.lua.type.object.insts.Camera;
 import engine.lua.type.object.insts.GameObject;
 import engine.lua.type.object.insts.Material;
 
@@ -66,11 +65,11 @@ public class AnimInstanceRenderer implements IObjectRenderer {
 	}
 
 	@Override
-	public void render(Camera camera, Matrix4f projection) {
+	public void render(IRenderingData rd, RendererData rnd) {
 		glGetIntegerv(GL_VIEWPORT, viewport);
 		resolution.set(viewport[2], viewport[3]);
 		shader.start();
-		shader.loadCamera(camera, projection, resolution);
+		shader.loadCamera(rd.camera, rd.projectionMatrix, resolution, rnd.rs.taaEnabled);
 		for (Instance instance : instances) {
 			renderInstance(instance);
 		}

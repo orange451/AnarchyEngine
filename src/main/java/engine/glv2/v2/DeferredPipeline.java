@@ -20,6 +20,7 @@
 
 package engine.glv2.v2;
 
+import static org.lwjgl.opengl.GL11C.GL_COLOR_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11C.GL_DEPTH_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11C.GL_DEPTH_COMPONENT;
 import static org.lwjgl.opengl.GL11C.GL_DEPTH_TEST;
@@ -54,7 +55,7 @@ import static org.lwjgl.opengl.GL30C.GL_DRAW_FRAMEBUFFER;
 import static org.lwjgl.opengl.GL30C.GL_READ_FRAMEBUFFER;
 import static org.lwjgl.opengl.GL30C.GL_RG;
 import static org.lwjgl.opengl.GL30C.GL_RGB16F;
-import static org.lwjgl.opengl.GL30C.*;
+import static org.lwjgl.opengl.GL30C.GL_RGB32F;
 import static org.lwjgl.opengl.GL30C.GL_RGBA16F;
 import static org.lwjgl.opengl.GL30C.glBindFramebuffer;
 import static org.lwjgl.opengl.GL30C.glBlitFramebuffer;
@@ -63,14 +64,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import engine.glv2.RendererData;
-import engine.glv2.RenderingSettings;
 import engine.glv2.objects.Framebuffer;
 import engine.glv2.objects.FramebufferBuilder;
 import engine.glv2.objects.Texture;
 import engine.glv2.objects.TextureBuilder;
 import engine.glv2.objects.VAO;
 import engine.glv2.shaders.FinalShader;
-
 
 public abstract class DeferredPipeline {
 
@@ -121,11 +120,11 @@ public abstract class DeferredPipeline {
 		main.unbind();
 	}
 
-	public void process(RenderingSettings rs, RendererData rnd, IRenderingData rd) {
+	public void process(RendererData rnd, IRenderingData rd) {
 		glDisable(GL_DEPTH_TEST);
 		quad.bind(0);
 		for (DeferredPass<?> pass : passes)
-			pass.process(rs, rnd, rd, this, auxTex, quad);
+			pass.process(rnd, rd, this, auxTex, quad);
 		quad.unbind(0);
 		glEnable(GL_DEPTH_TEST);
 	}

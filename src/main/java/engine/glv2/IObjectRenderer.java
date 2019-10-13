@@ -22,20 +22,17 @@ package engine.glv2;
 
 import java.util.List;
 
-import org.joml.Matrix4f;
-
 import engine.glv2.entities.CubeMapCamera;
 import engine.glv2.entities.SunCamera;
 import engine.glv2.v2.IRenderingData;
 import engine.glv2.v2.lights.DirectionalLightCamera;
 import engine.lua.type.object.Instance;
-import engine.lua.type.object.insts.Camera;
 
 public interface IObjectRenderer {
 
 	public void preProcess(List<Instance> instances);
 
-	public void render(Camera camera, Matrix4f projection);
+	public void render(IRenderingData rd, RendererData rnd);
 
 	public void renderReflections(IRenderingData rd, RendererData rnd, CubeMapCamera cubeCamera);
 

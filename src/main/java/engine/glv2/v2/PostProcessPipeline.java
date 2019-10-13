@@ -50,7 +50,6 @@ import java.util.List;
 
 import engine.gl.Surface;
 import engine.glv2.RendererData;
-import engine.glv2.RenderingSettings;
 import engine.glv2.objects.Framebuffer;
 import engine.glv2.objects.FramebufferBuilder;
 import engine.glv2.objects.Texture;
@@ -71,7 +70,7 @@ public abstract class PostProcessPipeline {
 	private VAO quad;
 
 	private FinalShader finalShader;
-	
+
 	private Surface finalSurface;
 
 	public PostProcessPipeline(int width, int height) {
@@ -107,11 +106,11 @@ public abstract class PostProcessPipeline {
 		main.unbind();
 	}
 
-	public void process(RenderingSettings rs, RendererData rnd, IRenderingData rd) {
+	public void process(RendererData rnd, IRenderingData rd) {
 		glDisable(GL_DEPTH_TEST);
 		quad.bind(0);
 		for (PostProcesPass<?> pass : passes)
-			pass.process(rs, rnd, rd, this, auxTex, quad);
+			pass.process(rnd, rd, this, auxTex, quad);
 		quad.unbind(0);
 		glEnable(GL_DEPTH_TEST);
 	}
@@ -196,7 +195,7 @@ public abstract class PostProcessPipeline {
 	public Texture getDepthTex() {
 		return depthTex;
 	}
-	
+
 	public Surface getFinalSurface() {
 		return finalSurface;
 	}

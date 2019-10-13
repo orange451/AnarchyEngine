@@ -39,5 +39,6 @@ public class RendererData {
 	public Vector3f previousCameraPosition = new Vector3f();
 	public PointLightHandler plh;
 	public DirectionalLightHandler dlh;
+	public RenderingSettings rs;
 
 }

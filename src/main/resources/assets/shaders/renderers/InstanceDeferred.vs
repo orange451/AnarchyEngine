@@ -33,11 +33,18 @@ uniform mat4 viewMatrix;
 uniform mat4 jitterMatrix;
 uniform int frame;
 
+uniform bool useTAA;
+
 void main() {
 	vec4 worldPosition = transformationMatrix * vec4(position, 1.0);
 	vec4 positionRelativeToCam = viewMatrix * worldPosition;
 	vec4 preJitter = projectionMatrix * positionRelativeToCam;
-	gl_Position = jitterMatrix * preJitter;
+	if (useTAA) {
+		vec4 preJitter = projectionMatrix * positionRelativeToCam;
+		gl_Position = jitterMatrix * preJitter;
+	} else {
+		gl_Position = projectionMatrix * positionRelativeToCam;
+	}
 
 	pass_textureCoords = textureCoords;
 	
