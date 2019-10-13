@@ -146,7 +146,11 @@ public class Camera extends Instance implements TreeViewable {
 	}
 	
 	public Matrix4 getViewMatrix() {
-		return (Matrix4)this.get(C_VIEWMATRIX);
+		LuaValue viewMat = this.get(C_VIEWMATRIX);
+		if ( viewMat.isnil() )
+			return new Matrix4();
+		
+		return (Matrix4)viewMat;
 	}
 
 	public void setYaw( float yaw ) {

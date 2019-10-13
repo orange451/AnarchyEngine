@@ -19,7 +19,6 @@ import engine.lua.type.object.Instance;
 import engine.lua.type.object.Service;
 import engine.lua.type.object.TreeViewable;
 import engine.lua.type.object.insts.Connection;
-import engine.lua.type.object.insts.GameObject;
 import ide.layout.windows.icons.Icons;
 
 public class Connections extends Service implements TreeViewable,GameSubscriber {
@@ -30,6 +29,8 @@ public class Connections extends Service implements TreeViewable,GameSubscriber 
 	
 	private static final LuaValue C_DEFAULTPORT = LuaValue.valueOf("DefaultPort");
 	private static final LuaValue C_LOCALCONNECTION = LuaValue.valueOf("LocalConnection");
+	private static final LuaValue C_ONCONNECT = LuaValue.valueOf("OnConnect");
+	private static final LuaValue C_ONDISCONNECT = LuaValue.valueOf("OnDisconnect");
 	
 	public Connections() {
 		super("Connections");
@@ -39,8 +40,8 @@ public class Connections extends Service implements TreeViewable,GameSubscriber 
 		
 		this.setArchivable(true);
 		
-		this.rawset("OnConnect", new LuaEvent());
-		this.rawset("OnDisconnect", new LuaEvent());
+		this.rawset(C_ONCONNECT, new LuaEvent());
+		this.rawset(C_ONDISCONNECT, new LuaEvent());
 		
 		this.getmetatable().set("ConnectTo", new VarArgFunction() {
 			@Override
@@ -84,7 +85,7 @@ public class Connections extends Service implements TreeViewable,GameSubscriber 
 			@Override
 			public LuaValue call(LuaValue object) {
 				if ( object instanceof Connection ) {
-					((LuaEvent)Connections.this.get("OnConnect")).fire( object );
+					((LuaEvent)Connections.this.get(C_ONCONNECT)).fire( object );
 				}
 				return LuaValue.NIL;
 			}
@@ -94,7 +95,7 @@ public class Connections extends Service implements TreeViewable,GameSubscriber 
 			@Override
 			public LuaValue call(LuaValue object) {
 				if ( object instanceof Connection ) {
-					((LuaEvent)Connections.this.get("OnDisconnect")).fire( object );
+					((LuaEvent)Connections.this.get(C_ONDISCONNECT)).fire( object );
 				}
 				return LuaValue.NIL;
 			}

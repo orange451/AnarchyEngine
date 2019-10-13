@@ -36,7 +36,7 @@ public class IDE extends RenderableApplication {
 		win.setWindowAutoClear(false); // We want control of clearing
 		
 		InternalRenderThread.desiredFPS = 60;
-		InternalGameThread.desiredTPS = 30;
+		InternalGameThread.desiredTPS = 60;
 		
 		// Setup background pane
 		Pane background = new Pane();
@@ -80,8 +80,10 @@ public class IDE extends RenderableApplication {
 				Load.load(tempArgs[0]);
 				InternalRenderThread.runLater(()->{
 					InternalGameThread.runLater(() -> {
-						Game.setRunning(true);
-						InternalGameThread.desiredTPS = 60;
+						InternalRenderThread.runLater(()->{
+							Game.setRunning(true);
+							InternalGameThread.desiredTPS = 60;
+						});
 					});
 				});
 			}

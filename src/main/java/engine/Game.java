@@ -2,14 +2,10 @@ package engine;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.luaj.vm2.LuaValue;
-import org.luaj.vm2.lib.OneArgFunction;
-import org.luaj.vm2.lib.TwoArgFunction;
-
 import engine.io.AsynchronousResourceLoader;
 import engine.io.Save;
 import engine.lua.LuaEngine;
@@ -500,9 +496,11 @@ public class Game implements Tickable {
 				sc.forceSetParent(p);
 				
 				// Simulate a client connection
-				ClientConnectFinishTCP finishCon = new ClientConnectFinishTCP();
-				finishCon.SID = p.getSID();
-				finishCon.clientProcess(null);
+				if ( internalTesting ) {
+					ClientConnectFinishTCP finishCon = new ClientConnectFinishTCP();
+					finishCon.SID = p.getSID();
+					finishCon.clientProcess(null);
+				}
 				
 				// Set him as local
 				new engine.lua.network.internal.protocol.ClientConnectFinishTCP().clientProcess(null);
@@ -555,5 +553,9 @@ public class Game implements Tickable {
 	
 	public static LuaEvent startEvent() {
 		return ((LuaEvent)LuaEngine.globals.get("game").get("Started"));
+	}
+
+	public static void setLoaded(boolean loaded) {
+		Game.loaded = loaded;
 	}
 }

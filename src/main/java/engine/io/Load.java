@@ -230,7 +230,7 @@ public class Load {
 				Object SIDRef = ((JSONObject)obj.get("Properties")).get("SID");
 				if ( SIDRef != null ) {
 					Instance inGame = Game.getInstanceFromSID(Long.parseLong(SIDRef.toString()));
-					if ( inGame != null && !inGame.isDestroyed() ) {
+					if ( inGame != null && !inGame.isDestroyed() && inGame.getClassName().eq_b(LuaValue.valueOf(root.ClassName)) ) {
 						root.instance = inGame;
 					} else {
 						root.instance = (Instance) Instance.instance(root.ClassName);

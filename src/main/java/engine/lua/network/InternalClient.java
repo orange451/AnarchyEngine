@@ -23,7 +23,6 @@ import engine.lua.network.internal.protocol.ClientConnectFinishTCP;
 import engine.lua.network.internal.protocol.ClientConnectTCP;
 import engine.lua.network.internal.protocol.ClientLoadMapTCP;
 import engine.lua.type.object.services.Connections;
-import engine.lua.type.object.services.GameLua;
 import ide.layout.windows.ErrorWindow;
 
 public class InternalClient extends Client {
@@ -76,26 +75,30 @@ public class InternalClient extends Client {
 								final JSONObject obj = (JSONObject) parser.parse(worldJSON);
 								
 								InternalGameThread.runLater(()->{
-									// Load new game data
-									if ( !Load.parseJSON(obj) )
-										return;
 									Game.unload();
 									Game.load();
-									
-									// Create connection object
-									connectionInstance = new engine.lua.type.object.insts.ServerConnection(connection);
-									connectionInstance.forceSetName("ConnectionServer");
-									connectionInstance.forceSetParent(Game.getService("Connections"));
-									Game.connections().rawset("LocalConnection", connectionInstance);
-									
-									// Tell server we're all loaded
+
 									InternalRenderThread.runLater(()->{
-										InternalGameThread.runLater(()->{
-											connection.sendTCP(new ClientConnectFinishTCP());
+										// Load new game data
+										if ( !Load.parseJSON(true, obj) )
+											return;
+										
+										// Tell server we're all loaded
+										InternalRenderThread.runLater(()->{
+											InternalGameThread.runLater(()->{
+												
+												// Create connection object
+												connectionInstance = new engine.lua.type.object.insts.ServerConnection(connection);
+												connectionInstance.forceSetName("ConnectionServer");
+												connectionInstance.forceSetParent(Game.getService("Connections"));
+												Game.connections().rawset("LocalConnection", connectionInstance);
+												
+												connection.sendTCP(new ClientConnectFinishTCP());
+												
+												Game.setRunning(true);
+											});
 										});
 									});
-									
-									Game.setRunning(true);
 								});
 								
 							} catch (Exception e) {
