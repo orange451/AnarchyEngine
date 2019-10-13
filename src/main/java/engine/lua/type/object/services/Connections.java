@@ -151,7 +151,7 @@ public class Connections extends Service implements TreeViewable,GameSubscriber 
 		} else {
 			if ( !enabled ) {
 				enabled = true;
-				if ( Game.isServer() || Game.internalTesting ) {
+				if ( Game.isServer() && !Game.internalTesting ) {
 					int port = Connections.this.get(C_DEFAULTPORT).toint();
 					internalServer = new InternalServer(port);
 				}
