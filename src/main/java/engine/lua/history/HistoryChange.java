@@ -17,7 +17,7 @@ public class HistoryChange {
 		this.instanceChanged.update();
 	}
 	
-	public HistoryObjectReference getInstance() {
+	public HistoryObjectReference getHistoryInstance() {
 		return this.instanceChanged;
 	}
 	

@@ -300,8 +300,8 @@ public class IdeExplorer extends IdePane implements GameSubscriber {
 					return;
 				Game.copiedInstance = t;
 				LuaValue p = inst.getParent();
-				inst.destroy();
 				Game.historyService().pushChange(inst, LuaValue.valueOf("Parent"), p, LuaValue.NIL);
+				inst.destroy();
 			}
 		});
 		c.getItems().add(cut);

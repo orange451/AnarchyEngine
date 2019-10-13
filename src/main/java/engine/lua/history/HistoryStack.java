@@ -62,13 +62,18 @@ public class HistoryStack {
 		// Undo ALL changes in the snapshot.
 		for (int i = 0; i < snapshot.changes.size(); i++) {
 			HistoryChange change = snapshot.changes.get(i);
+			if ( change == null )
+				continue;
 			
-			Instance object = change.getInstance().getInstance();
+			Instance object = change.getHistoryInstance().getInstance();
+			if ( object == null )
+				continue;
+			
 			object.forceset(change.getFieldChanged(), change.getValueOld());
 			object.set(change.getFieldChanged(), change.getValueOld());
 			
 			System.out.println("UNDO: " + object.getName() + "." + change.getFieldChanged() + " --> " + change.getValueOld());
-			change.getInstance().update();
+			change.getHistoryInstance().update();
 		}
 		
 		// Decrease snapshot index
@@ -94,7 +99,7 @@ public class HistoryStack {
 		for (int i = 0; i < snapshot.changes.size(); i++) {
 			HistoryChange change = snapshot.changes.get(i);
 			
-			Instance object = change.getInstance().getInstance();
+			Instance object = change.getHistoryInstance().getInstance();
 			object.forceset(change.getFieldChanged(), change.getValueNew());
 		}
 		busy = false;

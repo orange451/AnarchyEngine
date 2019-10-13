@@ -23,7 +23,7 @@ public class HistoryObjectReference {
 	}
 	
 	public Instance getInstance() {
-		if ( object.isDestroyed() ) {
+		if ( object == null || object.isDestroyed() ) {
 			object = Instance.instance(className);
 			historyStack.updateReference(object, this);
 			

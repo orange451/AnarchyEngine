@@ -57,7 +57,7 @@ public class PointLight extends LightBase implements TreeViewable {
 		});
 		
 		InternalGameThread.runLater(()->{
-			onParentChange();
+			//onParentChange();
 		});
 	}
 	
@@ -114,38 +114,38 @@ public class PointLight extends LightBase implements TreeViewable {
 	}
 	
 	private void destroyLight() {
-		if ( light != null ) {
-			if ( pipeline != null ) {
-				InternalRenderThread.runLater(()->{
-					//pipeline.getPointLightHandler().removeLight(light);
-					light = null;
-					pipeline = null;
-				});
-			}
+		InternalRenderThread.runLater(()->{
+			if ( light == null || pipeline == null )
+				return;
+			
+			pipeline.getPointLightHandler().removeLight(light);
+			light = null;
+			pipeline = null;
+
 			System.out.println("Destroyed light");
-		}
+		});
 	}
 	
-	private void makeLight() {
-		if ( pipeline == null )
-			return;
-		
-		if ( light != null )
-			return;
-		
-		// Create light
-		Vector3f pos = ((Vector3)this.get("Position")).toJoml();
-		float radius = this.get(C_RADIUS).tofloat();
-		float intensity = this.get("Intensity").tofloat();
-		light = new engine.gl.light.PointLightInternal(pos, radius, intensity);
-		
-		// Color it
-		Color color = ((Color3)this.get("Color")).toColor();
-		light.color = new Vector3f( Math.max( color.getRed(),1 )/255f, Math.max( color.getGreen(),1 )/255f, Math.max( color.getBlue(),1 )/255f );
-		
+	private void makeLight() {		
 		// Add it to pipeline
 		InternalRenderThread.runLater(()->{
-			//pipeline.getPointLightHandler().addLight(light);
+			if ( pipeline == null )
+				return;
+			
+			if ( light != null )
+				return;
+			
+			// Create light
+			Vector3f pos = ((Vector3)this.get("Position")).toJoml();
+			float radius = this.get(C_RADIUS).tofloat();
+			float intensity = this.get("Intensity").tofloat();
+			light = new engine.gl.light.PointLightInternal(pos, radius, intensity);
+			
+			// Color it
+			Color color = ((Color3)this.get("Color")).toColor();
+			light.color = new Vector3f( Math.max( color.getRed(),1 )/255f, Math.max( color.getGreen(),1 )/255f, Math.max( color.getBlue(),1 )/255f );
+			
+			pipeline.getPointLightHandler().addLight(light);
 		});
 	}
 	
