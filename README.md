@@ -19,8 +19,8 @@ For support, see: http://manta.games/
 # Screenshots
 ![pong](https://i.imgur.com/EBIDL8M.gif)
 ![editor1](https://i.imgur.com/fx1bRnx.png)
+![editor2](https://i.imgur.com/lt9aq8a.png)
 ![pbr](https://cdn.discordapp.com/attachments/541818498293170177/568638439914733580/unknown.png)
-![editor2](https://cdn.discordapp.com/attachments/511187289897173009/522436178088034305/unknown.png)
 
 # Setup (Using Java directly)
 1) Ensure the proper libraries are downloaded, and include them in your projects build path. Include the source to this project as well, or export it to a library.
