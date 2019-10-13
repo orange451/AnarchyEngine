@@ -95,31 +95,9 @@ public class Game implements Tickable {
 		
 		if ( Game.getService("StarterPlayer") == null )
 			new StarterPlayer().forceSetParent(Game.game());
-		
-		InternalGameThread.runLater(()->{
-			if ( Game.starterPlayer().findFirstChild("StarterPlayerScripts") == null ) {
-				StarterPlayerScripts pls = new StarterPlayerScripts();
-				pls.forceSetParent(Game.starterPlayer());
-			}
-		});
 
 		if ( Game.getService("Assets") == null )
 			new Assets().forceSetParent(Game.game());
-			
-		if ( Game.getService("Assets").findFirstChild("Prefabs") == null )
-			Assets.newPackage("Prefabs", Game.getService("Assets"));
-
-		if ( Game.getService("Assets").findFirstChild("Meshes") == null )
-			Assets.newPackage("Meshes", Game.getService("Assets"));
-
-		if ( Game.getService("Assets").findFirstChild("Materials") == null )
-			Assets.newPackage("Materials", Game.getService("Assets"));
-
-		if ( Game.getService("Assets").findFirstChild("Textures") == null )
-			Assets.newPackage("Textures", Game.getService("Assets"));
-
-		if ( Game.getService("Assets").findFirstChild("Audio") == null )
-			Assets.newPackage("Audio", Game.getService("Assets"));
 
 		if ( Game.getService("UserInputService") == null )
 			new UserInputService().forceSetParent(Game.game());
@@ -322,6 +300,26 @@ public class Game implements Tickable {
 				
 				// Register services (new blank project)
 				Game.services();
+				
+				if ( Game.starterPlayer().findFirstChild("StarterPlayerScripts") == null ) {
+					StarterPlayerScripts pls = new StarterPlayerScripts();
+					pls.forceSetParent(Game.starterPlayer());
+				}
+				
+				if ( Game.getService("Assets").findFirstChild("Prefabs") == null )
+					Assets.newPackage("Prefabs", Game.getService("Assets"));
+
+				if ( Game.getService("Assets").findFirstChild("Meshes") == null )
+					Assets.newPackage("Meshes", Game.getService("Assets"));
+
+				if ( Game.getService("Assets").findFirstChild("Materials") == null )
+					Assets.newPackage("Materials", Game.getService("Assets"));
+
+				if ( Game.getService("Assets").findFirstChild("Textures") == null )
+					Assets.newPackage("Textures", Game.getService("Assets"));
+
+				if ( Game.getService("Assets").findFirstChild("Audio") == null )
+					Assets.newPackage("Audio", Game.getService("Assets"));
 				
 				// Set changes to false, so we're not prompted with save dialog later.
 				InternalGameThread.runLater(()-> {

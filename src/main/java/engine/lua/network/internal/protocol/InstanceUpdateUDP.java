@@ -13,7 +13,6 @@ import engine.lua.network.internal.JSONUtil;
 import engine.lua.network.internal.ServerProcessable;
 import engine.lua.type.object.Instance;
 import engine.lua.type.object.PhysicsBase;
-import engine.lua.type.object.insts.PhysicsObject;
 import engine.lua.type.object.insts.Player;
 
 public class InstanceUpdateUDP implements ClientProcessable,ServerProcessable {
