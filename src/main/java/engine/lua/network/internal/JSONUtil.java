@@ -81,7 +81,7 @@ public class JSONUtil {
 			
 			if ( j.get(C_TYPE).equals(C_REFERENCE) ) {
 				long v = Long.parseLong(j.get(C_VALUE).toString());
-				return Game.getInstanceFromSID(Game.game(), v);
+				return Game.getInstanceFromSID(v);
 			}
 			
 			if ( j.get(C_TYPE).equals(C_DATATYPE) ) {

@@ -45,7 +45,7 @@ public class InstanceUpdateUDP implements ClientProcessable,ServerProcessable {
 	
 	@Override
 	public void serverProcess(Connection connection) {
-		Instance instance = Game.getInstanceFromSID(Game.game(), instanceId);
+		Instance instance = Game.getInstanceFromSID(instanceId);
 		if ( instance == null ) {
 			return;
 		}
@@ -100,7 +100,7 @@ public class InstanceUpdateUDP implements ClientProcessable,ServerProcessable {
 
 	@Override
 	public void clientProcess(Connection Connection) {
-		Instance instance = Game.getInstanceFromSID(Game.game(), instanceId);
+		Instance instance = Game.getInstanceFromSID(instanceId);
 		if ( instance == null )
 			return;
 		

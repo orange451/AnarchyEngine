@@ -7,7 +7,6 @@ import org.luaj.vm2.lib.OneArgFunction;
 import org.luaj.vm2.lib.TwoArgFunction;
 
 import engine.Game;
-import engine.lua.LuaEngine;
 import engine.lua.type.LuaEvent;
 import engine.lua.type.object.Instance;
 import engine.lua.type.object.Service;
@@ -77,6 +76,11 @@ public class GameLua extends Instance {
 		// LOCK HER UP
 		setLocked(true);
 		setInstanceable(false);
+	}
+	
+	@SuppressWarnings("unchecked")
+	public HashMap<Long, Instance> getInstanceMap() {
+		return (HashMap<Long, Instance>) createdInstances.clone();
 	}
 	
 	public String getName() {

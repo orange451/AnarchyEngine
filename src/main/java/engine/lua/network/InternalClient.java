@@ -77,7 +77,7 @@ public class InternalClient extends Client {
 								
 								InternalGameThread.runLater(()->{
 									// Load new game data
-									if ( !Load.parseJSON(Game.game(), obj) )
+									if ( !Load.parseJSON(obj) )
 										return;
 									Game.unload();
 									Game.load();

@@ -1,5 +1,7 @@
 package ide.layout;
 
+import org.json.simple.JSONObject;
+
 import engine.Game;
 import engine.InternalGameThread;
 import engine.application.impl.ClientApplication;
@@ -213,6 +215,7 @@ public class IdeLayout {
 			if ( !saved )
 				return;
 			
+			JSONObject gameJson = Save.getGameJSON();
 			Game.internalTesting = true;
 			Game.setRunning(true);
 			
@@ -231,7 +234,12 @@ public class IdeLayout {
 				// End Test
 				Game.internalTesting = false;
 				Game.setRunning(false);
-				Load.load(Game.saveFile);
+				
+				// Reload from stored JSON
+				Load.parseJSON(true, gameJson);
+				Game.load();
+				
+				// Make sure game isn't running
 				InternalGameThread.runLater(()->{
 					Game.setRunning(false);
 				});

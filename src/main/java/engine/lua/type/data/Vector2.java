@@ -219,8 +219,8 @@ public class Vector2 extends LuaValuetype {
 	@Override
 	public JSONObject toJSON() {
 		JSONObject j = new JSONObject();
-		j.put("X", this.getX());
-		j.put("Y", this.getY());
+		j.put("X", (double)this.getX());
+		j.put("Y", (double)this.getY());
 		return j;
 	}
 	

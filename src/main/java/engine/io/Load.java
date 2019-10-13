@@ -5,6 +5,7 @@ import java.io.FileReader;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -32,6 +33,7 @@ import ide.layout.windows.ErrorWindow;
 public class Load {
 	private static ArrayList<LoadedInstance> instances;
 	private static HashMap<Long, LoadedInstance> instancesMap;
+	private static HashMap<Long, Instance> unmodifiedInstances;
 	
 	public static void load() {
 		String path = "";
@@ -50,10 +52,10 @@ public class Load {
 	}
 	
 	public static void load(String path) {
-		load(Game.game(), path, true);
+		load(path, true);
 	}
 	
-	public static void load(GameLua game, String path, boolean reset) {
+	public static void load(String path, boolean reset) {
 		// Load from JSON file
 		boolean loadedJSON = false;
 		JSONObject obj = null;
@@ -82,25 +84,38 @@ public class Load {
 			Game.unload();
 		
 		// Load the json
-		if ( !parseJSON( game, obj) )
+		if ( !parseJSON(obj) )
 			return;
 		
 		// Tell game we're loaded
 		if ( reset )
 			Game.load();
 	}
-	
+
 	/**
-	 * Desearializes a JSONObject into Instances.
+	 * Desearializes a JSONObject(s) into Instances.
 	 * @param obj
 	 */
-	public static boolean parseJSON(GameLua game, JSONObject... obj) {
+	public static boolean parseJSON(JSONObject... obj) {
+		return parseJSON( false, obj );
+	}
+	
+	/**
+	 * Desearializes a JSONObject(s) into Instances.
+	 * @param removeUnusedInstances
+	 * @param obj
+	 * @return
+	 */
+	public static boolean parseJSON(boolean removeUnusedInstances, JSONObject... obj) {
 		// Read in the objects from JSON
 		instances = new ArrayList<LoadedInstance>();
 		instancesMap = new HashMap<>();
 		for ( int i = 0; i < obj.length; i++) {
-			readObjects( game, obj[i]);
+			readObjects( obj[i]);
 		}
+		
+		if ( removeUnusedInstances )
+			unmodifiedInstances = Game.game().getInstanceMap();
 		
 		try {
 			List<LoadedInstance> services = new ArrayList<LoadedInstance>();
@@ -109,7 +124,7 @@ public class Load {
 			for (int i = 0; i < instances.size(); i++) {
 				LoadedInstance inst = instances.get(i);
 				if ( inst.instance instanceof Service ) {
-					loadObject(game, inst);
+					loadObject(inst);
 					services.add(inst);
 				}
 			}
@@ -117,7 +132,7 @@ public class Load {
 			// Correct instances (properties and such)
 			for (int i = 0; i < instances.size(); i++) {
 				LoadedInstance inst = instances.get(i);
-				loadObject(game, inst);
+				loadObject(inst);
 			}
 			
 	
@@ -125,9 +140,13 @@ public class Load {
 			for (int i = 0; i < instances.size(); i++) {
 				LoadedInstance inst = instances.get(i);
 				long parent = inst.Parent;
+				
+				// Remove reference to unused
+				if ( removeUnusedInstances )
+					unmodifiedInstances.remove(inst.instance.getSID());
 
 				if ( parent != -1 && inst.loaded ) {
-					Instance p = getInstanceFromReference(game, parent);
+					Instance p = getInstanceFromReference(parent);
 					//if ( !inst.instance.getParent().equals(p) ) {
 						inst.instance.forceSetParent(p);
 						//System.out.println("Setting parent of: " + inst.instance + "\tto\t" + p);
@@ -138,7 +157,20 @@ public class Load {
 			// Parent services
 			for (int i = 0; i < services.size(); i++) {
 				LoadedInstance inst = services.get(i);
-				inst.instance.forceSetParent(game);
+				inst.instance.forceSetParent(Game.game());
+			}
+			
+			// Delete unused instances
+			if ( removeUnusedInstances ) {
+				Set<Entry<Long, Instance>> insts = unmodifiedInstances.entrySet();
+				Iterator<Entry<Long, Instance>> iterator = insts.iterator();
+				while ( iterator.hasNext() ) {
+					Entry<Long, Instance> entry = iterator.next();
+					Instance t = entry.getValue();
+					if ( !t.isDestroyed() ) {
+						t.destroy();
+					}
+				}
 			}
 			
 			return true;
@@ -150,7 +182,7 @@ public class Load {
 		return false;
 	}
 
-	private static void loadObject(GameLua game, LoadedInstance inst) {
+	private static void loadObject(LoadedInstance inst) {
 		if ( inst.loaded )
 			return;
 		
@@ -170,7 +202,7 @@ public class Load {
 			Object value = p.getValue();
 			if ( p.pointer ) {
 				int pointer = ((Integer) value).intValue();
-				value = getInstanceFromReference(game, pointer);
+				value = getInstanceFromReference(pointer);
 			}
 			
 			if ( value != null ) {
@@ -183,7 +215,7 @@ public class Load {
 		}
 	}
 
-	private static void readObjects(GameLua game, JSONObject obj) {
+	private static void readObjects(JSONObject obj) {
 		LoadedInstance root = new LoadedInstance();
 		root.ClassName = (String) obj.get("ClassName");
 		root.Name = (String) obj.get("Name");
@@ -191,11 +223,21 @@ public class Load {
 		root.Parent = loadReference("Parent",obj);
 		
 		if ( root.ClassName.equals("Game") ) {
-			root.instance = game;
+			root.instance = Game.game();
 		} else {
-			LuaValue temp = game.get(root.ClassName);
+			LuaValue temp = Game.game().get(root.ClassName);
 			if ( temp.isnil() ) {
-				root.instance = (Instance) Instance.instance(root.ClassName);
+				Object SIDRef = ((JSONObject)obj.get("Properties")).get("SID");
+				if ( SIDRef != null ) {
+					Instance inGame = Game.getInstanceFromSID(Long.parseLong(SIDRef.toString()));
+					if ( inGame != null ) {
+						root.instance = inGame;
+					} else {
+						root.instance = (Instance) Instance.instance(root.ClassName);
+					}
+				} else {
+					root.instance = (Instance) Instance.instance(root.ClassName);
+				}
 			} else {
 				root.instance = (Instance) temp;
 			}
@@ -217,25 +259,25 @@ public class Load {
 		
 		JSONArray children = (JSONArray) obj.get("Children");
 		for (int i = 0; i < children.size(); i++) {
-			readObjects(game, (JSONObject) children.get(i));
+			readObjects( (JSONObject) children.get(i));
 		}
 	}
 	
 	private static long loadReference(String field, JSONObject obj) {
 		JSONObject r = (JSONObject) obj.get(field);
 		if ( r != null && r.get("Type").equals("Reference") ) {
-			return Long.parseLong(""+r.get("Value"));
+			return Long.parseLong(r.get("Value").toString());
 		}
 		return -1;
 	}
 	
-	protected static Instance getInstanceFromReference(GameLua game, long ref) {
+	protected static Instance getInstanceFromReference(long ref) {
 		LoadedInstance loaded = instancesMap.get(ref);
 		if ( loaded != null )
 			return loaded.instance;
 		
 		// Now search for instance by SID if it wasn't found before.
-		return Game.getInstanceFromSID(game, ref);
+		return Game.getInstanceFromSID(ref);
 	}
 	
 	static class LoadedInstance {

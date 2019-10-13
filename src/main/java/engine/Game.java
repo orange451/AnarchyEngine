@@ -282,10 +282,10 @@ public class Game implements Tickable {
 		return loaded;
 	}
 	
-	public static Instance getInstanceFromSID(GameLua game, long sid) {
+	public static Instance getInstanceFromSID(long sid) {
 		if ( sid == -1 ) 
 			return null;
-		return game.createdInstances.get(sid);
+		return game().createdInstances.get(sid);
 	}
 
 	public static void unload() {
@@ -353,12 +353,14 @@ public class Game implements Tickable {
 		
 		System.out.println("Game Loaded");
 		
+		// Ensure services are loaded
 		List<Service> children = Game.getServices();
 		for (int i = 0; i < children.size(); i++) {
 			Instance c = children.get(i);
 			game().createdInstances.put( c.getSID(), c);
 		}
 		
+		// Fire load event
 		loadEvent().fire();
 	}
 
@@ -486,7 +488,7 @@ public class Game implements Tickable {
 		
 		if (running) {
 			// Create local player
-			if ( !Game.isServer() && Game.players().getLocalPlayer() == null ) {
+			if ( !Game.isServer() && Game.players().getLocalPlayer() == null || internalTesting ) {
 				
 				// Create the player
 				Player p = new Player();

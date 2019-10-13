@@ -248,22 +248,22 @@ public class Matrix4 extends LuaValuetype {
 	@Override
 	public JSONObject toJSON() {
 		JSONObject j = new JSONObject();
-		j.put("m00", internal.m00());
-		j.put("m01", internal.m01());
-		j.put("m02", internal.m02());
-		j.put("m03", internal.m03());
-		j.put("m10", internal.m10());
-		j.put("m11", internal.m11());
-		j.put("m12", internal.m12());
-		j.put("m13", internal.m13());
-		j.put("m20", internal.m20());
-		j.put("m21", internal.m21());
-		j.put("m22", internal.m22());
-		j.put("m23", internal.m23());
-		j.put("m30", internal.m30());
-		j.put("m31", internal.m31());
-		j.put("m32", internal.m32());
-		j.put("m33", internal.m33());
+		j.put("m00", (double)internal.m00());
+		j.put("m01", (double)internal.m01());
+		j.put("m02", (double)internal.m02());
+		j.put("m03", (double)internal.m03());
+		j.put("m10", (double)internal.m10());
+		j.put("m11", (double)internal.m11());
+		j.put("m12", (double)internal.m12());
+		j.put("m13", (double)internal.m13());
+		j.put("m20", (double)internal.m20());
+		j.put("m21", (double)internal.m21());
+		j.put("m22", (double)internal.m22());
+		j.put("m23", (double)internal.m23());
+		j.put("m30", (double)internal.m30());
+		j.put("m31", (double)internal.m31());
+		j.put("m32", (double)internal.m32());
+		j.put("m33", (double)internal.m33());
 		return j;
 	}
 	

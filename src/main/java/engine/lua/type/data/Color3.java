@@ -252,9 +252,9 @@ public class Color3 extends LuaValuetype {
 	@Override
 	public JSONObject toJSON() {
 		JSONObject j = new JSONObject();
-		j.put("R", this.getR());
-		j.put("G", this.getG());
-		j.put("B", this.getB());
+		j.put("R", (long)this.getR());
+		j.put("G", (long)this.getG());
+		j.put("B", (long)this.getB());
 		return j;
 	}
 	

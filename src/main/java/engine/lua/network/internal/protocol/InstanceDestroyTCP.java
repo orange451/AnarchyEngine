@@ -19,7 +19,7 @@ public class InstanceDestroyTCP implements ClientProcessable {
 
 	@Override
 	public void clientProcess(Connection Connection) {
-		Instance instance = Game.getInstanceFromSID(Game.game(), instanceId);
+		Instance instance = Game.getInstanceFromSID(instanceId);
 		if ( instance != null )
 			instance.destroy();
 	}
