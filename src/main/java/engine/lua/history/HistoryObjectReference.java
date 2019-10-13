@@ -22,6 +22,10 @@ public class HistoryObjectReference {
 		this.historyStack = historyStack;
 	}
 	
+	public HistoryStack getHistoryStack() {
+		return this.historyStack;
+	}
+	
 	public Instance getInstance() {
 		if ( object == null || object.isDestroyed() ) {
 			object = Instance.instance(className);

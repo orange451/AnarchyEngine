@@ -348,7 +348,7 @@ public abstract class DataModel extends LuaDatatype {
 			}
 			
 			// Add self to new parent
-			if ( newParent instanceof Instance ) {
+			if ( newParent instanceof Instance && !((Instance)newParent).isDestroyed() ) {
 				Instance newParInst = (Instance) newParent;
 				
 				// Add to children list

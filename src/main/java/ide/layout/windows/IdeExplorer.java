@@ -17,8 +17,12 @@ import org.lwjgl.util.nfd.NativeFileDialog;
 
 import engine.Game;
 import engine.GameSubscriber;
+import engine.lua.history.HistoryChange;
+import engine.lua.history.HistorySnapshot;
+import engine.lua.type.data.Vector3;
 import engine.lua.type.object.Instance;
 import engine.lua.type.object.PhysicsBase;
+import engine.lua.type.object.Positionable;
 import engine.lua.type.object.ScriptBase;
 import engine.lua.type.object.TreeViewable;
 import engine.lua.type.object.insts.AnimationController;
@@ -299,8 +303,27 @@ public class IdeExplorer extends IdePane implements GameSubscriber {
 				if ( t == null || t.isnil() )
 					return;
 				Game.copiedInstance = t;
-				LuaValue p = inst.getParent();
-				Game.historyService().pushChange(inst, LuaValue.valueOf("Parent"), p, LuaValue.NIL);
+				
+				// History snapshot for deleting
+				HistorySnapshot snapshot = new HistorySnapshot();
+				{
+					List<Instance> desc = inst.getDescendants();
+					desc.add(0, inst);
+					for (int i = 0; i < desc.size(); i++) {
+						Instance tempInstance = desc.get(i);
+						
+						HistoryChange change = new HistoryChange(
+								Game.historyService().getHistoryStack().getObjectReference(tempInstance),
+								LuaValue.valueOf("Parent"),
+								tempInstance.getParent(),
+								LuaValue.NIL
+						);
+						snapshot.changes.add(change);
+					}
+				}
+				Game.historyService().pushChange(snapshot);
+				
+				// Destroy parent object
 				inst.destroy();
 			}
 		});
