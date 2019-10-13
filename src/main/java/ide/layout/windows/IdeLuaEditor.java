@@ -18,27 +18,6 @@ public class IdeLuaEditor extends IdePane {
 	private ScriptBase inst;
 	private CodeArea code;
 	
-	private int getTabs(String t) {
-		int a = 0;
-		for (int i = 0; i < t.length(); i++) {
-			char c = t.charAt(i);
-			if ( c == '\t' )
-				a++;
-			else
-				break;
-		}
-		
-		return a;
-	}
-	
-	private String generateCharacters(int amt, char c) {
-		StringBuilder t = new StringBuilder();
-		for (int i = 0; i < amt; i++) {
-			t.append(""+c);
-		}
-		return t.toString();
-	}
-	
 	public IdeLuaEditor(ScriptBase script) {
 		super(script.getName()+".lua", true);
 		
@@ -129,7 +108,7 @@ public class IdeLuaEditor extends IdePane {
 		final String NUMBER_PATTERN = "^\\d*\\.\\d+" + "|" + "\\d+\\.\\d" + "|" + "\\d+";
 		final String PAREN_PATTERN = "\\(" + "|" + "\\)";
 		final String BRACKET_PATTERN = "\\[|\\]";
-		final String STRING_PATTERN = "(\\[\\[)(.|\\R)*?(\\]\\])" + "|" + "\"([^\"\\\\]|\\\\.)*\"";
+		final String STRING_PATTERN = "(\\[\\[)(.|\\R)*?(\\]\\])" + "|" + "\"([^\"\\\\]|\\\\.)*\"" + "|" + "\'([^\"\\\\]|\\\\.)*\'";
 		final String COMMENT_PATTERN = "--(\\[\\[)(.|\\R)*?(\\]\\])" + "|" + "--[^\n]*";
 		
 		Pattern PATTERN = Pattern.compile(
@@ -212,5 +191,26 @@ public class IdeLuaEditor extends IdePane {
 		if ( inst == null )
 			return;
 		inst.setSource(code.getText());
+	}
+	
+	private int getTabs(String t) {
+		int a = 0;
+		for (int i = 0; i < t.length(); i++) {
+			char c = t.charAt(i);
+			if ( c == '\t' )
+				a++;
+			else
+				break;
+		}
+		
+		return a;
+	}
+	
+	private String generateCharacters(int amt, char c) {
+		StringBuilder t = new StringBuilder();
+		for (int i = 0; i < amt; i++) {
+			t.append(""+c);
+		}
+		return t.toString();
 	}
 }
