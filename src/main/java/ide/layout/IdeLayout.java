@@ -211,10 +211,6 @@ public class IdeLayout {
 		// Test inside IDE (buggy)
 		MenuItem internalTest = new MenuItem("Test Internal (buggy)", Icons.icon_play.getView());
 		internalTest.setOnAction( event -> {
-			boolean saved = Save.save();
-			if ( !saved )
-				return;
-			
 			JSONObject gameJson = Save.getGameJSON();
 			Game.internalTesting = true;
 			Game.setRunning(true);
