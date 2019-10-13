@@ -18,7 +18,7 @@ For support, see: http://manta.games/
 
 # Screenshots
 ![pong](https://i.imgur.com/EBIDL8M.gif)
-![editor1](https://i.imgur.com/580uHdZ.png)
+![editor1](https://i.imgur.com/fx1bRnx.png)
 ![pbr](https://cdn.discordapp.com/attachments/541818498293170177/568638439914733580/unknown.png)
 ![editor2](https://cdn.discordapp.com/attachments/511187289897173009/522436178088034305/unknown.png)
 
