@@ -206,6 +206,7 @@ public class PhysicsObjectInternal {
 	}
 
 	public void destroy() {
+		//System.out.println("Destroying physics internal");
 		if ( world != null ) {
 			this.world.destroy(this);
 		}

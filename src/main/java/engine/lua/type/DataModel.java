@@ -435,7 +435,12 @@ public abstract class DataModel extends LuaDatatype {
 			r.descendentsList.add((Instance) this);
 			//System.out.println(this.getName() + " was added as descendent to " + r.getFullName());
 		}
-		descendantAdded(r.getParent());
+		
+		LuaValue parent = r.getParent();
+		if ( parent == root )
+			return;
+		
+		descendantAdded(parent);
 	}
 	
 	private void updateChildPointer( LuaValue name, LuaValue value ) {

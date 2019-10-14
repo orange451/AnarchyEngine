@@ -226,19 +226,22 @@ public class IdeLayout {
 				for (int i = 0; i < items.size(); i++) {
 					menuEdit.getItems().add(items.get(i));
 				}
-				
-				// End Test
-				Game.internalTesting = false;
-				Game.setRunning(false);
-				
-				// Reload from stored JSON
-				Load.parseJSON(true, gameJson);
-				Game.load();
-				
-				// Make sure game isn't running
-				InternalGameThread.runLater(()->{
+				try {
+					// End Test
+					Game.internalTesting = false;
 					Game.setRunning(false);
-				});
+					
+					// Reload from stored JSON
+					Load.parseJSON(true, gameJson);
+					Game.load();
+					
+					// Make sure game isn't running
+					InternalGameThread.runLater(()->{
+						Game.setRunning(false);
+					});
+				} catch(Exception e) {
+					e.printStackTrace();
+				}
 				items.clear();
 			});
 			menuEdit.getItems().add(endTest);
