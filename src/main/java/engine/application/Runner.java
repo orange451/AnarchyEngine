@@ -77,10 +77,6 @@ public abstract class Runner extends RenderableApplication {
 				Game.setRunning(true);
 				Game.load();
 				
-				InternalGameThread.runLater(()->{
-					Game.load();
-				});
-				
 				Game.getGame().gameUpdate(true);
 			});
 		});

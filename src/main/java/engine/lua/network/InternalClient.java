@@ -75,13 +75,20 @@ public class InternalClient extends Client {
 								final JSONObject obj = (JSONObject) parser.parse(worldJSON);
 								
 								InternalGameThread.runLater(()->{
-									Game.unload();
-									Game.load();
 
 									InternalRenderThread.runLater(()->{
-										// Load new game data
-										if ( Load.parseJSON(true, obj) == null )
-											return;
+										try {
+											Game.unload();
+											
+											// Load new game data
+											if ( Load.parseJSON(true, obj) == null )
+												return;
+											
+											//Game.load();
+											Game.setLoaded(true);
+										} catch(Exception e) {
+											e.printStackTrace();
+										}
 										
 										// Tell server we're all loaded
 										InternalRenderThread.runLater(()->{
