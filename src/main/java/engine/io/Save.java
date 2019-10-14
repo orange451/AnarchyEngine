@@ -167,7 +167,7 @@ public class Save {
 
 		// Start saving process
 		REFID = 0;		
-		JSONObject gameJSON = getGameJSON();
+		JSONObject gameJSON = getInstanceJSONRecursive(false, true, Game.game());
 		Game.changes = false;
 
 		try {
@@ -193,7 +193,7 @@ public class Save {
 	 * @return
 	 */
 	public static JSONObject getGameJSON() {
-		return getInstanceJSONRecursive(Game.game());
+		return getInstanceJSONRecursive(true, true, Game.game());
 	}
 	
 	/**
@@ -201,12 +201,12 @@ public class Save {
 	 * @param instance
 	 * @return
 	 */
-	public static JSONObject getInstanceJSONRecursive(Instance instance) {
+	public static JSONObject getInstanceJSONRecursive(boolean saveArchivable, boolean saveSID, Instance instance) {
 		JSONObject ret = null;
 		try {
 			instanceMap = new HashMap<>();
-			inst = getSavedInstances(instance);
-			ret = inst.getFirst().toJSON();
+			inst = getSavedInstances(saveArchivable, saveSID, instance);
+			ret = inst.getFirst().toJSON(saveArchivable, saveSID);
 		} catch(Exception e ) {
 			e.printStackTrace();
 		}
@@ -219,14 +219,14 @@ public class Save {
 	 * @param instance
 	 * @return
 	 */
-	public static JSONObject getInstanceJSON(Instance instance) {
+	public static JSONObject getInstanceJSON(boolean saveArchivable, boolean saveSID, Instance instance) {
 		JSONObject ret = null;
 		try {
 			
-			if ( !instance.isArchivable() )
+			if ( !instance.isArchivable() && !saveArchivable )
 				return ret;
 
-			ret = new SavedInstance(instance).toJSON();
+			ret = new SavedInstance(saveSID, instance).toJSON(saveArchivable, saveSID);
 		} catch(Exception e ) {
 			e.printStackTrace();
 		}
@@ -234,24 +234,25 @@ public class Save {
 		return ret;
 	}
 
-	private static LinkedList<SavedInstance> getSavedInstances(Instance root) {
+	private static LinkedList<SavedInstance> getSavedInstances(boolean saveArchivable, boolean saveSID, Instance root) {
 		LinkedList<SavedInstance> ret = new LinkedList<SavedInstance>();
 		
-		if ( !root.isArchivable() )
+		if ( !root.isArchivable() && !saveArchivable )
 			return ret;
 
-		ret.add(new SavedInstance(root));
+		SavedInstance savedRoot = new SavedInstance(saveSID, root);
+		ret.add(savedRoot);
+		instanceMap.put(root, savedRoot);
 
 		List<Instance> children = root.getChildren();
 		for (int i = 0; i < children.size(); i++) {
 			Instance child = children.get(i);
-			List<SavedInstance> t = getSavedInstances(child);
+			List<SavedInstance> t = getSavedInstances(saveArchivable, saveSID, child);
 			
 			ListIterator<SavedInstance> listIterator = t.listIterator();
 			while(listIterator.hasNext()) {
 				SavedInstance si = listIterator.next();
 				ret.add(si);
-				instanceMap.put(si.instance, si);
 			}
 		}
 
@@ -262,18 +263,18 @@ public class Save {
 		final Instance instance;
 		final SavedReference reference;
 
-		public SavedInstance(Instance child) {
+		public SavedInstance(boolean saveSID, Instance child) {
 			this.instance = child;
-			long refId = child.getSID();
-			if ( child.getSID() == -1 )
+			long refId = saveSID?child.getSID():-1;
+			if ( refId == -1 )
 				refId = REFID++;
 			
 			this.reference = new SavedReference(refId);
 		}
 
 		@SuppressWarnings("unchecked")
-		public JSONObject toJSON() {
-			if ( !instance.isArchivable() )
+		public JSONObject toJSON(boolean saveArchivable, boolean saveSID) {
+			if ( !instance.isArchivable() && !saveArchivable )
 				return null;
 			
 			SavedInstance parent = null;
@@ -290,7 +291,7 @@ public class Save {
 
 				SavedInstance sinst = instanceMap.get(child);
 				if ( sinst != null ) {
-					JSONObject json = sinst.toJSON();
+					JSONObject json = sinst.toJSON(saveArchivable, saveSID);
 					if ( json != null ) {
 						childArray.add(json);
 					}
@@ -302,6 +303,9 @@ public class Save {
 			for (int i = 0; i < fields.length; i++) {
 				String field = fields[i].toString();
 				if ( field.equals("Name") || field.equals("ClassName") || field.equals("Parent") )
+					continue;
+				
+				if ( field.equals("SID") && !saveSID )
 					continue;
 
 				if ( !field.equals("SID") && Game.isRunning() && instance instanceof NonReplicatable ) {

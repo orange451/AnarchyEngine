@@ -19,10 +19,8 @@ import engine.Game;
 import engine.GameSubscriber;
 import engine.lua.history.HistoryChange;
 import engine.lua.history.HistorySnapshot;
-import engine.lua.type.data.Vector3;
 import engine.lua.type.object.Instance;
 import engine.lua.type.object.PhysicsBase;
-import engine.lua.type.object.Positionable;
 import engine.lua.type.object.ScriptBase;
 import engine.lua.type.object.TreeViewable;
 import engine.lua.type.object.insts.AnimationController;
@@ -299,10 +297,7 @@ public class IdeExplorer extends IdePane implements GameSubscriber {
 		MenuItem cut = new MenuItem("Cut", Icons.icon_cut.getView());
 		cut.setOnAction(event -> {
 			if ( inst.isInstanceable() ) {
-				Instance t = inst.clone();
-				if ( t == null || t.isnil() )
-					return;
-				Game.copiedInstance = t;
+				Game.copy(Game.selected());
 				
 				// History snapshot for deleting
 				HistorySnapshot snapshot = new HistorySnapshot();
@@ -333,10 +328,7 @@ public class IdeExplorer extends IdePane implements GameSubscriber {
 		MenuItem copy = new MenuItem("Copy", Icons.icon_copy.getView());
 		copy.setOnAction(event -> {
 			if ( inst.isInstanceable() ) {
-				Instance t = inst.clone();
-				if ( t == null || t.isnil() )
-					return;
-				Game.copiedInstance = t;
+				Game.copy(Game.selected());
 			}
 		});
 		c.getItems().add(copy);
@@ -344,12 +336,8 @@ public class IdeExplorer extends IdePane implements GameSubscriber {
 		// Paste
 		MenuItem paste = new MenuItem("Paste", Icons.icon_paste.getView());
 		paste.setOnAction(event -> {
-			Instance t = Game.copiedInstance;
-			if ( t == null )
-				return;
-			Instance cl = t.clone();
-			cl.forceSetParent(inst);
-			Game.historyService().pushChange(cl, LuaValue.valueOf("Parent"), LuaValue.NIL, cl.getParent());
+			Game.paste(inst);
+			//Game.historyService().pushChange(cl, LuaValue.valueOf("Parent"), LuaValue.NIL, cl.getParent());
 		});
 		c.getItems().add(paste);
 

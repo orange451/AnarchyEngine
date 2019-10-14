@@ -33,7 +33,7 @@ public class Resources {
 		MESH_UNIT_QUAD = MeshUtils.quad(1, 1);
 
 		MATERIAL_BLANK = new MaterialGL().setDiffuseTexture(TEXTURE_WHITE_RGBA).setNormalTexture(TEXTURE_NORMAL_RGBA)
-				.setMetalnessTexture(TEXTURE_BLACK_SRGB).setRoughnessTexture(TEXTURE_WHITE_SRGB);
+				.setMetalnessTexture(TEXTURE_WHITE_SRGB).setRoughnessTexture(TEXTURE_WHITE_SRGB);
 	}
 
 	public static void initialize() {

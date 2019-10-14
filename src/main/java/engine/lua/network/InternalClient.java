@@ -80,7 +80,7 @@ public class InternalClient extends Client {
 
 									InternalRenderThread.runLater(()->{
 										// Load new game data
-										if ( !Load.parseJSON(true, obj) )
+										if ( Load.parseJSON(true, obj) == null )
 											return;
 										
 										// Tell server we're all loaded

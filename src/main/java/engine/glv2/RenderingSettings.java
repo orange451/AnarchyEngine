@@ -27,7 +27,7 @@ public class RenderingSettings {
 	public volatile int shadowsDrawDistance = 80;
 	public volatile boolean volumetricLightEnabled = false;
 	public volatile boolean fxaaEnabled = true;
-	public volatile boolean taaEnabled = true;
+	public volatile boolean taaEnabled = false;
 	public volatile boolean vsyncEnabled = false; // TODO: Implement vsync toggle
 	// TODO: Maximize and restore windows
 	public volatile boolean motionBlurEnabled = false;

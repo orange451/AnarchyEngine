@@ -1,12 +1,22 @@
 package engine;
 
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 import org.luaj.vm2.LuaValue;
 import engine.io.AsynchronousResourceLoader;
+import engine.io.Load;
 import engine.io.Save;
 import engine.lua.LuaEngine;
 import engine.lua.network.internal.protocol.ClientConnectFinishTCP;
@@ -47,7 +57,6 @@ public class Game implements Tickable {
 	public static String saveDirectory = "";
 	public static String saveFile = "";
 	public static boolean changes;
-	public static Instance copiedInstance;
 	public static boolean internalTesting;
 	private static boolean running;
 	
@@ -561,5 +570,78 @@ public class Game implements Tickable {
 
 	public static void setLoaded(boolean loaded) {
 		Game.loaded = loaded;
+	}
+
+	/**
+	 * Copies instances to temp file. Used to communicate between programs.
+	 * @param selected
+	 */
+	@SuppressWarnings("unchecked")
+	public static void copy(List<Instance> selected) {
+		JSONArray temp = new JSONArray();
+		
+		// Find duplicate entities
+		List<Instance> toRemove = new ArrayList<>();
+		for (int i = 0; i < selected.size(); i++) {
+			Instance t = selected.get(i);
+			for (int j = 0; j < selected.size(); j++) {
+				Instance p = selected.get(j);
+				if ( p == t )
+					continue;
+				
+				if ( p.isDescendantOf(t) )
+					toRemove.add(p);
+			}
+		}
+		
+		// Delete duplicate entities
+		while (toRemove.size() > 0 ) {
+			selected.remove(toRemove.get(0));
+			toRemove.remove(0);
+		}
+		
+		// Generate json for each root object
+		for (int i = 0; i < selected.size(); i++) {
+			JSONObject json = Save.getInstanceJSONRecursive(true, false, selected.get(i));
+			temp.add(json);
+		}
+		
+		// Write to file
+        try (FileWriter file = new FileWriter("TEMPCOPY.json")) {
+            file.write(temp.toJSONString());
+            file.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+	}
+
+	/**
+	 * Paste instances into parent instance
+	 * @return
+	 */
+	public static List<Instance> paste(Instance parent) {
+		ArrayList<Instance> ret = new ArrayList<>();
+        JSONParser parser = new JSONParser();
+
+        try (Reader reader = new FileReader("TEMPCOPY.json")) {
+        	JSONArray jsonObjects = (JSONArray) parser.parse(reader);
+        	for (int i = 0; i < jsonObjects.size(); i++) {
+        		JSONObject json = (JSONObject) jsonObjects.get(i);
+        		Instance inst = Load.parseJSON(false, json);
+        		if ( inst != null ) {
+        			ret.add(inst);
+        		}
+        		
+        		inst.forceSetParent(parent);
+        	}
+        } catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+        
+        return ret;
 	}
 }

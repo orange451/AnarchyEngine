@@ -31,9 +31,9 @@ import ide.IDE;
 import ide.layout.windows.ErrorWindow;
 
 public class Load {
-	private static ArrayList<LoadedInstance> instances;
-	private static HashMap<Long, LoadedInstance> instancesMap;
-	private static HashMap<Long, Instance> unmodifiedInstances;
+	//private static ArrayList<LoadedInstance> instances;
+	//private static HashMap<Long, LoadedInstance> instancesMap;
+	//private static HashMap<Long, Instance> unmodifiedInstances;
 	
 	public static void load() {
 		String path = "";
@@ -84,7 +84,7 @@ public class Load {
 			Game.unload();
 		
 		// Load the json
-		if ( !parseJSON(obj) )
+		if ( parseJSON(obj) == null )
 			return;
 		
 		// Tell game we're loaded
@@ -96,7 +96,7 @@ public class Load {
 	 * Desearializes a JSONObject(s) into Instances.
 	 * @param obj
 	 */
-	public static boolean parseJSON(JSONObject... obj) {
+	public static Instance parseJSON(JSONObject obj) {
 		return parseJSON( false, obj );
 	}
 	
@@ -106,13 +106,13 @@ public class Load {
 	 * @param obj
 	 * @return
 	 */
-	public static boolean parseJSON(boolean removeUnusedInstances, JSONObject... obj) {
+	public static Instance parseJSON(boolean removeUnusedInstances, JSONObject obj) {
+		
 		// Read in the objects from JSON
-		instances = new ArrayList<LoadedInstance>();
-		instancesMap = new HashMap<>();
-		for ( int i = 0; i < obj.length; i++) {
-			readObjects( obj[i]);
-		}
+		ArrayList<LoadedInstance> instances = new ArrayList<LoadedInstance>();
+		HashMap<Long, LoadedInstance> instancesMap = new HashMap<>();
+		HashMap<Long, Instance> unmodifiedInstances = null;
+		readObjects(instances, instancesMap, obj);
 		
 		if ( removeUnusedInstances )
 			unmodifiedInstances = Game.game().getInstanceMap();
@@ -124,7 +124,7 @@ public class Load {
 			for (int i = 0; i < instances.size(); i++) {
 				LoadedInstance inst = instances.get(i);
 				if ( inst.instance instanceof Service ) {
-					loadObject(inst);
+					loadObject(instancesMap, inst);
 					services.add(inst);
 				}
 			}
@@ -132,10 +132,9 @@ public class Load {
 			// Correct instances (properties and such)
 			for (int i = 0; i < instances.size(); i++) {
 				LoadedInstance inst = instances.get(i);
-				loadObject(inst);
+				loadObject(instancesMap, inst);
 			}
 			
-	
 			// Force set parents (of non services)
 			for (int i = 0; i < instances.size(); i++) {
 				LoadedInstance inst = instances.get(i);
@@ -146,7 +145,7 @@ public class Load {
 					unmodifiedInstances.remove(inst.instance.getSID());
 
 				if ( parent != -1 && inst.loaded ) {
-					Instance p = getInstanceFromReference(parent);
+					Instance p = getInstanceFromReference(instancesMap, parent);
 					if ( !inst.instance.equals(p) ) {
 						inst.instance.forceSetParent(p);
 						//System.out.println("Setting parent of: " + inst.instance + "\tto\t" + p);
@@ -173,16 +172,16 @@ public class Load {
 				}
 			}
 			
-			return true;
+			return instances.get(0).instance;
 		} catch(Exception e ) {
 			e.printStackTrace();
 			new ErrorWindow("There was a problem reading this file. 002");
 		}
 		
-		return false;
+		return null;
 	}
 
-	private static void loadObject(LoadedInstance inst) {
+	private static void loadObject(HashMap<Long, LoadedInstance> instancesMap, LoadedInstance inst) {
 		if ( inst.loaded )
 			return;
 		
@@ -195,14 +194,19 @@ public class Load {
 		String[] propertyKeys = properties.keySet().toArray(new String[properties.keySet().size()]);
 		for (int j = 0; j < propertyKeys.length; j++) {
 			String key = propertyKeys[j];
-			if ( key.equals("SID") && !Game.isRunning() )
-				continue;
+			if ( key.equals("SID") ) {
+				if (!Game.isRunning())
+					continue;
+				
+				if ( Integer.parseInt(properties.get(key).value.toString()) == -1 )
+					continue;
+			}
 			
 			PropertyValue<?> p = properties.get(key);
 			Object value = p.getValue();
 			if ( p.pointer ) {
 				int pointer = ((Integer) value).intValue();
-				value = getInstanceFromReference(pointer);
+				value = getInstanceFromReference(instancesMap, pointer);
 			}
 			
 			if ( value != null ) {
@@ -215,7 +219,7 @@ public class Load {
 		}
 	}
 
-	private static void readObjects(JSONObject obj) {
+	private static void readObjects(ArrayList<LoadedInstance> instances, HashMap<Long, LoadedInstance> instancesMap, JSONObject obj) {
 		LoadedInstance root = new LoadedInstance();
 		root.ClassName = (String) obj.get("ClassName");
 		root.Name = (String) obj.get("Name");
@@ -259,7 +263,7 @@ public class Load {
 		
 		JSONArray children = (JSONArray) obj.get("Children");
 		for (int i = 0; i < children.size(); i++) {
-			readObjects( (JSONObject) children.get(i));
+			readObjects( instances, instancesMap, (JSONObject) children.get(i));
 		}
 	}
 	
@@ -271,7 +275,7 @@ public class Load {
 		return -1;
 	}
 	
-	protected static Instance getInstanceFromReference(long ref) {
+	protected static Instance getInstanceFromReference(HashMap<Long, LoadedInstance> instancesMap, long ref) {
 		LoadedInstance loaded = instancesMap.get(ref);
 		if ( loaded != null )
 			return loaded.instance;
