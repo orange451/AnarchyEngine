@@ -45,7 +45,7 @@ public class Mesh extends AssetLoadable implements TreeViewable {
 		
 		this.setLocked(false);
 		
-		this.getmetatable().set(C_CAPSULE, new ThreeArgFunction() {
+		this.getmetatable().set(C_CAPSULE.toString(), new ThreeArgFunction() {
 			@Override
 			public LuaValue call(LuaValue myself, LuaValue radius, LuaValue height) {
 				if ( !myself.eq_b(Mesh.this) )
@@ -56,7 +56,7 @@ public class Mesh extends AssetLoadable implements TreeViewable {
 			}
 		});
 		
-		this.getmetatable().set(C_SPHERE, new TwoArgFunction() {
+		this.getmetatable().set(C_SPHERE.toString(), new TwoArgFunction() {
 			@Override
 			public LuaValue call(LuaValue myself, LuaValue radius) {
 				if ( !myself.eq_b(Mesh.this) )
@@ -67,7 +67,7 @@ public class Mesh extends AssetLoadable implements TreeViewable {
 			}
 		});
 		
-		this.getmetatable().set(C_TEAPOT, new TwoArgFunction() {
+		this.getmetatable().set(C_TEAPOT.toString(), new TwoArgFunction() {
 			@Override
 			public LuaValue call(LuaValue myself, LuaValue radius) {
 				if ( !myself.eq_b(Mesh.this) )
@@ -78,7 +78,7 @@ public class Mesh extends AssetLoadable implements TreeViewable {
 			}
 		});
 		
-		this.getmetatable().set(C_CUBE, new TwoArgFunction() {
+		this.getmetatable().set(C_CUBE.toString(), new TwoArgFunction() {
 			@Override
 			public LuaValue call(LuaValue myself, LuaValue arg2) {
 				if ( !myself.eq_b(Mesh.this) )
@@ -89,7 +89,7 @@ public class Mesh extends AssetLoadable implements TreeViewable {
 			}
 		});
 		
-		this.getmetatable().set(C_BLOCK, new FourArgFunction() {
+		this.getmetatable().set(C_BLOCK.toString(), new FourArgFunction() {
 			@Override
 			public LuaValue call(LuaValue myself, LuaValue arg2, LuaValue arg3, LuaValue arg4) {
 				if ( !myself.eq_b(Mesh.this) )

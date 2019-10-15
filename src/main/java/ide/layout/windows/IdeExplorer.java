@@ -24,6 +24,7 @@ import engine.lua.type.object.PhysicsBase;
 import engine.lua.type.object.ScriptBase;
 import engine.lua.type.object.TreeViewable;
 import engine.lua.type.object.insts.AnimationController;
+import engine.lua.type.object.insts.AssetFolder;
 import engine.lua.type.object.insts.Camera;
 import engine.lua.type.object.insts.DirectionalLight;
 import engine.lua.type.object.insts.Folder;
@@ -53,6 +54,7 @@ import lwjgui.scene.control.TreeBase;
 import lwjgui.scene.control.TreeItem;
 import lwjgui.scene.control.TreeNode;
 import lwjgui.scene.control.TreeView;
+import lwjgui.scene.image.ImageView;
 
 public class IdeExplorer extends IdePane implements GameSubscriber {
 	private ScrollPane scroller;
@@ -354,11 +356,24 @@ public class IdeExplorer extends IdePane implements GameSubscriber {
 		});
 		c.getItems().add(duplicate);
 		
-		// Separate
+		List<ContextMenuType> menus = ContextMenuType.match(inst);
+		if ( menus.size() > 0 )
+			c.getItems().add(new SeparatorMenuItem());
+		
+		for (int i = 0; i < menus.size(); i++) {
+			ContextMenuType menu = menus.get(i);
+			MenuItem menuItem = new MenuItem(menu.getMenuName(), menu.getMenuGraphic());
+			menuItem.setOnAction(event->{
+				menu.onClick(inst);
+			});
+			c.getItems().add(menuItem);
+		}
+		
+		// Add separator
 		c.getItems().add(new SeparatorMenuItem());
 
 		// New Model
-		if ( inst instanceof Prefab ) {
+		/*if ( inst instanceof Prefab ) {
 			// New Prefab
 			MenuItem pref = new MenuItem("Add Model", Icons.icon_wat.getView());
 			pref.setOnAction(event -> {
@@ -377,10 +392,10 @@ public class IdeExplorer extends IdePane implements GameSubscriber {
 			c.getItems().add(gobj);
 			
 			
-		}
+		}*/
 		
 		// Asset functions
-		if ( inst instanceof Assets ) {
+		/*if ( inst instanceof Assets ) {
 			
 			// New Prefab
 			MenuItem prefi = new MenuItem("Import Prefab", Icons.icon_model.getView());
@@ -457,7 +472,7 @@ public class IdeExplorer extends IdePane implements GameSubscriber {
 			
 			// Separate
 			c.getItems().add(new SeparatorMenuItem());
-		}
+		}*/
 
 
 		// Cut

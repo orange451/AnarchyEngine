@@ -67,14 +67,14 @@ public class Assets extends Service implements TreeViewable {
 		this.getmetatable().set("ImportTexture", new TwoArgFunction() {
 			@Override
 			public LuaValue call(LuaValue arg1, LuaValue arg3) {
-				return importTexture(arg3.toString());
+				return importTexture(arg3.toString(), textures());
 			}
 		});
 		
 		this.getmetatable().set("ImportPrefab", new TwoArgFunction() {
 			@Override
 			public LuaValue call(LuaValue myself, LuaValue path) {
-				return importPrefab(path.toString());
+				return importPrefab(path.toString(), Game.assets().prefabs());
 			}
 		});
 		
@@ -115,15 +115,15 @@ public class Assets extends Service implements TreeViewable {
 		});
 	}
 	
-	public Texture importTexture(String filepath) {
+	public Texture importTexture(String filepath, Instance parent) {
 		Texture t = new Texture();
 		t.setFilePath(filepath);
-		t.forceSetParent(t.getPreferredParent());
+		t.forceSetParent(parent);
 		return t;
 	}
 
-	public Prefab importPrefab(String filePath) {
-		return importPrefab(filePath, 1, -1);
+	public Prefab importPrefab(String filePath, Instance instance) {
+		return importPrefab(filePath, 1, -1, instance);
 	}
 
 	public static Instance newPackage(String name, Instance parent) {
@@ -204,7 +204,7 @@ public class Assets extends Service implements TreeViewable {
 	 * @param filePath
 	 * @return
 	 */
-	private static Prefab importPrefab(String filePath, float scale, int extraFlags) {
+	private static Prefab importPrefab(String filePath, float scale, int extraFlags, Instance parent) {
 		String specificFile = FileUtils.getFileNameFromPath(filePath);
 		Prefab prefab = new Prefab();
 		
@@ -341,7 +341,7 @@ public class Assets extends Service implements TreeViewable {
 			System.out.println("Loaded");
 			
 			prefab.setName(fileWithoutExtension);
-			prefab.forceSetParent(Game.assets().prefabs());
+			prefab.forceSetParent(parent);
 		} catch(Exception e ) {
 			e.printStackTrace();
 		}

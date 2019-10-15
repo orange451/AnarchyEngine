@@ -10,6 +10,10 @@ public class Icons {
 	public static final Icons icon_world = new Icons("World.png");
 	public static final Icons icon_folder = new Icons("Folder.png");
 	public static final Icons icon_asset_folder = new Icons("AssetFolder.png");
+	public static final Icons icon_asset_folder_material = new Icons("AssetFolderMaterial.png");
+	public static final Icons icon_asset_folder_mesh = new Icons("AssetFolderMesh.png");
+	public static final Icons icon_asset_folder_texture = new Icons("AssetFolderTexture.png");
+	public static final Icons icon_asset_folder_prefab = new Icons("AssetFolderPrefab.png");
 	public static final Icons icon_cut = new Icons("Cut.png");
 	public static final Icons icon_copy = new Icons("Copy.png");
 	public static final Icons icon_paste = new Icons("Paste.png");

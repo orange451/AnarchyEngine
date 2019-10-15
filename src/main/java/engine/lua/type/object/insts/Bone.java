@@ -53,6 +53,6 @@ public class Bone extends Instance implements TreeViewable {
 	}
 
 	public void setOffsetMatrix(Matrix4 matrix4) {
-		this.set(C_OFFSETMATRIX, matrix4);
+		this.forceset(C_OFFSETMATRIX, matrix4);
 	}
 }

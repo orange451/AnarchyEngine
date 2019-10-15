@@ -198,14 +198,14 @@ public class Load {
 				if (!Game.isRunning())
 					continue;
 				
-				if ( Integer.parseInt(properties.get(key).value.toString()) == -1 )
+				if ( Long.parseLong(properties.get(key).value.toString()) == -1 )
 					continue;
 			}
 			
 			PropertyValue<?> p = properties.get(key);
 			Object value = p.getValue();
 			if ( p.pointer ) {
-				int pointer = ((Integer) value).intValue();
+				long pointer = ((Long) value).longValue();
 				value = getInstanceFromReference(instancesMap, pointer);
 			}
 			
@@ -334,8 +334,8 @@ public class Load {
 				JSONObject j = (JSONObject)t;
 				
 				if ( j.get("Type").equals("Reference") ) {
-					int v = Integer.parseInt(""+j.get("Value"));
-					return new PropertyValue<Integer>(v, true);
+					long v = Long.parseLong(j.get("Value").toString());
+					return new PropertyValue<Long>(v, true);
 				}
 				
 				if ( j.get("Type").equals("Datatype") ) {

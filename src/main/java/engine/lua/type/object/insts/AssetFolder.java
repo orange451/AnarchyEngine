@@ -32,6 +32,16 @@ public class AssetFolder extends Instance implements TreeViewable {
 
 	@Override
 	public Icons getIcon() {
+		String name = this.getName();
+		if ( name.contains("Mesh"))
+			return Icons.icon_asset_folder_mesh;
+		if ( name.contains("Material"))
+			return Icons.icon_asset_folder_material;
+		if ( name.contains("Texture"))
+			return Icons.icon_asset_folder_texture;
+		if ( name.contains("Prefab"))
+			return Icons.icon_asset_folder_prefab;
+		
 		return Icons.icon_asset_folder;
 	}
 }
