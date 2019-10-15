@@ -287,7 +287,7 @@ public class IdeExplorer extends IdePane implements GameSubscriber {
 		}
 		
 		if ( treeItem instanceof SortedTreeItem ) {
-			((SortedTreeItem)treeItem).sort();
+			((SortedTreeItem<Instance>)treeItem).sort();
 		}
 	}
 	
@@ -298,14 +298,20 @@ public class IdeExplorer extends IdePane implements GameSubscriber {
 		// Cut
 		MenuItem cut = new MenuItem("Cut", Icons.icon_cut.getView());
 		cut.setOnAction(event -> {
-			if ( inst.isInstanceable() ) {
-				Game.copy(Game.selected());
-				
-				// History snapshot for deleting
-				HistorySnapshot snapshot = new HistorySnapshot();
-				{
-					List<Instance> desc = inst.getDescendants();
-					desc.add(0, inst);
+			List<Instance> instances = Game.getRootInstances(Game.selected());
+			Game.copy(instances);
+			
+			// History snapshot for deleting
+			HistorySnapshot snapshot = new HistorySnapshot();
+			{
+				for (int j = 0; j < instances.size(); j++) {
+					Instance root = instances.get(j);
+					if ( !root.isInstanceable() ) {
+						instances.remove(j--);
+						continue;
+					}
+					List<Instance> desc = root.getDescendants();
+					desc.add(0, root);
 					for (int i = 0; i < desc.size(); i++) {
 						Instance tempInstance = desc.get(i);
 						
@@ -318,10 +324,12 @@ public class IdeExplorer extends IdePane implements GameSubscriber {
 						snapshot.changes.add(change);
 					}
 				}
-				Game.historyService().pushChange(snapshot);
-				
-				// Destroy parent object
-				inst.destroy();
+			}
+			Game.historyService().pushChange(snapshot);
+			
+			// Destroy parent object
+			for (int i = 0; i < instances.size(); i++) {
+				instances.get(i).destroy();
 			}
 		});
 		c.getItems().add(cut);
@@ -346,16 +354,41 @@ public class IdeExplorer extends IdePane implements GameSubscriber {
 		// Copy
 		MenuItem duplicate = new MenuItem("Duplicate", Icons.icon_copy.getView());
 		duplicate.setOnAction(event -> {
-			if ( inst.isInstanceable() ) {
-				List<Instance> dup = Game.getRootInstances(Game.selected());
-				for (int i = 0; i < dup.size(); i++) {
-					Instance t = dup.get(i).clone();
+			List<Instance> instances = Game.getRootInstances(Game.selected());
+			
+			// History snapshot for duplicating
+			HistorySnapshot snapshot = new HistorySnapshot();
+			{
+				for (int j = 0; j < instances.size(); j++) {
+					Instance root = instances.get(j);
+					if ( !root.isInstanceable() ) {
+						instances.remove(j--);
+						continue;
+					}
+
+					// Clone the root instance
+					Instance t = root.clone();
 					if ( t == null || t.isnil() )
-						return;
-					t.forceSetParent(inst.getParent());
+						continue;
+					t.forceSetParent(root.getParent());
+					
+					// Add snapshot change for root clone & all descendents
+					List<Instance> desc = t.getDescendants();
+					desc.add(0, t);
+					for (int i = 0; i < desc.size(); i++) {
+						Instance tempInstance = desc.get(i);
+						
+						HistoryChange change = new HistoryChange(
+								Game.historyService().getHistoryStack().getObjectReference(tempInstance),
+								LuaValue.valueOf("Parent"),
+								LuaValue.NIL,
+								tempInstance.getParent()
+						);
+						snapshot.changes.add(change);
+					}
 				}
-				//Game.historyService().pushChange(t, LuaValue.valueOf("Parent"), LuaValue.NIL, t.getParent());
 			}
+			Game.historyService().pushChange(snapshot);
 		});
 		c.getItems().add(duplicate);
 		
