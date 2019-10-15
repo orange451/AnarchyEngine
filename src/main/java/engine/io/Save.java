@@ -337,9 +337,15 @@ public class Save {
 			this.put("Type", "Reference");
 			this.put("Value", ref);
 		}
+	}
 
-		public int getReference() {
-			return (int) this.get("Reference");
+	@SuppressWarnings("serial")
+	static class HashReference extends SavedReference {
+		@SuppressWarnings("unchecked")
+		public HashReference(Instance instance) {
+			super(instance.getSID());
+			
+			this.put("Hash", instance.hashFields());
 		}
 	}
 
@@ -389,7 +395,7 @@ public class Save {
 			if ( svd != null ) {
 				return svd.reference;
 			} else {
-				return null;
+				return new HashReference((Instance) luaValue);
 			}
 		}
 

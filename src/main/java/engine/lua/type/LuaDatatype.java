@@ -67,11 +67,11 @@ public abstract class LuaDatatype extends LuaTable {
 		return f;
 	}
 	
-	public String[] getFieldsOrdered() {
-		String[] t = new String[fieldsOrdered.size()];
+	public LuaValue[] getFieldsOrdered() {
+		LuaValue[] t = new LuaValue[fieldsOrdered.size()];
 		synchronized(fieldsOrdered) {
 			for (int i = 0; i < t.length; i++) {
-				t[i] = fieldsOrdered.get(i).getName();
+				t[i] = LuaValue.valueOf(fieldsOrdered.get(i).getName());
 			}
 		}
 		

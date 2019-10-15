@@ -722,12 +722,14 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 		
 		private void fill() {
 			// Fill grid
-			String[] fields = inst.getFieldsOrdered();
+			LuaValue[] fields = inst.getFieldsOrdered();
 			for (int i = 0; i < fields.length; i++) {
-				String field = fields[i];
+				LuaValue field = fields[i];
 				LuaValue value = inst.get(field);
 				
-				Label fieldLabel = new Label(field);
+				String fieldName = field.toString();
+				
+				Label fieldLabel = new Label(fieldName);
 				fieldLabel.setFontSize(16);
 				
 				// Cell 1
@@ -739,7 +741,7 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 				t1.getChildren().add(fieldLabel);
 				
 				// Cell 2
-				PropertyModifier t2 = getPropertyModifier( inst, field, value );
+				PropertyModifier t2 = getPropertyModifier( inst, fieldName, value );
 				if ( t2 == null )
 					return;
 				
@@ -747,7 +749,7 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 					t2.setBackground(alt);
 				
 				// Make cell 1 text color match cell 2
-				boolean editable = inst.getField(LuaValue.valueOf(field)).canModify();
+				boolean editable = inst.getField(field).canModify();
 				if ( t2 instanceof PropertyModifierTemp )
 					fieldLabel.setTextFill(((PropertyModifierTemp) t2).label.getTextFill());
 				if ( !editable )
@@ -756,7 +758,7 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 				// Add them to grid
 				getInternal().add(t1, 0, i);
 				getInternal().add(t2, 1, i);
-				props.put(LuaValue.valueOf(field), t2);
+				props.put(field, t2);
 			}
 			
 			this.updateChildren();

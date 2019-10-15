@@ -314,27 +314,38 @@ public class Load {
 			return value;
 		}
 
-		public static PropertyValue<?> parse(Object t) {
-			if ( t == null ) {
+		public static PropertyValue<?> parse(Object fieldKey) {
+			if ( fieldKey == null ) {
 				return new PropertyValue<LuaValue>(LuaValue.NIL);
 			}
-			if ( t instanceof Boolean ) {
-				return new PropertyValue<Boolean>((Boolean)t);
+			if ( fieldKey instanceof Boolean ) {
+				return new PropertyValue<Boolean>((Boolean)fieldKey);
 			}
-			if ( t instanceof Double ) {
-				return new PropertyValue<Double>((Double)t);
+			if ( fieldKey instanceof Double ) {
+				return new PropertyValue<Double>((Double)fieldKey);
 			}
-			if ( t instanceof Float ) {
-				return new PropertyValue<Float>((Float)t);
+			if ( fieldKey instanceof Float ) {
+				return new PropertyValue<Float>((Float)fieldKey);
 			}
-			if ( t instanceof String ) {
-				return new PropertyValue<String>((String)t);
+			if ( fieldKey instanceof String ) {
+				return new PropertyValue<String>((String)fieldKey);
 			}
-			if ( t instanceof JSONObject ) {
-				JSONObject j = (JSONObject)t;
+			if ( fieldKey instanceof JSONObject ) {
+				JSONObject j = (JSONObject)fieldKey;
 				
 				if ( j.get("Type").equals("Reference") ) {
 					long v = Long.parseLong(j.get("Value").toString());
+					
+					// Make sure the pointed to hash object matches exactly!
+					Object hashEntry = j.get("Hash");
+					if ( hashEntry != null ) {
+						Instance temp = Game.getInstanceFromSID(v);
+						if ( temp != null ) {
+							if ( !temp.hashFields().equals(hashEntry) )
+								v = -1;
+						}
+					}
+					
 					return new PropertyValue<Long>(v, true);
 				}
 				

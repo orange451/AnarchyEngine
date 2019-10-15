@@ -538,4 +538,26 @@ public abstract class Instance extends DataModel {
 	public Instance playerScripts() {
 		return findFirstChild(C_PLAYERSCRIPTS);
 	}
+
+	/**
+	 * Hash this instances fields and values to a compact string.
+	 * @return
+	 */
+	public String hashFields() {
+		StringBuilder resultBuilder = new StringBuilder();
+		
+		LuaValue[] tempFields = this.getFields();
+		for (int i = 0; i < tempFields.length; i++) {
+			LuaValue tempField = tempFields[i];
+			LuaValue tempValue = this.rawget(tempField);
+			
+			String tempString = "Field:"+tempField.toString() + ",Value:"+tempValue.toString();
+			if ( i < tempFields.length-1 )
+				tempString += "|";
+			
+			resultBuilder.append(tempString);
+		}
+		
+		return Integer.toString(resultBuilder.toString().hashCode());
+	}
 }
