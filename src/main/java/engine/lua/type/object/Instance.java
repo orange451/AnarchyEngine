@@ -546,7 +546,7 @@ public abstract class Instance extends DataModel {
 	public String hashFields() {
 		StringBuilder resultBuilder = new StringBuilder();
 		
-		LuaValue[] tempFields = this.getFields();
+		LuaValue[] tempFields = this.getFieldsOrdered();
 		for (int i = 0; i < tempFields.length; i++) {
 			LuaValue tempField = tempFields[i];
 			LuaValue tempValue = this.rawget(tempField);
