@@ -41,7 +41,9 @@ import lwjgui.scene.control.Button;
 import lwjgui.scene.control.CheckBox;
 import lwjgui.scene.control.ColorPicker;
 import lwjgui.scene.control.ComboBox;
+import lwjgui.scene.control.ContextMenu;
 import lwjgui.scene.control.Label;
+import lwjgui.scene.control.MenuItem;
 import lwjgui.scene.control.ScrollPane;
 import lwjgui.scene.control.ScrollPane.ScrollBarPolicy;
 import lwjgui.scene.control.Slider;
@@ -671,7 +673,26 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 			this.l = new Label("");
 			l.setFontStyle(FontStyle.BOLD);
 			l.setFontSize(16);
+			l.setMouseTransparent(true);
 			top.getChildren().add(l);
+			
+			top.setOnMouseClicked((event)-> {
+				if ( event.getButton() != GLFW.GLFW_MOUSE_BUTTON_RIGHT )
+					return;
+				
+				if ( inst == null )
+					return;
+				
+				ContextMenu menu = new ContextMenu();
+				MenuItem copyPath = new MenuItem("Copy Path");
+				copyPath.setOnAction((clickEvent)->{
+					LWJGUI.runLater(() -> {
+						GLFW.glfwSetClipboardString(cached_context.getWindowHandle(), inst.getFullName());
+					});
+				});
+				menu.getItems().add(copyPath);
+				menu.show(top.getScene(), event.getMouseX(), top.getY()+top.getHeight());
+			});
 	
 			// Create column constraints
 			ColumnConstraint const1 = new ColumnConstraint( 100 );
@@ -694,7 +715,7 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 		
 		@Override
 		public void resize() {
-			this.setPrefSize(scroller.getViewportWidth(), scroller.getViewportHeight());
+			this.setMaxSize(scroller.getViewportWidth(), scroller.getViewportHeight());
 			internal.forceWidth(this.getPrefWidth());
 			super.resize();
 		}
