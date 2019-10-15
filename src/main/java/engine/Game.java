@@ -571,21 +571,21 @@ public class Game implements Tickable {
 	public static void setLoaded(boolean loaded) {
 		Game.loaded = loaded;
 	}
-
+	
 	/**
-	 * Copies instances to temp file. Used to communicate between programs.
-	 * @param selected
+	 * Trims a list of instances by getting rid of all descendant instances.
+	 * @param instances
+	 * @return
 	 */
-	@SuppressWarnings("unchecked")
-	public static void copy(List<Instance> selected) {
-		JSONArray temp = new JSONArray();
+	public static List<Instance> getRootInstances(List<Instance> instances) {
+		ArrayList<Instance> ret = new ArrayList<>(instances);
 		
 		// Find duplicate entities
 		List<Instance> toRemove = new ArrayList<>();
-		for (int i = 0; i < selected.size(); i++) {
-			Instance t = selected.get(i);
-			for (int j = 0; j < selected.size(); j++) {
-				Instance p = selected.get(j);
+		for (int i = 0; i < instances.size(); i++) {
+			Instance t = instances.get(i);
+			for (int j = 0; j < instances.size(); j++) {
+				Instance p = instances.get(j);
 				if ( p == t )
 					continue;
 				
@@ -596,9 +596,23 @@ public class Game implements Tickable {
 		
 		// Delete duplicate entities
 		while (toRemove.size() > 0 ) {
-			selected.remove(toRemove.get(0));
+			ret.remove(toRemove.get(0));
 			toRemove.remove(0);
 		}
+		
+		return ret;
+	}
+
+	/**
+	 * Copies instances to temp file. Used to communicate between programs.
+	 * @param selected
+	 */
+	@SuppressWarnings("unchecked")
+	public static void copy(List<Instance> selected) {
+		JSONArray temp = new JSONArray();
+		
+		// Remove descendant instances
+		selected = getRootInstances(selected);
 		
 		// Generate json for each root object
 		for (int i = 0; i < selected.size(); i++) {

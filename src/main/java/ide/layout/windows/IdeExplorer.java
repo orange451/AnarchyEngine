@@ -347,11 +347,14 @@ public class IdeExplorer extends IdePane implements GameSubscriber {
 		MenuItem duplicate = new MenuItem("Duplicate", Icons.icon_copy.getView());
 		duplicate.setOnAction(event -> {
 			if ( inst.isInstanceable() ) {
-				Instance t = inst.clone();
-				if ( t == null || t.isnil() )
-					return;
-				t.forceSetParent(inst.getParent());
-				Game.historyService().pushChange(t, LuaValue.valueOf("Parent"), LuaValue.NIL, t.getParent());
+				List<Instance> dup = Game.getRootInstances(Game.selected());
+				for (int i = 0; i < dup.size(); i++) {
+					Instance t = dup.get(i).clone();
+					if ( t == null || t.isnil() )
+						return;
+					t.forceSetParent(inst.getParent());
+				}
+				//Game.historyService().pushChange(t, LuaValue.valueOf("Parent"), LuaValue.NIL, t.getParent());
 			}
 		});
 		c.getItems().add(duplicate);
