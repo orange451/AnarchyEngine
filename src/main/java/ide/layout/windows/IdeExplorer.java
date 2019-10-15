@@ -329,6 +329,7 @@ public class IdeExplorer extends IdePane implements GameSubscriber {
 			
 			// Destroy parent object
 			for (int i = 0; i < instances.size(); i++) {
+				Game.deselect(instances.get(i));
 				instances.get(i).destroy();
 			}
 		});
