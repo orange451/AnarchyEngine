@@ -346,8 +346,29 @@ public class IdeExplorer extends IdePane implements GameSubscriber {
 		// Paste
 		MenuItem paste = new MenuItem("Paste", Icons.icon_paste.getView());
 		paste.setOnAction(event -> {
-			Game.paste(inst);
-			//Game.historyService().pushChange(cl, LuaValue.valueOf("Parent"), LuaValue.NIL, cl.getParent());
+			List<Instance> instances = Game.paste(inst);
+			
+			// History snapshot for deleting
+			HistorySnapshot snapshot = new HistorySnapshot();
+			{
+				for (int j = 0; j < instances.size(); j++) {
+					Instance root = instances.get(j);
+					List<Instance> desc = root.getDescendants();
+					desc.add(0, root);
+					for (int i = 0; i < desc.size(); i++) {
+						Instance tempInstance = desc.get(i);
+						
+						HistoryChange change = new HistoryChange(
+								Game.historyService().getHistoryStack().getObjectReference(tempInstance),
+								LuaValue.valueOf("Parent"),
+								LuaValue.NIL,
+								tempInstance.getParent()
+						);
+						snapshot.changes.add(change);
+					}
+				}
+			}
+			Game.historyService().pushChange(snapshot);
 		});
 		c.getItems().add(paste);
 
