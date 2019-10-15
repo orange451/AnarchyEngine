@@ -1,11 +1,12 @@
-package ide;
+package engine;
 
 import java.io.File;
 
-import engine.Game;
 import engine.util.FileUtils;
 
-public class IDEFilePath {
+public class FilePath {
+	
+	public static final String PROJECT_IDENTIFIER = "%PROJECT%";
 
 	/**
 	 * Convert a URL string to a full system filepath.
@@ -13,7 +14,7 @@ public class IDEFilePath {
 	 * @return
 	 */
 	public static String convertToSystem(String ideFilePath) {
-		return FileUtils.fixPath(ideFilePath.replace("%PROJECT%", new File(Game.saveDirectory).getAbsolutePath()));
+		return FileUtils.fixPath(ideFilePath.replace(PROJECT_IDENTIFIER, new File(Game.saveDirectory).getAbsolutePath()));
 	}
 
 	/**
@@ -22,6 +23,6 @@ public class IDEFilePath {
 	 * @return
 	 */
 	public static String convertToIDE(String systemFilePath) {
-		return FileUtils.fixPath(systemFilePath.replace(new File(Game.saveDirectory).getAbsolutePath(), "%PROJECT%"));
+		return FileUtils.fixPath(systemFilePath.replace(new File(Game.saveDirectory).getAbsolutePath(), PROJECT_IDENTIFIER));
 	}
 }

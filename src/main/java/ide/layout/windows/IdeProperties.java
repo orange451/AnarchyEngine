@@ -13,6 +13,7 @@ import org.lwjgl.glfw.GLFW;
 import org.lwjgl.system.MemoryUtil;
 import org.lwjgl.util.nfd.NativeFileDialog;
 
+import engine.FilePath;
 import engine.Game;
 import engine.GameSubscriber;
 import engine.InternalRenderThread;
@@ -28,7 +29,6 @@ import engine.lua.type.object.AssetLoadable;
 import engine.lua.type.object.Instance;
 import engine.lua.type.object.InstancePropertySubscriber;
 import engine.lua.type.object.ScriptBase;
-import ide.IDEFilePath;
 import ide.layout.IdePane;
 import lwjgui.LWJGUI;
 import lwjgui.font.FontStyle;
@@ -525,7 +525,7 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 					
 					try {
 						PointerBuffer outPath = MemoryUtil.memAllocPointer(1);
-						String pp = IDEFilePath.convertToSystem(initialValue.toString());
+						String pp = FilePath.convertToSystem(initialValue.toString());
 						if ( !new File(pp).exists() )
 							pp = "";
 						String types = null;
@@ -537,7 +537,7 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 						}
 						int result = NativeFileDialog.NFD_OpenDialog(types, pp, outPath);
 						if ( result == NativeFileDialog.NFD_OKAY ) {
-							String path = IDEFilePath.convertToIDE(outPath.getStringUTF8(0));
+							String path = FilePath.convertToIDE(outPath.getStringUTF8(0));
 							try {
 								setWithHistory(this.instance, field, LuaValue.valueOf(path));
 							}catch(Exception e) {

@@ -2,6 +2,7 @@ package engine.lua.type.object.insts;
 
 import org.luaj.vm2.LuaValue;
 
+import engine.FilePath;
 import engine.Game;
 import engine.gl.Resources;
 import engine.gl.Texture2D;
@@ -14,7 +15,6 @@ import engine.lua.type.object.Instance;
 import engine.lua.type.object.Service;
 import engine.lua.type.object.TreeViewable;
 import engine.util.TextureUtils;
-import ide.IDEFilePath;
 import ide.layout.windows.icons.Icons;
 
 public class Texture extends AssetLoadable implements TreeViewable,FileResource {
@@ -88,7 +88,7 @@ public class Texture extends AssetLoadable implements TreeViewable,FileResource 
 	}
 	
 	private void reloadFromFile(String path) {
-		String realPath = IDEFilePath.convertToSystem(path);
+		String realPath = FilePath.convertToSystem(path);
 		
 		loaded = false; // Force image to reload
 		image = new AsynchronousImage(realPath, this.rawget(C_FLIPY).toboolean());

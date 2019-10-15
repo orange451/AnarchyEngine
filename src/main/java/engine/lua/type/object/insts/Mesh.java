@@ -14,6 +14,7 @@ import org.lwjgl.assimp.AIScene;
 import org.lwjgl.assimp.AIVector3D;
 import org.lwjgl.assimp.Assimp;
 
+import engine.FilePath;
 import engine.gl.Resources;
 import engine.gl.mesh.BufferedMesh;
 import engine.gl.mesh.Vertex;
@@ -22,7 +23,6 @@ import engine.lua.type.LuaEvent;
 import engine.lua.type.object.AssetLoadable;
 import engine.lua.type.object.TreeViewable;
 import engine.util.MeshUtils;
-import ide.IDEFilePath;
 import ide.layout.windows.icons.Icons;
 
 public class Mesh extends AssetLoadable implements TreeViewable {
@@ -136,7 +136,7 @@ public class Mesh extends AssetLoadable implements TreeViewable {
 		// Load new mesh
 		if ( changed && !filePath.isnil() && filePath.toString().length()>3 && !filePath.toString().equals("nil") ) {
 			String path = filePath.toString();
-			String realPath = IDEFilePath.convertToSystem(path);
+			String realPath = FilePath.convertToSystem(path);
 			if ( realPath.contains(".mesh") ) {
 				mesh = BufferedMesh.Import(realPath);
 			} else {

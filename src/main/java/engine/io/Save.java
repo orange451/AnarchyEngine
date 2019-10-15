@@ -20,6 +20,7 @@ import org.lwjgl.glfw.GLFW;
 import org.lwjgl.system.MemoryUtil;
 import org.lwjgl.util.nfd.NativeFileDialog;
 
+import engine.FilePath;
 import engine.Game;
 import engine.InternalRenderThread;
 import engine.gl.mesh.BufferedMesh;
@@ -444,8 +445,8 @@ public class Save {
 			AssetLoadable a = assets.get(i);
 			
 			String filePath = a.getFilePath();
-			boolean localFile = filePath.contains("%PROJECT%");
-			filePath = filePath.replace("%PROJECT%", new File(Game.saveDirectory).getAbsolutePath());
+			boolean localFile = filePath.contains(FilePath.PROJECT_IDENTIFIER);
+			filePath = filePath.replace(FilePath.PROJECT_IDENTIFIER, new File(Game.saveDirectory).getAbsolutePath());
 			
 			if ( filePath != null && filePath.length() > 3 ) {
 				String fileName = FileUtils.getFileNameFromPath(filePath);
@@ -471,7 +472,7 @@ public class Save {
 						if ( s.exists() ) {
 							Files.copy(s.toPath(), d.toPath(), StandardCopyOption.REPLACE_EXISTING);
 							
-							a.rawset("FilePath", dest.replace(p.getParentFile().getParentFile().getAbsolutePath(), "%PROJECT%"));
+							a.rawset("FilePath", dest.replace(p.getParentFile().getParentFile().getAbsolutePath(), FilePath.PROJECT_IDENTIFIER));
 						}
 					} catch (IOException e) {
 						e.printStackTrace();
@@ -488,7 +489,7 @@ public class Save {
 						if ( d != null ) {
 							String dest = d.getAbsolutePath();
 							BufferedMesh.Export(bufferedMesh, dest);
-							a.rawset("FilePath", dest.replace(p.getParentFile().getParentFile().getAbsolutePath(), "%PROJECT%"));
+							a.rawset("FilePath", dest.replace(p.getParentFile().getParentFile().getAbsolutePath(), FilePath.PROJECT_IDENTIFIER));
 						}
 					}
 				}
