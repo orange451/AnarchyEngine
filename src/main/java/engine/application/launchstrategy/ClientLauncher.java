@@ -7,9 +7,9 @@ import engine.util.JVMUtil;
 
 public class ClientLauncher {
 
-	public static void launch(RenderableApplication application) {
+	public static boolean launch(RenderableApplication application) {
 		if ( JVMUtil.restartJVM(true, true, null) ) {
-			return;
+			return false;
 		}
 		
 		// Start server game-logic thread
@@ -17,5 +17,6 @@ public class ClientLauncher {
 		
 		// Start rendering thread
 		GameEngine.renderThread = new InternalRenderThread(application);
+		return true;
 	}
 }

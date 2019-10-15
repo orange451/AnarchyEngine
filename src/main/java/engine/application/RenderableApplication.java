@@ -137,7 +137,10 @@ public abstract class RenderableApplication extends Application implements Rende
 
 	@Override
 	protected void onStart(String[] args) {
-		ClientLauncher.launch(this);
+		if ( !ClientLauncher.launch(this) )
+			return;
+
+		internalInitialize();
 		
 		if ( !glfwInit() ) {
 			GLFW_INITIALIZED = false;
@@ -215,7 +218,6 @@ public abstract class RenderableApplication extends Application implements Rende
 		// Start thread
 		try {
 			GLFW_INITIALIZED = true;
-			internalInitialize();
 			initialize(args);
 			initialized = true;
 			Resources.initialize();

@@ -9,6 +9,7 @@ import java.util.Observer;
 import org.luaj.vm2.LuaValue;
 
 import engine.application.Application;
+import engine.lua.LuaEngine;
 import engine.lua.type.ScriptData;
 import engine.lua.type.object.Service;
 import engine.lua.type.object.services.RunService;
@@ -84,22 +85,32 @@ public class InternalGameThread extends Observable implements Runnable {
 				delta = (now - lastTime) / (float)nanoSecond;
 				lastTime = now;
 				
-				if ( Game.isLoaded() ) {
-					RunService runService = Game.runService();
-					if ( runService != null && Game.isRunning() ) {
-						runService.heartbeatEvent().fire(LuaValue.valueOf(delta));
-					}
-					Game.getGame().tick();
-					this.notifyObservers();
-					
+				if ( LuaEngine.globals == null )
+					continue;
+				
+				if ( Game.game() == null )
+					continue;
+				
+				if ( !Game.isLoaded() )
+					continue;
+				
+				if ( Game.core() == null )
+					continue;
+				
+				RunService runService = Game.runService();
+				if ( runService != null && Game.isRunning() ) {
+					runService.heartbeatEvent().fire(LuaValue.valueOf(delta));
+				}
+				Game.getGame().tick();
+				this.notifyObservers();
+				
 
-					// Run runnables
-					synchronized(runnables) {
-						while ( runnables.size() > 0 ) {
-							Runnable r = runnables.get(0);
-							r.run();
-							runnables.remove(0);
-						}
+				// Run runnables
+				synchronized(runnables) {
+					while ( runnables.size() > 0 ) {
+						Runnable r = runnables.get(0);
+						r.run();
+						runnables.remove(0);
 					}
 				}
 

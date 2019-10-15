@@ -68,16 +68,6 @@ public class Game implements Tickable {
 	
 	public Game() {
 		game = this;
-		
-		// Turn on lua
-		LuaEngine.initialize();
-		
-		// Create the game instance
-		setGame(new GameLua());
-		
-		// Start a new project
-		changes = false;
-		newProject();
 	}
 	
 	//local j = game.Workspace.GameObject local t = 6  for i=1,t do t = t-1 for a=-t/2,t/2 do local k = j:Clone() k.WorldMatrix = Matrix4.new( Vector3.new( 0, a * 1.2, i ) ) k.Parent = game.Workspace.Cubes end end
@@ -189,7 +179,8 @@ public class Game implements Tickable {
 	private static final LuaValue C_ASSETS = LuaValue.valueOf("Assets");
 
 	public static GameLua game() {
-		return (GameLua) LuaEngine.globals.get(C_GAME);
+		LuaValue game = LuaEngine.globals.get(C_GAME);
+		return game.isnil()?null:(GameLua) game;
 	}
 	
 	public static void setGame(GameLua game) {
@@ -386,12 +377,16 @@ public class Game implements Tickable {
 	
 	@Override
 	public void tick() {
-		LuaEngine.globals.set(C_WORKSPACE, Game.workspace());
 		Game.game().rawset(C_RUNNING, LuaValue.valueOf(running));
 		Game.game().rawset(C_ISSERVER, LuaValue.valueOf(Game.isServer()));
 		
 		if ( !isLoaded() )
 			return;
+		
+		if ( Game.workspace() == null )
+			return;
+
+		LuaEngine.globals.set(C_WORKSPACE, Game.workspace());
 
 		// Make sure there's a camera
 		if ( Game.workspace().getCurrentCamera() == null ) {

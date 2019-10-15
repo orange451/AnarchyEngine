@@ -7,6 +7,7 @@ import engine.application.impl.ClientApplication;
 import engine.lua.type.data.Color3;
 import engine.lua.type.data.Vector3;
 import engine.lua.type.object.insts.Camera;
+import engine.lua.type.object.insts.DynamicSkybox;
 import engine.lua.type.object.insts.GameObject;
 import engine.lua.type.object.insts.Material;
 import engine.lua.type.object.insts.Mesh;
@@ -20,6 +21,11 @@ public class HelloWorld extends ClientApplication {
 		
 		// Set ambient
 		Game.lighting().setAmbient(Color3.newInstance(64, 64, 64));
+		
+		// Skybox
+		DynamicSkybox sky = new DynamicSkybox();
+		sky.setParent(Game.lighting());
+		Game.lighting().setSkybox(sky);
 		
 		// Make a sphere
 		Mesh mesh = Game.assets().newMesh();

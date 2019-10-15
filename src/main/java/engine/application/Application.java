@@ -3,6 +3,8 @@ package engine.application;
 import engine.Game;
 import engine.GameEngine;
 import engine.application.launchstrategy.ServerLauncher;
+import engine.lua.LuaEngine;
+import engine.lua.type.object.services.GameLua;
 import engine.observer.Tickable;
 
 public abstract class Application extends GameEngine implements Tickable {
@@ -49,13 +51,22 @@ public abstract class Application extends GameEngine implements Tickable {
 	}
 
 	protected void onStart(String[] args) {
-		ServerLauncher.launch(this);
 		internalInitialize();
+		ServerLauncher.launch(this);
 		initialize(args);
 	}
 
 	public void internalInitialize() {
-		// Nothing here.
+		
+		// Turn on lua
+		LuaEngine.initialize();
+		
+		// Create the game instance
+		Game.setGame(new GameLua());
+		
+		// Start a new project
+		Game.changes = false;
+		Game.newProject();
 	}
 
 	public abstract void initialize(String[] args);

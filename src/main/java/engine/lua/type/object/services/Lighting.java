@@ -13,6 +13,7 @@ import engine.lua.lib.EnumType;
 import engine.lua.type.LuaConnection;
 import engine.lua.type.NumberClampPreferred;
 import engine.lua.type.data.Color3;
+import engine.lua.type.object.Instance;
 import engine.lua.type.object.Service;
 import engine.lua.type.object.TreeViewable;
 import engine.lua.type.object.insts.DynamicSkybox;
@@ -241,7 +242,7 @@ public class Lighting extends Service implements TreeViewable {
 		return ret.isnil()?null:(Skybox)ret;
 	}
 
-	public void setSkybox(Skybox skybox) {
+	public void setSkybox(Instance skybox) {
 		if ( skybox == null )
 			this.set(C_SKYBOX, LuaValue.NIL);
 		else
