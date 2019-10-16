@@ -428,6 +428,8 @@ public abstract class DataModel extends LuaDatatype {
 			return;
 		
 		DataModel r = (DataModel)root;
+		if ( r.destroyed )
+			return;
 		
 		if ( !r.descendents.contains(this) ) {
 			r.descendantAddedEvent().fire(this);
