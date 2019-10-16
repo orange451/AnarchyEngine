@@ -66,6 +66,7 @@ public class Workspace extends Service implements RenderableWorld,TreeViewable,T
 		if ( camera == null || camera.isnil() )
 			return;
 		
+		camera.setParent(this);
 		this.set(C_CURRENTCAMERA, camera);
 	}
 
@@ -81,6 +82,14 @@ public class Workspace extends Service implements RenderableWorld,TreeViewable,T
 					continue;
 
 				d.internalTick();
+			}
+		}
+		
+		// Camera should never be in nil.
+		Camera currentCamera = this.getCurrentCamera();
+		if ( currentCamera != null ) {
+			if ( currentCamera.getParent().isnil() ) {
+				currentCamera.setParent(this);
 			}
 		}
 	}

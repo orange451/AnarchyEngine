@@ -140,7 +140,7 @@ public abstract class PhysicsBase extends Instance implements GameSubscriber {
 		checkNetworkOwnership();
 		
 		// Send update packets
-		if ( internalPhys.getBody() != null ) {
+		if ( internalPhys.getBody() != null && !internalPhys.getBody().isDisposed() ) {
 			
 			// Server sends physics updates to the clients (except for client-owned physics)
 			if ( Game.isServer() && internalPhys.getBody().isActive() && this.getMass() > 0 ) {

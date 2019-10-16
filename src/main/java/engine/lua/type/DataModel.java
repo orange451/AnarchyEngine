@@ -512,6 +512,9 @@ public abstract class DataModel extends LuaDatatype {
 		if ( parent == this )
 			throw new LuaError("Instance can not be its own parent");
 		
+		if ( parent == this.getParent() )
+			return;
+		
 		this.set(C_PARENT, parent);
 	}
 	
