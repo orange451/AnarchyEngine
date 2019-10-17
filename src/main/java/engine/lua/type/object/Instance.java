@@ -403,7 +403,9 @@ public abstract class Instance extends DataModel {
 	 * @param name
 	 * @return
 	 */
-	public Instance findFirstChild(LuaValue name) {
+	public Instance findFirstChild(LuaValue name) {		
+		
+		// If the child we're looking for has a name that is also a FIELD name of this object, we can't do O(1) lookup.
 		if ( this.containsField(name) ) {
 			synchronized(children) {
 				for (int i = 0; i < children.size(); i++) {
@@ -415,27 +417,40 @@ public abstract class Instance extends DataModel {
 			}
 			return null;
 		}
+		
+		// Check the object->name lookup stored inside this Instance. O(1) time.
 		LuaValue temp = this.get(name);
 		if ( temp instanceof Instance && ((Instance)temp).get(C_NAME).eq_b(name) )
 			return (Instance)temp;
 		
+		// Child not found.
 		return null;
 	}
 
 	/**
-	 * Returns the first child whos class matches the desired class name. This method is O(n) time.
+	 * Returns the first child whos class matches the desired class name. This method is O(n) the first time ran, or whenever the children of this object changes.
+	 * Afterwards it is cached and O(1) lookup.
 	 * @param name
 	 * @return
 	 */
 	public Instance findFirstChildOfClass(LuaValue name) {
+		// Try using the cache of classes first
+		if ( cachedChildrenOfClass.containsKey(name) )
+			return (Instance) cachedChildrenOfClass.get(name);
+		
+		// Much perform O(n) search, and also cache the returned value
 		synchronized(children) {
 			for (int i = 0; i < children.size(); i++) {
 				Instance child = children.get(i);
-				if ( child.getClassName().eq_b(name) ) {
+				LuaValue className = child.getClassName();
+				if ( className.eq_b(name) ) {
+					cachedChildrenOfClass.put(className, child);
 					return child;
 				}
 			}
 		}
+		
+		// No children of this class exist within this instance.
 		return null;
 	}
 	

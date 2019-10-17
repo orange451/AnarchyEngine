@@ -22,6 +22,7 @@ public abstract class DataModel extends LuaDatatype {
 	protected HashSet<Instance> descendents = new HashSet<Instance>();
 	protected ArrayList<Instance> descendentsList = new ArrayList<Instance>();
 	protected List<InstancePropertySubscriber> propertySubscribers = Collections.synchronizedList(new ArrayList<InstancePropertySubscriber>());
+	protected HashMap<LuaValue, DataModel> cachedChildrenOfClass = new HashMap<LuaValue, DataModel>();
 	
 	protected static HashMap<String,LuaInstancetypeData> TYPES = new HashMap<String,LuaInstancetypeData>();
 
@@ -366,11 +367,14 @@ public abstract class DataModel extends LuaDatatype {
 					((DataModel)descendentsList.get(i)).descendantAdded(newParInst);
 				}
 				
+				// Set cached children of class lookup table FOR this class
+				if ( !((Instance)newParInst).cachedChildrenOfClass.containsKey(this.getClassName()) )
+					((Instance)newParInst).cachedChildrenOfClass.put(this.getClassName(), this);
+				
+				
 				// Add new reference
-				LuaValue temp = newParInst.get(name);
-				if ( temp.equals(LuaValue.NIL) && newParInst.getField(this.rawget(C_NAME)) == null ) {
-					newParInst.rawset(name, this);
-				}
+				if ( newParInst.rawget(name).isnil() )
+					newParInst.updateChildPointer( LuaValue.valueOf(name), this );
 			}
 			
 			// Delete self from old parent reference
@@ -378,6 +382,10 @@ public abstract class DataModel extends LuaDatatype {
 				List<Instance> oldParentChildren = ((Instance)oldParent).getChildren();
 				synchronized(oldParentChildren) {
 					oldParentChildren.remove(this);
+
+					// Reset cached children of class lookup table FOR this class
+					if ( ((Instance)oldParent).cachedChildrenOfClass.containsKey(this.getClassName()) )
+						((Instance)oldParent).cachedChildrenOfClass.remove(this.getClassName());
 					
 					// If the parents reference by name points to this instance...
 					if ( oldParent.rawget(this.rawget(C_NAME)) == this ) {
@@ -386,14 +394,14 @@ public abstract class DataModel extends LuaDatatype {
 						LuaValue firstWithName = LuaValue.NIL;
 						for (int i = 0; i < oldParentChildren.size(); i++) {
 							Instance temp = oldParentChildren.get(i);
-							if ( temp.getName().equalsIgnoreCase(name) ) {
+							if ( temp.getName().equals(name) ) {
 								firstWithName = temp;
 								break;
 							}
 						}
 						
 						// Set the reference to that child. NIL if no child found.
-						((DataModel)oldParent).updateChildPointer(this.rawget(C_NAME), firstWithName);
+						((DataModel)oldParent).updateChildPointer(LuaValue.valueOf(name), firstWithName);
 					}
 				}
 				
@@ -445,11 +453,11 @@ public abstract class DataModel extends LuaDatatype {
 		descendantAdded(parent);
 	}
 	
-	private void updateChildPointer( LuaValue name, LuaValue value ) {
-		if ( this.containsField(name) ) {
+	protected void updateChildPointer( LuaValue childName, LuaValue instanceReference ) {
+		if ( this.containsField(childName) ) {
 			return;
 		}
-		this.rawset(name, value);
+		this.rawset(childName, instanceReference);
 	}
 	
 	/**
@@ -639,6 +647,7 @@ public abstract class DataModel extends LuaDatatype {
 		this.descendentsList.clear();
 		this.destroyed = true;
 		this.propertySubscribers.clear();
+		this.cachedChildrenOfClass.clear();
 		
 		super.cleanup();
 	}

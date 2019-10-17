@@ -76,7 +76,10 @@ public class GameObject extends Instance implements RenderableInstance,TreeViewa
 	 * @return
 	 */
 	public Matrix4 getWorldMatrix() {
-		return (Matrix4) this.get(C_WORLDMATRIX);
+		LuaValue worldMatrix = this.get(C_WORLDMATRIX);
+		if ( worldMatrix.isnil() )
+			return new Matrix4();
+		return (Matrix4) worldMatrix;
 	}
 	
 	/**
