@@ -41,8 +41,7 @@ public class Matrix4 extends LuaValuetype {
 	public Matrix4(Matrix4f internal) {
 		this.internal = new Matrix4f(internal);
 		
-		this.defineField("P", new Vector3(), false);
-		update();
+		this.defineField("P", new Vector3(internal.getTranslation(new Vector3f())), false);
 
 		// Create ToString function
 		this.getmetatable().set("ToString", new ZeroArgFunction() {
@@ -124,8 +123,8 @@ public class Matrix4 extends LuaValuetype {
 	}
 
 	private void update() {
-		Vector3 pos = (Vector3) this.rawget(C_P);
 		Vector3f translation = internal.getTranslation(new Vector3f());
+		Vector3 pos = (Vector3) this.rawget(C_P);
 		pos.setInternal(translation);
 	}
 
@@ -192,26 +191,64 @@ public class Matrix4 extends LuaValuetype {
 			@Override
 			public Varargs invoke(Varargs args) {
 				int amtarg = args.narg();
-				if ( amtarg == 0 ) {
-					return new Matrix4();
-				}
-				if ( amtarg == 1 ) {
-					LuaValue t = args.arg(1);
-					if ( t instanceof Matrix4 ) {
-						return new Matrix4((Matrix4)t);
+				
+				try {
+					// Blank Matrix
+					if ( amtarg == 0 ) {
+						return new Matrix4();
 					}
-					if ( t instanceof Vector3 ) {
-						return new Matrix4((Vector3)t);
-					}
-				}
-				if ( amtarg == 3 ) {
-					double a1 = args.arg(1).checkdouble();
-					double a2 = args.arg(2).checkdouble();
-					double a3 = args.arg(3).checkdouble();
 					
-					return new Matrix4(a1, a2, a3);
+					// Clone of matrix or set from Vector
+					if ( amtarg == 1 ) {
+						LuaValue t = args.arg(1);
+						if ( t instanceof Matrix4 ) {
+							return new Matrix4((Matrix4)t);
+						}
+						if ( t instanceof Vector3 ) {
+							return new Matrix4((Vector3)t);
+						}
+					}
+					
+					// Build look-at matrix
+					if ( amtarg == 2 ) {
+						if ( args.arg(1) instanceof Vector3 && args.arg(2) instanceof Vector3 ) {
+							Vector3 v1 = (Vector3)args.arg(1);
+							Vector3 v2 = (Vector3)args.arg(2);
+							float v1x = v1.getX();
+							float v1y = v1.getY();
+							float v1z = v1.getZ();
+							float v2x = v2.getX();
+							float v2y = v2.getY();
+							float v2z = v2.getZ();
+							if ( (v1x-v2x)*(v1x-v2x) + (v1y-v2y)*(v1y-v2y) + (v1z-v2z)*(v1z-v2z) < 0.0001 )
+								return new Matrix4(v1);
+							
+							Matrix4f rotation = new Matrix4f()
+									.rotateX((float)-Math.PI/2f)
+									.lookAt(0, 0, 0, (v2x-v1x), (v2y-v1y), (v2z-v1z), 0, 0, 1)
+									.rotateX((float)Math.PI)
+									.rotateZ((float)Math.PI);
+							Matrix4f source = new Matrix4f()
+									.translate(v1x,v1y,v1z)
+									.mul(rotation);
+							return new Matrix4(source);
+						}
+						
+						return new Matrix4();
+					}
+					
+					// Build matrix from vector xyz
+					if ( amtarg == 3 ) {
+						double a1 = args.arg(1).checkdouble();
+						double a2 = args.arg(2).checkdouble();
+						double a3 = args.arg(3).checkdouble();
+						
+						return new Matrix4(a1, a2, a3);
+					}
+					LuaValue.error("Invalid constructor for " + this.typename());
+				} catch(Exception e) {
+					e.printStackTrace();
 				}
-				LuaValue.error("Invalid constructor for " + this.typename());
 				return LuaValue.NIL;
 			}
 		};

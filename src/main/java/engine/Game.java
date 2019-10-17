@@ -637,10 +637,12 @@ public class Game implements Tickable {
         	for (int i = 0; i < jsonObjects.size(); i++) {
         		JSONObject json = (JSONObject) jsonObjects.get(i);
         		Instance inst = Load.parseJSON(false, json);
+        		if ( inst == parent ) 
+        			continue;
+        		
         		if ( inst != null ) {
         			ret.add(inst);
         		}
-        		
         		inst.forceSetParent(parent);
         	}
         } catch (FileNotFoundException e) {
