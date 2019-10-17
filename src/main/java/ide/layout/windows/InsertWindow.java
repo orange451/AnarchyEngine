@@ -8,6 +8,8 @@ import java.util.List;
 import org.luaj.vm2.LuaValue;
 
 import engine.Game;
+import engine.InternalGameThread;
+import engine.InternalRenderThread;
 import engine.lua.type.object.Instance;
 import engine.lua.type.object.TreeViewable;
 import ide.layout.windows.icons.Icons;
@@ -101,16 +103,18 @@ public class InsertWindow {
 				items.getChildren().add(t);
 				
 				t.setOnMouseClicked((event)->{
-					try {
-						if ( event.getClickCount() == 2 ) {
-							Instance inst = (Instance) instClass.newInstance();
-							inst.forceSetParent(getParent());
-							Game.historyService().pushChange(inst, LuaValue.valueOf("Parent"), LuaValue.NIL, inst.getParent());
-							
-							//Game.select(inst);
-						}
-					} catch (Exception e) {
-						//
+					if ( event.getClickCount() == 2 ) {
+						InternalRenderThread.runLater(()->{
+							try {
+								Instance inst = (Instance) instClass.newInstance();
+								inst.forceSetParent(getParent());
+								Game.historyService().pushChange(inst, LuaValue.valueOf("Parent"), LuaValue.NIL, inst.getParent());
+							} catch (Exception e) {
+								//
+							}
+						});
+						
+						//Game.select(inst);
 					}
 				});
 			} catch (Exception e) {
