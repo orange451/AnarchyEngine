@@ -186,6 +186,14 @@ public class AnimationController extends Instance {
 		
 		playingAnimations.add(track);
 	}
+	
+	/**
+	 * Returns the amount of animations playing in this controller.
+	 * @return
+	 */
+	public int getPlayingAnimations() {
+		return this.playingAnimations.size();
+	}
 
 	/**
 	 * Debug render

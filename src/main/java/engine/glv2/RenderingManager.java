@@ -39,6 +39,7 @@ import engine.glv2.entities.SunCamera;
 import engine.glv2.v2.IRenderingData;
 import engine.glv2.v2.lights.DirectionalLightCamera;
 import engine.lua.type.object.Instance;
+import engine.lua.type.object.insts.AnimationController;
 import engine.lua.type.object.insts.Camera;
 import engine.observer.RenderableInstance;
 
@@ -115,7 +116,10 @@ public class RenderingManager {
 			process(inst);
 		}
 		if (root instanceof RenderableInstance) {
-			int id = root.findFirstChildOfClass(C_ANIMATIONCONTROLLER) == null ? 1 : 2; // TODO: Poll current instance
+			
+			Instance animationController = root.findFirstChildOfClass(C_ANIMATIONCONTROLLER);
+			boolean hasAnimationController = animationController != null && ((AnimationController)animationController).getPlayingAnimations() > 0;
+			int id = hasAnimationController ? 2 : 1; // TODO: Poll current instance
 																						// renderer id
 			List<Instance> batch = entitiesToRenderers.findKey(id);
 			if (batch != null)
