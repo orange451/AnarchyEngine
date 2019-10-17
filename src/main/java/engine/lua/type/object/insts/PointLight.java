@@ -55,10 +55,6 @@ public class PointLight extends LightBase implements TreeViewable {
 				onParentChange();
 			}
 		});
-		
-		InternalGameThread.runLater(()->{
-			//onParentChange();
-		});
 	}
 	
 	private void onParentChange() {

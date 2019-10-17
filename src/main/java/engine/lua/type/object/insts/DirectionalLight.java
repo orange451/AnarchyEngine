@@ -63,7 +63,6 @@ public class DirectionalLight extends LightBase implements TreeViewable {
 		});
 		
 		InternalGameThread.runLater(()->{
-			onParentChange();
 			
 			Game.lighting().changedEvent().connect((args)->{
 				if ( light == null )
@@ -82,7 +81,7 @@ public class DirectionalLight extends LightBase implements TreeViewable {
 	private void onParentChange() {
 		LuaValue t = this.getParent();
 		if ( t.isnil() ) {
-			onDestroy();
+			destroyLight();
 			return;
 		}
 		
@@ -91,7 +90,7 @@ public class DirectionalLight extends LightBase implements TreeViewable {
 			if ( t instanceof RenderableWorld ) {
 				IPipeline tempPipeline = Pipeline.get((RenderableWorld)t);
 				if ( tempPipeline == null )
-					continue;
+					break;
 				
 				// Light exists inside old pipeline. No need to recreate.
 				if ( pipeline != null && pipeline.equals(tempPipeline) )
@@ -99,7 +98,7 @@ public class DirectionalLight extends LightBase implements TreeViewable {
 				
 				// Destroy old light
 				if ( pipeline != null )
-					onDestroy();
+					destroyLight();
 				
 				// Make new light. Return means we can live for another day!
 				pipeline = tempPipeline;
@@ -108,11 +107,14 @@ public class DirectionalLight extends LightBase implements TreeViewable {
 			}
 			
 			// Navigate up tree
+			LuaValue temp = t;
 			t = ((Instance)t).getParent();
+			if ( t == temp )
+				t = null;
 		}
 		
 		// Cant make light, can't destroy light. SO NO LIGHT!
-		onDestroy();
+		destroyLight();
 	}
 
 	@Override
@@ -122,45 +124,42 @@ public class DirectionalLight extends LightBase implements TreeViewable {
 
 	@Override
 	public void onDestroy() {
-		if ( light != null ) {
-			DirectionalLightInternal tempLight = light;
-			InternalRenderThread.runLater(()->{
-				if ( pipeline != null ) {
-					pipeline.getDirectionalLightHandler().removeLight(tempLight);
-					pipeline = null;
-				}
-			});
-			light = null;
-			
-			System.out.println("Destroyed light");
-		}
+		destroyLight();
 	}
 	
-	private void makeLight() {
-		if ( pipeline == null )
-			return;
-		
-		if ( light != null )
-			return;
-		
-		System.out.println("Making light");
-		
-		// Create light
-		Vector3f direction = ((Vector3)this.get(C_DIRECTION)).toJoml();
-		float intensity = this.get(C_INTENSITY).tofloat();
-		light = new engine.gl.light.DirectionalLightInternal(direction, intensity);
-		light.distance = this.get(C_SHADOWDISTANCE).toint();
-		
-		// Color it
-		Color color = ((Color3)this.get("Color")).toColor();
-		light.color = new Vector3f( Math.max( color.getRed(),1 )/255f, Math.max( color.getGreen(),1 )/255f, Math.max( color.getBlue(),1 )/255f );
-		
+	private void destroyLight() {
+		InternalRenderThread.runLater(()->{
+			if ( light == null || pipeline == null )
+				return;
+			
+			pipeline.getDirectionalLightHandler().removeLight(light);
+			light = null;
+			pipeline = null;
+
+			System.out.println("Destroyed light");
+		});
+	}
+	
+	private void makeLight() {		
 		// Add it to pipeline
 		InternalRenderThread.runLater(()->{
-			if ( pipeline == null || light == null )
+			if ( pipeline == null )
 				return;
+			
+			if ( light != null )
+				return;
+			
+			// Create light
+			Vector3f direction = ((Vector3)this.get(C_DIRECTION)).toJoml();
+			float intensity = this.get(C_INTENSITY).tofloat();
+			light = new engine.gl.light.DirectionalLightInternal(direction, intensity);
+			light.distance = this.get(C_SHADOWDISTANCE).toint();
+			
+			// Color it
+			Color color = ((Color3)this.get("Color")).toColor();
+			light.color = new Vector3f( Math.max( color.getRed(),1 )/255f, Math.max( color.getGreen(),1 )/255f, Math.max( color.getBlue(),1 )/255f );
+			
 			pipeline.getDirectionalLightHandler().addLight(light);
-			light.update();
 		});
 	}
 	
