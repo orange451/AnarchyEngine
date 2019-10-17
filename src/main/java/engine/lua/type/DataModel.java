@@ -362,9 +362,10 @@ public abstract class DataModel extends LuaDatatype {
 				newParInst.childAddedEvent().fire(this);
 	
 				// Fire descendant added event
-				descendantAdded(newParInst);
+				boolean forceAdd = oldParent.isnil();
+				descendantAdded(newParInst, forceAdd);
 				for (int i = 0; i < descendentsList.size(); i++) {
-					((DataModel)descendentsList.get(i)).descendantAdded(newParInst);
+					((DataModel)descendentsList.get(i)).descendantAdded(newParInst, forceAdd);
 				}
 				
 				// Set cached children of class lookup table FOR this class
@@ -431,7 +432,11 @@ public abstract class DataModel extends LuaDatatype {
 		}
 	}
 
-	private void descendantAdded(LuaValue root) {
+	/**
+	 * add THIS datamodel as a descendant of all its ancestors recursively.
+	 * @param root
+	 */
+	private void descendantAdded(LuaValue root, boolean force) {
 		if ( root == null || root.isnil() || !(root instanceof Instance) )
 			return;
 		
@@ -439,7 +444,7 @@ public abstract class DataModel extends LuaDatatype {
 		if ( r.destroyed )
 			return;
 		
-		if ( !r.descendents.contains(this) ) {
+		if ( force || !r.descendents.contains(this) ) {
 			r.descendantAddedEvent().fire(this);
 			r.descendents.add((Instance) this);
 			r.descendentsList.add((Instance) this);
@@ -450,7 +455,7 @@ public abstract class DataModel extends LuaDatatype {
 		if ( parent == root )
 			return;
 		
-		descendantAdded(parent);
+		descendantAdded(parent, force);
 	}
 	
 	protected void updateChildPointer( LuaValue childName, LuaValue instanceReference ) {
