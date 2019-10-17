@@ -96,6 +96,7 @@ public class IdeLuaEditor extends IdePane {
 				"spawn",
 				"tostring",
 				"Enum",
+				"_G",
 				
 				// Datatypes
 				"Vector3",
