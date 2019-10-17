@@ -108,7 +108,7 @@ public class IdeLuaEditor extends IdePane {
 		final String NUMBER_PATTERN = "^\\d*\\.\\d+" + "|" + "\\d+\\.\\d" + "|" + "\\d+";
 		final String PAREN_PATTERN = "\\(" + "|" + "\\)";
 		final String BRACKET_PATTERN = "\\[|\\]";
-		final String STRING_PATTERN = "(\\[\\[)(.|\\R)*?(\\]\\])" + "|" + "\"([^\"\\\\]|\\\\.)*\"" + "|" + "\'([^\"\\\\]|\\\\.)*\'";
+		final String STRING_PATTERN = "(\"(.*?)\"|'(.*?)'|(?s)(\\[\\[)(.*?)(\\]\\]))";
 		final String COMMENT_PATTERN = "--(\\[\\[)(.|\\R)*?(\\]\\])" + "|" + "--[^\n]*";
 		
 		Pattern PATTERN = Pattern.compile(
