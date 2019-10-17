@@ -421,7 +421,7 @@ public class PhysicsObjectInternal {
 		if ( type.equals("Hull") && !luaFrontEnd.get(C_LINKED).get(C_PREFAB).isnil() ) {
 			Prefab prefab = (Prefab) luaFrontEnd.get(C_LINKED).get(C_PREFAB);
 			BufferedMesh mesh = prefab.getPrefab().getCombinedMesh();
-			shape = PhysicsUtils.hullShape(mesh, 1.0f, mesh.getSize() > 64);
+			shape = PhysicsUtils.hullShape(mesh, 1.0f, mesh.getSize() > 512);
 		}
 		
 		this.desiredShape = shape;

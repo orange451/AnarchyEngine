@@ -34,6 +34,11 @@ public abstract class PhysicsBase extends Instance implements GameSubscriber {
 	private LuaConnection connection;
 	private LuaConnection prefabChanged;
 	
+	/**
+	 * If true, the linked instance must have a prefab in order to be physics backed.
+	 */
+	protected boolean FLAG_REQUIRE_PREFAB = true;
+	
 	public Player playerOwns;
 
 	protected static final LuaValue C_WORLDMATRIX = LuaValue.valueOf("WorldMatrix");
@@ -235,7 +240,7 @@ public abstract class PhysicsBase extends Instance implements GameSubscriber {
 
 		// Linked object must have a prefab
 		LuaValue prefab = value.get(C_PREFAB);
-		if ( prefab.isnil() )
+		if ( prefab.isnil() && FLAG_REQUIRE_PREFAB )
 			return;
 		
 		// Link us to this game object
@@ -271,7 +276,7 @@ public abstract class PhysicsBase extends Instance implements GameSubscriber {
 			}
 			
 			// Game object had its model changed. Replicate to physics object.
-			if ( property.equals("Prefab") ) {
+			if ( property.equals(C_PREFAB) ) {
 				physics.refresh();
 				setupPrefabChanged();
 			}

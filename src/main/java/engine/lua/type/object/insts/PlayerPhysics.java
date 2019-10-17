@@ -28,6 +28,8 @@ public class PlayerPhysics extends PhysicsBase implements TreeViewable {
 	
 	public PlayerPhysics() {
 		super("PlayerPhysics");
+		
+		this.FLAG_REQUIRE_PREFAB = false;
 
 		this.defineField(C_ONGROUND.toString(), LuaValue.valueOf(false), true);
 		
