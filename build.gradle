@@ -5,10 +5,11 @@ plugins {
 	id "idea"
 	id "java"
 	id "java-library"
-	id "java-library-distribution"
+	id "application"
 }
 
 sourceCompatibility = "8"
+mainClassName = "ide.IDE"
 project.ext.lwjglVersion = "3.2.3"
 project.ext.jomlVersion = "1.9.17"
 project.ext.gdxVersion = "1.9.3"
