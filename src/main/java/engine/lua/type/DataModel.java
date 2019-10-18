@@ -274,6 +274,10 @@ public abstract class DataModel extends LuaDatatype {
 		return new ArrayList<Instance>(descendentsList);
 	}
 	
+	public List<Instance> getDescendantsUnsafe() {
+		return this.descendentsList;
+	}
+	
 	private void onKeyChange(LuaValue key, LuaValue value, LuaValue oldValue) {
 		if ( value == oldValue )
 			return;

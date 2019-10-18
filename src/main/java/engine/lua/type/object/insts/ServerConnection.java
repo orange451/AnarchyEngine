@@ -10,7 +10,11 @@ public class ServerConnection extends Connection implements TreeViewable,NonRepl
 	public ServerConnection( com.esotericsoftware.kryonet.Connection kryoConnection) {
 		this();
 		this.kryoConnection = kryoConnection;
-		this.rawset("Address", LuaValue.valueOf(kryoConnection.getRemoteAddressTCP().getAddress().getHostAddress()));
+		if ( kryoConnection != null && kryoConnection.getRemoteAddressTCP() != null && kryoConnection.getRemoteAddressTCP().getAddress() != null ) {
+			this.rawset("Address", LuaValue.valueOf(kryoConnection.getRemoteAddressTCP().getAddress().getHostAddress()));
+		} else {
+			this.rawset("Address", LuaValue.NIL);
+		}
 	}
 	
 	public ServerConnection() {

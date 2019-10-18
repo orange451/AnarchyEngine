@@ -166,9 +166,27 @@ public class Assets extends Service implements TreeViewable {
 	 * Get list of all textures loaded
 	 * @return
 	 */
+	public List<Material> getMaterials() {
+		List<Material> assets = new ArrayList<>();
+		List<Instance> d = this.getDescendantsUnsafe();
+		
+		for (int i = 0; i < d.size(); i++) {
+			Instance t = d.get(i);
+			if ( t instanceof Material ) {
+				assets.add((Material) t);
+			}
+		}
+		
+		return assets;
+	}
+	
+	/**
+	 * Get list of all textures loaded
+	 * @return
+	 */
 	public List<AssetLoadable> getTextures() {
 		List<AssetLoadable> assets = new ArrayList<AssetLoadable>();
-		List<Instance> d = this.getDescendants();
+		List<Instance> d = this.getDescendantsUnsafe();
 		
 		for (int i = 0; i < d.size(); i++) {
 			Instance t = d.get(i);
@@ -186,7 +204,7 @@ public class Assets extends Service implements TreeViewable {
 	 */
 	public List<AssetLoadable> getMeshes() {
 		List<AssetLoadable> assets = new ArrayList<AssetLoadable>();
-		List<Instance> d = this.getDescendants();
+		List<Instance> d = this.getDescendantsUnsafe();
 		
 		for (int i = 0; i < d.size(); i++) {
 			Instance t = d.get(i);
