@@ -197,8 +197,6 @@ public class GLRenderer implements IPipeline {
 		sunCamera.setPosition(currentCamera.getPosition().getInternal());
 		if (renderingSettings.shadowsEnabled) {
 			GPUProfiler.start("Shadow Pass");
-			sunCamera.switchProjectionMatrix(0);
-			// frustum.calculateFrustum(sunCamera);
 
 			dlsm.bind();
 			glClear(GL_DEPTH_BUFFER_BIT);
@@ -207,6 +205,8 @@ public class GLRenderer implements IPipeline {
 			dlsm.unbind();
 			synchronized (directionalLightHandler.getLights()) {
 				for (DirectionalLightInternal l : directionalLightHandler.getLights()) {
+					l.setPosition(currentCamera.getPosition().getInternal());
+					l.update();
 					l.getShadowMap().bind();
 					glClear(GL_DEPTH_BUFFER_BIT);
 					renderingManager.renderShadow(l.getLightCamera());
@@ -216,13 +216,6 @@ public class GLRenderer implements IPipeline {
 
 			GPUProfiler.end();
 			glCullFace(GL_FRONT);
-			/*
-			 * for (Light light : lightRenderer.getLights()) { if (light.useShadows()) { //
-			 * frustum.calculateFrustum(light.getCamera()); light.getShadowMap().bind();
-			 * glClear(GL_DEPTH_BUFFER_BIT);
-			 * //renderingManager.renderShadow(light.getCamera());
-			 * light.getShadowMap().unbind(); } }
-			 */
 			glCullFace(GL_BACK);
 		}
 	}
@@ -361,8 +354,8 @@ public class GLRenderer implements IPipeline {
 		rd.camera = currentCamera;
 		rd.sun = sun;
 		rd.projectionMatrix = projMatrix;
-		//currentCamera.getViewMatrix().getInternal().set(directionalLightHandler.getLights().get(0).getLightCamera().getViewMatrix());
-		//projMatrix.set(directionalLightHandler.getLights().get(0).getLightCamera().getProjectionArray()[2]);
+		// currentCamera.getViewMatrix().getInternal().set(directionalLightHandler.getLights().get(0).getLightCamera().getViewMatrix());
+		// projMatrix.set(directionalLightHandler.getLights().get(0).getLightCamera().getProjectionArray()[2]);
 		GPUProfiler.startFrame();
 
 		shadowPass();

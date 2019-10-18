@@ -218,9 +218,9 @@ public abstract class RenderableApplication extends Application implements Rende
 		// Start thread
 		try {
 			GLFW_INITIALIZED = true;
+			Resources.initialize();
 			initialize(args);
 			initialized = true;
-			Resources.initialize();
 		} catch(Exception e) {
 			e.printStackTrace();
 			new ErrorWindow("Error initializing engine.", true);
