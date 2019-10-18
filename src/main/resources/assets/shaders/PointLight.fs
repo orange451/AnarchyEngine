@@ -20,28 +20,26 @@
 
 #include struct Light
 
-in vec2 textureCoords;
+out vec3 out_Color;
 
-out vec4 out_Color;
-
+uniform vec2 texel;
 uniform vec3 cameraPosition;
+uniform sampler2D gDiffuse;
+uniform sampler2D gPosition;
+uniform sampler2D gNormal;
+uniform sampler2D gPBR; // R = roughness, G = metallic
+uniform sampler2D gMask;
+uniform sampler2D gDepth;
+uniform int useShadows;
+uniform mat4 biasMatrix;
 uniform mat4 projectionMatrix;
 uniform mat4 viewMatrix;
 uniform mat4 inverseProjectionMatrix;
 uniform mat4 inverseViewMatrix;
 
-uniform Light pointLights[128];
-uniform int totalPointLights;
-uniform mat4 biasMatrix;
+uniform Light light;
 
-uniform int useShadows;
-
-uniform sampler2D gDiffuse;
-uniform sampler2D gNormal;
-uniform sampler2D gMask;
-uniform sampler2D gPBR; // R = roughness, B = metallic
-uniform sampler2D gDepth;
-uniform sampler2D image;
+#include variable GLOBAL
 
 #include variable pi
 
@@ -55,35 +53,34 @@ uniform sampler2D image;
 
 #include function fresnelSchlick
 
+#include function fresnelSchlickRoughness
+
 #include function calcPointLight
 
 #include variable MASK
 
 void main() {
-	vec4 composite = texture(image, textureCoords);
+	vec2 textureCoords = gl_FragCoord.xy * texel;
+
 	vec4 mask = texture(gMask, textureCoords);
+	vec3 result = vec3(1.0);
 	if (MASK_COMPARE(mask.a, PBR_OBJECT)) {
-		vec4 diffuse = texture(gDiffuse, textureCoords);
+		vec4 image = texture(gDiffuse, textureCoords);
 		vec2 pbr = texture(gPBR, textureCoords).rg;
 		float depth = texture(gDepth, textureCoords).r;
 		vec3 position =
 			positionFromDepth(textureCoords, depth, inverseProjectionMatrix, inverseViewMatrix);
 		vec3 normal = texture(gNormal, textureCoords).rgb;
+		float roughness = pbr.r;
+		float metallic = pbr.g;
 
 		vec3 N = normalize(normal);
 		vec3 V = normalize(cameraPosition - position);
 
-		float roughness = pbr.r;
-		float metallic = pbr.g;
-
 		vec3 F0 = vec3(0.04);
-		F0 = mix(F0, diffuse.rgb, metallic);
+		F0 = mix(F0, image.rgb, metallic);
 
-		vec3 Lo = vec3(0.0);
-		for (int i = 0; i < totalPointLights; i++) {
-			Lo += calcPointLight(pointLights[i], position, diffuse.rgb, N, V, F0, roughness, metallic);
-		}
-		composite.rgb += Lo;
+		result = calcPointLight(light, position, image.rgb, N, V, F0, roughness, metallic);
 	}
-	out_Color = composite;
+	out_Color = result;
 }

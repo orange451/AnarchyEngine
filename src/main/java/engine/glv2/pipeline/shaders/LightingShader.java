@@ -49,6 +49,7 @@ public class LightingShader extends BasePipelineShader {
 	private UniformSampler environmentCube = new UniformSampler("environmentCube");
 	private UniformSampler brdfLUT = new UniformSampler("brdfLUT");
 	private UniformSampler directionalLightData = new UniformSampler("directionalLightData");
+	private UniformSampler pointLightData = new UniformSampler("pointLightData");
 
 	private UniformMatrix4 biasMatrix = new UniformMatrix4("biasMatrix");
 
@@ -58,7 +59,7 @@ public class LightingShader extends BasePipelineShader {
 		super("deferred/" + name);
 		super.storeUniforms(projectionMatrix, viewMatrix, cameraPosition, uAmbient, gDiffuse, gPosition, gNormal,
 				gDepth, gPBR, gMask, volumetric, irradianceCube, environmentCube, brdfLUT, biasMatrix,
-				inverseProjectionMatrix, inverseViewMatrix, directionalLightData);
+				inverseProjectionMatrix, inverseViewMatrix, directionalLightData, pointLightData);
 		super.validate();
 		this.loadInitialData();
 	}
@@ -77,6 +78,7 @@ public class LightingShader extends BasePipelineShader {
 		environmentCube.loadTexUnit(8);
 		brdfLUT.loadTexUnit(9);
 		directionalLightData.loadTexUnit(11);
+		pointLightData.loadTexUnit(12);
 		Matrix4f bias = new Matrix4f();
 		bias.m00(0.5f);
 		bias.m11(0.5f);

@@ -119,7 +119,6 @@ public class GLRenderer implements IPipeline {
 		sun = new Sun();
 		rd = new IRenderingData();
 		renderingSettings = new RenderingSettings();
-		pointLightHandler = new PointLightHandler();
 		glEnable(GL_DEPTH_TEST);
 		glEnable(GL_CULL_FACE);
 		glCullFace(GL_BACK);
@@ -144,6 +143,9 @@ public class GLRenderer implements IPipeline {
 	}
 
 	public void init() {
+		width = RenderableApplication.windowWidth;
+		height = RenderableApplication.windowHeight;
+
 		renderingManager = new RenderingManager();
 
 		envRenderer = new EnvironmentRenderer(32);
@@ -157,16 +159,13 @@ public class GLRenderer implements IPipeline {
 		renderingManager.addRenderer(new InstanceRenderer());
 		renderingManager.addRenderer(new AnimInstanceRenderer());
 		handlesRenderer = new HandlesRenderer();
-		dp = new MultiPass(RenderableApplication.windowWidth, RenderableApplication.windowHeight);
-		pp = new PostProcess(RenderableApplication.windowWidth, RenderableApplication.windowHeight);
-		width = RenderableApplication.windowWidth;
-		height = RenderableApplication.windowHeight;
-		projMatrix = Maths.createProjectionMatrix(RenderableApplication.windowWidth, RenderableApplication.windowHeight,
-				90, 0.1f, Float.POSITIVE_INFINITY, true);
+		dp = new MultiPass(width, height);
+		pp = new PostProcess(width, height);
+		projMatrix = Maths.createProjectionMatrix(width, height, 90, 0.1f, Float.POSITIVE_INFINITY, true);
 
 		rnd.exposure = Game.lighting().getExposure();
-		directionalLightHandler = new DirectionalLightHandler(RenderableApplication.windowWidth,
-				RenderableApplication.windowHeight);
+		directionalLightHandler = new DirectionalLightHandler(width, height);
+		pointLightHandler = new PointLightHandler(width, height);
 		rnd.plh = pointLightHandler;
 		rnd.dlh = directionalLightHandler;
 		rnd.rs = renderingSettings;
@@ -248,6 +247,7 @@ public class GLRenderer implements IPipeline {
 	private void deferredPass() {
 		GPUProfiler.start("Lighting");
 		directionalLightHandler.render(currentCamera, projMatrix, dp, renderingSettings);
+		pointLightHandler.render(currentCamera, projMatrix, dp, renderingSettings);
 		GPUProfiler.end();
 		GPUProfiler.start("Deferred Pass");
 		dp.process(rnd, rd);
@@ -347,6 +347,7 @@ public class GLRenderer implements IPipeline {
 		dp.resize(width, height);
 		pp.resize(width, height);
 		directionalLightHandler.resize(width, height);
+		pointLightHandler.resize(width, height);
 	}
 
 	public void dispose() {
@@ -355,6 +356,7 @@ public class GLRenderer implements IPipeline {
 		dp.dispose();
 		pp.dispose();
 		directionalLightHandler.dispose();
+		pointLightHandler.dispose();
 		dynamicSkyRenderer.dispose();
 		// particleRenderer.cleanUp();
 		irradianceCapture.dispose();

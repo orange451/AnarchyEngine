@@ -98,6 +98,8 @@ public class DirectionalLightHandler implements IDirectionalLightHandler {
 		activateTexture(GL_TEXTURE5, GL_TEXTURE_2D, dp.getMaskTex().getTexture());
 		synchronized (lights) {
 			for (DirectionalLightInternal l : lights) {
+				if (!l.visible)
+					continue;
 				shader.loadDirectionalLight(l);
 				activateTexture(GL_TEXTURE6, GL_TEXTURE_2D_ARRAY, l.getShadowMap().getShadowMaps().getTexture());
 				glDrawArrays(GL_TRIANGLE_STRIP, 0, quad.getVertexCount());

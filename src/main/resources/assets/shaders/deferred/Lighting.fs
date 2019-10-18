@@ -50,6 +50,7 @@ uniform mat4 inverseProjectionMatrix;
 uniform mat4 inverseViewMatrix;
 uniform sampler2DArrayShadow shadowMap;
 uniform sampler2D directionalLightData;
+uniform sampler2D pointLightData;
 
 #include variable GLOBAL
 
@@ -172,6 +173,7 @@ void main() {
 		vec3 Lo = vec3(0.0);
 
 		Lo += texture(directionalLightData, textureCoords).rgb;
+		Lo += texture(pointLightData, textureCoords).rgb;
 
 		vec3 F = fresnelSchlickRoughness(max(dot(N, V), 0.0), F0, roughness);
 
