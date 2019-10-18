@@ -11,6 +11,8 @@ public class DirectionalLightCamera {
 
 	private Matrix4f viewMatrix = new Matrix4f();
 
+	private Vector3f temp = new Vector3f();
+
 	public DirectionalLightCamera(int distance) {
 		int shadowDrawDistance = distance;
 		shadowDrawDistance *= 2;
@@ -27,7 +29,9 @@ public class DirectionalLightCamera {
 	}
 
 	public void update(Vector3f direction, Vector3f position) {
-		viewMatrix.setLookAt(position, direction.mul(-1.0f, new Vector3f()), new Vector3f(0, 1, 0));
+		temp.set(direction);
+		temp.z = -temp.z;
+		viewMatrix.setLookAt(position, temp.mul(-1.0f).add(position), new Vector3f(0, 1, 0));
 	}
 
 	public void setShadowDistance(int distance) {
