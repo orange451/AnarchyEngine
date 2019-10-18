@@ -76,6 +76,8 @@ public abstract class LightBase extends Instance implements Positionable {
 	}
 	
 	public void setPosition(Vector3 position) {
+		if ( !this.getField(C_POSITION).canModify() )
+			return;
 		this.set(C_POSITION, position.clone());
 	}
 	
