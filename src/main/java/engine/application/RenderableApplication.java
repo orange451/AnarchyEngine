@@ -217,6 +217,7 @@ public abstract class RenderableApplication extends Application implements Rende
 		GL.createCapabilities(true);
 
 		TaskManager.switchToSharedContext(window);
+		TaskManager.setRenderThread(Thread.currentThread());
 
 		// Start thread
 		try {

@@ -82,6 +82,8 @@ public class InternalRenderThread {
 		double nanoSecond = 1e+9;
 
 		while ( InternalGameThread.isRunning() ) {
+			TaskManager.updateRenderThread();
+
 			//long t1 = System.nanoTime();
 			forceUpdate();
 			//long t2 = System.nanoTime();

@@ -68,6 +68,7 @@ public class InternalGameThread extends Observable implements Runnable {
 		double nanoSecond = 1e+9;
 		long lastTime = System.nanoTime();
 		while(running) {
+			TaskManager.updateMainThread();
 
 			// Limit TPS to desiredTPS max
 			float cvtps = Math.max(Math.min(120, desiredTPS), 2);

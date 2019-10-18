@@ -102,7 +102,7 @@ public class TaskManager {
 		if (t == null)
 			return null;
 
-		if (Thread.currentThread().equals(mainThread))
+		if (Thread.currentThread().getId() == mainThread.getId())
 			t.callI();
 		else
 			tasksMainThread.add(t);
@@ -113,7 +113,7 @@ public class TaskManager {
 		if (t == null)
 			return null;
 
-		if (Thread.currentThread().equals(backgroundThread))
+		if (Thread.currentThread().getId() == backgroundThread.getId())
 			t.callI();
 		else {
 			tasksBackgroundThread.add(t);
@@ -158,7 +158,7 @@ public class TaskManager {
 		if (t == null)
 			return null;
 
-		if (Thread.currentThread().equals(renderThread))
+		if (Thread.currentThread().getId() == renderThread.getId())
 			t.callI();
 		else
 			tasksRenderThread.add(t);
@@ -169,7 +169,7 @@ public class TaskManager {
 		if (t == null)
 			return null;
 
-		if (Thread.currentThread().equals(renderBackgroundThread))
+		if (Thread.currentThread().getId() == renderBackgroundThread.getId())
 			t.callI();
 		else {
 			tasksRenderBackgroundThread.add(t);
@@ -223,6 +223,10 @@ public class TaskManager {
 		while (renderBackgroundThread.isAlive())
 			ThreadUtils.sleep(100);
 		glfwDestroyWindow(asyncWindow);
+	}
+
+	public static void setRenderThread(Thread renderThread) {
+		TaskManager.renderThread = renderThread;
 	}
 
 }
