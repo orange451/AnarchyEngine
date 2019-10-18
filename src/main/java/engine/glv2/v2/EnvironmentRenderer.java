@@ -81,8 +81,8 @@ public class EnvironmentRenderer {
 		i %= 6;
 	}
 
-	public void renderEnvironmentMap(Vector3f center, DynamicSkyRenderer sr, RenderingManager renderingManager,
-			IRenderingData rd, RendererData rnd, float globalTime) {
+	public void renderEnvironmentMap(Vector3f center, DynamicSkyRenderer sr, Vector3f lightPosition,
+			RenderingManager renderingManager, IRenderingData rd, RendererData rnd, float globalTime) {
 		camera.setPosition(center);
 		framebuffer.bind();
 		for (int i = 0; i < 6; i++) {
@@ -91,7 +91,7 @@ public class EnvironmentRenderer {
 			camera.switchToFace(i);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			renderingManager.renderReflections(rd, rnd, camera); // TODO: Issue here with shadow sampler
-			sr.render(camera, new Vector3f(0, 0, 0), false, false);
+			sr.render(camera, lightPosition, false, false);
 		}
 		framebuffer.unbind();
 	}
