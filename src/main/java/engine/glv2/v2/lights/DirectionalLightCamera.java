@@ -21,7 +21,7 @@ public class DirectionalLightCamera {
 				-shadowDrawDistance, shadowDrawDistance, false);
 		projectionArray[1] = Maths.orthoSymmetric(-shadowDrawDistance * 0.5f, shadowDrawDistance * 0.5f,
 				-shadowDrawDistance, shadowDrawDistance, false);
-		projectionArray[2] = Maths.orthoSymmetric(-shadowDrawDistance * 0.25f, shadowDrawDistance * 0.25f,
+		projectionArray[2] = Maths.orthoSymmetric(-shadowDrawDistance * 0.75f, shadowDrawDistance * 0.75f,
 				-shadowDrawDistance, shadowDrawDistance, false);
 		projectionArray[3] = Maths.orthoSymmetric(-shadowDrawDistance, shadowDrawDistance, -shadowDrawDistance,
 				shadowDrawDistance, false);
@@ -40,7 +40,7 @@ public class DirectionalLightCamera {
 				-shadowDrawDistance, shadowDrawDistance, false);
 		projectionArray[1] = Maths.orthoSymmetric(-shadowDrawDistance * 0.5f, shadowDrawDistance * 0.5f,
 				-shadowDrawDistance, shadowDrawDistance, false);
-		projectionArray[2] = Maths.orthoSymmetric(-shadowDrawDistance * 0.25f, shadowDrawDistance * 0.25f,
+		projectionArray[2] = Maths.orthoSymmetric(-shadowDrawDistance * 0.75f, shadowDrawDistance * 0.75f,
 				-shadowDrawDistance, shadowDrawDistance, false);
 		projectionArray[3] = Maths.orthoSymmetric(-shadowDrawDistance, shadowDrawDistance, -shadowDrawDistance,
 				shadowDrawDistance, false);

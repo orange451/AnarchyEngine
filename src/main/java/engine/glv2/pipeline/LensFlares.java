@@ -24,17 +24,16 @@ import static org.lwjgl.opengl.GL11C.GL_TEXTURE_2D;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE0;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE1;
 
-import engine.gl.Texture2D;
 import engine.glv2.objects.Texture;
 import engine.glv2.pipeline.shaders.LensFlaresShader;
 import engine.glv2.v2.DeferredPass;
 import engine.glv2.v2.DeferredPipeline;
 import engine.glv2.v2.RendererData;
-import engine.util.TextureUtils;
+import engine.resources.ResourcesManager;
 
 public class LensFlares extends DeferredPass<LensFlaresShader> {
 
-	private Texture2D lensColor;
+	private Texture lensColor;
 
 	public LensFlares() {
 		super("LensFlares");
@@ -43,7 +42,7 @@ public class LensFlares extends DeferredPass<LensFlaresShader> {
 	@Override
 	public void init(int width, int height) {
 		super.init(width, height);
-		lensColor = TextureUtils.loadRGBATexture("assets/textures/lens/lens_color.png");
+		lensColor = ResourcesManager.loadTextureMisc("textures/lens/lens_color.png", null).get();
 	}
 
 	@Override
@@ -54,14 +53,14 @@ public class LensFlares extends DeferredPass<LensFlaresShader> {
 	@Override
 	protected void setupTextures(RendererData rnd, DeferredPipeline dp, Texture[] auxTex) {
 		super.activateTexture(GL_TEXTURE0, GL_TEXTURE_2D, auxTex[1].getTexture());
-		super.activateTexture(GL_TEXTURE1, GL_TEXTURE_2D, lensColor.getID());
+		super.activateTexture(GL_TEXTURE1, GL_TEXTURE_2D, lensColor.getTexture());
 		auxTex[1] = auxTex[0];
 	}
 
 	@Override
 	public void dispose() {
 		super.dispose();
-		// lensColor.dispose();
+		lensColor.dispose();
 	}
 
 }

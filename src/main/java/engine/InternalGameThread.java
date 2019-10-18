@@ -14,6 +14,7 @@ import engine.lua.type.ScriptData;
 import engine.lua.type.object.Service;
 import engine.lua.type.object.services.RunService;
 import engine.observer.Tickable;
+import engine.tasks.TaskManager;
 import engine.util.Sync;
 
 public class InternalGameThread extends Observable implements Runnable {
@@ -56,6 +57,8 @@ public class InternalGameThread extends Observable implements Runnable {
 
 	@Override
 	public void run() {
+		TaskManager.init();
+
 		try {
 			Thread.sleep(200);
 		} catch (InterruptedException e) {

@@ -56,8 +56,8 @@ public class UniformSpotLight extends UniformObject {
 		intensity.loadFloat(light.intensity);
 		radius.loadFloat(light.radius);
 		visible.loadBoolean(light.visible);
-		outerFOV.loadFloat((float) Math.cos(Math.toRadians(light.outerFOV)));
-		innerFOV.loadFloat((float) Math.cos(Math.toRadians(light.innerFOV * light.outerFOV)));
+		outerFOV.loadFloat((float) Math.cos(Math.toRadians(light.outerFOV * 0.5f)));
+		innerFOV.loadFloat((float) Math.cos(Math.toRadians((light.innerFOV * light.outerFOV) * 0.5f)));
 		viewMatrix.loadMatrix(light.getLightCamera().getViewMatrix());
 		projectionMatrix.loadMatrix(light.getLightCamera().getProjectionMatrix());
 		shadowMap.loadTexUnit(shadowUnit);

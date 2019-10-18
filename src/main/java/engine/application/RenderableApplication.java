@@ -40,10 +40,10 @@ import org.lwjgl.system.MemoryStack;
 
 import engine.application.launchstrategy.ClientLauncher;
 import engine.gl.IPipeline;
-import engine.gl.Pipeline;
 import engine.gl.Resources;
 import engine.observer.InternalRenderable;
 import engine.observer.Renderable;
+import engine.tasks.TaskManager;
 import ide.layout.windows.ErrorWindow;
 
 public abstract class RenderableApplication extends Application implements Renderable,InternalRenderable {
@@ -141,6 +141,8 @@ public abstract class RenderableApplication extends Application implements Rende
 			return;
 
 		internalInitialize();
+
+		GLFWErrorCallback.createPrint(System.err).set();
 		
 		if ( !glfwInit() ) {
 			GLFW_INITIALIZED = false;
@@ -148,18 +150,17 @@ public abstract class RenderableApplication extends Application implements Rende
 			return;
 		}
 		
-		GLFWErrorCallback.createPrint(System.err).set();
 
 		// Configure GLFW
 		glfwDefaultWindowHints(); // optional, the current window hints are already the default
 		glfwWindowHint(GLFW_VISIBLE, GL_FALSE); // the window will stay hidden after creation
 		glfwWindowHint(GLFW_RESIZABLE, GL_TRUE); // the window will be resizable
 
-		// Core OpenGL version 3.2
+		// Core OpenGL version 3.3
 		glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 		glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
+		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 
 		// Create the window
 		window = glfwCreateWindow(1024, 640, "Window", NULL, NULL);
@@ -207,13 +208,15 @@ public abstract class RenderableApplication extends Application implements Rende
 		glfwMakeContextCurrent(window);
 
 		// Enable v-sync
-		glfwSwapInterval(0);
+		glfwSwapInterval(1);
 
 		// Make the window visible
 		glfwShowWindow(window);
 
 		// Setup opengl
-		GL.createCapabilities();
+		GL.createCapabilities(true);
+
+		TaskManager.switchToSharedContext(window);
 
 		// Start thread
 		try {

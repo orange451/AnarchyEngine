@@ -1,6 +1,8 @@
 package engine;
 
+import static org.lwjgl.glfw.GLFW.glfwMakeContextCurrent;
 import static org.lwjgl.glfw.GLFW.glfwTerminate;
+import static org.lwjgl.system.MemoryUtil.NULL;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -10,6 +12,7 @@ import java.util.Observer;
 
 import org.luaj.vm2.LuaValue;
 import org.lwjgl.glfw.GLFW;
+import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL11;
 
 import engine.application.RenderableApplication;
@@ -17,6 +20,7 @@ import engine.lua.type.object.services.RunService;
 import engine.observer.InternalRenderable;
 import engine.observer.PostRenderable;
 import engine.observer.Renderable;
+import engine.tasks.TaskManager;
 import engine.util.Sync;
 
 public class InternalRenderThread {
@@ -102,13 +106,16 @@ public class InternalRenderThread {
 				InternalGameThread.terminate();
 			}
 		}
-
+		TaskManager.stopRenderBackgroundThread();
 		cleanup();
 	}
 	
 	private void cleanup() {
 		// TODO clean up loaded OpenGL data...
-		
+
+		glfwMakeContextCurrent(NULL);
+		GL.setCapabilities(null);
+
 		// Close OpenGL
 		glfwTerminate();
 	}

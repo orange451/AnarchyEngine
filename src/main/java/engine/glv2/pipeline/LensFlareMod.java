@@ -26,18 +26,17 @@ import static org.lwjgl.opengl.GL13C.GL_TEXTURE1;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE2;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE3;
 
-import engine.gl.Texture2D;
 import engine.glv2.objects.Texture;
 import engine.glv2.pipeline.shaders.LensFlareModShader;
 import engine.glv2.v2.DeferredPass;
 import engine.glv2.v2.DeferredPipeline;
 import engine.glv2.v2.RendererData;
-import engine.util.TextureUtils;
+import engine.resources.ResourcesManager;
 
 public class LensFlareMod extends DeferredPass<LensFlareModShader> {
 
-	private Texture2D lensDirt;
-	private Texture2D lensStar;
+	private Texture lensDirt;
+	private Texture lensStar;
 
 	public LensFlareMod() {
 		super("LensFlaresMod");
@@ -46,8 +45,8 @@ public class LensFlareMod extends DeferredPass<LensFlareModShader> {
 	@Override
 	public void init(int width, int height) {
 		super.init(width, height);
-		lensDirt = TextureUtils.loadRGBATexture("assets/textures/lens/lens_dirt.png");
-		lensStar = TextureUtils.loadRGBATexture("assets/textures/lens/lens_star.png");
+		lensDirt = ResourcesManager.loadTextureMisc("textures/lens/lens_dirt.png", null).get();
+		lensStar = ResourcesManager.loadTextureMisc("textures/lens/lens_star.png", null).get();
 	}
 
 	@Override
@@ -58,16 +57,16 @@ public class LensFlareMod extends DeferredPass<LensFlareModShader> {
 	@Override
 	protected void setupTextures(RendererData rnd, DeferredPipeline dp, Texture[] auxTex) {
 		super.activateTexture(GL_TEXTURE0, GL_TEXTURE_2D, auxTex[0].getTexture());
-		super.activateTexture(GL_TEXTURE1, GL_TEXTURE_2D, lensDirt.getID());
-		super.activateTexture(GL_TEXTURE2, GL_TEXTURE_2D, lensStar.getID());
+		super.activateTexture(GL_TEXTURE1, GL_TEXTURE_2D, lensDirt.getTexture());
+		super.activateTexture(GL_TEXTURE2, GL_TEXTURE_2D, lensStar.getTexture());
 		super.activateTexture(GL_TEXTURE3, GL_TEXTURE_2D, auxTex[1].getTexture());
 	}
 
 	@Override
 	public void dispose() {
 		super.dispose();
-		//lensDirt.dispose();
-		//lensStar.dispose();
+		lensDirt.dispose();
+		lensStar.dispose();
 	}
 
 }

@@ -24,7 +24,7 @@ public class SpotLightCamera {
 	}
 
 	public void setFov(float fov, int resolution) {
-		projectionMatrix = Maths.createProjectionMatrix(resolution, resolution, fov * 2.0f, 0.1f, 100f);
+		projectionMatrix = Maths.createProjectionMatrix(resolution, resolution, fov, 0.1f, 100f);
 	}
 
 	public Matrix4f getProjectionMatrix() {
