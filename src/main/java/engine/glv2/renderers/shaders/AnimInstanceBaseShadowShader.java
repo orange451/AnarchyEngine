@@ -18,33 +18,29 @@
  * 
  */
 
-package engine.glv2.v2;
+package engine.glv2.renderers.shaders;
 
-import java.util.List;
+import java.nio.FloatBuffer;
 
-import engine.glv2.entities.CubeMapCamera;
-import engine.glv2.v2.lights.DirectionalLightCamera;
-import engine.glv2.v2.lights.SpotLightCamera;
-import engine.lua.type.object.Instance;
+import engine.glv2.shaders.data.Attribute;
+import engine.glv2.shaders.data.UniformMatrix4;
 
-public interface IObjectRenderer {
+public class AnimInstanceBaseShadowShader extends InstanceBaseShadowShader {
 
-	public void preProcess(List<Instance> instances);
+	private UniformMatrix4 boneMat = new UniformMatrix4("boneMat");
 
-	public void render(IRenderingData rd, RendererData rnd);
+	public AnimInstanceBaseShadowShader(String vs, String gs, String fs, Attribute... attributes) {
+		super(vs, gs, fs, attributes);
+		super.storeUniforms(boneMat);
+	}
 
-	public void renderReflections(IRenderingData rd, RendererData rnd, CubeMapCamera cubeCamera);
+	public AnimInstanceBaseShadowShader(String vs, String fs, Attribute... attributes) {
+		super(vs, fs, attributes);
+		super.storeUniforms(boneMat);
+	}
 
-	public void renderForward(IRenderingData rd, RendererData rnd);
-
-	public void renderShadow(DirectionalLightCamera camera);
-
-	public void renderShadow(SpotLightCamera camera);
-
-	public void dispose();
-
-	public void end();
-
-	public int getID();
+	public void loadBoneMat(FloatBuffer mat) {
+		boneMat.loadMatrix(mat);
+	}
 
 }

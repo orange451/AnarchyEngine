@@ -26,38 +26,25 @@ import engine.glv2.shaders.ShaderProgram;
 import engine.glv2.shaders.data.Attribute;
 import engine.glv2.shaders.data.UniformFloat;
 import engine.glv2.shaders.data.UniformMatrix4;
-import engine.glv2.v2.lights.DirectionalLightCamera;
-import engine.lua.type.object.insts.Camera;
 
-public class InstanceBasicShader extends ShaderProgram {
+public abstract class InstanceBaseShadowShader extends ShaderProgram {
 
 	private UniformMatrix4 transformationMatrix = new UniformMatrix4("transformationMatrix");
-	private UniformMatrix4 projectionMatrix[] = new UniformMatrix4[4];
-	private UniformMatrix4 viewMatrix = new UniformMatrix4("viewMatrix");
+	protected UniformMatrix4 viewMatrix = new UniformMatrix4("viewMatrix");
 	private UniformFloat transparency = new UniformFloat("transparency");
 
-	public InstanceBasicShader() {
-		super("assets/shaders/renderers/InstanceBasic.vs", "assets/shaders/renderers/InstanceBasic.gs",
-				"assets/shaders/renderers/InstanceBasic.fs", new Attribute(0, "position"));
-		for (int i = 0; i < 4; i++)
-			projectionMatrix[i] = new UniformMatrix4("projectionMatrix[" + i + "]");
-		super.storeUniforms(projectionMatrix);
+	public InstanceBaseShadowShader(String vs, String gs, String fs, Attribute... attributes) {
+		super(vs, gs, fs, attributes);
 		super.storeUniforms(transformationMatrix, viewMatrix, transparency);
-		super.validate();
+	}
+
+	public InstanceBaseShadowShader(String vs, String fs, Attribute... attributes) {
+		super(vs, fs, attributes);
+		super.storeUniforms(transformationMatrix, viewMatrix, transparency);
 	}
 
 	public void loadTransformationMatrix(Matrix4f matrix) {
 		transformationMatrix.loadMatrix(matrix);
-	}
-
-	public void loadviewMatrix(Camera camera) {
-		viewMatrix.loadMatrix(camera.getViewMatrix().getInternal());
-	}
-
-	public void loadDirectionalLight(DirectionalLightCamera camera) {
-		viewMatrix.loadMatrix(camera.getViewMatrix());
-		for (int i = 0; i < 4; i++)
-			projectionMatrix[i].loadMatrix(camera.getProjectionArray()[i]);
 	}
 
 	public void loadTransparency(float t) {

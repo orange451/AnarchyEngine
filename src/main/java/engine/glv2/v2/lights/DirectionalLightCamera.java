@@ -17,12 +17,12 @@ public class DirectionalLightCamera {
 		int shadowDrawDistance = distance;
 		shadowDrawDistance *= 2;
 		projectionArray = new Matrix4f[4];
-		projectionArray[0] = Maths.orthoSymmetric(-shadowDrawDistance / 25, shadowDrawDistance / 25,
+		projectionArray[0] = Maths.orthoSymmetric(-shadowDrawDistance * 0.25f, shadowDrawDistance * 0.25f,
 				-shadowDrawDistance, shadowDrawDistance, false);
-		projectionArray[1] = Maths.orthoSymmetric(-shadowDrawDistance / 10, shadowDrawDistance / 10,
+		projectionArray[1] = Maths.orthoSymmetric(-shadowDrawDistance * 0.5f, shadowDrawDistance * 0.5f,
 				-shadowDrawDistance, shadowDrawDistance, false);
-		projectionArray[2] = Maths.orthoSymmetric(-shadowDrawDistance / 4, shadowDrawDistance / 4, -shadowDrawDistance,
-				shadowDrawDistance, false);
+		projectionArray[2] = Maths.orthoSymmetric(-shadowDrawDistance * 0.25f, shadowDrawDistance * 0.25f,
+				-shadowDrawDistance, shadowDrawDistance, false);
 		projectionArray[3] = Maths.orthoSymmetric(-shadowDrawDistance, shadowDrawDistance, -shadowDrawDistance,
 				shadowDrawDistance, false);
 		viewMatrix = new Matrix4f();
@@ -36,12 +36,12 @@ public class DirectionalLightCamera {
 	public void setShadowDistance(int distance) {
 		int shadowDrawDistance = distance;
 		shadowDrawDistance *= 2;
-		projectionArray[0] = Maths.orthoSymmetric(-shadowDrawDistance / 25, shadowDrawDistance / 25,
+		projectionArray[0] = Maths.orthoSymmetric(-shadowDrawDistance * 0.25f, shadowDrawDistance * 0.25f,
 				-shadowDrawDistance, shadowDrawDistance, false);
-		projectionArray[1] = Maths.orthoSymmetric(-shadowDrawDistance / 10, shadowDrawDistance / 10,
+		projectionArray[1] = Maths.orthoSymmetric(-shadowDrawDistance * 0.5f, shadowDrawDistance * 0.5f,
 				-shadowDrawDistance, shadowDrawDistance, false);
-		projectionArray[2] = Maths.orthoSymmetric(-shadowDrawDistance / 4, shadowDrawDistance / 4, -shadowDrawDistance,
-				shadowDrawDistance, false);
+		projectionArray[2] = Maths.orthoSymmetric(-shadowDrawDistance * 0.25f, shadowDrawDistance * 0.25f,
+				-shadowDrawDistance, shadowDrawDistance, false);
 		projectionArray[3] = Maths.orthoSymmetric(-shadowDrawDistance, shadowDrawDistance, -shadowDrawDistance,
 				shadowDrawDistance, false);
 	}

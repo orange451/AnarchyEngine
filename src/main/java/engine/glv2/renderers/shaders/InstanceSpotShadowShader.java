@@ -18,33 +18,26 @@
  * 
  */
 
-package engine.glv2.v2;
+package engine.glv2.renderers.shaders;
 
-import java.util.List;
-
-import engine.glv2.entities.CubeMapCamera;
-import engine.glv2.v2.lights.DirectionalLightCamera;
+import engine.glv2.shaders.data.Attribute;
+import engine.glv2.shaders.data.UniformMatrix4;
 import engine.glv2.v2.lights.SpotLightCamera;
-import engine.lua.type.object.Instance;
 
-public interface IObjectRenderer {
+public class InstanceSpotShadowShader extends InstanceBaseShadowShader {
 
-	public void preProcess(List<Instance> instances);
+	private UniformMatrix4 projectionMatrix = new UniformMatrix4("projectionMatrix");
 
-	public void render(IRenderingData rd, RendererData rnd);
+	public InstanceSpotShadowShader() {
+		super("assets/shaders/renderers/InstanceSpotShadow.vs", "assets/shaders/renderers/InstanceShadow.fs",
+				new Attribute(0, "position"));
+		super.storeUniforms(projectionMatrix);
+		super.validate();
+	}
 
-	public void renderReflections(IRenderingData rd, RendererData rnd, CubeMapCamera cubeCamera);
-
-	public void renderForward(IRenderingData rd, RendererData rnd);
-
-	public void renderShadow(DirectionalLightCamera camera);
-
-	public void renderShadow(SpotLightCamera camera);
-
-	public void dispose();
-
-	public void end();
-
-	public int getID();
+	public void loadSpotLight(SpotLightCamera camera) {
+		viewMatrix.loadMatrix(camera.getViewMatrix());
+		projectionMatrix.loadMatrix(camera.getProjectionMatrix());
+	}
 
 }

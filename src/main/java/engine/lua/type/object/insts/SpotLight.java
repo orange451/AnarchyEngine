@@ -3,6 +3,8 @@ package engine.lua.type.object.insts;
 import org.joml.Vector3f;
 import org.luaj.vm2.LuaValue;
 
+import engine.Game;
+import engine.InternalGameThread;
 import engine.InternalRenderThread;
 import engine.gl.IPipeline;
 import engine.gl.Pipeline;
@@ -40,7 +42,7 @@ public class SpotLight extends LightBase implements TreeViewable {
 		this.defineField(C_RADIUS.toString(), LuaValue.valueOf(8), false);
 		this.getField(C_RADIUS).setClamp(new NumberClampPreferred(0, 1024, 0, 64));
 		
-		this.defineField(C_DIRECTION.toString(), new Vector3(1, 1, 1), false);
+		this.defineField(C_DIRECTION.toString(), new Vector3(1, 1, -1), false);
 
 		this.changedEvent().connect((args)->{
 			LuaValue key = args[0];
@@ -53,7 +55,7 @@ public class SpotLight extends LightBase implements TreeViewable {
 					light.y = pos.y;
 					light.z = pos.z;
 				} else if ( key.eq_b(C_OUTERFOV) ) {
-					light.outerFOV = value.tofloat();
+					light.setOuterFOV(value.tofloat());
 				} else if ( key.eq_b(C_INNERFOVSCALE) ) {
 					light.innerFOV = value.tofloat();
 				} else if ( key.eq_b(C_RADIUS) ) {
@@ -65,12 +67,29 @@ public class SpotLight extends LightBase implements TreeViewable {
 					light.color = new Vector3f( Math.max( color.getRed(),1 )/255f, Math.max( color.getGreen(),1 )/255f, Math.max( color.getBlue(),1 )/255f );
 				} else if (key.eq_b(C_DIRECTION)) {
 					light.direction = ((Vector3) value).toJoml();
+				} else if (key.eq_b(C_SHADOWS)) {
+					light.shadows = value.toboolean();
 				}
 			}
 			
 			if ( key.eq_b(C_PARENT) ) {
 				onParentChange();
 			}
+		});
+
+		InternalGameThread.runLater(() -> {
+
+			Game.lighting().changedEvent().connect((args) -> {
+				if (light == null)
+					return;
+
+				LuaValue key = args[0];
+				LuaValue value = args[1];
+
+				if (key.eq_b(LuaValue.valueOf("ShadowMapSize"))) {
+					light.setSize(value.toint());
+				}
+			});
 		});
 	}
 	
@@ -156,10 +175,10 @@ public class SpotLight extends LightBase implements TreeViewable {
 			Vector3f pos = ((Vector3)this.get("Position")).toJoml();
 			float radius = this.get(C_RADIUS).tofloat();
 			float outerFOV = this.get(C_OUTERFOV).tofloat();
-			float innerFOVScale = this.get(C_INNERFOVSCALE).tofloat();
+			float innerFOV = this.get(C_INNERFOVSCALE).tofloat();
 			float intensity = this.get(C_INTENSITY).tofloat();
 			Vector3f direction = ((Vector3) this.get(C_DIRECTION)).toJoml();
-			light = new engine.gl.light.SpotLightInternal(direction, pos, outerFOV, innerFOVScale*outerFOV, radius, intensity);
+			light = new engine.gl.light.SpotLightInternal(direction, pos, outerFOV, innerFOV, radius, intensity);
 			
 			// Color it
 			Color color = ((Color3)this.get("Color")).toColor();

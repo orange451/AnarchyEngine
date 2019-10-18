@@ -27,8 +27,11 @@ import org.joml.Matrix4f;
 import engine.gl.MaterialGL;
 import engine.gl.Resources;
 import engine.gl.mesh.BufferedMesh;
-import engine.glv2.renderers.shaders.InstanceBasicShader;
+import engine.glv2.renderers.shaders.InstanceBaseShadowShader;
+import engine.glv2.renderers.shaders.InstanceDirectionalShadowShader;
+import engine.glv2.renderers.shaders.InstanceSpotShadowShader;
 import engine.glv2.v2.lights.DirectionalLightCamera;
+import engine.glv2.v2.lights.SpotLightCamera;
 import engine.lua.type.object.Instance;
 import engine.lua.type.object.PrefabRenderer;
 import engine.lua.type.object.insts.GameObject;
@@ -37,22 +40,33 @@ import engine.lua.type.object.insts.Model;
 
 public class InstanceShadowRenderer {
 
-	private InstanceBasicShader shader;
+	private InstanceDirectionalShadowShader directionalShader;
+	private InstanceSpotShadowShader spotShader;
 
 	public InstanceShadowRenderer() {
-		shader = new InstanceBasicShader();
+		directionalShader = new InstanceDirectionalShadowShader();
+		spotShader = new InstanceSpotShadowShader();
 	}
 
 	protected void renderShadow(List<Instance> instances, DirectionalLightCamera camera) {
-		shader.start();
-		shader.loadDirectionalLight(camera);
+		directionalShader.start();
+		directionalShader.loadDirectionalLight(camera);
 		for (Instance instance : instances) {
-			renderInstance(instance);
+			renderInstance(instance, directionalShader);
 		}
-		shader.stop();
+		directionalShader.stop();
 	}
 
-	private void renderInstance(Instance inst) {
+	protected void renderShadow(List<Instance> instances, SpotLightCamera camera) {
+		spotShader.start();
+		spotShader.loadSpotLight(camera);
+		for (Instance instance : instances) {
+			renderInstance(instance, spotShader);
+		}
+		spotShader.stop();
+	}
+
+	private void renderInstance(Instance inst, InstanceBaseShadowShader shader) {
 		GameObject go = (GameObject) inst;
 		if (go.isDestroyed())
 			return;
@@ -91,7 +105,8 @@ public class InstanceShadowRenderer {
 	}
 
 	public void dispose() {
-		shader.dispose();
+		directionalShader.dispose();
+		spotShader.dispose();
 	}
 
 }

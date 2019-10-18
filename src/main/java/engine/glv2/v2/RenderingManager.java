@@ -35,6 +35,7 @@ import com.esotericsoftware.kryonet.util.ObjectIntMap;
 
 import engine.glv2.entities.CubeMapCamera;
 import engine.glv2.v2.lights.DirectionalLightCamera;
+import engine.glv2.v2.lights.SpotLightCamera;
 import engine.lua.type.object.Instance;
 import engine.lua.type.object.insts.AnimationController;
 import engine.lua.type.object.insts.Camera;
@@ -87,6 +88,11 @@ public class RenderingManager {
 	}
 
 	public void renderShadow(DirectionalLightCamera camera) {
+		for (Entry<IObjectRenderer> rendererEntry : objectRenderers)
+			rendererEntry.value.renderShadow(camera);
+	}
+
+	public void renderShadow(SpotLightCamera camera) {
 		for (Entry<IObjectRenderer> rendererEntry : objectRenderers)
 			rendererEntry.value.renderShadow(camera);
 	}

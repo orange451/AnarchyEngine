@@ -161,6 +161,8 @@ public class PointLightHandler implements IPointLightHandler {
 
 	@Override
 	public void addLight(PointLightInternal l) {
+		if (l == null)
+			return;
 		lights.add(l);
 	}
 

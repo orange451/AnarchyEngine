@@ -20,58 +20,29 @@
 
 package engine.glv2.renderers.shaders;
 
-import java.nio.FloatBuffer;
-
-import org.joml.Matrix4f;
-
-import engine.glv2.shaders.ShaderProgram;
 import engine.glv2.shaders.data.Attribute;
-import engine.glv2.shaders.data.UniformFloat;
 import engine.glv2.shaders.data.UniformMatrix4;
 import engine.glv2.v2.lights.DirectionalLightCamera;
-import engine.lua.type.object.insts.Camera;
 
-public class AnimInstanceBasicShader extends ShaderProgram {
+public class AnimInstanceDirectionalShadowShader extends AnimInstanceBaseShadowShader {
 
-	private UniformMatrix4 transformationMatrix = new UniformMatrix4("transformationMatrix");
 	private UniformMatrix4 projectionMatrix[] = new UniformMatrix4[4];
-	private UniformMatrix4 viewMatrix = new UniformMatrix4("viewMatrix");
-	private UniformFloat transparency = new UniformFloat("transparency");
 
-	private UniformMatrix4 boneMat = new UniformMatrix4("boneMat");
-
-	public AnimInstanceBasicShader() {
-		super("assets/shaders/renderers/AnimInstanceBasic.vs", "assets/shaders/renderers/InstanceBasic.gs",
-				"assets/shaders/renderers/InstanceBasic.fs", new Attribute(0, "position"), new Attribute(1, "normals"),
-				new Attribute(2, "textureCoords"), new Attribute(3, "inColor"), new Attribute(4, "boneIndices"),
-				new Attribute(5, "boneWeights"));
+	public AnimInstanceDirectionalShadowShader() {
+		super("assets/shaders/renderers/AnimInstanceDirectionalShadow.vs",
+				"assets/shaders/renderers/InstanceDirectionalShadow.gs", "assets/shaders/renderers/InstanceShadow.fs",
+				new Attribute(0, "position"), new Attribute(1, "normals"), new Attribute(2, "textureCoords"),
+				new Attribute(3, "inColor"), new Attribute(4, "boneIndices"), new Attribute(5, "boneWeights"));
 		for (int i = 0; i < 4; i++)
 			projectionMatrix[i] = new UniformMatrix4("projectionMatrix[" + i + "]");
 		super.storeUniforms(projectionMatrix);
-		super.storeUniforms(transformationMatrix, viewMatrix, transparency, boneMat);
 		super.validate();
-	}
-
-	public void loadTransformationMatrix(Matrix4f matrix) {
-		transformationMatrix.loadMatrix(matrix);
-	}
-
-	public void loadviewMatrix(Camera camera) {
-		viewMatrix.loadMatrix(camera.getViewMatrix().getInternal());
 	}
 
 	public void loadDirectionalLight(DirectionalLightCamera camera) {
 		viewMatrix.loadMatrix(camera.getViewMatrix());
 		for (int i = 0; i < 4; i++)
 			projectionMatrix[i].loadMatrix(camera.getProjectionArray()[i]);
-	}
-
-	public void loadTransparency(float t) {
-		transparency.loadFloat(t);
-	}
-
-	public void loadBoneMat(FloatBuffer mat) {
-		boneMat.loadMatrix(mat);
 	}
 
 }

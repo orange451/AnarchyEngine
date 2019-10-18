@@ -26,6 +26,7 @@ import static org.lwjgl.opengl.GL11C.GL_COLOR_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11C.GL_CULL_FACE;
 import static org.lwjgl.opengl.GL11C.GL_DEPTH_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11C.GL_DEPTH_TEST;
+import static org.lwjgl.opengl.GL11C.GL_FRONT;
 import static org.lwjgl.opengl.GL11C.GL_GREATER;
 import static org.lwjgl.opengl.GL11C.GL_LESS;
 import static org.lwjgl.opengl.GL11C.GL_ONE_MINUS_SRC_ALPHA;
@@ -54,6 +55,7 @@ import engine.gl.IPipeline;
 import engine.gl.Pipeline;
 import engine.gl.Surface;
 import engine.gl.light.DirectionalLightInternal;
+import engine.gl.light.SpotLightInternal;
 import engine.glv2.pipeline.MultiPass;
 import engine.glv2.pipeline.PostProcess;
 import engine.glv2.renderers.AnimInstanceRenderer;
@@ -192,7 +194,7 @@ public class GLRenderer implements IPipeline {
 			GPUProfiler.start("Shadow Pass");
 			synchronized (directionalLightHandler.getLights()) {
 				for (DirectionalLightInternal l : directionalLightHandler.getLights()) {
-					if (!l.shadows)
+					if (!l.shadows || !l.visible)
 						continue;
 					l.setPosition(currentCamera.getPosition().getInternal());
 					l.update();
@@ -202,6 +204,19 @@ public class GLRenderer implements IPipeline {
 					l.getShadowMap().unbind();
 				}
 			}
+			glCullFace(GL_FRONT);
+			synchronized (spotLightHandler.getLights()) {
+				for (SpotLightInternal l : spotLightHandler.getLights()) {
+					if (!l.shadows || !l.visible)
+						continue;
+					l.update();
+					l.getShadowMap().bind();
+					glClear(GL_DEPTH_BUFFER_BIT);
+					renderingManager.renderShadow(l.getLightCamera());
+					l.getShadowMap().unbind();
+				}
+			}
+			glCullFace(GL_BACK);
 			GPUProfiler.end();
 		}
 	}
@@ -320,6 +335,8 @@ public class GLRenderer implements IPipeline {
 		// Set global time for clouds
 		this.globalTime += InternalRenderThread.delta * 100;
 		sun.update(dynamicSkybox);
+
+		// currentCamera.getViewMatrix().getInternal().set(spotLightHandler.getLights().get(0).getLightCamera().getViewMatrix());
 
 		// Update lighting data
 		rnd.ambient = Game.lighting().getAmbient().toJOML();

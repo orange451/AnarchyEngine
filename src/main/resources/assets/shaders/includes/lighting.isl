@@ -47,6 +47,10 @@ struct SpotLight {
 	bool visible;
 	float outerFOV;
 	float innerFOV;
+	mat4 viewMatrix;
+	mat4 projectionMatrix;
+	sampler2DShadow shadowMap;
+	bool shadows;
 };
 #end
 
@@ -332,6 +336,11 @@ vec3 calcSpotLight(SpotLight light, vec3 position, vec3 diffuse, vec3 N, vec3 V,
 	kD *= 1.0 - metallic;
 
 	float NdotL = max(dot(N, L), 0.0) * intensity;
+	if (light.shadows) {
+		vec4 posLight = light.viewMatrix * vec4(position, 1.0);
+		vec4 shadowCoord = biasMatrix * (light.projectionMatrix * posLight);
+		NdotL *= texture(light.shadowMap, (shadowCoord.xyz / shadowCoord.w), 0);
+	}
 	return (kD * diffuse / PI + brdf) * radiance * NdotL;
 }
 #end

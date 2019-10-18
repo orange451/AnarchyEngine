@@ -91,7 +91,7 @@ public class SpotLightShader extends ShaderProgram {
 	}
 
 	public void loadSpotLight(SpotLightInternal l) {
-		light.loadLight(l);
+		light.loadLight(l, 6);
 	}
 
 	public void loadTransformationMatrix(Matrix4f mat) {

@@ -39,14 +39,14 @@ import engine.glv2.objects.FramebufferBuilder;
 import engine.glv2.objects.Texture;
 import engine.glv2.objects.TextureBuilder;
 
-public class LightShadowMap {
+public class SpotLightShadowMap {
 
 	private Framebuffer framebuffer;
 	private Texture shadowMap;
 
 	private int size;
 
-	public LightShadowMap(int size) {
+	public SpotLightShadowMap(int size) {
 		this.size = size;
 		generateFramebuffer();
 	}

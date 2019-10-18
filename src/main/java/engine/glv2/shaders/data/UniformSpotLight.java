@@ -28,6 +28,9 @@ public class UniformSpotLight extends UniformObject {
 	private UniformFloat radius, intensity;
 	private UniformBoolean visible;
 	private UniformFloat outerFOV, innerFOV;
+	private UniformMatrix4 viewMatrix, projectionMatrix;
+	private UniformSampler shadowMap;
+	private UniformBoolean shadows;
 
 	public UniformSpotLight(String name) {
 		position = new UniformVec3(name + ".position");
@@ -38,10 +41,15 @@ public class UniformSpotLight extends UniformObject {
 		visible = new UniformBoolean(name + ".visible");
 		outerFOV = new UniformFloat(name + ".outerFOV");
 		innerFOV = new UniformFloat(name + ".innerFOV");
-		super.storeUniforms(position, direction, color, radius, intensity, visible, outerFOV, innerFOV);
+		viewMatrix = new UniformMatrix4(name + ".viewMatrix");
+		projectionMatrix = new UniformMatrix4(name + ".projectionMatrix");
+		shadowMap = new UniformSampler(name + ".shadowMap");
+		shadows = new UniformBoolean(name + ".shadows");
+		super.storeUniforms(position, direction, color, radius, intensity, visible, outerFOV, innerFOV, viewMatrix,
+				projectionMatrix, shadowMap, shadows);
 	}
 
-	public void loadLight(SpotLightInternal light) {
+	public void loadLight(SpotLightInternal light, int shadowUnit) {
 		position.loadVec3(light.x, light.y, light.z);
 		direction.loadVec3(light.direction);
 		color.loadVec3(light.color);
@@ -50,6 +58,10 @@ public class UniformSpotLight extends UniformObject {
 		visible.loadBoolean(light.visible);
 		outerFOV.loadFloat((float) Math.cos(Math.toRadians(light.outerFOV)));
 		innerFOV.loadFloat((float) Math.cos(Math.toRadians(light.innerFOV * light.outerFOV)));
+		viewMatrix.loadMatrix(light.getLightCamera().getViewMatrix());
+		projectionMatrix.loadMatrix(light.getLightCamera().getProjectionMatrix());
+		shadowMap.loadTexUnit(shadowUnit);
+		shadows.loadBoolean(light.shadows);
 	}
 
 }

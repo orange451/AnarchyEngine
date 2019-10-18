@@ -29,6 +29,7 @@ import engine.glv2.v2.IObjectRenderer;
 import engine.glv2.v2.IRenderingData;
 import engine.glv2.v2.RendererData;
 import engine.glv2.v2.lights.DirectionalLightCamera;
+import engine.glv2.v2.lights.SpotLightCamera;
 import engine.lua.type.object.Instance;
 import engine.lua.type.object.insts.AnimationController;
 import engine.lua.type.object.insts.GameObject;
@@ -87,6 +88,11 @@ public class AnimInstanceRenderer implements IObjectRenderer {
 
 	@Override
 	public void renderShadow(DirectionalLightCamera camera) {
+		shadowRenderer.renderShadow(instances, camera);
+	}
+
+	@Override
+	public void renderShadow(SpotLightCamera camera) {
 		shadowRenderer.renderShadow(instances, camera);
 	}
 

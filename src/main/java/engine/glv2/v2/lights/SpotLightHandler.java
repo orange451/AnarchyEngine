@@ -28,6 +28,7 @@ import static org.lwjgl.opengl.GL13C.GL_TEXTURE2;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE3;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE4;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE5;
+import static org.lwjgl.opengl.GL13C.GL_TEXTURE6;
 import static org.lwjgl.opengl.GL13C.glActiveTexture;
 import static org.lwjgl.opengl.GL30C.GL_COLOR_ATTACHMENT0;
 import static org.lwjgl.opengl.GL30C.GL_RGB16F;
@@ -103,9 +104,7 @@ public class SpotLightHandler implements ISpotLightHandler {
 				temp.scale(l.radius);
 				shader.loadTransformationMatrix(temp);
 				shader.loadSpotLight(l);
-				// activateTexture(GL_TEXTURE6, GL_TEXTURE_2D_ARRAY,
-				// l.getShadowMap().getShadowMaps().getTexture());
-				// glDrawArrays(GL_TRIANGLE_STRIP, 0, quad.getVertexCount());
+				activateTexture(GL_TEXTURE6, GL_TEXTURE_2D, l.getShadowMap().getShadowMap().getTexture());
 				mesh.render(null, null, null);
 			}
 		}
@@ -161,6 +160,9 @@ public class SpotLightHandler implements ISpotLightHandler {
 
 	@Override
 	public void addLight(SpotLightInternal l) {
+		if (l == null)
+			return;
+		l.init();
 		lights.add(l);
 	}
 
@@ -169,6 +171,7 @@ public class SpotLightHandler implements ISpotLightHandler {
 		synchronized (lights) {
 			lights.remove(l);
 		}
+		l.dispose();
 	}
 
 	public List<SpotLightInternal> getLights() {
