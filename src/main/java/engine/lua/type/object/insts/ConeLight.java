@@ -26,6 +26,7 @@ public class ConeLight extends LightBase implements TreeViewable {
 
 	private static final LuaValue C_INNERFOVSCALE = LuaValue.valueOf("InnerFOVScale");
 	private static final LuaValue C_OUTERFOV = LuaValue.valueOf("OuterFOV");
+	private static final LuaValue C_RADIUS = LuaValue.valueOf("Radius");
 
 	public ConeLight() {
 		super("SpotLight");
@@ -35,6 +36,9 @@ public class ConeLight extends LightBase implements TreeViewable {
 		
 		this.defineField(C_INNERFOVSCALE.toString(), LuaValue.valueOf(0.9), false);
 		this.getField(C_INNERFOVSCALE).setClamp(new NumberClamp(0, 1));
+		
+		this.defineField(C_RADIUS.toString(), LuaValue.valueOf(8), false);
+		this.getField(C_RADIUS).setClamp(new NumberClampPreferred(0, 1024, 0, 64));
 		
 		this.changedEvent().connect((args)->{
 			LuaValue key = args[0];
@@ -50,6 +54,8 @@ public class ConeLight extends LightBase implements TreeViewable {
 					light.outerFOV = value.tofloat();
 				} else if ( key.eq_b(C_INNERFOVSCALE) ) {
 					light.innerFOV = value.tofloat() * light.outerFOV;
+				} else if ( key.eq_b(C_RADIUS) ) {
+					light.radius = value.tofloat();
 				} else if ( key.eq_b(C_INTENSITY) ) {
 					light.intensity = value.tofloat();
 				} else if ( key.eq_b(C_COLOR) ) {
@@ -106,6 +112,10 @@ public class ConeLight extends LightBase implements TreeViewable {
 		this.set(C_OUTERFOV, LuaValue.valueOf(fov));
 	}
 
+	public void setRadius(float radius) {
+		this.set(C_RADIUS, LuaValue.valueOf(radius));
+	}
+
 	@Override
 	public Light getLightInternal() {
 		return light;
@@ -140,10 +150,11 @@ public class ConeLight extends LightBase implements TreeViewable {
 			
 			// Create light
 			Vector3f pos = ((Vector3)this.get("Position")).toJoml();
+			float radius = this.get(C_RADIUS).tofloat();
 			float outerFOV = this.get(C_OUTERFOV).tofloat();
 			float innerFOVScale = this.get(C_INNERFOVSCALE).tofloat();
 			float intensity = this.get("Intensity").tofloat();
-			light = new engine.gl.light.SpotLightInternal(pos, outerFOV, innerFOVScale*outerFOV, intensity);
+			light = new engine.gl.light.SpotLightInternal(pos, outerFOV, innerFOVScale*outerFOV, radius, intensity);
 			
 			// Color it
 			Color color = ((Color3)this.get("Color")).toColor();
