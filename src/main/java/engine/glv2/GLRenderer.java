@@ -74,7 +74,9 @@ import engine.glv2.v2.Sun;
 import engine.glv2.v2.lights.DirectionalLightHandler;
 import engine.glv2.v2.lights.IDirectionalLightHandler;
 import engine.glv2.v2.lights.IPointLightHandler;
+import engine.glv2.v2.lights.ISpotLightHandler;
 import engine.glv2.v2.lights.PointLightHandler;
+import engine.glv2.v2.lights.SpotLightHandler;
 import engine.lua.type.object.insts.Camera;
 import engine.lua.type.object.insts.DynamicSkybox;
 import engine.observer.RenderableWorld;
@@ -91,6 +93,7 @@ public class GLRenderer implements IPipeline {
 	private DynamicSkyRenderer dynamicSkyRenderer;
 	private PointLightHandler pointLightHandler;
 	private DirectionalLightHandler directionalLightHandler;
+	private SpotLightHandler spotLightHandler;
 	private RenderingManager renderingManager;
 	private HandlesRenderer handlesRenderer;
 
@@ -174,8 +177,10 @@ public class GLRenderer implements IPipeline {
 		rnd.exposure = Game.lighting().getExposure();
 		directionalLightHandler = new DirectionalLightHandler(width, height);
 		pointLightHandler = new PointLightHandler(width, height);
+		spotLightHandler = new SpotLightHandler(width, height);
 		rnd.plh = pointLightHandler;
 		rnd.dlh = directionalLightHandler;
+		rnd.slh = spotLightHandler;
 		rnd.rs = renderingSettings;
 		size.set(RenderableApplication.windowWidth, RenderableApplication.windowHeight);
 		enabled = true;
@@ -256,6 +261,7 @@ public class GLRenderer implements IPipeline {
 		GPUProfiler.start("Lighting");
 		directionalLightHandler.render(currentCamera, projMatrix, dp, renderingSettings);
 		pointLightHandler.render(currentCamera, projMatrix, dp, renderingSettings);
+		spotLightHandler.render(currentCamera, projMatrix, dp, renderingSettings);
 		GPUProfiler.end();
 		GPUProfiler.start("Deferred Pass");
 		dp.process(rnd, rd);
@@ -356,6 +362,7 @@ public class GLRenderer implements IPipeline {
 		pp.resize(width, height);
 		directionalLightHandler.resize(width, height);
 		pointLightHandler.resize(width, height);
+		spotLightHandler.resize(width, height);
 	}
 
 	public void dispose() {
@@ -365,14 +372,12 @@ public class GLRenderer implements IPipeline {
 		pp.dispose();
 		directionalLightHandler.dispose();
 		pointLightHandler.dispose();
+		spotLightHandler.dispose();
 		dynamicSkyRenderer.dispose();
-		// particleRenderer.cleanUp();
 		irradianceCapture.dispose();
 		preFilteredEnvironment.dispose();
-		// waterRenderer.dispose();
 		renderingManager.dispose();
 		handlesRenderer.dispose();
-		// lightRenderer.dispose();
 	}
 
 	@Override
@@ -404,6 +409,11 @@ public class GLRenderer implements IPipeline {
 	@Override
 	public IDirectionalLightHandler getDirectionalLightHandler() {
 		return directionalLightHandler;
+	}
+
+	@Override
+	public ISpotLightHandler getSpotLightHandler() {
+		return spotLightHandler;
 	}
 
 	@Override

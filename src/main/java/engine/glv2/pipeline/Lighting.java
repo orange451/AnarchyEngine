@@ -23,6 +23,7 @@ package engine.glv2.pipeline;
 import static org.lwjgl.opengl.GL11C.GL_TEXTURE_2D;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE0;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE1;
+import static org.lwjgl.opengl.GL13C.GL_TEXTURE10;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE11;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE12;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE2;
@@ -71,8 +72,9 @@ public class Lighting extends DeferredPass<LightingShader> {
 		super.activateTexture(GL_TEXTURE7, GL_TEXTURE_CUBE_MAP, rnd.irradianceCapture.getTexture());
 		super.activateTexture(GL_TEXTURE8, GL_TEXTURE_CUBE_MAP, rnd.environmentMap.getTexture());
 		super.activateTexture(GL_TEXTURE9, GL_TEXTURE_2D, rnd.brdfLUT.getTexture());
-		super.activateTexture(GL_TEXTURE11, GL_TEXTURE_2D, rnd.dlh.getMainTex().getTexture());
-		super.activateTexture(GL_TEXTURE12, GL_TEXTURE_2D, rnd.plh.getMainTex().getTexture());
+		super.activateTexture(GL_TEXTURE10, GL_TEXTURE_2D, rnd.dlh.getMainTex().getTexture());
+		super.activateTexture(GL_TEXTURE11, GL_TEXTURE_2D, rnd.plh.getMainTex().getTexture());
+		super.activateTexture(GL_TEXTURE12, GL_TEXTURE_2D, rnd.slh.getMainTex().getTexture());
 	}
 
 }

@@ -20,7 +20,7 @@
 
 #include struct Material
 
-#include struct Light
+#include struct PointLight
 
 #include struct DirectionalLight
 
@@ -44,7 +44,7 @@ uniform float transparency;
 uniform float exposure;
 uniform float gamma;
 
-uniform Light pointLights[8];
+uniform PointLight pointLights[8];
 uniform int totalPointLights;
 
 uniform DirectionalLight directionalLights[8];

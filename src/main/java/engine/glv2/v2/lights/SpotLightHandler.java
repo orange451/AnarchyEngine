@@ -1,5 +1,8 @@
 package engine.glv2.v2.lights;
 
+import static org.lwjgl.opengl.GL11.GL_FRONT;
+import static org.lwjgl.opengl.GL11.glCullFace;
+import static org.lwjgl.opengl.GL11C.GL_BACK;
 import static org.lwjgl.opengl.GL11C.GL_BLEND;
 import static org.lwjgl.opengl.GL11C.GL_COLOR_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11C.GL_FLOAT;
@@ -13,12 +16,10 @@ import static org.lwjgl.opengl.GL11C.GL_TEXTURE_MAG_FILTER;
 import static org.lwjgl.opengl.GL11C.GL_TEXTURE_MIN_FILTER;
 import static org.lwjgl.opengl.GL11C.GL_TEXTURE_WRAP_S;
 import static org.lwjgl.opengl.GL11C.GL_TEXTURE_WRAP_T;
-import static org.lwjgl.opengl.GL11C.GL_TRIANGLE_STRIP;
 import static org.lwjgl.opengl.GL11C.glBindTexture;
 import static org.lwjgl.opengl.GL11C.glBlendFunc;
 import static org.lwjgl.opengl.GL11C.glClear;
 import static org.lwjgl.opengl.GL11C.glDisable;
-import static org.lwjgl.opengl.GL11C.glDrawArrays;
 import static org.lwjgl.opengl.GL11C.glEnable;
 import static org.lwjgl.opengl.GL12C.GL_CLAMP_TO_EDGE;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE0;
@@ -27,69 +28,66 @@ import static org.lwjgl.opengl.GL13C.GL_TEXTURE2;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE3;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE4;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE5;
-import static org.lwjgl.opengl.GL13C.GL_TEXTURE6;
 import static org.lwjgl.opengl.GL13C.glActiveTexture;
-import static org.lwjgl.opengl.GL15C.GL_STATIC_DRAW;
 import static org.lwjgl.opengl.GL30C.GL_COLOR_ATTACHMENT0;
 import static org.lwjgl.opengl.GL30C.GL_RGB16F;
-import static org.lwjgl.opengl.GL30C.GL_TEXTURE_2D_ARRAY;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 import org.joml.Matrix4f;
+import org.joml.Vector2f;
 
-import engine.gl.light.DirectionalLightInternal;
+import engine.gl.light.SpotLightInternal;
+import engine.gl.mesh.BufferedMesh;
 import engine.glv2.objects.Framebuffer;
 import engine.glv2.objects.FramebufferBuilder;
 import engine.glv2.objects.Texture;
 import engine.glv2.objects.TextureBuilder;
-import engine.glv2.objects.VAO;
-import engine.glv2.shaders.DirectionalLightShader;
+import engine.glv2.shaders.SpotLightShader;
 import engine.glv2.v2.DeferredPipeline;
 import engine.glv2.v2.RenderingSettings;
 import engine.lua.type.object.insts.Camera;
+import engine.util.MeshUtils;
 
-public class DirectionalLightHandler implements IDirectionalLightHandler {
+public class SpotLightHandler implements ISpotLightHandler {
 
-	private List<DirectionalLightInternal> lights = Collections.synchronizedList(new ArrayList<>());
+	private List<SpotLightInternal> lights = Collections.synchronizedList(new ArrayList<>());
 
-	private VAO quad;
+	private BufferedMesh mesh = MeshUtils.sphere(1, 16);
 
 	private Framebuffer main;
 	private Texture mainTex;
 
-	private DirectionalLightShader shader;
+	private SpotLightShader shader;
 
 	private int width, height;
 
-	public DirectionalLightHandler(int width, int height) {
+	private Matrix4f temp = new Matrix4f();
+	private Vector2f texel = new Vector2f();
+
+	public SpotLightHandler(int width, int height) {
 		this.width = width;
 		this.height = height;
 		init();
 	}
 
 	public void init() {
-		float[] positions = { -1, 1, -1, -1, 1, 1, 1, -1 };
-		quad = VAO.create();
-		quad.bind();
-		quad.createAttribute(0, positions, 2, GL_STATIC_DRAW);
-		quad.unbind();
-		quad.setVertexCount(4);
-		shader = new DirectionalLightShader();
+		shader = new SpotLightShader();
 		generateFramebuffer();
 	}
 
 	public void render(Camera camera, Matrix4f projectionMatrix, DeferredPipeline dp, RenderingSettings rs) {
 		main.bind();
+		glCullFace(GL_FRONT);
 		glClear(GL_COLOR_BUFFER_BIT);
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_ONE, GL_ONE);
 		shader.start();
 		shader.loadCameraData(camera, projectionMatrix);
 		shader.loadUseShadows(rs.shadowsEnabled);
-		quad.bind(0);
+		shader.loadTexel(texel);
 		activateTexture(GL_TEXTURE0, GL_TEXTURE_2D, dp.getDiffuseTex().getTexture());
 		activateTexture(GL_TEXTURE1, GL_TEXTURE_2D, dp.getPositionTex().getTexture());
 		activateTexture(GL_TEXTURE2, GL_TEXTURE_2D, dp.getNormalTex().getTexture());
@@ -97,16 +95,22 @@ public class DirectionalLightHandler implements IDirectionalLightHandler {
 		activateTexture(GL_TEXTURE4, GL_TEXTURE_2D, dp.getPbrTex().getTexture());
 		activateTexture(GL_TEXTURE5, GL_TEXTURE_2D, dp.getMaskTex().getTexture());
 		synchronized (lights) {
-			for (DirectionalLightInternal l : lights) {
+			for (SpotLightInternal l : lights) {
 				if (!l.visible)
 					continue;
-				shader.loadDirectionalLight(l);
-				activateTexture(GL_TEXTURE6, GL_TEXTURE_2D_ARRAY, l.getShadowMap().getShadowMaps().getTexture());
-				glDrawArrays(GL_TRIANGLE_STRIP, 0, quad.getVertexCount());
+				temp.identity();
+				temp.translate(l.x, l.y, l.z);
+				temp.scale(l.radius);
+				shader.loadTransformationMatrix(temp);
+				shader.loadSpotLight(l);
+				// activateTexture(GL_TEXTURE6, GL_TEXTURE_2D_ARRAY,
+				// l.getShadowMap().getShadowMaps().getTexture());
+				// glDrawArrays(GL_TRIANGLE_STRIP, 0, quad.getVertexCount());
+				mesh.render(null, null, null);
 			}
 		}
-		quad.unbind(0);
 		shader.stop();
+		glCullFace(GL_BACK);
 		glDisable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		main.unbind();
@@ -115,13 +119,13 @@ public class DirectionalLightHandler implements IDirectionalLightHandler {
 	public void resize(int width, int height) {
 		this.width = width;
 		this.height = height;
+		this.texel.set(1f / (float) width, 1f / (float) height);
 		disposeFramebuffer();
 		generateFramebuffer();
 	}
 
 	public void dispose() {
 		disposeFramebuffer();
-		quad.dispose();
 	}
 
 	private void activateTexture(int textureNum, int target, int texture) {
@@ -156,22 +160,18 @@ public class DirectionalLightHandler implements IDirectionalLightHandler {
 	}
 
 	@Override
-	public void addLight(DirectionalLightInternal l) {
-		if (l == null)
-			return;
-		l.init();
+	public void addLight(SpotLightInternal l) {
 		lights.add(l);
 	}
 
 	@Override
-	public void removeLight(DirectionalLightInternal l) {
+	public void removeLight(SpotLightInternal l) {
 		synchronized (lights) {
 			lights.remove(l);
 		}
-		l.dispose();
 	}
 
-	public List<DirectionalLightInternal> getLights() {
+	public List<SpotLightInternal> getLights() {
 		return lights;
 	}
 

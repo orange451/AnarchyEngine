@@ -27,6 +27,7 @@ import engine.gl.renderer.TransparencyRenderer;
 import engine.gl.shader.BaseShader;
 import engine.glv2.v2.lights.IDirectionalLightHandler;
 import engine.glv2.v2.lights.IPointLightHandler;
+import engine.glv2.v2.lights.ISpotLightHandler;
 import engine.lua.type.object.Instance;
 import engine.lua.type.object.PrefabRenderer;
 import engine.lua.type.object.insts.AnimationController;
@@ -485,5 +486,11 @@ public class Pipeline implements IPipeline {
 	public void setDyamicSkybox(DynamicSkybox dynamicSkybox) {
 		// TODO Auto-generated method stub
 		
+	}
+
+	@Override
+	public ISpotLightHandler getSpotLightHandler() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

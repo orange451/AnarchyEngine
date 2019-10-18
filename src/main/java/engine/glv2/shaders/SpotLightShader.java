@@ -18,17 +18,22 @@
  * 
  */
 
-package engine.glv2.pipeline.shaders;
+package engine.glv2.shaders;
 
 import org.joml.Matrix4f;
-import org.joml.Vector3f;
+import org.joml.Vector2f;
 
+import engine.gl.light.SpotLightInternal;
+import engine.glv2.shaders.data.Attribute;
+import engine.glv2.shaders.data.UniformBoolean;
 import engine.glv2.shaders.data.UniformMatrix4;
 import engine.glv2.shaders.data.UniformSampler;
+import engine.glv2.shaders.data.UniformSpotLight;
+import engine.glv2.shaders.data.UniformVec2;
 import engine.glv2.shaders.data.UniformVec3;
 import engine.lua.type.object.insts.Camera;
 
-public class LightingShader extends BasePipelineShader {
+public class SpotLightShader extends ShaderProgram {
 
 	private UniformMatrix4 projectionMatrix = new UniformMatrix4("projectionMatrix");
 	private UniformMatrix4 viewMatrix = new UniformMatrix4("viewMatrix");
@@ -36,7 +41,6 @@ public class LightingShader extends BasePipelineShader {
 	private UniformMatrix4 inverseViewMatrix = new UniformMatrix4("inverseViewMatrix");
 
 	private UniformVec3 cameraPosition = new UniformVec3("cameraPosition");
-	private UniformVec3 uAmbient = new UniformVec3("uAmbient");
 
 	private UniformSampler gDiffuse = new UniformSampler("gDiffuse");
 	private UniformSampler gPosition = new UniformSampler("gPosition");
@@ -44,23 +48,24 @@ public class LightingShader extends BasePipelineShader {
 	private UniformSampler gDepth = new UniformSampler("gDepth");
 	private UniformSampler gPBR = new UniformSampler("gPBR");
 	private UniformSampler gMask = new UniformSampler("gMask");
-	private UniformSampler volumetric = new UniformSampler("volumetric");
-	private UniformSampler irradianceCube = new UniformSampler("irradianceCube");
-	private UniformSampler environmentCube = new UniformSampler("environmentCube");
-	private UniformSampler brdfLUT = new UniformSampler("brdfLUT");
-	private UniformSampler directionalLightData = new UniformSampler("directionalLightData");
-	private UniformSampler pointLightData = new UniformSampler("pointLightData");
-	private UniformSampler spotLightData = new UniformSampler("spotLightData");
 
 	private UniformMatrix4 biasMatrix = new UniformMatrix4("biasMatrix");
 
+	private UniformMatrix4 transformationMatrix = new UniformMatrix4("transformationMatrix");
+
+	private UniformSpotLight light = new UniformSpotLight("light");
+
+	private UniformBoolean useShadows = new UniformBoolean("useShadows");
+
+	private UniformVec2 texel = new UniformVec2("texel");
+
 	private Matrix4f projInv = new Matrix4f(), viewInv = new Matrix4f();
 
-	public LightingShader(String name) {
-		super("deferred/" + name);
-		super.storeUniforms(projectionMatrix, viewMatrix, cameraPosition, uAmbient, gDiffuse, gPosition, gNormal,
-				gDepth, gPBR, gMask, volumetric, irradianceCube, environmentCube, brdfLUT, biasMatrix,
-				inverseProjectionMatrix, inverseViewMatrix, directionalLightData, pointLightData, spotLightData);
+	public SpotLightShader() {
+		super("assets/shaders/SpotLight.vs", "assets/shaders/SpotLight.fs", new Attribute(0, "position"));
+		super.storeUniforms(projectionMatrix, viewMatrix, cameraPosition, gDiffuse, gPosition, gNormal, gDepth, gPBR,
+				gMask, light, inverseProjectionMatrix, inverseViewMatrix, biasMatrix, useShadows, transformationMatrix,
+				texel);
 		super.validate();
 		this.loadInitialData();
 	}
@@ -74,13 +79,6 @@ public class LightingShader extends BasePipelineShader {
 		gDepth.loadTexUnit(3);
 		gPBR.loadTexUnit(4);
 		gMask.loadTexUnit(5);
-		volumetric.loadTexUnit(6);
-		irradianceCube.loadTexUnit(7);
-		environmentCube.loadTexUnit(8);
-		brdfLUT.loadTexUnit(9);
-		directionalLightData.loadTexUnit(10);
-		pointLightData.loadTexUnit(11);
-		spotLightData.loadTexUnit(12);
 		Matrix4f bias = new Matrix4f();
 		bias.m00(0.5f);
 		bias.m11(0.5f);
@@ -92,8 +90,20 @@ public class LightingShader extends BasePipelineShader {
 		super.stop();
 	}
 
-	public void loadAmbient(Vector3f ambient) {
-		this.uAmbient.loadVec3(ambient);
+	public void loadSpotLight(SpotLightInternal l) {
+		light.loadLight(l);
+	}
+
+	public void loadTransformationMatrix(Matrix4f mat) {
+		transformationMatrix.loadMatrix(mat);
+	}
+
+	public void loadUseShadows(boolean shadows) {
+		useShadows.loadBoolean(shadows);
+	}
+
+	public void loadTexel(Vector2f texel) {
+		this.texel.loadVec2(texel);
 	}
 
 	public void loadCameraData(Camera camera, Matrix4f projection) {

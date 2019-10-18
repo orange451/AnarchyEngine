@@ -26,6 +26,7 @@ import org.joml.Vector3f;
 import engine.glv2.objects.Texture;
 import engine.glv2.v2.lights.DirectionalLightHandler;
 import engine.glv2.v2.lights.PointLightHandler;
+import engine.glv2.v2.lights.SpotLightHandler;
 
 public class RendererData {
 
@@ -39,6 +40,7 @@ public class RendererData {
 	public Vector3f previousCameraPosition = new Vector3f();
 	public PointLightHandler plh;
 	public DirectionalLightHandler dlh;
+	public SpotLightHandler slh;
 	public RenderingSettings rs;
 
 }

@@ -18,7 +18,7 @@
 //
 //
 
-#include struct PointLight
+#include struct SpotLight
 
 out vec3 out_Color;
 
@@ -37,7 +37,7 @@ uniform mat4 viewMatrix;
 uniform mat4 inverseProjectionMatrix;
 uniform mat4 inverseViewMatrix;
 
-uniform PointLight light;
+uniform SpotLight light;
 
 #include variable GLOBAL
 
@@ -55,7 +55,7 @@ uniform PointLight light;
 
 #include function fresnelSchlickRoughness
 
-#include function calcPointLight
+#include function calcSpotLight
 
 #include variable MASK
 
@@ -80,7 +80,7 @@ void main() {
 		vec3 F0 = vec3(0.04);
 		F0 = mix(F0, image.rgb, metallic);
 
-		result = calcPointLight(light, position, image.rgb, N, V, F0, roughness, metallic);
+		result = calcSpotLight(light, position, image.rgb, N, V, F0, roughness, metallic);
 	}
 	out_Color = result;
 }

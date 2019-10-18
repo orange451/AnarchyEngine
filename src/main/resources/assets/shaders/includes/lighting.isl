@@ -27,13 +27,26 @@
 #define MASK_COMPARE(a, b) abs(a - b) < 0.2
 #end
 
-#struct Light
-struct Light {
+#struct PointLight
+struct PointLight {
 	vec3 position;
 	vec3 color;
 	float radius;
 	float intensity;
 	bool visible;
+};
+#end
+
+#struct SpotLight
+struct SpotLight {
+	vec3 position;
+	vec3 direction;
+	vec3 color;
+	float radius;
+	float intensity;
+	bool visible;
+	float outerFOV;
+	float innerFOV;
 };
 #end
 
@@ -257,7 +270,7 @@ float computeAmbientOcclusion(vec2 texCoords, vec3 position, vec3 normal, sample
 #end
 
 #function calcPointLight
-vec3 calcPointLight(Light light, vec3 position, vec3 diffuse, vec3 N, vec3 V, vec3 F0,
+vec3 calcPointLight(PointLight light, vec3 position, vec3 diffuse, vec3 N, vec3 V, vec3 F0,
 					float roughness, float metallic) {
 	if (!light.visible)
 		return vec3(0.0);
@@ -282,6 +295,43 @@ vec3 calcPointLight(Light light, vec3 position, vec3 diffuse, vec3 N, vec3 V, ve
 	kD *= 1.0 - metallic;
 
 	float NdotL = max(dot(N, L), 0.0);
+	return (kD * diffuse / PI + brdf) * radiance * NdotL;
+}
+#end
+
+#function calcSpotLight
+vec3 calcSpotLight(SpotLight light, vec3 position, vec3 diffuse, vec3 N, vec3 V, vec3 F0,
+				   float roughness, float metallic) {
+	if (!light.visible)
+		return vec3(0.0);
+	vec3 L = normalize(light.position - position);
+
+	float theta = dot(L, normalize(-light.direction));
+	float epsilon = light.innerFOV - light.outerFOV;
+	float intensity = clamp((theta - light.outerFOV) / epsilon, 0.0, 1.0);
+	if (intensity <= 0.0)
+		return vec3(0.0);
+
+	vec3 H = normalize(V + L);
+	float distance = length(light.position - position);
+	float attenuation = max(1.0 - distance / light.radius, 0.0) / distance;
+	vec3 radiance = light.color * attenuation * light.intensity;
+	if (radiance.r <= 0.0 && radiance.g <= 0.0 && radiance.b <= 0.0)
+		return vec3(0.0);
+
+	float NDF = DistributionGGX(N, H, roughness);
+	float G = GeometrySmith(N, V, L, roughness);
+	vec3 F = fresnelSchlick(max(dot(H, V), 0.0), F0);
+
+	vec3 nominator = NDF * G * F;
+	float denominator = max(dot(N, V), 0.0) * max(dot(N, L), 0.0) + 0.001;
+	vec3 brdf = nominator / denominator;
+
+	vec3 kS = F;
+	vec3 kD = vec3(1.0) - kS;
+	kD *= 1.0 - metallic;
+
+	float NdotL = max(dot(N, L), 0.0) * intensity;
 	return (kD * diffuse / PI + brdf) * radiance * NdotL;
 }
 #end
