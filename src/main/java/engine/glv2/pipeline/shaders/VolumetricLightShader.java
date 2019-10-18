@@ -23,7 +23,6 @@ package engine.glv2.pipeline.shaders;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
-import engine.glv2.entities.SunCamera;
 import engine.glv2.shaders.data.UniformFloat;
 import engine.glv2.shaders.data.UniformMatrix4;
 import engine.glv2.shaders.data.UniformSampler;
@@ -79,12 +78,6 @@ public class VolumetricLightShader extends BasePipelineShader {
 
 	public void loadLightPosition(Vector3f pos) {
 		lightPosition.loadVec3(pos);
-	}
-
-	public void loadSunCameraData(SunCamera camera) {
-		for (int x = 0; x < 4; x++)
-			this.projectionLightMatrix[x].loadMatrix(camera.getProjectionArray()[x]);
-		viewLightMatrix.loadMatrix(camera.getViewMatrix());
 	}
 
 	public void loadCameraData(Camera camera, Matrix4f projection) {

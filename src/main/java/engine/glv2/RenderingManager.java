@@ -27,7 +27,6 @@ import static org.lwjgl.opengl.GL11.glEnable;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.joml.Matrix4f;
 import org.luaj.vm2.LuaValue;
 
 import com.badlogic.gdx.utils.IntMap;
@@ -35,7 +34,6 @@ import com.badlogic.gdx.utils.IntMap.Entry;
 import com.esotericsoftware.kryonet.util.ObjectIntMap;
 
 import engine.glv2.entities.CubeMapCamera;
-import engine.glv2.entities.SunCamera;
 import engine.glv2.v2.IRenderingData;
 import engine.glv2.v2.lights.DirectionalLightCamera;
 import engine.lua.type.object.Instance;
@@ -89,11 +87,6 @@ public class RenderingManager {
 		glDisable(GL_BLEND);
 	}
 
-	public void renderShadow(SunCamera camera) {
-		for (Entry<IObjectRenderer> rendererEntry : objectRenderers)
-			rendererEntry.value.renderShadow(camera);
-	}
-
 	public void renderShadow(DirectionalLightCamera camera) {
 		for (Entry<IObjectRenderer> rendererEntry : objectRenderers)
 			rendererEntry.value.renderShadow(camera);
@@ -116,11 +109,12 @@ public class RenderingManager {
 			process(inst);
 		}
 		if (root instanceof RenderableInstance) {
-			
+
 			Instance animationController = root.findFirstChildOfClass(C_ANIMATIONCONTROLLER);
-			boolean hasAnimationController = animationController != null && ((AnimationController)animationController).getPlayingAnimations() > 0;
+			boolean hasAnimationController = animationController != null
+					&& ((AnimationController) animationController).getPlayingAnimations() > 0;
 			int id = hasAnimationController ? 2 : 1; // TODO: Poll current instance
-																						// renderer id
+														// renderer id
 			List<Instance> batch = entitiesToRenderers.findKey(id);
 			if (batch != null)
 				batch.add(root);

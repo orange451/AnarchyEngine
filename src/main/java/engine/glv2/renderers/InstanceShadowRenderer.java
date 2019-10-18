@@ -27,7 +27,6 @@ import org.joml.Matrix4f;
 import engine.gl.MaterialGL;
 import engine.gl.Resources;
 import engine.gl.mesh.BufferedMesh;
-import engine.glv2.entities.SunCamera;
 import engine.glv2.renderers.shaders.InstanceBasicShader;
 import engine.glv2.v2.lights.DirectionalLightCamera;
 import engine.lua.type.object.Instance;
@@ -42,15 +41,6 @@ public class InstanceShadowRenderer {
 
 	public InstanceShadowRenderer() {
 		shader = new InstanceBasicShader();
-	}
-
-	protected void renderShadow(List<Instance> instances, SunCamera sunCamera) {
-		shader.start();
-		shader.loadsunCamera(sunCamera);
-		for (Instance instance : instances) {
-			renderInstance(instance);
-		}
-		shader.stop();
 	}
 
 	protected void renderShadow(List<Instance> instances, DirectionalLightCamera camera) {

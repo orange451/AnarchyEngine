@@ -30,6 +30,7 @@ public class UniformDirectionalLight extends UniformObject {
 	private UniformMatrix4 viewMatrix;
 	private UniformMatrix4 projectionMatrix[];
 	private UniformSampler shadowMap;
+	private UniformBoolean shadows;
 
 	public UniformDirectionalLight(String name) {
 		direction = new UniformVec3(name + ".direction");
@@ -38,11 +39,12 @@ public class UniformDirectionalLight extends UniformObject {
 		visible = new UniformBoolean(name + ".visible");
 		viewMatrix = new UniformMatrix4(name + ".viewMatrix");
 		shadowMap = new UniformSampler(name + ".shadowMap");
+		shadows = new UniformBoolean(name + ".shadows");
 		projectionMatrix = new UniformMatrix4[4];
 		for (int x = 0; x < 4; x++)
 			projectionMatrix[x] = new UniformMatrix4(name + ".projectionMatrix" + x);
 		super.storeUniforms(projectionMatrix);
-		super.storeUniforms(direction, intensity, visible, color, viewMatrix, shadowMap);
+		super.storeUniforms(direction, intensity, visible, color, viewMatrix, shadowMap, shadows);
 	}
 
 	public void loadLight(DirectionalLightInternal light, int i, int offset) {
@@ -54,8 +56,9 @@ public class UniformDirectionalLight extends UniformObject {
 		for (int x = 0; x < 4; x++)
 			projectionMatrix[x].loadMatrix(light.getLightCamera().getProjectionArray()[x]);
 		shadowMap.loadTexUnit(offset + i);
+		shadows.loadBoolean(light.shadows);
 	}
-	
+
 	public void loadLight(DirectionalLightInternal light, int shadowUnit) {
 		direction.loadVec3(light.direction);
 		color.loadVec3(light.color);
@@ -65,6 +68,7 @@ public class UniformDirectionalLight extends UniformObject {
 		for (int x = 0; x < 4; x++)
 			projectionMatrix[x].loadMatrix(light.getLightCamera().getProjectionArray()[x]);
 		shadowMap.loadTexUnit(shadowUnit);
+		shadows.loadBoolean(light.shadows);
 	}
 
 }

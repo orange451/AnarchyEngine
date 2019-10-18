@@ -24,13 +24,11 @@ import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
 import engine.glv2.objects.Texture;
-import engine.glv2.v2.lights.DirectionalLightShadowMap;
 
 public class RendererData {
 
 	public Texture irradianceCapture, environmentMap;
 	public Texture brdfLUT;
-	public DirectionalLightShadowMap dlsm;
 	public float exposure;
 	public float gamma;
 	public float saturation;

@@ -23,7 +23,6 @@ package engine.glv2;
 import java.util.List;
 
 import engine.glv2.entities.CubeMapCamera;
-import engine.glv2.entities.SunCamera;
 import engine.glv2.v2.IRenderingData;
 import engine.glv2.v2.lights.DirectionalLightCamera;
 import engine.lua.type.object.Instance;
@@ -37,8 +36,6 @@ public interface IObjectRenderer {
 	public void renderReflections(IRenderingData rd, RendererData rnd, CubeMapCamera cubeCamera);
 
 	public void renderForward(IRenderingData rd, RendererData rnd);
-
-	public void renderShadow(SunCamera sun);
 
 	public void renderShadow(DirectionalLightCamera camera);
 

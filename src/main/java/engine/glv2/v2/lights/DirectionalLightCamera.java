@@ -30,7 +30,6 @@ public class DirectionalLightCamera {
 
 	public void update(Vector3f direction, Vector3f position) {
 		temp.set(direction);
-		temp.z = -temp.z;
 		viewMatrix.setLookAt(position, temp.mul(-1.0f).add(position), new Vector3f(0, 1, 0));
 	}
 

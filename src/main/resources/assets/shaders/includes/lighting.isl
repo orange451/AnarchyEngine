@@ -49,6 +49,7 @@ struct DirectionalLight {
 	mat4 projectionMatrix2;
 	mat4 projectionMatrix3;
 	sampler2DArrayShadow shadowMap;
+	bool shadows;
 };
 #end
 
@@ -307,7 +308,9 @@ vec3 calcDirectionalLight(DirectionalLight light, vec3 position, vec3 diffuse, v
 	vec3 kD = vec3(1.0) - kS;
 	kD *= 1.0 - metallic;
 
-	float NdotL = max(dot(N, L), 0.0) * computeShadowV2(position, light);
+	float NdotL = max(dot(N, L), 0.0);
+	if (light.shadows)
+		NdotL *= computeShadowV2(position, light);
 	return (kD * diffuse / PI + brdf) * radiance * NdotL;
 }
 #end

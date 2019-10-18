@@ -39,10 +39,7 @@ uniform samplerCube irradianceMap;
 uniform samplerCube preFilterEnv;
 uniform sampler2D brdfLUT;
 uniform int useShadows;
-uniform mat4 projectionLightMatrix[4];
-uniform mat4 viewLightMatrix;
 uniform mat4 biasMatrix;
-uniform sampler2DArrayShadow shadowMap;
 uniform float transparency;
 uniform float exposure;
 uniform float gamma;
@@ -64,8 +61,6 @@ uniform int totalDirectionalLights;
 #include function fresnelSchlickRoughness
 
 #include function fresnelSchlick
-
-#include function computeShadow
 
 #include function computeShadowV2
 
@@ -102,29 +97,10 @@ void main() {
 	vec3 N = normalize(normal);
 	vec3 V = normalize(cameraPosition - position);
 	vec3 R = reflect(-V, N);
-	vec3 L = normalize(lightPosition);
-	vec3 H = normalize(V + L);
 
 	vec3 F0 = vec3(0.04);
 	F0 = mix(F0, diffuseF.rgb, metallic);
-
 	vec3 Lo = vec3(0.0);
-	vec3 radiance = vec3(1.0);
-
-	float NDF = DistributionGGX(N, H, roughness);
-	float G = GeometrySmith(N, V, L, roughness);
-	vec3 F = fresnelSchlick(max(dot(H, V), 0.0), F0);
-
-	vec3 nominator = NDF * G * F;
-	float denominator = max(dot(N, V), 0.0) * max(dot(N, L), 0.0) + 0.001;
-	vec3 brdf = nominator / denominator;
-
-	vec3 kS = F;
-	vec3 kD = vec3(1.0) - kS;
-	kD *= 1.0 - metallic;
-
-	float NdotL = max(dot(N, L), 0.0) * computeShadow(position);
-	Lo += (kD * diffuseF.rgb / PI + brdf) * radiance * NdotL;
 
 	for (int i = 0; i < totalDirectionalLights; i++) {
 		Lo += calcDirectionalLight(directionalLights[i], position, diffuseF.rgb, N, V, F0,
@@ -135,10 +111,10 @@ void main() {
 		Lo += calcPointLight(pointLights[i], position, diffuseF.rgb, N, V, F0, roughness, metallic);
 	}
 
-	F = fresnelSchlickRoughness(max(dot(N, V), 0.0), F0, roughness);
+	vec3 F = fresnelSchlickRoughness(max(dot(N, V), 0.0), F0, roughness);
 
-	kS = F;
-	kD = 1.0 - kS;
+	vec3 kS = F;
+	vec3 kD = vec3(1.0) - kS;
 	kD *= 1.0 - metallic;
 
 	vec3 irradiance = texture(irradianceMap, N).rgb;

@@ -91,7 +91,7 @@ public class EnvironmentRenderer {
 			camera.switchToFace(i);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			renderingManager.renderReflections(rd, rnd, camera); // TODO: Issue here with shadow sampler
-			sr.render(camera, rd.sun.getSunPosition(), false, false);
+			sr.render(camera, new Vector3f(0, 0, 0), false, false);
 		}
 		framebuffer.unbind();
 	}

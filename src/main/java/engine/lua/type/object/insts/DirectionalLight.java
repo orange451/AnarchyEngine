@@ -34,7 +34,7 @@ public class DirectionalLight extends LightBase implements TreeViewable {
 		this.getField(C_POSITION).setLocked(true);
 
 		// Define direction field
-		this.defineField(C_DIRECTION.toString(), new Vector3(1, 1, -1), false);
+		this.defineField(C_DIRECTION.toString(), new Vector3(1, 1, 1), false);
 
 		// Shadow distance
 		this.defineField(C_SHADOWDISTANCE.toString(), LuaValue.valueOf(50), false);
@@ -54,6 +54,8 @@ public class DirectionalLight extends LightBase implements TreeViewable {
 					light.setShadowDistance(value.toint());
 				} else if (key.eq_b(C_DIRECTION)) {
 					light.direction = ((Vector3) value).toJoml();
+				} else if (key.eq_b(C_SHADOWS)) {
+					light.shadows = value.toboolean();
 				}
 			}
 

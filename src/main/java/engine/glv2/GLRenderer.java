@@ -26,13 +26,13 @@ import static org.lwjgl.opengl.GL11C.GL_COLOR_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11C.GL_CULL_FACE;
 import static org.lwjgl.opengl.GL11C.GL_DEPTH_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11C.GL_DEPTH_TEST;
-import static org.lwjgl.opengl.GL11C.*;
 import static org.lwjgl.opengl.GL11C.GL_GREATER;
 import static org.lwjgl.opengl.GL11C.GL_LESS;
 import static org.lwjgl.opengl.GL11C.GL_ONE_MINUS_SRC_ALPHA;
 import static org.lwjgl.opengl.GL11C.GL_SRC_ALPHA;
 import static org.lwjgl.opengl.GL11C.glBlendFunc;
 import static org.lwjgl.opengl.GL11C.glClear;
+import static org.lwjgl.opengl.GL11C.glClearColor;
 import static org.lwjgl.opengl.GL11C.glClearDepth;
 import static org.lwjgl.opengl.GL11C.glCullFace;
 import static org.lwjgl.opengl.GL11C.glDepthFunc;
@@ -48,13 +48,12 @@ import org.lwjgl.opengl.ARBClipControl;
 import org.lwjgl.opengl.GL;
 
 import engine.Game;
+import engine.InternalRenderThread;
 import engine.application.RenderableApplication;
 import engine.gl.IPipeline;
 import engine.gl.Pipeline;
 import engine.gl.Surface;
 import engine.gl.light.DirectionalLightInternal;
-import engine.glv2.entities.Sun;
-import engine.glv2.entities.SunCamera;
 import engine.glv2.pipeline.MultiPass;
 import engine.glv2.pipeline.PostProcess;
 import engine.glv2.renderers.AnimInstanceRenderer;
@@ -67,7 +66,7 @@ import engine.glv2.v2.HandlesRenderer;
 import engine.glv2.v2.IRenderingData;
 import engine.glv2.v2.IrradianceCapture;
 import engine.glv2.v2.PostProcessPipeline;
-import engine.glv2.v2.lights.DirectionalLightShadowMap;
+import engine.glv2.v2.Sun;
 import engine.lua.type.object.insts.Camera;
 import engine.lua.type.object.insts.DynamicSkybox;
 import engine.observer.RenderableWorld;
@@ -81,28 +80,19 @@ public class GLRenderer implements IPipeline {
 	private IrradianceCapture irradianceCapture;
 	private PreFilteredEnvironment preFilteredEnvironment;
 
-	// private ParticleRenderer particleRenderer;
 	private DynamicSkyRenderer dynamicSkyRenderer;
-	// private WaterRenderer waterRenderer;
-	// private LightRenderer lightRenderer;
 	private PointLightHandler pointLightHandler;
 	private DirectionalLightHandler directionalLightHandler;
 	private RenderingManager renderingManager;
 	private HandlesRenderer handlesRenderer;
 
-	private DirectionalLightShadowMap dlsm;
-
 	private DeferredPipeline dp;
 	private PostProcessPipeline pp;
-
-	/*
-	 * private IShadowPass shadowPass = (a) -> { }; private IGBufferPass gbufferPass
-	 * = (a) -> { }; private IForwardPass forwardPass = (a, b) -> { };
-	 */
 
 	private Matrix4f projMatrix;
 	private Camera currentCamera;
 	private Sun sun;
+	private DynamicSkybox dynamicSkybox;
 
 	private RenderingSettings renderingSettings;
 
@@ -117,12 +107,11 @@ public class GLRenderer implements IPipeline {
 	private int width, height;
 	private Vector2f size = new Vector2f();
 
-	private float time = 20000, globalTime = 0;
+	private float globalTime = 0;
 
 	private boolean useARBClipControl = false;
 
 	public GLRenderer() {
-
 		useARBClipControl = GL.getCapabilities().GL_ARB_clip_control;
 
 		rnd = new RendererData();
@@ -156,8 +145,6 @@ public class GLRenderer implements IPipeline {
 
 	public void init() {
 		renderingManager = new RenderingManager();
-		// lightRenderer = new LightRenderer();
-		// frustum = new Frustum();
 
 		envRenderer = new EnvironmentRenderer(32);
 		envRendererEntities = new EnvironmentRenderer(128);
@@ -166,13 +153,10 @@ public class GLRenderer implements IPipeline {
 		preFilteredEnvironment = new PreFilteredEnvironment(loader.createEmptyCubeMap(128, true, true), loader);
 		rnd.brdfLUT = preFilteredEnvironment.getBRDFLUT();
 		rnd.environmentMap = preFilteredEnvironment.getCubeMapTexture();
-		// particleRenderer = new ParticleRenderer(loader);
 		dynamicSkyRenderer = new DynamicSkyRenderer(loader);
-		// waterRenderer = new WaterRenderer(loader);
 		renderingManager.addRenderer(new InstanceRenderer());
 		renderingManager.addRenderer(new AnimInstanceRenderer());
 		handlesRenderer = new HandlesRenderer();
-		rnd.dlsm = dlsm = new DirectionalLightShadowMap(renderingSettings.shadowsResolution);
 		dp = new MultiPass(RenderableApplication.windowWidth, RenderableApplication.windowHeight);
 		pp = new PostProcess(RenderableApplication.windowWidth, RenderableApplication.windowHeight);
 		width = RenderableApplication.windowWidth;
@@ -180,7 +164,6 @@ public class GLRenderer implements IPipeline {
 		projMatrix = Maths.createProjectionMatrix(RenderableApplication.windowWidth, RenderableApplication.windowHeight,
 				90, 0.1f, Float.POSITIVE_INFINITY, true);
 
-		// rnd.lights = lightRenderer.getLights();
 		rnd.exposure = Game.lighting().getExposure();
 		directionalLightHandler = new DirectionalLightHandler(RenderableApplication.windowWidth,
 				RenderableApplication.windowHeight);
@@ -193,18 +176,12 @@ public class GLRenderer implements IPipeline {
 
 	private void shadowPass() {
 		// TODO: Render transparent shadows using an extra texture
-		SunCamera sunCamera = sun.getCamera();
-		sunCamera.setPosition(currentCamera.getPosition().getInternal());
 		if (renderingSettings.shadowsEnabled) {
 			GPUProfiler.start("Shadow Pass");
-
-			dlsm.bind();
-			glClear(GL_DEPTH_BUFFER_BIT);
-			renderingManager.renderShadow(sunCamera);
-			// shadowPass.shadowPass(sunCamera);
-			dlsm.unbind();
 			synchronized (directionalLightHandler.getLights()) {
 				for (DirectionalLightInternal l : directionalLightHandler.getLights()) {
+					if (!l.shadows)
+						continue;
 					l.setPosition(currentCamera.getPosition().getInternal());
 					l.update();
 					l.getShadowMap().bind();
@@ -213,10 +190,7 @@ public class GLRenderer implements IPipeline {
 					l.getShadowMap().unbind();
 				}
 			}
-
 			GPUProfiler.end();
-			glCullFace(GL_FRONT);
-			glCullFace(GL_BACK);
 		}
 	}
 
@@ -225,7 +199,7 @@ public class GLRenderer implements IPipeline {
 		GPUProfiler.start("Irradiance");
 		GPUProfiler.start("CubeMap Render");
 		envRenderer.renderEnvironmentMap(currentCamera.getPosition().getInternal(), dynamicSkyRenderer,
-				sun.getSunPosition(), globalTime);
+				sun.getLight().direction, globalTime);
 		GPUProfiler.end();
 		GPUProfiler.start("Irradiance Capture");
 		irradianceCapture.render(envRenderer.getCubeTexture());
@@ -244,7 +218,6 @@ public class GLRenderer implements IPipeline {
 	}
 
 	private void occlusionPass() {
-		// frustum.calculateFrustum(camera);
 		glClear(GL_DEPTH_BUFFER_BIT);
 	}
 
@@ -257,14 +230,11 @@ public class GLRenderer implements IPipeline {
 		}
 		dp.bind();
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		// gbufferPass.gBufferPass(camera);
 		GPUProfiler.start("RenderingManager");
 		renderingManager.render(rd, rnd);
 		GPUProfiler.end();
-		// waterRenderer.render(rd.getEngine().getEntitiesFor(waterFam), camera,
-		// worldSimulation.getGlobalTime(), frustum);
 		GPUProfiler.start("Skybox");
-		dynamicSkyRenderer.render(currentCamera, projMatrix, sun.getSunPosition(), true, true);
+		dynamicSkyRenderer.render(currentCamera, projMatrix, sun.getLight().direction, true, true);
 		GPUProfiler.end();
 		dp.unbind();
 		if (useARBClipControl) {
@@ -294,8 +264,6 @@ public class GLRenderer implements IPipeline {
 		pp.bind();
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		dp.render(pp.getMain());
-		// forwardPass.forwardPass(rd, rnd);
-		// particleRenderer.render(ParticleDomain.getParticles(), camera);
 		GPUProfiler.start("RenderingManager");
 		renderingManager.renderForward(rd, rnd);
 		GPUProfiler.end();
@@ -330,20 +298,14 @@ public class GLRenderer implements IPipeline {
 		if (currentCamera == null)
 			return;
 		resetState();
-		renderingManager.preProcess(renderableWorld.getInstance());
-
-		this.time += 0.016f * 1;
-		this.time %= 24000;
 
 		// Update Projection
 		Maths.createProjectionMatrix(projMatrix, this.width, this.height, currentCamera.getFov(), 0.1f,
 				Float.POSITIVE_INFINITY, useARBClipControl);
 
 		// Set global time for clouds
-		this.globalTime += 0.016f * 100;
-		time += 0.016f * 1;
-		float res = time * 0.015f;
-		sun.update(res, 0);
+		this.globalTime += InternalRenderThread.delta * 100;
+		sun.update(dynamicSkybox);
 
 		// Update lighting data
 		rnd.ambient = Game.lighting().getAmbient().toJOML();
@@ -352,26 +314,18 @@ public class GLRenderer implements IPipeline {
 		rnd.saturation = Game.lighting().getSaturation();
 
 		rd.camera = currentCamera;
-		rd.sun = sun;
 		rd.projectionMatrix = projMatrix;
-		// currentCamera.getViewMatrix().getInternal().set(directionalLightHandler.getLights().get(0).getLightCamera().getViewMatrix());
-		// projMatrix.set(directionalLightHandler.getLights().get(0).getLightCamera().getProjectionArray()[2]);
+
 		GPUProfiler.startFrame();
 
+		renderingManager.preProcess(renderableWorld.getInstance());
 		shadowPass();
-
 		environmentPass();
-
 		// occlusionPass();
-
 		gBufferPass();
-
 		deferredPass();
-
 		forwardPass();
-
 		postFXPass();
-
 		renderingManager.end();
 
 		pp.render();
@@ -398,7 +352,6 @@ public class GLRenderer implements IPipeline {
 	public void dispose() {
 		envRenderer.dispose();
 		envRendererEntities.dispose();
-		dlsm.dispose();
 		dp.dispose();
 		pp.dispose();
 		directionalLightHandler.dispose();
@@ -445,7 +398,12 @@ public class GLRenderer implements IPipeline {
 
 	@Override
 	public void setDyamicSkybox(DynamicSkybox dynamicSkybox) {
+		this.dynamicSkybox = dynamicSkybox;
 		dynamicSkyRenderer.setSky(dynamicSkybox);
+		if (dynamicSkybox != null)
+			directionalLightHandler.addLight(sun.getLight());
+		else
+			directionalLightHandler.removeLight(sun.getLight());
 	}
 
 	public void resetState() {

@@ -29,7 +29,6 @@ import static org.lwjgl.opengl.GL13C.GL_TEXTURE3;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE4;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE5;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE6;
-import static org.lwjgl.opengl.GL13C.GL_TEXTURE7;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE8;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE_CUBE_MAP;
 import static org.lwjgl.opengl.GL13C.glActiveTexture;
@@ -72,11 +71,8 @@ public class InstanceForwardRenderer {
 			shader.loadCamera(rd.camera, rd.projectionMatrix);
 		else
 			shader.loadCamera(cubeCamera);
-		shader.loadLightPosition(rd.sun.getSunPosition());
 		shader.colorCorrect(colorCorrect);
 		shader.loadSettings(true);
-		shader.loadBiasMatrix(rd.sun.getCamera().getProjectionArray());
-		shader.loadLightMatrix(rd.sun.getCamera().getViewMatrix());
 		shader.loadExposure(rnd.exposure);
 		shader.loadGamma(rnd.gamma);
 		shader.loadAmbient(rnd.ambient);
@@ -87,8 +83,6 @@ public class InstanceForwardRenderer {
 		glBindTexture(GL_TEXTURE_CUBE_MAP, rnd.environmentMap.getTexture());
 		glActiveTexture(GL_TEXTURE6);
 		glBindTexture(GL_TEXTURE_2D, rnd.brdfLUT.getTexture());
-		glActiveTexture(GL_TEXTURE7);
-		glBindTexture(GL_TEXTURE_2D_ARRAY, rnd.dlsm.getShadowMaps().getTexture());
 		synchronized (rnd.dlh.getLights()) {
 			for (int x = 0; x < Math.min(8, rnd.dlh.getLights().size()); x++) {
 				glActiveTexture(GL_TEXTURE8 + x);

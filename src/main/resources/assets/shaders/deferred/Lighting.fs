@@ -69,8 +69,6 @@ uniform sampler2D directionalLightData;
 
 #include function computeAmbientOcclusionV2
 
-#include function computeShadow
-
 #include variable MASK
 
 // Linear depth
@@ -173,33 +171,12 @@ void main() {
 		F0 = mix(F0, image.rgb, metallic);
 		vec3 Lo = vec3(0.0);
 
-		vec3 L = normalize(lightPosition);
-		vec3 H = normalize(V + L);
+		Lo += texture(directionalLightData, textureCoords).rgb;
 
-		vec3 radiance = vec3(1.0);
-
-		float NDF = DistributionGGX(N, H, roughness);
-		float G = GeometrySmith(N, V, L, roughness);
-		vec3 F = fresnelSchlick(max(dot(H, V), 0.0), F0);
-
-		vec3 nominator = NDF * G * F;
-		float denominator = max(dot(N, V), 0.0) * max(dot(N, L), 0.0) + 0.001;
-		vec3 brdf = nominator / denominator;
+		vec3 F = fresnelSchlickRoughness(max(dot(N, V), 0.0), F0, roughness);
 
 		vec3 kS = F;
 		vec3 kD = vec3(1.0) - kS;
-		kD *= 1.0 - metallic;
-
-		float NdotL = max(dot(N, L), 0.0) *
-					  computeShadow(position); // * computeContactShadows(position, N, L, depth);
-		Lo += (kD * image.rgb / PI + brdf) * radiance * NdotL;
-
-		Lo += texture(directionalLightData, textureCoords).rgb;
-
-		F = fresnelSchlickRoughness(max(dot(N, V), 0.0), F0, roughness);
-
-		kS = F;
-		kD = 1.0 - kS;
 		kD *= 1.0 - metallic;
 
 		vec3 irradiance = texture(irradianceCube, N).rgb;

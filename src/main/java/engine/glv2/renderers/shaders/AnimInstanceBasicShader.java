@@ -24,7 +24,6 @@ import java.nio.FloatBuffer;
 
 import org.joml.Matrix4f;
 
-import engine.glv2.entities.SunCamera;
 import engine.glv2.shaders.ShaderProgram;
 import engine.glv2.shaders.data.Attribute;
 import engine.glv2.shaders.data.UniformFloat;
@@ -59,12 +58,6 @@ public class AnimInstanceBasicShader extends ShaderProgram {
 
 	public void loadviewMatrix(Camera camera) {
 		viewMatrix.loadMatrix(camera.getViewMatrix().getInternal());
-	}
-
-	public void loadsunCamera(SunCamera camera) {
-		viewMatrix.loadMatrix(camera.getViewMatrix());
-		for (int i = 0; i < 4; i++)
-			projectionMatrix[i].loadMatrix(camera.getProjectionArray()[i]);
 	}
 
 	public void loadDirectionalLight(DirectionalLightCamera camera) {

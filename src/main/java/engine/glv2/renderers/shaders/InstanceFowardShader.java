@@ -49,7 +49,6 @@ public class InstanceFowardShader extends ShaderProgram {
 	private UniformMatrix4 viewMatrix = new UniformMatrix4("viewMatrix");
 	private UniformMaterial material = new UniformMaterial("material");
 	private UniformVec3 cameraPosition = new UniformVec3("cameraPosition");
-	private UniformVec3 lightPosition = new UniformVec3("lightPosition");
 	private UniformSampler irradianceMap = new UniformSampler("irradianceMap");
 	private UniformSampler preFilterEnv = new UniformSampler("preFilterEnv");
 	private UniformSampler brdfLUT = new UniformSampler("brdfLUT");
@@ -62,10 +61,7 @@ public class InstanceFowardShader extends ShaderProgram {
 
 	private UniformBoolean useShadows = new UniformBoolean("useShadows");
 
-	private UniformMatrix4 projectionLightMatrix[];
-	private UniformMatrix4 viewLightMatrix = new UniformMatrix4("viewLightMatrix");
 	private UniformMatrix4 biasMatrix = new UniformMatrix4("biasMatrix");
-	private UniformSampler shadowMap = new UniformSampler("shadowMap");
 
 	private UniformPointLight pointLights[] = new UniformPointLight[8];
 	private UniformInteger totalPointLights = new UniformInteger("totalPointLights");
@@ -77,10 +73,6 @@ public class InstanceFowardShader extends ShaderProgram {
 		super("assets/shaders/renderers/InstanceForward.vs", "assets/shaders/renderers/InstanceForward.fs",
 				new Attribute(0, "position"), new Attribute(1, "normals"), new Attribute(2, "textureCoords"),
 				new Attribute(3, "inColor"));
-		projectionLightMatrix = new UniformMatrix4[4];
-		for (int x = 0; x < 4; x++)
-			projectionLightMatrix[x] = new UniformMatrix4("projectionLightMatrix[" + x + "]");
-		super.storeUniforms(projectionLightMatrix);
 		for (int x = 0; x < 8; x++) {
 			pointLights[x] = new UniformPointLight("pointLights[" + x + "]");
 		}
@@ -89,9 +81,9 @@ public class InstanceFowardShader extends ShaderProgram {
 			directionalLights[x] = new UniformDirectionalLight("directionalLights[" + x + "]");
 		}
 		super.storeUniforms(directionalLights);
-		super.storeUniforms(transformationMatrix, projectionMatrix, viewMatrix, material, cameraPosition, lightPosition,
-				uAmbient, irradianceMap, preFilterEnv, brdfLUT, colorCorrect, biasMatrix, viewLightMatrix, useShadows,
-				transparency, gamma, exposure, totalPointLights, shadowMap, totalDirectionalLights);
+		super.storeUniforms(transformationMatrix, projectionMatrix, viewMatrix, material, cameraPosition, uAmbient,
+				irradianceMap, preFilterEnv, brdfLUT, colorCorrect, biasMatrix, useShadows, transparency, gamma,
+				exposure, totalPointLights, totalDirectionalLights);
 		super.validate();
 		this.loadInitialData();
 	}
@@ -102,7 +94,6 @@ public class InstanceFowardShader extends ShaderProgram {
 		irradianceMap.loadTexUnit(4);
 		preFilterEnv.loadTexUnit(5);
 		brdfLUT.loadTexUnit(6);
-		shadowMap.loadTexUnit(7);
 		Matrix4f bias = new Matrix4f();
 		bias.m00(0.5f);
 		bias.m11(0.5f);
@@ -122,10 +113,6 @@ public class InstanceFowardShader extends ShaderProgram {
 		this.material.loadMaterial(mat);
 	}
 
-	public void loadLightPosition(Vector3f lightPos) {
-		lightPosition.loadVec3(lightPos);
-	}
-
 	public void colorCorrect(boolean val) {
 		colorCorrect.loadBoolean(val);
 	}
@@ -140,11 +127,6 @@ public class InstanceFowardShader extends ShaderProgram {
 		projectionMatrix.loadMatrix(camera.getProjectionMatrix());
 		viewMatrix.loadMatrix(camera.getViewMatrix());
 		cameraPosition.loadVec3(camera.getPosition());
-	}
-
-	public void loadBiasMatrix(Matrix4f[] shadowProjectionMatrix) {
-		for (int x = 0; x < 4; x++)
-			this.projectionLightMatrix[x].loadMatrix(shadowProjectionMatrix[x]);
 	}
 
 	public void loadPointLights(List<PointLightInternal> lights) {
@@ -163,10 +145,6 @@ public class InstanceFowardShader extends ShaderProgram {
 
 	public void loadAmbient(Vector3f ambient) {
 		this.uAmbient.loadVec3(ambient);
-	}
-
-	public void loadLightMatrix(Matrix4f sunCameraViewMatrix) {
-		viewLightMatrix.loadMatrix(sunCameraViewMatrix);
 	}
 
 	public void loadSettings(boolean useShadows) {

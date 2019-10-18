@@ -26,7 +26,6 @@ import engine.gl.mesh.animation.AnimatedModelSubMesh;
 import engine.glv2.IObjectRenderer;
 import engine.glv2.RendererData;
 import engine.glv2.entities.CubeMapCamera;
-import engine.glv2.entities.SunCamera;
 import engine.glv2.renderers.shaders.AnimInstanceDeferredShader;
 import engine.glv2.v2.IRenderingData;
 import engine.glv2.v2.lights.DirectionalLightCamera;
@@ -84,11 +83,6 @@ public class AnimInstanceRenderer implements IObjectRenderer {
 	@Override
 	public void renderForward(IRenderingData rd, RendererData rnd) {
 		forwardRenderer.render(instances, rd, rnd, null, true/* ,MaterialType.TRANSPARENT */, true);
-	}
-
-	@Override
-	public void renderShadow(SunCamera sun) {
-		shadowRenderer.renderShadow(instances, sun);
 	}
 
 	@Override

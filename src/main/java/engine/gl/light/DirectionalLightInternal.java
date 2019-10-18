@@ -12,6 +12,7 @@ public class DirectionalLightInternal extends Light {
 	public Vector3f direction = new Vector3f(1, 1, 1);
 	public int distance = 100;
 	public int shadowResolution = 512;
+	public boolean shadows = true;;
 	private DirectionalLightShadowMap shadowMap;
 	private DirectionalLightCamera lightCamera;
 
