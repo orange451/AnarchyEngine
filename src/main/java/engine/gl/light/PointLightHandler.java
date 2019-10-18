@@ -27,7 +27,7 @@ import org.joml.Vector4f;
 import engine.gl.Pipeline;
 import engine.gl.mesh.BufferedMesh;
 import engine.gl.shader.BaseShader;
-import engine.glv2.IPointLightHandler;
+import engine.glv2.v2.IPointLightHandler;
 import engine.util.MeshUtils;
 
 public class PointLightHandler implements IPointLightHandler {

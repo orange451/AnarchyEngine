@@ -27,11 +27,11 @@ import static org.lwjgl.opengl.GL13C.GL_TEXTURE2;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE3;
 
 import engine.gl.Texture2D;
-import engine.glv2.RendererData;
 import engine.glv2.objects.Texture;
 import engine.glv2.pipeline.shaders.LensFlareModShader;
 import engine.glv2.v2.DeferredPass;
 import engine.glv2.v2.DeferredPipeline;
+import engine.glv2.v2.RendererData;
 import engine.util.TextureUtils;
 
 public class LensFlareMod extends DeferredPass<LensFlareModShader> {

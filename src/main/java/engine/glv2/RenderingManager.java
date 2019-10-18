@@ -34,7 +34,9 @@ import com.badlogic.gdx.utils.IntMap.Entry;
 import com.esotericsoftware.kryonet.util.ObjectIntMap;
 
 import engine.glv2.entities.CubeMapCamera;
+import engine.glv2.v2.IObjectRenderer;
 import engine.glv2.v2.IRenderingData;
+import engine.glv2.v2.RendererData;
 import engine.glv2.v2.lights.DirectionalLightCamera;
 import engine.lua.type.object.Instance;
 import engine.lua.type.object.insts.AnimationController;

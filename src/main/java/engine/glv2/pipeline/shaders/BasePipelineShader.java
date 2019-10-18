@@ -22,12 +22,12 @@ package engine.glv2.pipeline.shaders;
 
 import org.joml.Vector2f;
 
-import engine.glv2.RenderingSettings;
 import engine.glv2.shaders.ShaderProgram;
 import engine.glv2.shaders.data.Attribute;
 import engine.glv2.shaders.data.UniformBoolean;
 import engine.glv2.shaders.data.UniformInteger;
 import engine.glv2.shaders.data.UniformVec2;
+import engine.glv2.v2.RenderingSettings;
 
 public class BasePipelineShader extends ShaderProgram {
 

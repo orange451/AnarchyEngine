@@ -23,12 +23,12 @@ package engine.glv2.pipeline;
 import static org.lwjgl.opengl.GL11C.GL_TEXTURE_2D;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE0;
 
-import engine.glv2.RendererData;
 import engine.glv2.objects.Texture;
 import engine.glv2.pipeline.shaders.ColorCorrectionShader;
 import engine.glv2.v2.DeferredPass;
 import engine.glv2.v2.DeferredPipeline;
 import engine.glv2.v2.IRenderingData;
+import engine.glv2.v2.RendererData;
 
 public class ColorCorrection extends DeferredPass<ColorCorrectionShader> {
 

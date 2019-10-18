@@ -1,4 +1,4 @@
-package engine.glv2;
+package engine.glv2.v2;
 
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL15.*;

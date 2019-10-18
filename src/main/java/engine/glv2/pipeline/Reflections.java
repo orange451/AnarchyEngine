@@ -32,12 +32,12 @@ import static org.lwjgl.opengl.GL13C.GL_TEXTURE7;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE8;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE_CUBE_MAP;
 
-import engine.glv2.RendererData;
 import engine.glv2.objects.Texture;
 import engine.glv2.pipeline.shaders.ReflectionsShader;
 import engine.glv2.v2.DeferredPass;
 import engine.glv2.v2.DeferredPipeline;
 import engine.glv2.v2.IRenderingData;
+import engine.glv2.v2.RendererData;
 
 public class Reflections extends DeferredPass<ReflectionsShader> {
 

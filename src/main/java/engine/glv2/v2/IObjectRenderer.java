@@ -18,25 +18,30 @@
  * 
  */
 
-package engine.glv2;
+package engine.glv2.v2;
 
-import org.joml.Matrix4f;
-import org.joml.Vector3f;
+import java.util.List;
 
-import engine.glv2.objects.Texture;
+import engine.glv2.entities.CubeMapCamera;
+import engine.glv2.v2.lights.DirectionalLightCamera;
+import engine.lua.type.object.Instance;
 
-public class RendererData {
+public interface IObjectRenderer {
 
-	public Texture irradianceCapture, environmentMap;
-	public Texture brdfLUT;
-	public float exposure;
-	public float gamma;
-	public float saturation;
-	public Vector3f ambient = new Vector3f();
-	public Matrix4f previousViewMatrix = new Matrix4f();
-	public Vector3f previousCameraPosition = new Vector3f();
-	public PointLightHandler plh;
-	public DirectionalLightHandler dlh;
-	public RenderingSettings rs;
+	public void preProcess(List<Instance> instances);
+
+	public void render(IRenderingData rd, RendererData rnd);
+
+	public void renderReflections(IRenderingData rd, RendererData rnd, CubeMapCamera cubeCamera);
+
+	public void renderForward(IRenderingData rd, RendererData rnd);
+
+	public void renderShadow(DirectionalLightCamera camera);
+
+	public void dispose();
+
+	public void end();
+
+	public int getID();
 
 }

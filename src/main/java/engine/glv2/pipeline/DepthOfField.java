@@ -24,11 +24,11 @@ import static org.lwjgl.opengl.GL11C.GL_TEXTURE_2D;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE0;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE1;
 
-import engine.glv2.RendererData;
 import engine.glv2.objects.Texture;
 import engine.glv2.pipeline.shaders.DepthOfFieldShader;
 import engine.glv2.v2.PostProcesPass;
 import engine.glv2.v2.PostProcessPipeline;
+import engine.glv2.v2.RendererData;
 
 public class DepthOfField extends PostProcesPass<DepthOfFieldShader> {
 

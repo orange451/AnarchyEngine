@@ -63,7 +63,6 @@ import static org.lwjgl.opengl.GL30C.glBlitFramebuffer;
 import java.util.ArrayList;
 import java.util.List;
 
-import engine.glv2.RendererData;
 import engine.glv2.objects.Framebuffer;
 import engine.glv2.objects.FramebufferBuilder;
 import engine.glv2.objects.Texture;

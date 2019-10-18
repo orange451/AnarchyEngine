@@ -25,12 +25,12 @@ import static org.lwjgl.opengl.GL13C.GL_TEXTURE0;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE1;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE2;
 
-import engine.glv2.RendererData;
 import engine.glv2.objects.Texture;
 import engine.glv2.pipeline.shaders.TAAShader;
 import engine.glv2.v2.DeferredPass;
 import engine.glv2.v2.DeferredPipeline;
 import engine.glv2.v2.IRenderingData;
+import engine.glv2.v2.RendererData;
 
 public class TAA extends DeferredPass<TAAShader> {
 

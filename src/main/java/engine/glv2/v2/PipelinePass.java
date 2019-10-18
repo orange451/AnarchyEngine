@@ -29,8 +29,6 @@ import static org.lwjgl.opengl.GL13C.glActiveTexture;
 
 import org.joml.Vector2f;
 
-import engine.glv2.GPUProfiler;
-import engine.glv2.RendererData;
 import engine.glv2.objects.Framebuffer;
 import engine.glv2.objects.Texture;
 import engine.glv2.objects.VAO;

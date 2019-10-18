@@ -43,7 +43,6 @@ import static org.lwjgl.opengl.GL30C.glFramebufferTexture2D;
 
 import org.joml.Vector3f;
 
-import engine.glv2.RendererData;
 import engine.glv2.RenderingManager;
 import engine.glv2.entities.CubeMapCamera;
 import engine.glv2.objects.Framebuffer;

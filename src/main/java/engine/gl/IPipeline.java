@@ -1,7 +1,7 @@
 package engine.gl;
 
-import engine.glv2.IDirectionalLightHandler;
-import engine.glv2.IPointLightHandler;
+import engine.glv2.v2.IDirectionalLightHandler;
+import engine.glv2.v2.IPointLightHandler;
 import engine.lua.type.object.insts.DynamicSkybox;
 import engine.observer.Renderable;
 import engine.observer.RenderableWorld;
