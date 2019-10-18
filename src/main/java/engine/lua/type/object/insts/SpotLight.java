@@ -166,6 +166,6 @@ public class SpotLight extends LightBase implements TreeViewable {
 	
 	@Override
 	public Icons getIcon() {
-		return Icons.icon_light;
+		return Icons.icon_light_spot;
 	}
 }

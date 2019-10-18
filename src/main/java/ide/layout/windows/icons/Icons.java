@@ -45,6 +45,7 @@ public class Icons {
 	public static final Icons icon_texture = new Icons("Texture.png");
 	public static final Icons icon_material = new Icons("Material.png");
 	public static final Icons icon_light = new Icons("Light.png");
+	public static final Icons icon_light_spot = new Icons("LightSpot.png");
 	public static final Icons icon_light_directional = new Icons("DirectionalLight.png");
 	public static final Icons icon_film = new Icons("Film.png");
 	public static final Icons icon_film_timeline = new Icons("FilmTimeline.png");
