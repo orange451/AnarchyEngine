@@ -24,6 +24,8 @@ import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
 import engine.glv2.objects.Texture;
+import engine.glv2.v2.lights.DirectionalLightHandler;
+import engine.glv2.v2.lights.PointLightHandler;
 
 public class RendererData {
 
