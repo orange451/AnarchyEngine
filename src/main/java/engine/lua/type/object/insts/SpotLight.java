@@ -19,7 +19,7 @@ import engine.observer.RenderableWorld;
 import ide.layout.windows.icons.Icons;
 import lwjgui.paint.Color;
 
-public class ConeLight extends LightBase implements TreeViewable {
+public class SpotLight extends LightBase implements TreeViewable {
 
 	private engine.gl.light.SpotLightInternal light;
 	private IPipeline pipeline;
@@ -28,7 +28,7 @@ public class ConeLight extends LightBase implements TreeViewable {
 	private static final LuaValue C_OUTERFOV = LuaValue.valueOf("OuterFOV");
 	private static final LuaValue C_RADIUS = LuaValue.valueOf("Radius");
 
-	public ConeLight() {
+	public SpotLight() {
 		super("SpotLight");
 		
 		this.defineField(C_OUTERFOV.toString(), LuaValue.valueOf(80), false);

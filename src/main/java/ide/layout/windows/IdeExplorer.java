@@ -38,6 +38,7 @@ import engine.lua.type.object.insts.PlayerPhysics;
 import engine.lua.type.object.insts.PointLight;
 import engine.lua.type.object.insts.Prefab;
 import engine.lua.type.object.insts.Script;
+import engine.lua.type.object.insts.SpotLight;
 import engine.lua.type.object.insts.Texture;
 import engine.lua.type.object.services.Assets;
 import engine.lua.type.object.services.StarterPlayerScripts;
@@ -79,7 +80,8 @@ public class IdeExplorer extends IdePane implements GameSubscriber {
 		priority.put(GlobalScript.class, 35);
 
 		priority.put(DirectionalLight.class, 25);
-		priority.put(PointLight.class, 25);
+		priority.put(PointLight.class, 24);
+		priority.put(SpotLight.class, 23);
 		
 		priority.put(Folder.class, 20);
 
