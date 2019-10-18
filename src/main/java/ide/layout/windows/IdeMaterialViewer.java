@@ -43,7 +43,7 @@ public class IdeMaterialViewer extends IdePane {
 	private HashMap<Material, MaterialNode> materialToNodeMap;
 	private boolean createdConnections;
 	
-	private static final int NODE_SIZE = 120;
+	public static final int NODE_SIZE = 120;
 
 	public IdeMaterialViewer() {
 		super("Material Viewer", true);

@@ -4,6 +4,7 @@ import org.json.simple.JSONObject;
 
 import engine.Game;
 import engine.InternalGameThread;
+import engine.application.RenderableApplication;
 import engine.application.impl.ClientApplication;
 import engine.application.impl.ServerApplication;
 import engine.io.Load;
@@ -84,7 +85,7 @@ public class IdeLayout {
 			SplitPane.setResizableWithParent(split.getItems().get(2), false);
 			SplitPane.setResizableWithParent(middle.getItems().get(1), false);
 			
-			split.setDividerPosition(0, 0.0);
+			split.setDividerPosition(0, (IdeMaterialViewer.NODE_SIZE + 5f)/(float)RenderableApplication.windowWidth);
 			split.setDividerPosition(1, 0.75);
 			middle.setDividerPosition(0, 0.8);
 		});	

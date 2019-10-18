@@ -24,6 +24,7 @@ import engine.lua.type.object.PhysicsBase;
 import engine.lua.type.object.ScriptBase;
 import engine.lua.type.object.TreeViewable;
 import engine.lua.type.object.insts.AnimationController;
+import engine.lua.type.object.insts.AnimationData;
 import engine.lua.type.object.insts.AssetFolder;
 import engine.lua.type.object.insts.Camera;
 import engine.lua.type.object.insts.DirectionalLight;
@@ -87,6 +88,9 @@ public class IdeExplorer extends IdePane implements GameSubscriber {
 		priority.put(PhysicsBase.class, 6);
 		priority.put(PhysicsObject.class, 6);
 		priority.put(PlayerPhysics.class, 6);
+		
+		priority.put(AssetFolder.class, 2);
+		priority.put(AnimationData.class, 2);
 	}
 	
 	protected static int getPriority(Class<? extends Instance> cls) {
