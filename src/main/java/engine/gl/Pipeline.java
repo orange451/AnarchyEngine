@@ -36,6 +36,7 @@ import engine.lua.type.object.insts.DynamicSkybox;
 import engine.lua.type.object.insts.GameObject;
 import engine.lua.type.object.insts.Model;
 import engine.lua.type.object.insts.Prefab;
+import engine.lua.type.object.insts.Skybox;
 import engine.observer.Renderable;
 import engine.observer.RenderableInstance;
 import engine.observer.RenderableMesh;
@@ -492,5 +493,11 @@ public class Pipeline implements IPipeline {
 	public ISpotLightHandler getSpotLightHandler() {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public void setStaticSkybox(Skybox skybox) {
+		// TODO Auto-generated method stub
+		
 	}
 }
