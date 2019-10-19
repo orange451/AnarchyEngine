@@ -153,6 +153,15 @@ public class GLRenderer implements IPipeline {
 		});
 
 		init();
+		
+		// Force size on creation. TEMP FIX
+		InternalRenderThread.runLater(()->{
+			int tw = width;
+			int th = height;
+			width = 1;
+			height = 1;
+			this.setSize(tw, th);
+		});
 	}
 
 	public void init() {
