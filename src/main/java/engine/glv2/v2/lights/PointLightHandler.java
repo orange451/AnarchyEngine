@@ -70,6 +70,7 @@ public class PointLightHandler implements IPointLightHandler {
 	public PointLightHandler(int width, int height) {
 		this.width = width;
 		this.height = height;
+		this.texel.set(1f / (float) width, 1f / (float) height);
 		init();
 	}
 
