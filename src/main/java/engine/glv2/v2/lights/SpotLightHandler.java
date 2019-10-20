@@ -168,6 +168,8 @@ public class SpotLightHandler implements ISpotLightHandler {
 
 	@Override
 	public void removeLight(SpotLightInternal l) {
+		if (l == null)
+			return;
 		synchronized (lights) {
 			lights.remove(l);
 		}

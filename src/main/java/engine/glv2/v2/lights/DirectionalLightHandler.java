@@ -165,6 +165,8 @@ public class DirectionalLightHandler implements IDirectionalLightHandler {
 
 	@Override
 	public void removeLight(DirectionalLightInternal l) {
+		if (l == null)
+			return;
 		synchronized (lights) {
 			lights.remove(l);
 		}

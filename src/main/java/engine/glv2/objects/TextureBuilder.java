@@ -23,6 +23,7 @@ package engine.glv2.objects;
 import static org.lwjgl.opengl.GL11C.glBindTexture;
 import static org.lwjgl.opengl.GL11C.glGenTextures;
 import static org.lwjgl.opengl.GL11C.glTexImage2D;
+import static org.lwjgl.opengl.GL11C.glTexParameterf;
 import static org.lwjgl.opengl.GL11C.glTexParameterfv;
 import static org.lwjgl.opengl.GL11C.glTexParameteri;
 import static org.lwjgl.opengl.GL12C.glTexImage3D;
@@ -89,6 +90,12 @@ public class TextureBuilder {
 	public TextureBuilder texParameteri(int pname, int param) {
 		check();
 		glTexParameteri(target, pname, param);
+		return this;
+	}
+
+	public TextureBuilder texParameterf(int pname, float param) {
+		check();
+		glTexParameterf(target, pname, param);
 		return this;
 	}
 

@@ -69,6 +69,7 @@ import engine.glv2.v2.HandlesRenderer;
 import engine.glv2.v2.IRenderingData;
 import engine.glv2.v2.IrradianceCapture;
 import engine.glv2.v2.PostProcessPipeline;
+import engine.glv2.v2.PreFilteredEnvironment;
 import engine.glv2.v2.RendererData;
 import engine.glv2.v2.RenderingManager;
 import engine.glv2.v2.RenderingSettings;
@@ -81,6 +82,7 @@ import engine.glv2.v2.lights.PointLightHandler;
 import engine.glv2.v2.lights.SpotLightHandler;
 import engine.lua.type.object.insts.Camera;
 import engine.lua.type.object.insts.DynamicSkybox;
+import engine.lua.type.object.insts.Skybox;
 import engine.observer.RenderableWorld;
 
 public class GLRenderer implements IPipeline {
@@ -153,9 +155,9 @@ public class GLRenderer implements IPipeline {
 		});
 
 		init();
-		
+
 		// Force size on creation. TEMP FIX
-		InternalRenderThread.runLater(()->{
+		InternalRenderThread.runLater(() -> {
 			int tw = width;
 			int th = height;
 			width = 1;
@@ -174,9 +176,9 @@ public class GLRenderer implements IPipeline {
 		envRendererEntities = new EnvironmentRenderer(128);
 		irradianceCapture = new IrradianceCapture();
 		rnd.irradianceCapture = irradianceCapture.getCubeTexture();
-		preFilteredEnvironment = new PreFilteredEnvironment(loader.createEmptyCubeMap(128, true, true), loader);
+		preFilteredEnvironment = new PreFilteredEnvironment();
 		rnd.brdfLUT = preFilteredEnvironment.getBRDFLUT();
-		rnd.environmentMap = preFilteredEnvironment.getCubeMapTexture();
+		rnd.environmentMap = preFilteredEnvironment.getTexture();
 		dynamicSkyRenderer = new DynamicSkyRenderer(loader);
 		renderingManager.addRenderer(new InstanceRenderer());
 		renderingManager.addRenderer(new AnimInstanceRenderer());
@@ -447,9 +449,13 @@ public class GLRenderer implements IPipeline {
 		this.dynamicSkybox = dynamicSkybox;
 		dynamicSkyRenderer.setSky(dynamicSkybox);
 		if (dynamicSkybox != null)
-			directionalLightHandler.addLight(sun.getLight());
+			directionalLightHandler.addLight(sun.addLight());
 		else
-			directionalLightHandler.removeLight(sun.getLight());
+			directionalLightHandler.removeLight(sun.removeLight());
+	}
+
+	@Override
+	public void setStaticSkybox(Skybox skybox) {
 	}
 
 	public void resetState() {

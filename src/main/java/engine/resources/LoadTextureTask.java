@@ -23,7 +23,6 @@ package engine.resources;
 import static org.lwjgl.opengl.GL11C.GL_TEXTURE_2D;
 import static org.lwjgl.stb.STBImage.stbi_failure_reason;
 import static org.lwjgl.stb.STBImage.stbi_info_from_memory;
-import static org.lwjgl.stb.STBImage.stbi_is_hdr_from_memory;
 import static org.lwjgl.stb.STBImage.stbi_load_from_memory;
 import static org.lwjgl.system.MemoryStack.stackPush;
 import static org.lwjgl.system.MemoryUtil.memFree;
@@ -83,8 +82,9 @@ public class LoadTextureTask extends Task<Texture> {
 			if (!stbi_info_from_memory(imageBuffer, w, h, comp))
 				throw new DecodeTextureException("Failed to read image information: " + stbi_failure_reason());
 
-			//System.out.println("Image width: " + w.get(0) + "\nImage height: " + h.get(0) + "\nImage components: "
-			//		+ comp.get(0) + "\nImage HDR: " + stbi_is_hdr_from_memory(imageBuffer));
+			// System.out.println("Image width: " + w.get(0) + "\nImage height: " + h.get(0)
+			// + "\nImage components: "
+			// + comp.get(0) + "\nImage HDR: " + stbi_is_hdr_from_memory(imageBuffer));
 
 			image = stbi_load_from_memory(imageBuffer, w, h, comp, 0);
 			memFree(imageBuffer);

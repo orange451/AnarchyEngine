@@ -168,6 +168,8 @@ public class PointLightHandler implements IPointLightHandler {
 
 	@Override
 	public void removeLight(PointLightInternal l) {
+		if (l == null)
+			return;
 		synchronized (lights) {
 			lights.remove(l);
 		}

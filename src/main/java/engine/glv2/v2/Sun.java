@@ -11,6 +11,7 @@ public class Sun {
 
 	private Vector3f rotation = new Vector3f(45, 5, 0);
 	private Vector3f lookAt = new Vector3f();
+	private boolean added;
 
 	public Sun() {
 		light = new DirectionalLightInternal(rotation, 1.0f);
@@ -31,6 +32,20 @@ public class Sun {
 	}
 
 	public DirectionalLightInternal getLight() {
+		return light;
+	}
+
+	public DirectionalLightInternal addLight() {
+		if (added)
+			return null;
+		added = true;
+		return light;
+	}
+
+	public DirectionalLightInternal removeLight() {
+		if (!added)
+			return null;
+		added = false;
 		return light;
 	}
 

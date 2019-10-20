@@ -113,6 +113,7 @@ public class Lighting extends Service implements TreeViewable {
 			if ( value instanceof DynamicSkybox ) {
 				DynamicSkybox skybox = (DynamicSkybox)value;
 				pp.setDyamicSkybox(skybox);
+				pp.setStaticSkybox(null);
 				
 				if ( skyboxDestroyed != null )
 					skyboxDestroyed.disconnect();
@@ -127,6 +128,7 @@ public class Lighting extends Service implements TreeViewable {
 			} else if ( value instanceof Skybox) {
 				Skybox skybox = (Skybox)value;
 				pp.setStaticSkybox(skybox);
+				pp.setDyamicSkybox(null);
 				
 				if ( skyboxDestroyed != null )
 					skyboxDestroyed.disconnect();
