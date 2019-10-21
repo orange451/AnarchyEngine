@@ -88,6 +88,7 @@ public class Lighting extends Service implements TreeViewable {
 
 	private LuaConnection skyboxDestroyed;
 	private LuaConnection skyboxChanged;
+	private LuaConnection skyboxImageChanged;
 	
 	@Override
 	protected LuaValue onValueSet(LuaValue key, LuaValue value) {
@@ -108,6 +109,10 @@ public class Lighting extends Service implements TreeViewable {
 				pp.setDyamicSkybox(null);
 				pp.setStaticSkybox(null);
 			}
+			
+			skyboxDestroyed.disconnect();
+			skyboxChanged.disconnect();
+			skyboxImageChanged.disconnect();
 			return value;
 		} else {
 			if ( value instanceof DynamicSkybox ) {
@@ -129,9 +134,38 @@ public class Lighting extends Service implements TreeViewable {
 				Skybox skybox = (Skybox)value;
 				pp.setStaticSkybox(skybox);
 				pp.setDyamicSkybox(null);
+
+				if ( skyboxChanged != null )
+					skyboxChanged.disconnect();
+				
+				skyboxChanged = skybox.changedEvent().connect((args)->{
+					LuaValue key = args[0];
+					LuaValue val = args[1];
+					
+					// User has changed the image of the skybox after it's attached
+					if ( key.eq_b(LuaValue.valueOf("Image")) ) {
+						if ( skyboxImageChanged != null )
+							skyboxImageChanged.disconnect();
+						
+						// Rebind image change event on NEW image
+						skyboxImageChanged = skybox.getImage().textureLoadedEvent().connect((args1)->{
+							System.out.println("SKYBOX IMAGE HAS LOADED");
+						});
+					}
+				});
+				
+				if ( skyboxImageChanged != null )
+					skyboxImageChanged.disconnect();
+				
+				// Bind image change event, for when user changes the images URL and new image is loaded.
+				skyboxImageChanged = skybox.getImage().textureLoadedEvent().connect((args)->{
+					System.out.println("SKYBOX IMAGE HAS LOADED");
+				});
 				
 				if ( skyboxDestroyed != null )
 					skyboxDestroyed.disconnect();
+				
+				// Event for when a skybox is destroyed
 				skyboxDestroyed = skybox.destroyedEvent().connect((args)->{
 					pp.setStaticSkybox(null);
 					
