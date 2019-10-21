@@ -142,17 +142,21 @@ public class Lighting extends Service implements TreeViewable {
 					LuaValue key = args[0];
 					LuaValue val = args[1];
 					
-					// User has changed the image of the skybox after it's attached
-					if ( key.eq_b(LuaValue.valueOf("Image")) ) {
-						if ( skyboxImageChanged != null )
-							skyboxImageChanged.disconnect();
-						
-						// Rebind image change event on NEW image
-						skyboxImageChanged = skybox.getImage().textureLoadedEvent().connect((args1)->{
-							System.out.println("SKYBOX IMAGE HAS LOADED");
-						});
-						
-						System.out.println("SKYBOX IMAGE HAS BEEN CHANGED BY USER");
+					if ( val.isnil() ) {
+						pp.setStaticSkybox(null);
+					} else {
+						// User has changed the image of the skybox after it's attached
+						if ( key.eq_b(LuaValue.valueOf("Image")) ) {
+							if ( skyboxImageChanged != null )
+								skyboxImageChanged.disconnect();
+							
+							// Rebind image change event on NEW image
+							skyboxImageChanged = skybox.getImage().textureLoadedEvent().connect((args1)->{
+								System.out.println("SKYBOX IMAGE HAS LOADED");
+							});
+							
+							System.out.println("SKYBOX IMAGE HAS BEEN CHANGED BY USER");
+						}
 					}
 				});
 				
