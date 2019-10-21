@@ -3,6 +3,7 @@ package engine.lua.type.object.services;
 import org.luaj.vm2.LuaValue;
 
 import engine.Game;
+import engine.InternalGameThread;
 import engine.InternalRenderThread;
 import engine.application.RenderableApplication;
 import engine.gl.IPipeline;
@@ -122,6 +123,7 @@ public class Lighting extends Service implements TreeViewable {
 				
 				if ( skyboxDestroyed != null )
 					skyboxDestroyed.disconnect();
+				
 				skyboxDestroyed = skybox.destroyedEvent().connect((args)->{
 					pp.setDyamicSkybox(null);
 					
@@ -145,7 +147,7 @@ public class Lighting extends Service implements TreeViewable {
 					if ( val.isnil() ) {
 						pp.setStaticSkybox(null);
 					} else {
-						// User has changed the image of the skybox after it's attached
+						// User has changed the image object-reference of the skybox after it's attached
 						if ( key.eq_b(LuaValue.valueOf("Image")) ) {
 							if ( skyboxImageChanged != null )
 								skyboxImageChanged.disconnect();
@@ -164,8 +166,10 @@ public class Lighting extends Service implements TreeViewable {
 					skyboxImageChanged.disconnect();
 				
 				// Bind image change event, for when user changes the images URL and new image is loaded.
-				skyboxImageChanged = skybox.getImage().textureLoadedEvent().connect((args)->{
-					System.out.println("SKYBOX IMAGE HAS LOADED");
+				InternalGameThread.runLater(()->{
+					skyboxImageChanged = skybox.getImage().textureLoadedEvent().connect((args)->{
+						System.out.println("SKYBOX IMAGE HAS LOADED");
+					});
 				});
 				
 				if ( skyboxDestroyed != null )
