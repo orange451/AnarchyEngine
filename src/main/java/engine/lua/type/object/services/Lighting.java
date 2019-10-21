@@ -151,6 +151,8 @@ public class Lighting extends Service implements TreeViewable {
 						skyboxImageChanged = skybox.getImage().textureLoadedEvent().connect((args1)->{
 							System.out.println("SKYBOX IMAGE HAS LOADED");
 						});
+						
+						System.out.println("SKYBOX IMAGE HAS BEEN CHANGED BY USER");
 					}
 				});
 				
