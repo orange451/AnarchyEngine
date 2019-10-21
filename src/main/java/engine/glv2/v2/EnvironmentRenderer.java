@@ -66,7 +66,7 @@ public class EnvironmentRenderer {
 		camera = new CubeMapCamera(new Vector3f());
 	}
 
-	public void renderEnvironmentMap(Vector3f center, DynamicSkyRenderer sr, Vector3f lightPosition, float globalTime) {
+	public void renderEnvironmentMap(Vector3f center, SkyRenderer sr, Vector3f lightPosition, float globalTime) {
 		camera.setPosition(center);
 		framebuffer.bind();
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
@@ -79,7 +79,7 @@ public class EnvironmentRenderer {
 		i %= 6;
 	}
 
-	public void renderEnvironmentMap(Vector3f center, DynamicSkyRenderer sr, Vector3f lightPosition,
+	public void renderEnvironmentMap(Vector3f center, SkyRenderer sr, Vector3f lightPosition,
 			RenderingManager renderingManager, IRenderingData rd, RendererData rnd, float globalTime) {
 		camera.setPosition(center);
 		framebuffer.bind();

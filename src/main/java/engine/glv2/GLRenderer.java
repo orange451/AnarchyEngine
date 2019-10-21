@@ -62,7 +62,6 @@ import engine.glv2.renderers.AnimInstanceRenderer;
 import engine.glv2.renderers.InstanceRenderer;
 import engine.glv2.shaders.ShaderIncludes;
 import engine.glv2.v2.DeferredPipeline;
-import engine.glv2.v2.DynamicSkyRenderer;
 import engine.glv2.v2.EnvironmentRenderer;
 import engine.glv2.v2.GPUProfiler;
 import engine.glv2.v2.HandlesRenderer;
@@ -73,6 +72,7 @@ import engine.glv2.v2.PreFilteredEnvironment;
 import engine.glv2.v2.RendererData;
 import engine.glv2.v2.RenderingManager;
 import engine.glv2.v2.RenderingSettings;
+import engine.glv2.v2.SkyRenderer;
 import engine.glv2.v2.Sun;
 import engine.glv2.v2.lights.DirectionalLightHandler;
 import engine.glv2.v2.lights.IDirectionalLightHandler;
@@ -94,28 +94,27 @@ public class GLRenderer implements IPipeline {
 	private IrradianceCapture irradianceCapture;
 	private PreFilteredEnvironment preFilteredEnvironment;
 
-	private DynamicSkyRenderer dynamicSkyRenderer;
+	private SkyRenderer skyRenderer;
+	private DynamicSkybox dynamicSkybox;
+
 	private PointLightHandler pointLightHandler;
 	private DirectionalLightHandler directionalLightHandler;
 	private SpotLightHandler spotLightHandler;
 	private RenderingManager renderingManager;
+
 	private HandlesRenderer handlesRenderer;
 
 	private DeferredPipeline dp;
 	private PostProcessPipeline pp;
+	private RenderingSettings renderingSettings;
+	private RendererData rnd;
+	private IRenderingData rd;
 
 	private Matrix4f projMatrix;
 	private Camera currentCamera;
 	private Sun sun;
-	private DynamicSkybox dynamicSkybox;
-
-	private RenderingSettings renderingSettings;
-
-	private RendererData rnd;
 
 	private GLResourceLoader loader;
-
-	private IRenderingData rd;
 
 	private RenderableWorld renderableWorld;
 
@@ -170,7 +169,7 @@ public class GLRenderer implements IPipeline {
 		preFilteredEnvironment = new PreFilteredEnvironment();
 		rnd.brdfLUT = preFilteredEnvironment.getBRDFLUT();
 		rnd.environmentMap = preFilteredEnvironment.getTexture();
-		dynamicSkyRenderer = new DynamicSkyRenderer(loader);
+		skyRenderer = new SkyRenderer(loader);
 		renderingManager.addRenderer(new InstanceRenderer());
 		renderingManager.addRenderer(new AnimInstanceRenderer());
 		handlesRenderer = new HandlesRenderer();
@@ -227,7 +226,7 @@ public class GLRenderer implements IPipeline {
 		GPUProfiler.start("Environment Pass");
 		GPUProfiler.start("Irradiance");
 		GPUProfiler.start("CubeMap Render");
-		envRenderer.renderEnvironmentMap(currentCamera.getPosition().getInternal(), dynamicSkyRenderer,
+		envRenderer.renderEnvironmentMap(currentCamera.getPosition().getInternal(), skyRenderer,
 				sun.getLight().direction, globalTime);
 		GPUProfiler.end();
 		GPUProfiler.start("Irradiance Capture");
@@ -236,7 +235,7 @@ public class GLRenderer implements IPipeline {
 		GPUProfiler.end();
 		GPUProfiler.start("Reflections");
 		GPUProfiler.start("CubeMap Render");
-		envRendererEntities.renderEnvironmentMap(currentCamera.getPosition().getInternal(), dynamicSkyRenderer,
+		envRendererEntities.renderEnvironmentMap(currentCamera.getPosition().getInternal(), skyRenderer,
 				sun.getLight().direction, renderingManager, rd, rnd, globalTime);
 		GPUProfiler.end();
 		GPUProfiler.start("PreFilteredEnvironment");
@@ -263,7 +262,7 @@ public class GLRenderer implements IPipeline {
 		renderingManager.render(rd, rnd);
 		GPUProfiler.end();
 		GPUProfiler.start("Skybox");
-		dynamicSkyRenderer.render(currentCamera, projMatrix, sun.getLight().direction, true, true);
+		skyRenderer.render(currentCamera, projMatrix, sun.getLight().direction, true, true);
 		GPUProfiler.end();
 		dp.unbind();
 		if (useARBClipControl) {
@@ -392,7 +391,7 @@ public class GLRenderer implements IPipeline {
 		directionalLightHandler.dispose();
 		pointLightHandler.dispose();
 		spotLightHandler.dispose();
-		dynamicSkyRenderer.dispose();
+		skyRenderer.dispose();
 		irradianceCapture.dispose();
 		preFilteredEnvironment.dispose();
 		renderingManager.dispose();
@@ -438,7 +437,7 @@ public class GLRenderer implements IPipeline {
 	@Override
 	public void setDyamicSkybox(DynamicSkybox dynamicSkybox) {
 		this.dynamicSkybox = dynamicSkybox;
-		dynamicSkyRenderer.setSky(dynamicSkybox);
+		skyRenderer.setDynamicSky(dynamicSkybox);
 		if (dynamicSkybox != null)
 			directionalLightHandler.addLight(sun.addLight());
 		else
@@ -447,6 +446,7 @@ public class GLRenderer implements IPipeline {
 
 	@Override
 	public void setStaticSkybox(Skybox skybox) {
+		skyRenderer.setStaticSky(skybox);
 	}
 
 	public void resetState() {

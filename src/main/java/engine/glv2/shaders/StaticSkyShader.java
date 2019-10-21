@@ -21,38 +21,40 @@
 package engine.glv2.shaders;
 
 import org.joml.Matrix4f;
-import org.joml.Vector3f;
 
 import engine.glv2.entities.CubeMapCamera;
 import engine.glv2.shaders.data.Attribute;
-import engine.glv2.shaders.data.UniformBoolean;
-import engine.glv2.shaders.data.UniformDynamicSky;
 import engine.glv2.shaders.data.UniformFloat;
 import engine.glv2.shaders.data.UniformMatrix4;
-import engine.glv2.shaders.data.UniformVec3;
+import engine.glv2.shaders.data.UniformSampler;
 import engine.lua.type.object.insts.Camera;
-import engine.lua.type.object.insts.DynamicSkybox;
+import engine.lua.type.object.insts.Skybox;
 
-public class SkydomeShader extends ShaderProgram {
+public class StaticSkyShader extends ShaderProgram {
 
 	private UniformMatrix4 projectionMatrix = new UniformMatrix4("projectionMatrix");
 	private UniformMatrix4 transformationMatrix = new UniformMatrix4("transformationMatrix");
 	private UniformMatrix4 viewMatrix = new UniformMatrix4("viewMatrix");
-	private UniformFloat time = new UniformFloat("time");
-	private UniformVec3 lightPosition = new UniformVec3("lightPosition");
-	private UniformBoolean renderSun = new UniformBoolean("renderSun");
-	private UniformVec3 cameraPosition = new UniformVec3("cameraPosition");
 
-	private UniformDynamicSky dynamicSky = new UniformDynamicSky("dynamicSky");
+	private UniformSampler environmentMap = new UniformSampler("environmentMap");
+
+	private UniformFloat power = new UniformFloat("power");
+	private UniformFloat brightness = new UniformFloat("brightness");
 
 	private Matrix4f temp = new Matrix4f();
 
-	public SkydomeShader() {
-		super("assets/shaders/Skydome.vs", "assets/shaders/Skydome.fs", new Attribute(0, "position"),
-				new Attribute(1, "textureCoords"), new Attribute(2, "normal"));
-		super.storeUniforms(projectionMatrix, transformationMatrix, viewMatrix, time, lightPosition, renderSun,
-				cameraPosition, dynamicSky);
+	public StaticSkyShader() {
+		super("assets/shaders/StaticSkyShader.vs", "assets/shaders/StaticSkyShader.fs", new Attribute(0, "position"));
+		super.storeUniforms(projectionMatrix, transformationMatrix, viewMatrix, environmentMap, power, brightness);
 		super.validate();
+		this.loadInitialData();
+	}
+
+	@Override
+	protected void loadInitialData() {
+		super.start();
+		environmentMap.loadTexUnit(0);
+		super.stop();
 	}
 
 	public void loadCamera(Camera camera, Matrix4f projection) {
@@ -62,7 +64,6 @@ public class SkydomeShader extends ShaderProgram {
 		temp._m31(0);
 		temp._m32(0);
 		viewMatrix.loadMatrix(temp);
-		cameraPosition.loadVec3(camera.getPosition().getInternal());
 	}
 
 	public void loadCamera(CubeMapCamera camera) {
@@ -72,23 +73,15 @@ public class SkydomeShader extends ShaderProgram {
 		temp._m31(0);
 		temp._m32(0);
 		viewMatrix.loadMatrix(temp);
-		cameraPosition.loadVec3(camera.getPosition());
+	}
+
+	public void loadSky(Skybox skybox) {
+		power.loadFloat(skybox.getPower());
+		brightness.loadFloat(skybox.getBrightness());
 	}
 
 	public void loadTransformationMatrix(Matrix4f mat) {
 		transformationMatrix.loadMatrix(mat);
-	}
-
-	public void loadLightPosition(Vector3f pos) {
-		lightPosition.loadVec3(pos);
-	}
-
-	public void renderSun(boolean val) {
-		renderSun.loadBoolean(val);
-	}
-
-	public void loadDynamicSky(DynamicSkybox sky) {
-		dynamicSky.loadLight(sky);
 	}
 
 }

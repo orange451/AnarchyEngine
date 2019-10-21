@@ -22,6 +22,7 @@ package engine.glv2.shaders.data;
 
 import static org.lwjgl.opengl.GL20C.glGetUniformLocation;
 
+@Deprecated
 public class UniformArray implements IUniform {
 
 	protected String[] names;

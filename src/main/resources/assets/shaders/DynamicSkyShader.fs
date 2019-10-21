@@ -237,9 +237,9 @@ void main() {
 	}
 
 	out_Color[0].rgb = color;
-	out_Color[0].a = 1;
-	out_Color[1] = vec4(pass_position.xyz, 0);
+	out_Color[0].a = 1.0;
+	out_Color[1] = vec4(pass_position, 0.0);
 	out_Color[2] = vec4(0.0);
 	out_Color[3] = vec4(0.0);
-	out_Color[4] = vec4(0, 0, 0, PBR_BACKGROUND_DYNAMIC);
+	out_Color[4] = vec4(0.0, 0.0, 0.0, PBR_BACKGROUND_DYNAMIC);
 }
