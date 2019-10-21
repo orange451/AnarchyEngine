@@ -500,4 +500,10 @@ public class Pipeline implements IPipeline {
 		// TODO Auto-generated method stub
 		
 	}
+
+	@Override
+	public void reloadStaticSkybox() {
+		// TODO Auto-generated method stub
+
+	}
 }

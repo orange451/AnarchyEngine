@@ -449,6 +449,11 @@ public class GLRenderer implements IPipeline {
 		skyRenderer.setStaticSky(skybox);
 	}
 
+	@Override
+	public void reloadStaticSkybox() {
+		skyRenderer.reloadStaticSkybox();
+	}
+
 	public void resetState() {
 		glEnable(GL_CULL_FACE);
 		glCullFace(GL_BACK);

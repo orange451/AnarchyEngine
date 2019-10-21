@@ -29,4 +29,6 @@ public interface IPipeline extends Renderable {
 	public void setDyamicSkybox(DynamicSkybox dynamicSkybox);
 
 	public void setStaticSkybox(Skybox skybox);
+
+	public void reloadStaticSkybox();
 }

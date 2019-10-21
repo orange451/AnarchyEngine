@@ -7,19 +7,19 @@ import engine.util.TextureUtils;
 import lwjgui.paint.Color;
 
 public class Resources {
-	public static final Texture2D TEXTURE_WHITE_SRGB;
-	public static final Texture2D TEXTURE_BLACK_SRGB;
-	public static final Texture2D TEXTURE_WHITE_RGBA;
-	public static final Texture2D TEXTURE_NORMAL_RGBA;
-	public static final Texture2D TEXTURE_DEBUG;
-	public static final BufferedMesh MESH_SPHERE;
-	public static final BufferedMesh MESH_CUBE;
-	public static final BufferedMesh MESH_CONE;
-	public static final BufferedMesh MESH_CYLINDER;
-	public static final BufferedMesh MESH_UNIT_QUAD;
-	public static final MaterialGL MATERIAL_BLANK;
+	public static Texture2D TEXTURE_WHITE_SRGB;
+	public static Texture2D TEXTURE_BLACK_SRGB;
+	public static Texture2D TEXTURE_WHITE_RGBA;
+	public static Texture2D TEXTURE_NORMAL_RGBA;
+	public static Texture2D TEXTURE_DEBUG;
+	public static BufferedMesh MESH_SPHERE;
+	public static BufferedMesh MESH_CUBE;
+	public static BufferedMesh MESH_CONE;
+	public static BufferedMesh MESH_CYLINDER;
+	public static BufferedMesh MESH_UNIT_QUAD;
+	public static MaterialGL MATERIAL_BLANK;
 
-	static {
+	public static void initialize() {
 		TEXTURE_WHITE_SRGB = TextureUtils.loadSRGBTextureFromImage(new Image(Color.WHITE, 1, 1));
 		TEXTURE_BLACK_SRGB = TextureUtils.loadSRGBTextureFromImage(new Image(Color.BLACK, 1, 1));
 		TEXTURE_WHITE_RGBA = TextureUtils.loadRGBATextureFromImage(new Image(Color.WHITE, 1, 1));
@@ -34,9 +34,5 @@ public class Resources {
 
 		MATERIAL_BLANK = new MaterialGL().setDiffuseTexture(TEXTURE_WHITE_RGBA).setNormalTexture(TEXTURE_NORMAL_RGBA)
 				.setMetalnessTexture(TEXTURE_WHITE_SRGB).setRoughnessTexture(TEXTURE_WHITE_SRGB);
-	}
-
-	public static void initialize() {
-		// Do nothing. Calling this will force java to initialize static final vars.
 	}
 }

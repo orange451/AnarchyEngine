@@ -9,9 +9,9 @@ import static org.lwjgl.opengl.GL11.GL_UNSIGNED_BYTE;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL21;
 
-import engine.InternalRenderThread;
 import engine.gl.Texture2D;
 import engine.io.Image;
+import engine.tasks.TaskManager;
 import lwjgui.paint.Color;
 
 public class TextureUtils {
@@ -61,8 +61,8 @@ public class TextureUtils {
 	private static Texture2D loadTexture(Image image, int near, int far, int internalFormat, int externalFormat) {
 		// Create new texture
 		Texture2D texture = new Texture2D(GL_TEXTURE_2D, internalFormat, GL_UNSIGNED_BYTE, externalFormat);
-		
-		InternalRenderThread.runLater(() -> {
+
+		TaskManager.addTaskRenderThread(() -> {
 			// Generate texture
 			texture.gen();
 			

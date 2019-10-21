@@ -126,7 +126,12 @@ public class TaskManager {
 	}
 
 	public static void updateMainThread() {
-		if (!tasksMainThread.isEmpty())
+		while (!tasksMainThread.isEmpty())
+			tasksMainThread.poll().callI();
+	}
+
+	public static void runAndStopMainThread() {
+		while (!tasksMainThread.isEmpty())
 			tasksMainThread.poll().callI();
 	}
 
@@ -182,7 +187,12 @@ public class TaskManager {
 	}
 
 	public static void updateRenderThread() {
-		if (!tasksRenderThread.isEmpty())
+		while (!tasksRenderThread.isEmpty())
+			tasksRenderThread.poll().callI();
+	}
+
+	public static void runAndStopRenderThread() {
+		while (!tasksRenderThread.isEmpty())
 			tasksRenderThread.poll().callI();
 	}
 

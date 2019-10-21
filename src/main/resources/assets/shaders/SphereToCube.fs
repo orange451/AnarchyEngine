@@ -19,7 +19,6 @@
 //
 
 in vec3 pass_textureCoords;
-in vec3 pass_position;
 
 out vec3 out_Color;
 

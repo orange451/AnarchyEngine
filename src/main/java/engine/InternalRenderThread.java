@@ -21,6 +21,7 @@ import engine.observer.InternalRenderable;
 import engine.observer.PostRenderable;
 import engine.observer.Renderable;
 import engine.tasks.TaskManager;
+import engine.tasks.ThreadUtils;
 import engine.util.Sync;
 
 public class InternalRenderThread {
@@ -109,6 +110,9 @@ public class InternalRenderThread {
 			}
 		}
 		TaskManager.stopRenderBackgroundThread();
+		while(!InternalGameThread.isDone())
+			ThreadUtils.sleep(100);
+		TaskManager.runAndStopRenderThread();
 		cleanup();
 	}
 	

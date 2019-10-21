@@ -23,24 +23,14 @@ in vec3 pass_position;
 
 out vec4[5] out_Color;
 
-uniform sampler2D environmentMap;
+uniform samplerCube environmentMap;
 uniform float power;
 uniform float brightness;
 
 #include variable MASK
 
-const vec2 invAtan = vec2(0.1591, 0.3183);
-
-vec2 SampleSphericalMap(vec3 v) {
-	vec2 uv = vec2(atan(v.z, v.x), asin(v.y));
-	uv *= invAtan;
-	uv += 0.5;
-	return uv;
-}
-
 void main() {
-	vec2 uv = SampleSphericalMap(normalize(pass_textureCoords));
-	vec3 color = texture(environmentMap, uv).rgb;
+	vec3 color = texture(environmentMap, pass_textureCoords).rgb;
 
 	color = max(color, 0.0);
 	color = pow(color, vec3(power));

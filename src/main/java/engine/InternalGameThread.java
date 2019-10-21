@@ -19,6 +19,7 @@ import engine.util.Sync;
 
 public class InternalGameThread extends Observable implements Runnable {
     private static boolean running = false;
+    private static boolean done = false;
 
 	public static int tps;
 	public static float delta;
@@ -121,7 +122,7 @@ public class InternalGameThread extends Observable implements Runnable {
 				Sync.sync( (int)cvtps );
 			}
 		}
-
+		TaskManager.runAndStopMainThread();
 		cleanup();
 	}
 	
@@ -139,6 +140,7 @@ public class InternalGameThread extends Observable implements Runnable {
 		// Disable scripts
 		ScriptData.shutdown();
 		Game.resourceLoader().shutdown();
+		done = true;
 	}
 
 	public static void terminate() {
@@ -148,5 +150,9 @@ public class InternalGameThread extends Observable implements Runnable {
 
 	public static boolean isRunning() {
 		return running;
+	}
+
+	public static boolean isDone() {
+		return done;
 	}
 }

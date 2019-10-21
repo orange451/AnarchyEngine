@@ -154,10 +154,8 @@ public class Lighting extends Service implements TreeViewable {
 							
 							// Rebind image change event on NEW image
 							skyboxImageChanged = skybox.getImage().textureLoadedEvent().connect((args1)->{
-								System.out.println("SKYBOX IMAGE HAS LOADED");
+								pp.reloadStaticSkybox();
 							});
-							
-							System.out.println("SKYBOX IMAGE HAS BEEN CHANGED BY USER");
 						}
 					}
 				});
@@ -167,9 +165,10 @@ public class Lighting extends Service implements TreeViewable {
 				
 				// Bind image change event, for when user changes the images URL and new image is loaded.
 				InternalGameThread.runLater(()->{
-					skyboxImageChanged = skybox.getImage().textureLoadedEvent().connect((args)->{
-						System.out.println("SKYBOX IMAGE HAS LOADED");
-					});
+					if(skybox.getImage() != null)
+						skyboxImageChanged = skybox.getImage().textureLoadedEvent().connect((args)->{
+							pp.reloadStaticSkybox();
+						});
 				});
 				
 				if ( skyboxDestroyed != null )
