@@ -27,6 +27,7 @@ import static org.lwjgl.opengl.GL11.glEnable;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.joml.Vector2f;
 import org.luaj.vm2.LuaValue;
 
 import com.badlogic.gdx.utils.IntMap;
@@ -70,9 +71,9 @@ public class RenderingManager {
 		}
 	}
 
-	public void render(IRenderingData rd, RendererData rnd) {
+	public void render(IRenderingData rd, RendererData rnd, Vector2f resolution) {
 		for (Entry<IObjectRenderer> rendererEntry : objectRenderers)
-			rendererEntry.value.render(rd, rnd);
+			rendererEntry.value.render(rd, rnd, resolution);
 	}
 
 	public void renderReflections(IRenderingData rd, RendererData rnd, CubeMapCamera cubeCamera) {

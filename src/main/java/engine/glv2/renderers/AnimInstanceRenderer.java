@@ -2,10 +2,8 @@ package engine.glv2.renderers;
 
 import static org.lwjgl.opengl.GL11C.GL_TEXTURE_2D;
 import static org.lwjgl.opengl.GL11C.GL_TRIANGLES;
-import static org.lwjgl.opengl.GL11C.GL_VIEWPORT;
 import static org.lwjgl.opengl.GL11C.glBindTexture;
 import static org.lwjgl.opengl.GL11C.glDrawArrays;
-import static org.lwjgl.opengl.GL11C.glGetIntegerv;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE0;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE1;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE2;
@@ -44,10 +42,6 @@ public class AnimInstanceRenderer implements IObjectRenderer {
 	private AnimInstanceShadowRenderer shadowRenderer;
 	private AnimInstanceForwardRenderer forwardRenderer;
 
-	// TODO: Temporary res storage
-	private int[] viewport = new int[4];
-	private Vector2f resolution = new Vector2f();
-
 	// TODO: this should NOT be here
 	private static final LuaValue C_ANIMATIONCONTROLLER = LuaValue.valueOf("AnimationController");
 
@@ -65,9 +59,7 @@ public class AnimInstanceRenderer implements IObjectRenderer {
 	}
 
 	@Override
-	public void render(IRenderingData rd, RendererData rnd) {
-		glGetIntegerv(GL_VIEWPORT, viewport);
-		resolution.set(viewport[2], viewport[3]);
+	public void render(IRenderingData rd, RendererData rnd, Vector2f resolution) {
 		shader.start();
 		shader.loadCamera(rd.camera, rd.projectionMatrix, resolution, rnd.rs.taaEnabled);
 		for (Instance instance : instances) {
@@ -78,12 +70,12 @@ public class AnimInstanceRenderer implements IObjectRenderer {
 
 	@Override
 	public void renderReflections(IRenderingData rd, RendererData rnd, CubeMapCamera cubeCamera) {
-		forwardRenderer.render(instances, rd, rnd, cubeCamera, false/* ,MaterialType.OPAQUE */, false);
+		forwardRenderer.render(instances, rd, rnd, cubeCamera, false, false);
 	}
 
 	@Override
 	public void renderForward(IRenderingData rd, RendererData rnd) {
-		forwardRenderer.render(instances, rd, rnd, null, true/* ,MaterialType.TRANSPARENT */, true);
+		forwardRenderer.render(instances, rd, rnd, null, true, true);
 	}
 
 	@Override

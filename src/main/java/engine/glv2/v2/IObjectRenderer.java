@@ -22,6 +22,8 @@ package engine.glv2.v2;
 
 import java.util.List;
 
+import org.joml.Vector2f;
+
 import engine.glv2.entities.CubeMapCamera;
 import engine.glv2.v2.lights.DirectionalLightCamera;
 import engine.glv2.v2.lights.SpotLightCamera;
@@ -31,7 +33,7 @@ public interface IObjectRenderer {
 
 	public void preProcess(List<Instance> instances);
 
-	public void render(IRenderingData rd, RendererData rnd);
+	public void render(IRenderingData rd, RendererData rnd, Vector2f resolution);
 
 	public void renderReflections(IRenderingData rd, RendererData rnd, CubeMapCamera cubeCamera);
 

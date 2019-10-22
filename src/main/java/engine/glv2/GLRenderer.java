@@ -259,7 +259,7 @@ public class GLRenderer implements IPipeline {
 		dp.bind();
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		GPUProfiler.start("RenderingManager");
-		renderingManager.render(rd, rnd);
+		renderingManager.render(rd, rnd, size);
 		GPUProfiler.end();
 		GPUProfiler.start("Skybox");
 		skyRenderer.render(currentCamera, projMatrix, sun.getLight().direction, true, true);
