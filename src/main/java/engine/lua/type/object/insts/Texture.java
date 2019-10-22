@@ -75,7 +75,7 @@ public class Texture extends AssetLoadable implements TreeViewable,FileResource 
 				}
 				this.loaded = false;
 			} else {
-				loadedImage = image.getResource();
+				this.loadedImage = image.getResource();
 				if ( this.get(C_SRGB).checkboolean() ) {
 					setTexture( TextureUtils.loadSRGBTextureFromImage(image.getResource()) );
 				} else {
