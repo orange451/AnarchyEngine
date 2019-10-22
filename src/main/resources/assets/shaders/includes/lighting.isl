@@ -339,7 +339,16 @@ vec3 calcSpotLight(SpotLight light, vec3 position, vec3 diffuse, vec3 N, vec3 V,
 	if (light.shadows) {
 		vec4 posLight = light.viewMatrix * vec4(position, 1.0);
 		vec4 shadowCoord = biasMatrix * (light.projectionMatrix * posLight);
-		NdotL *= texture(light.shadowMap, (shadowCoord.xyz / shadowCoord.w), 0);
+		vec2 multTex = 1.0 / textureSize(light.shadowMap, 0).xy;
+		float shadow = 0.0;
+		for (int x = -2; x <= 2; ++x) {
+			for (int y = -2; y <= 2; ++y) {
+				vec2 offset = vec2(x, y) * multTex;
+				vec3 temp = shadowCoord.xyz + vec3(offset * shadowCoord.z, 0);
+				shadow += texture(light.shadowMap, (temp / shadowCoord.w), 0);
+			}
+		}
+		NdotL *= shadow / 25.0;
 	}
 	return (kD * diffuse / PI + brdf) * radiance * NdotL;
 }
