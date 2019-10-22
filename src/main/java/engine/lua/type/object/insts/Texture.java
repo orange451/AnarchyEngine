@@ -11,8 +11,6 @@ import engine.io.FileResource;
 import engine.io.Image;
 import engine.lua.type.LuaEvent;
 import engine.lua.type.object.AssetLoadable;
-import engine.lua.type.object.Instance;
-import engine.lua.type.object.Service;
 import engine.lua.type.object.TreeViewable;
 import engine.util.TextureUtils;
 import ide.layout.windows.icons.Icons;
@@ -141,5 +139,9 @@ public class Texture extends AssetLoadable implements TreeViewable,FileResource 
 	
 	public static String getFileTypes() {
 		return "png,bmp,tga,jpg,hdr";
+	}
+
+	public boolean hasLoaded() {
+		return loaded;
 	}
 }

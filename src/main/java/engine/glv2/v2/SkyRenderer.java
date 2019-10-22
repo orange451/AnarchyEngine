@@ -33,7 +33,7 @@ import static org.lwjgl.opengl.GL30C.GL_COLOR_ATTACHMENT0;
 import static org.lwjgl.opengl.GL30C.GL_DEPTH_ATTACHMENT;
 import static org.lwjgl.opengl.GL30C.GL_FRAMEBUFFER;
 import static org.lwjgl.opengl.GL30C.GL_RGB16F;
-import static org.lwjgl.opengl.GL30C.glFramebufferTexture2D;
+import static org.lwjgl.opengl.GL30C.*;
 import static org.lwjgl.opengl.GL30C.glGenerateMipmap;
 
 import org.joml.Matrix4f;
@@ -118,19 +118,21 @@ public class SkyRenderer {
 		} else if (staticSky != null) {
 			if (staticSky.getImage() != null) {
 				staticSky.getImage().getTexture(); // Trigger image load
-				staticSkyShader.start();
-				staticSkyShader.loadCamera(camera, projection);
-				staticSkyShader.loadSky(staticSky);
-				if (infScale)
-					staticSkyShader.loadTransformationMatrix(infMat);
-				else
-					staticSkyShader.loadTransformationMatrix(regMat);
-				cube.bind(0);
-				glActiveTexture(GL_TEXTURE0);
-				glBindTexture(GL_TEXTURE_CUBE_MAP, cubeTex.getTexture());
-				glDrawArrays(GL_TRIANGLES, 0, cube.getVertexCount());
-				cube.unbind(0);
-				staticSkyShader.stop();
+				if (staticSky.getImage().hasLoaded()) {
+					staticSkyShader.start();
+					staticSkyShader.loadCamera(camera, projection);
+					staticSkyShader.loadSky(staticSky);
+					if (infScale)
+						staticSkyShader.loadTransformationMatrix(infMat);
+					else
+						staticSkyShader.loadTransformationMatrix(regMat);
+					cube.bind(0);
+					glActiveTexture(GL_TEXTURE0);
+					glBindTexture(GL_TEXTURE_CUBE_MAP, cubeTex.getTexture());
+					glDrawArrays(GL_TRIANGLES, 0, cube.getVertexCount());
+					cube.unbind(0);
+					staticSkyShader.stop();
+				}
 			}
 		}
 	}
@@ -154,19 +156,21 @@ public class SkyRenderer {
 			glCullFace(GL_BACK);
 		} else if (staticSky != null) {
 			if (staticSky.getImage() != null) {
-				staticSkyShader.start();
-				staticSkyShader.loadCamera(camera);
-				staticSkyShader.loadSky(staticSky);
-				if (infScale)
-					staticSkyShader.loadTransformationMatrix(infMat);
-				else
-					staticSkyShader.loadTransformationMatrix(regMat);
-				cube.bind(0);
-				glActiveTexture(GL_TEXTURE0);
-				glBindTexture(GL_TEXTURE_CUBE_MAP, cubeTex.getTexture());
-				glDrawArrays(GL_TRIANGLES, 0, cube.getVertexCount());
-				cube.unbind(0);
-				staticSkyShader.stop();
+				if (staticSky.getImage().hasLoaded()) {
+					staticSkyShader.start();
+					staticSkyShader.loadCamera(camera);
+					staticSkyShader.loadSky(staticSky);
+					if (infScale)
+						staticSkyShader.loadTransformationMatrix(infMat);
+					else
+						staticSkyShader.loadTransformationMatrix(regMat);
+					cube.bind(0);
+					glActiveTexture(GL_TEXTURE0);
+					glBindTexture(GL_TEXTURE_CUBE_MAP, cubeTex.getTexture());
+					glDrawArrays(GL_TRIANGLES, 0, cube.getVertexCount());
+					cube.unbind(0);
+					staticSkyShader.stop();
+				}
 			}
 		}
 	}
@@ -177,6 +181,8 @@ public class SkyRenderer {
 	}
 
 	public void setDynamicSky(DynamicSkybox dynamicSky) {
+		if (this.dynamicSky == dynamicSky)
+			return;
 		this.dynamicSky = dynamicSky;
 		if (dynamicSky != null) {
 			infMat = Maths.createTransformationMatrix(pos, 0, 0, 0, Integer.MAX_VALUE);
@@ -188,6 +194,8 @@ public class SkyRenderer {
 	}
 
 	public void setStaticSky(Skybox staticSky) {
+		if (this.staticSky == staticSky)
+			return;
 		this.staticSky = staticSky;
 		if (staticSky != null) {
 			infMat = Maths.createTransformationMatrix(pos, -90, 0, 0, Integer.MAX_VALUE);
@@ -219,6 +227,8 @@ public class SkyRenderer {
 		generateFramebuffer(512);
 		CubeMapCamera camera = new CubeMapCamera(new Vector3f());
 		SphereToCubeShader stc = new SphereToCubeShader();
+
+		glDisable(GL_BLEND);
 
 		framebuffer.bind();
 		stc.start();

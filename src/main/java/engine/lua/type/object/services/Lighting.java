@@ -20,6 +20,7 @@ import engine.lua.type.object.TreeViewable;
 import engine.lua.type.object.insts.DynamicSkybox;
 import engine.lua.type.object.insts.Skybox;
 import engine.lua.type.object.insts.Texture;
+import engine.tasks.TaskManager;
 import ide.layout.windows.icons.Icons;
 
 public class Lighting extends Service implements TreeViewable {
@@ -156,6 +157,9 @@ public class Lighting extends Service implements TreeViewable {
 							skyboxImageChanged = skybox.getImage().textureLoadedEvent().connect((args1)->{
 								pp.reloadStaticSkybox();
 							});
+							if (skybox.getImage().hasLoaded()) {
+								TaskManager.addTaskRenderThread(() -> pp.reloadStaticSkybox());
+							}
 						}
 					}
 				});
@@ -165,10 +169,14 @@ public class Lighting extends Service implements TreeViewable {
 				
 				// Bind image change event, for when user changes the images URL and new image is loaded.
 				InternalGameThread.runLater(()->{
-					if(skybox.getImage() != null)
+					if(skybox.getImage() != null) {
+						if(skybox.getImage().hasLoaded()) {
+							TaskManager.addTaskRenderThread(() -> pp.reloadStaticSkybox());
+						}
 						skyboxImageChanged = skybox.getImage().textureLoadedEvent().connect((args)->{
 							pp.reloadStaticSkybox();
 						});
+					}
 				});
 				
 				if ( skyboxDestroyed != null )
