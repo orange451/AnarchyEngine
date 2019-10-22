@@ -28,7 +28,6 @@ uniform vec3 cameraPosition;
 uniform vec3 lightPosition;
 uniform vec3 uAmbient;
 uniform sampler2D gDiffuse;
-uniform sampler2D gPosition;
 uniform sampler2D gNormal;
 uniform sampler2D gPBR; // R = roughness, G = metallic
 uniform sampler2D gMask;

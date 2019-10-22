@@ -25,7 +25,6 @@ out vec3 out_Color;
 uniform vec2 texel;
 uniform vec3 cameraPosition;
 uniform sampler2D gDiffuse;
-uniform sampler2D gPosition;
 uniform sampler2D gNormal;
 uniform sampler2D gPBR; // R = roughness, G = metallic
 uniform sampler2D gMask;

@@ -28,7 +28,6 @@ uniform mat4 viewMatrix;
 uniform mat4 inverseProjectionMatrix;
 uniform mat4 inverseViewMatrix;
 uniform sampler2D gDiffuse;
-uniform sampler2D gPosition;
 uniform sampler2D gNormal;
 uniform sampler2D gPBR;
 uniform sampler2D gMask;

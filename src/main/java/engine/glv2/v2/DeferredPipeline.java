@@ -55,7 +55,6 @@ import static org.lwjgl.opengl.GL30C.GL_DRAW_FRAMEBUFFER;
 import static org.lwjgl.opengl.GL30C.GL_READ_FRAMEBUFFER;
 import static org.lwjgl.opengl.GL30C.GL_RG;
 import static org.lwjgl.opengl.GL30C.GL_RGB16F;
-import static org.lwjgl.opengl.GL30C.GL_RGB32F;
 import static org.lwjgl.opengl.GL30C.GL_RGBA16F;
 import static org.lwjgl.opengl.GL30C.glBindFramebuffer;
 import static org.lwjgl.opengl.GL30C.glBlitFramebuffer;
@@ -78,7 +77,7 @@ public abstract class DeferredPipeline {
 	protected List<DeferredPass<?>> passes;
 
 	private Framebuffer main;
-	private Texture diffuseTex, positionTex, normalTex, pbrTex, maskTex, depthTex;
+	private Texture diffuseTex, motionTex, normalTex, pbrTex, maskTex, depthTex;
 
 	private VAO quad;
 
@@ -182,12 +181,12 @@ public abstract class DeferredPipeline {
 		diffuseTex = tb.endTexture();
 
 		tb.genTexture(GL_TEXTURE_2D).bindTexture();
-		tb.sizeTexture(width, height).texImage2D(0, GL_RGB32F, 0, GL_RGB, GL_FLOAT, 0);
+		tb.sizeTexture(width, height).texImage2D(0, GL_RGB16F, 0, GL_RGB, GL_FLOAT, 0);
 		tb.texParameteri(GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		tb.texParameteri(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		tb.texParameteri(GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 		tb.texParameteri(GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-		positionTex = tb.endTexture();
+		motionTex = tb.endTexture();
 
 		tb.genTexture(GL_TEXTURE_2D).bindTexture();
 		tb.sizeTexture(width, height).texImage2D(0, GL_RGB16F, 0, GL_RGB, GL_FLOAT, 0);
@@ -225,7 +224,7 @@ public abstract class DeferredPipeline {
 
 		fb.genFramebuffer().bindFramebuffer().sizeFramebuffer(width, height);
 		fb.framebufferTexture(GL_COLOR_ATTACHMENT0, diffuseTex, 0);
-		fb.framebufferTexture(GL_COLOR_ATTACHMENT1, positionTex, 0);
+		fb.framebufferTexture(GL_COLOR_ATTACHMENT1, motionTex, 0);
 		fb.framebufferTexture(GL_COLOR_ATTACHMENT2, normalTex, 0);
 		fb.framebufferTexture(GL_COLOR_ATTACHMENT3, pbrTex, 0);
 		fb.framebufferTexture(GL_COLOR_ATTACHMENT4, maskTex, 0);
@@ -251,7 +250,7 @@ public abstract class DeferredPipeline {
 	private void disposePipeline() {
 		main.dispose();
 		diffuseTex.dispose();
-		positionTex.dispose();
+		motionTex.dispose();
 		normalTex.dispose();
 		pbrTex.dispose();
 		maskTex.dispose();
@@ -264,8 +263,8 @@ public abstract class DeferredPipeline {
 		return diffuseTex;
 	}
 
-	public Texture getPositionTex() {
-		return positionTex;
+	public Texture getMotionTex() {
+		return motionTex;
 	}
 
 	public Texture getNormalTex() {

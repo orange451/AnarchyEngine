@@ -50,8 +50,8 @@ void main() {
     map.y = map.y;
 	vec3 normal = normalize(TBN * map);
 
-	out_Color[0] = vec4(diffuseF, 1.0);
-	out_Color[1] = vec4(pass_position, 0.0);
+	out_Color[0] = vec4(diffuseF, 0.0);
+	out_Color[1] = vec4(0.0);
 	out_Color[2] = vec4(normal, 0.0);
 	out_Color[3] = vec4(roughnessF, metallicF, 0.0, 0.0);
 	out_Color[4] = vec4(material.emissive.rgb * diffuseF.rgb, PBR_OBJECT);
