@@ -90,7 +90,7 @@ public class PointLightHandler implements IPointLightHandler {
 				if ( !light.visible )
 					continue;
 				
-				Vector4f lightEyePos = new Vector4f(light.x, light.y, light.z, 1.0f);
+				Vector4f lightEyePos = new Vector4f(light.position.x, light.position.y, light.position.z, 1.0f);
 				viewMatrix.transform(lightEyePos, lightEyePos);
 
 				lightShader.shader_set_uniform_f( lightShader.shader_get_uniform( U_L_RADIUS), light.radius );
@@ -99,7 +99,7 @@ public class PointLightHandler implements IPointLightHandler {
 				lightShader.shader_set_uniform_f( lightShader.shader_get_uniform( U_L_COLOR), light.color.x, light.color.y, light.color.z );
 				
 				tempLightMatrix.identity();
-				tempLightMatrix.translate(light.x, light.y, light.z);
+				tempLightMatrix.translate(light.position.x, light.position.y, light.position.z);
 				tempLightMatrix.scale(light.radius);
 				
 				mesh.render(lightShader, tempLightMatrix, null);

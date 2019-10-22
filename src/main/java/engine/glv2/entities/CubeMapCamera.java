@@ -34,6 +34,10 @@ public class CubeMapCamera {
 
 	private Vector3f position = new Vector3f(), rotation = new Vector3f();
 
+	private static final Vector3f X = new Vector3f(1, 0, 0);
+	private static final Vector3f Y = new Vector3f(0, 1, 0);
+	private static final Vector3f Z = new Vector3f(0, 0, 1);
+
 	public CubeMapCamera(Vector3f position) {
 		this.position = position;
 		createProjectionMatrix();
@@ -112,15 +116,14 @@ public class CubeMapCamera {
 		this.position = position;
 	}
 
-	private static Matrix4f createViewMatrix(CubeMapCamera camera) {
-		Matrix4f viewMatrix = new Matrix4f();
+	private Matrix4f createViewMatrix(CubeMapCamera camera) {
 		viewMatrix.identity();
 		createViewMatrixRot(camera.rotation.x, camera.rotation.y, camera.rotation.z, viewMatrix);
 		createViewMatrixPos(camera.position, viewMatrix);
 		return viewMatrix;
 	}
 
-	private static Matrix4f createViewMatrixPos(Vector3f pos, Matrix4f viewMatrix) {
+	private Matrix4f createViewMatrixPos(Vector3f pos, Matrix4f viewMatrix) {
 		if (viewMatrix == null) {
 			viewMatrix = new Matrix4f();
 			viewMatrix.identity();
@@ -129,14 +132,14 @@ public class CubeMapCamera {
 		return viewMatrix;
 	}
 
-	private static Matrix4f createViewMatrixRot(float pitch, float yaw, float roll, Matrix4f viewMatrix) {
+	private Matrix4f createViewMatrixRot(float pitch, float yaw, float roll, Matrix4f viewMatrix) {
 		if (viewMatrix == null) {
 			viewMatrix = new Matrix4f();
 			viewMatrix.identity();
 		}
-		viewMatrix.rotate((float) Math.toRadians(pitch), new Vector3f(1, 0, 0));
-		viewMatrix.rotate((float) Math.toRadians(yaw), new Vector3f(0, 1, 0));
-		viewMatrix.rotate((float) Math.toRadians(roll), new Vector3f(0, 0, 1));
+		viewMatrix.rotate((float) Math.toRadians(pitch), X);
+		viewMatrix.rotate((float) Math.toRadians(yaw), Y);
+		viewMatrix.rotate((float) Math.toRadians(roll), Z);
 		return viewMatrix;
 	}
 

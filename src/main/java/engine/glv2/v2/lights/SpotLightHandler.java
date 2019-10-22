@@ -101,7 +101,7 @@ public class SpotLightHandler implements ISpotLightHandler {
 				if (!l.visible)
 					continue;
 				temp.identity();
-				temp.translate(l.x, l.y, l.z);
+				temp.translate(l.position);
 				temp.scale(l.radius);
 				shader.loadTransformationMatrix(temp);
 				shader.loadSpotLight(l);

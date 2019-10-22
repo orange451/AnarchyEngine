@@ -87,6 +87,7 @@ public class PlayerPhysics extends PhysicsBase implements TreeViewable {
 			} else {
 				this.forceset(C_ONGROUND, LuaValue.FALSE);
 			}
+			ret.dispose();
 			
 			if ( this.isOnGround() ) {
 				float scale = (float)Math.pow(1f - this.getFriction(), InternalGameThread.delta);

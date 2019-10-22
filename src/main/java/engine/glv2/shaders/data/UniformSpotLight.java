@@ -50,7 +50,7 @@ public class UniformSpotLight extends UniformObject {
 	}
 
 	public void loadLight(SpotLightInternal light, int shadowUnit) {
-		position.loadVec3(light.x, light.y, light.z);
+		position.loadVec3(light.position);
 		direction.loadVec3(light.direction);
 		color.loadVec3(light.color);
 		intensity.loadFloat(light.intensity);

@@ -66,7 +66,7 @@ public class TransparencyRenderer {
 		for (int i = 0; i < pointLights.length; i++) {
 			PointLightInternal light = pointLights[i];
 			
-			Vector3f lightEyePos = new Vector3f(light.x, light.y, light.z);
+			Vector3f lightEyePos = new Vector3f(light.position.x, light.position.y, light.position.z);
 			viewMatrix.transformPosition(lightEyePos, lightEyePos);
 			
 			shader.shader_set_uniform_f(shader.shader_get_uniform("uPointLights["+i+"].Position"), lightEyePos);

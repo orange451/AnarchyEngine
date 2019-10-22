@@ -38,7 +38,7 @@ public class UniformPointLight extends UniformObject {
 	}
 
 	public void loadLight(PointLightInternal light) {
-		position.loadVec3(light.x, light.y, light.z);
+		position.loadVec3(light.position);
 		color.loadVec3(light.color);
 		intensity.loadFloat(light.intensity);
 		radius.loadFloat(light.radius);

@@ -167,7 +167,7 @@ public class PhysicsWorld {
 			btCollisionWorld.rayTestSingle(start, finish, collisionObject, collisionObject.getCollisionShape(), collisionObject.getWorldTransform(), callback);
 		}
 
-		return (ClosestRayResultCallback) callback;
+		return callback;
 	}
 
 	private boolean aabbTest(org.joml.Vector3f from, org.joml.Vector3f to, Vector3 lb, Vector3 rt) {
@@ -244,11 +244,17 @@ public class PhysicsWorld {
 						float dist = vec.len();
 						if ( dist < maxDist ) {
 							maxDist = dist;
+							ret.dispose();
 							ret = c;
+						} else {
+							c.dispose();
 						}
 					} else {
 						((btRigidBody)c.getCollisionObject()).dispose();
+						c.dispose();
 					}
+				} else {
+					c.dispose();
 				}
 			}
 		}

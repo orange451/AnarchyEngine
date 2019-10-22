@@ -37,10 +37,7 @@ public class PointLight extends LightBase implements TreeViewable {
 			
 			if ( light != null ) {
 				if ( key.eq_b(C_POSITION) ) {
-					Vector3f pos = ((Vector3)value).toJoml();
-					light.x = pos.x;
-					light.y = pos.y;
-					light.z = pos.z;
+					light.setPosition(((Vector3)value).toJoml());
 				} else if ( key.eq_b(C_RADIUS) ) {
 					light.radius = value.tofloat();
 				} else if ( key.eq_b(C_INTENSITY) ) {
