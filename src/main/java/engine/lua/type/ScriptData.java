@@ -84,7 +84,6 @@ public class ScriptData extends LuaValue implements Runnable {
 				LuaEngine.globals.set(C_LASTSCRIPT, script);
 				threadToScriptData.put(Thread.currentThread(),ScriptData.this);
 				scriptDataToThread.put(ScriptData.this, Thread.currentThread());
-				Thread.currentThread().setDaemon(true);
 			}
 			if ( function != null ) {
 				function.invoke(arguments);
