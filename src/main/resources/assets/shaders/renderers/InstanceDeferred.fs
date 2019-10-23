@@ -34,11 +34,11 @@ uniform Material material;
 
 void main() {
 
-	vec3 diffuseF = texture(material.diffuseTex, pass_textureCoords).rgb;
+	vec4 diffuseF = texture(material.diffuseTex, pass_textureCoords);
 	float roughnessF = texture(material.roughnessTex, pass_textureCoords).r;
 	float metallicF = texture(material.metallicTex, pass_textureCoords).r;
 
-	diffuseF *= material.diffuse;
+	diffuseF.rgb *= material.diffuse;
 	roughnessF *= material.roughness;
 	metallicF *= material.metallic;
 
@@ -55,7 +55,7 @@ void main() {
 	vec3 ndcPos = (clipSpace / clipSpace.w).xyz;
     vec3 ndcPosPrev = (clipSpacePrev / clipSpacePrev.w).xyz;
 
-	out_Color[0] = vec4(diffuseF, 0.0);
+	out_Color[0] = vec4(diffuseF.rgb, 0.0);
 	out_Color[1] = vec4((ndcPosPrev - ndcPos).xy, 0.0, 0.0);
 	out_Color[2] = vec4(normal, 0.0);
 	out_Color[3] = vec4(roughnessF, metallicF, 0.0, 0.0);
