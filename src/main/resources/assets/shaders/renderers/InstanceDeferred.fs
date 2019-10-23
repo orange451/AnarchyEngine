@@ -42,8 +42,8 @@ void main() {
 	roughnessF *= material.roughness;
 	metallicF *= material.metallic;
 
-	// if (diffuseF.a <= 0.5)
-	//	discard;
+	if (diffuseF.a <= 0.5)
+		discard;
 
 	vec3 norm = texture(material.normalTex, pass_textureCoords).rgb;
 	vec3 map = vec3(norm.x, norm.y, 1.0);
