@@ -109,10 +109,12 @@ public class RenderingManager {
 	}
 
 	private void process(Instance root) {
-		for (Instance inst : root.getChildren()) {
-			if (inst instanceof Camera)
-				continue;
-			process(inst);
+		synchronized (root.getChildren()) {
+			for (Instance inst : root.getChildren()) {
+				if (inst instanceof Camera)
+					continue;
+				process(inst);
+			}
 		}
 		if (root instanceof RenderableInstance) {
 
