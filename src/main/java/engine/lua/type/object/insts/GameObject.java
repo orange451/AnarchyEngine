@@ -6,6 +6,7 @@ import org.luaj.vm2.LuaValue;
 
 import engine.Game;
 import engine.InternalGameThread;
+import engine.InternalRenderThread;
 import engine.gl.shader.BaseShader;
 import engine.lua.type.NumberClamp;
 import engine.lua.type.data.Matrix4;
@@ -41,10 +42,17 @@ public class GameObject extends Instance implements RenderableInstance,TreeViewa
 		this.getField(C_TRANSPARENCY).setClamp(new NumberClamp(0, 1));
 		
 		// Update the last world matrix BEFORE running physics simulation.
-		InternalGameThread.runLater(()->{
-			Game.runService().heartbeatEvent().connect((args)->{
+		InternalRenderThread.runLater(()->{
+			InternalGameThread.runLater(()->{
+				Game.runService().heartbeatEvent().connect((args)->{
+					lastWorldMatrix.set(this.getWorldMatrix().getInternal());
+				});
 				lastWorldMatrix.set(this.getWorldMatrix().getInternal());
 			});
+		});
+		
+		// Another update for when game state reloads
+		Game.loadEvent().connect((args)->{
 			lastWorldMatrix.set(this.getWorldMatrix().getInternal());
 		});
 	}
