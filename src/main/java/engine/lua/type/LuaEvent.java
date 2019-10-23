@@ -58,7 +58,7 @@ public class LuaEvent extends LuaDatatype {
 				connections.add(cnt);
 			}
 			
-			ScriptBase runningScript = ScriptData.getScript(Thread.currentThread());
+			ScriptBase runningScript = ScriptRunner.getScript(Thread.currentThread());
 			if ( runningScript != null && runningScript.isRunning() ) {
 				runningScript.connections.put(LuaEvent.this,cnt);
 			}
@@ -102,7 +102,7 @@ public class LuaEvent extends LuaDatatype {
 				//LuaEngine.spawn(temp.getFunction(), null, vargs);
 				
 				try {
-					ScriptData t = ScriptData.create(temp.getFunction(), null, vargs);
+					ScriptRunner t = ScriptRunner.create(temp.getFunction(), null, vargs);
 					t.run();
 				}catch(Exception e) {
 					//

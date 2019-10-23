@@ -12,11 +12,11 @@ import org.luaj.vm2.Varargs;
 import engine.lua.LuaEngine;
 import engine.lua.type.object.ScriptBase;
 
-public class ScriptData extends LuaValue implements Runnable {
+public class ScriptRunner extends LuaValue implements Runnable {
 	private static ScheduledExecutorService THREAD_POOL;
-	private static HashMap<Thread,ScriptData> threadToScriptData;
-	private static HashMap<ScriptData,Thread> scriptDataToThread;
-	private static HashMap<ScriptData,Boolean> interruptedClosures;
+	private static HashMap<Thread,ScriptRunner> threadToScriptData;
+	private static HashMap<ScriptRunner,Thread> scriptDataToThread;
+	private static HashMap<ScriptRunner,Boolean> interruptedClosures;
 	//private static List<LuaThread> THREAD_POOL = Collections.synchronizedList(new ArrayList<LuaThread>());
 
 	private LuaValue function;
@@ -29,19 +29,19 @@ public class ScriptData extends LuaValue implements Runnable {
 
 	static {
 		THREAD_POOL = Executors.newScheduledThreadPool(2048);
-		interruptedClosures = new HashMap<ScriptData,Boolean>();
-		threadToScriptData = new HashMap<Thread,ScriptData>();
-		scriptDataToThread = new HashMap<ScriptData,Thread>();
+		interruptedClosures = new HashMap<ScriptRunner,Boolean>();
+		threadToScriptData = new HashMap<Thread,ScriptRunner>();
+		scriptDataToThread = new HashMap<ScriptRunner,Thread>();
 	}
 	
-	private ScriptData(ScriptBase script) {
+	private ScriptRunner(ScriptBase script) {
 		this.function = null;
 		this.arguments = null;
 		this.script = script;
 	}
 
-	public static ScriptData create( LuaValue function, ScriptBase script, Varargs vargs ) {
-		ScriptData deadThread = new ScriptData(script);
+	public static ScriptRunner create( LuaValue function, ScriptBase script, Varargs vargs ) {
+		ScriptRunner deadThread = new ScriptRunner(script);
 		deadThread.function = function;
 		deadThread.arguments = vargs;
 
@@ -68,7 +68,7 @@ public class ScriptData extends LuaValue implements Runnable {
 	}
 	
 	public void interrupt() {
-		interruptedClosures.put(ScriptData.this, true);
+		interruptedClosures.put(ScriptRunner.this, true);
 		System.out.println("Attempting to interrupt closure: " + script+"/"+function);
 	}
 
@@ -82,8 +82,8 @@ public class ScriptData extends LuaValue implements Runnable {
 			if ( script != null ) {
 				System.out.println("Running data: " + this + " on thread: " + Thread.currentThread());
 				LuaEngine.globals.set(C_LASTSCRIPT, script);
-				threadToScriptData.put(Thread.currentThread(),ScriptData.this);
-				scriptDataToThread.put(ScriptData.this, Thread.currentThread());
+				threadToScriptData.put(Thread.currentThread(),ScriptRunner.this);
+				scriptDataToThread.put(ScriptRunner.this, Thread.currentThread());
 			}
 			if ( function != null ) {
 				function.invoke(arguments);
@@ -91,9 +91,9 @@ public class ScriptData extends LuaValue implements Runnable {
 		}catch(LuaError e) {
 			
 			if ( e.getMessage().contains("ScriptInterruptException") ) {
-				interruptedClosures.remove(ScriptData.this);
-				threadToScriptData.remove(Thread.currentThread(), ScriptData.this);
-				scriptDataToThread.remove(ScriptData.this);
+				interruptedClosures.remove(ScriptRunner.this);
+				threadToScriptData.remove(Thread.currentThread(), ScriptRunner.this);
+				scriptDataToThread.remove(ScriptRunner.this);
 				LuaEngine.error( "[" + fullName + "], Interrupted. Infinite Loop?" );
 				return;
 			}
@@ -120,7 +120,7 @@ public class ScriptData extends LuaValue implements Runnable {
 	}
 
 	public static ScriptBase getScript(Thread thread) {
-		ScriptData data = threadToScriptData.get(thread);
+		ScriptRunner data = threadToScriptData.get(thread);
 		if ( data == null ) {
 			return null;
 		}

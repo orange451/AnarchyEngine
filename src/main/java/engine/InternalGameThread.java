@@ -10,7 +10,7 @@ import org.luaj.vm2.LuaValue;
 
 import engine.application.Application;
 import engine.lua.LuaEngine;
-import engine.lua.type.ScriptData;
+import engine.lua.type.ScriptRunner;
 import engine.lua.type.object.Service;
 import engine.lua.type.object.services.RunService;
 import engine.observer.Tickable;
@@ -138,7 +138,7 @@ public class InternalGameThread extends Observable implements Runnable {
 		}
 		
 		// Disable scripts
-		ScriptData.shutdown();
+		ScriptRunner.shutdown();
 		Game.resourceLoader().shutdown();
 		done = true;
 	}

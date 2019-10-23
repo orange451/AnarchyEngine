@@ -21,7 +21,7 @@ import engine.io.Save;
 import engine.lua.LuaEngine;
 import engine.lua.network.internal.protocol.ClientConnectFinishTCP;
 import engine.lua.type.LuaEvent;
-import engine.lua.type.ScriptData;
+import engine.lua.type.ScriptRunner;
 import engine.lua.type.object.Instance;
 import engine.lua.type.object.Service;
 import engine.lua.type.object.insts.Camera;
@@ -273,7 +273,7 @@ public class Game implements Tickable {
 		instanceCounter = new AtomicLong(0);
 		
 		clearServices();
-		ScriptData.cleanup();
+		ScriptRunner.cleanup();
 		
 		loaded = false;
 	}

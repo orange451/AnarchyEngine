@@ -12,13 +12,13 @@ import engine.GameSubscriber;
 import engine.lua.LuaEngine;
 import engine.lua.type.LuaConnection;
 import engine.lua.type.LuaEvent;
-import engine.lua.type.ScriptData;
+import engine.lua.type.ScriptRunner;
 import engine.lua.type.object.Instance;
 import engine.util.FileIO;
 import engine.util.IOUtil;
 
 public abstract class ScriptBase extends Instance implements GameSubscriber {
-	private ScriptData scriptInstance;
+	private ScriptRunner scriptInstance;
 	private AtomicBoolean running;
 	public HashMap<LuaEvent,LuaConnection> connections;
 

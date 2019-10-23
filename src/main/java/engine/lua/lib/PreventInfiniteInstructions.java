@@ -7,7 +7,7 @@ import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.Varargs;
 import org.luaj.vm2.lib.DebugLib;
 
-import engine.lua.type.ScriptData;
+import engine.lua.type.ScriptRunner;
 
 public class PreventInfiniteInstructions extends DebugLib {
 	private HashMap<Thread,LuaThreadInstructions> instructions;
@@ -44,7 +44,7 @@ public class PreventInfiniteInstructions extends DebugLib {
 		}
 		
 		// Check if the thread was interrupted or we have too many instructions looping (100 million).
-		if ( inst.instructions > 1.0e8 || ScriptData.isInterrupted(Thread.currentThread())) {
+		if ( inst.instructions > 1.0e8 || ScriptRunner.isInterrupted(Thread.currentThread())) {
 			System.out.println("Cancelling the current closure");
 			inst.interrupted = true;
 		}

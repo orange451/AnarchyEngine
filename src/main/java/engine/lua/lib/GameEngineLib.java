@@ -11,7 +11,7 @@ import org.luaj.vm2.lib.VarArgFunction;
 import org.luaj.vm2.lib.ZeroArgFunction;
 
 import engine.lua.LuaEngine;
-import engine.lua.type.ScriptData;
+import engine.lua.type.ScriptRunner;
 import engine.lua.type.object.ScriptBase;
 
 public class GameEngineLib extends TwoArgFunction {
@@ -58,7 +58,7 @@ public class GameEngineLib extends TwoArgFunction {
 			LuaValue.assert_(function.isfunction(), "requires a function argument");
 			ScriptBase s = script instanceof ScriptBase ? (ScriptBase)script : null;
 			
-			ScriptData t = ScriptData.create(function, s, LuaValue.NONE);
+			ScriptRunner t = ScriptRunner.create(function, s, LuaValue.NONE);
 			t.start();
 			
 			return t;

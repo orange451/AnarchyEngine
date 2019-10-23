@@ -49,7 +49,7 @@ public class LuaEngine {
 			// load Data types (color/vector/ect)
 			loadDataTypes("engine.lua.type.data");
 			
-			// Register instance types
+			// Register instance types (GameObject/Camera/Etc)
 			loadDataTypes("engine.lua.type.object.insts");
 		}
 	}
@@ -88,22 +88,22 @@ public class LuaEngine {
 		}
 	}
 	
-	public static ScriptData runLua(String source) {
+	public static ScriptRunner runLua(String source) {
 		return runLua(source, null);
 	}
 
-	public static ScriptData runLua(String source, ScriptBase script) {
+	public static ScriptRunner runLua(String source, ScriptBase owner) {
 		String name = "CMD";
 		String full = name;
-		if ( script != null ) {
-			System.out.println("Running: " + script.getFullName());
-			name = script.getName();
-			full = script.getFullName();
+		if ( owner != null ) {
+			System.out.println("Running: " + owner.getFullName());
+			name = owner.getName();
+			full = owner.getFullName();
 		}
 		
 		try{
 			LuaValue currentChunk = LuaEngine.globals.load(source, name);
-			return (ScriptData) globals.get("spawn").call(currentChunk, script); // Run spawn class from GameEngineLib
+			return (ScriptRunner) globals.get("spawn").call(currentChunk, owner); // Run spawn class from GameEngineLib
 		}catch(LuaError e) {
 			// This will only run for syntax errors. Not logical errors.
 			String message = e.getMessage();
