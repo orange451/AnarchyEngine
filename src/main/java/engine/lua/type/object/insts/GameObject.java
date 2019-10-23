@@ -45,6 +45,7 @@ public class GameObject extends Instance implements RenderableInstance,TreeViewa
 			Game.runService().heartbeatEvent().connect((args)->{
 				lastWorldMatrix.set(this.getWorldMatrix().getInternal());
 			});
+			lastWorldMatrix.set(this.getWorldMatrix().getInternal());
 		});
 	}
 	
@@ -143,6 +144,9 @@ public class GameObject extends Instance implements RenderableInstance,TreeViewa
 			
 			// Get current world matrix
 			Matrix4 mat = ((Matrix4)this.rawget(C_WORLDMATRIX));
+			
+			// Update last position
+			this.lastWorldMatrix.set(mat.getInternal());
 			
 			// Update world matrix with new position
 			mat.setPosition((Vector3) value);
