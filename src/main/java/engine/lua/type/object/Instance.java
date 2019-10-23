@@ -4,7 +4,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import org.luaj.vm2.LuaTable;
 import org.luaj.vm2.LuaValue;
+import org.luaj.vm2.lib.OneArgFunction;
 import org.luaj.vm2.lib.ThreeArgFunction;
 import org.luaj.vm2.lib.TwoArgFunction;
 import org.luaj.vm2.lib.ZeroArgFunction;
@@ -22,6 +24,20 @@ public abstract class Instance extends DataModel {
 	protected static final LuaValue C_ARCHIVABLE = LuaValue.valueOf("Archivable");
 	protected static final LuaValue C_SID = LuaValue.valueOf("SID");
 	protected static final LuaValue C_PLAYERSCRIPTS = LuaValue.valueOf("PlayerScripts");
+	
+	static {
+		LuaTable table = new LuaTable();
+		table.set("new", new OneArgFunction() {
+			@Override
+			public LuaValue call(LuaValue arg) {
+				String searchType = arg.toString();
+				Instance inst = instanceLua(searchType);
+				return inst==null?LuaValue.NIL:inst;
+			}
+		});
+		table.set(LuaValue.INDEX, table);
+		LuaEngine.globals.set("Instance", table);
+	}
 	
 	public static void initialize() {
 		System.out.println("Loaded instance");
@@ -243,6 +259,37 @@ public abstract class Instance extends DataModel {
 		}
 		
 		return null;
+	}
+	
+	/**
+	 * Instantiate an Instance as if it was created in lua via script. This means that non-instanceable objects will get blocked.
+	 * @param type
+	 * @return
+	 */
+	public static Instance instanceLua(String type) {
+		LuaInstancetypeData c = TYPES.get(type);
+		if ( c == null )
+			return null;
+		
+		if ( c.isInstanceable() ) {
+			Instance instance = instance(type);
+			if ( instance == null )
+				return null;
+			
+			instance.onLuaCreate();
+			return instance;
+		} else {
+			LuaValue.error("Cannot instantiate object of type " + type);
+		}
+		
+		return null;
+	}
+	
+	/**
+	 * Function that gets ran when a instance is created via Instance.new() through lua.
+	 */
+	protected void onLuaCreate() {
+		//
 	}
 	
 	/**

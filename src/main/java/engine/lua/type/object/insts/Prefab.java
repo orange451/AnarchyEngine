@@ -88,6 +88,22 @@ public class Prefab extends Asset implements TreeViewable {
 		});
 	}
 	
+	@Override
+	protected void onLuaCreate() {
+		AssetFolder meshes = new AssetFolder();
+		meshes.forceSetName("Meshes");
+		meshes.forceSetParent(this);
+		
+		AssetFolder textures = new AssetFolder();
+		textures.forceSetName("Textures");
+		textures.forceSetParent(this);
+		
+		AssetFolder materials = new AssetFolder();
+		materials.forceSetName("Materials");
+		materials.forceSetParent(this);
+
+	}
+	
 	/**
 	 * Returns immutable list of models attached to this prefab.
 	 * @return

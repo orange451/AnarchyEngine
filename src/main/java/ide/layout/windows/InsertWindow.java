@@ -106,7 +106,7 @@ public class InsertWindow {
 					if ( event.getClickCount() == 2 ) {
 						InternalRenderThread.runLater(()->{
 							try {
-								Instance inst = (Instance) instClass.newInstance();
+								Instance inst = Instance.instanceLua(temp.getClassName().toString());
 								inst.forceSetParent(getParent());
 								Game.historyService().pushChange(inst, LuaValue.valueOf("Parent"), LuaValue.NIL, inst.getParent());
 							} catch (Exception e) {

@@ -36,20 +36,8 @@ public abstract class ContextMenuType {
 
 		@Override
 		public void onClick(Instance instance) {
-			Prefab prefab = new Prefab();
+			Instance prefab = Instance.instanceLua(Prefab.class.getSimpleName());
 			prefab.forceSetParent(instance);
-			
-			AssetFolder meshes = new AssetFolder();
-			meshes.forceSetName("Meshes");
-			meshes.forceSetParent(prefab);
-			
-			AssetFolder textures = new AssetFolder();
-			textures.forceSetName("Textures");
-			textures.forceSetParent(prefab);
-			
-			AssetFolder materials = new AssetFolder();
-			materials.forceSetName("Materials");
-			materials.forceSetParent(prefab);
 			
 			Game.historyService().pushChange(prefab, LuaValue.valueOf("Parent"), LuaValue.NIL, prefab.getParent());
 		}

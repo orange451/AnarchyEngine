@@ -10,10 +10,7 @@ import org.luaj.vm2.LuaError;
 import org.luaj.vm2.LuaNumber;
 import org.luaj.vm2.LuaTable;
 import org.luaj.vm2.LuaValue;
-import org.luaj.vm2.lib.OneArgFunction;
-
 import engine.Game;
-import engine.lua.LuaEngine;
 import engine.lua.type.object.Instance;
 import engine.lua.type.object.InstancePropertySubscriber;
 
@@ -52,31 +49,10 @@ public abstract class DataModel extends LuaDatatype {
 		LuaInstancetypeData( Class<?> cls ) {
 			this.instanceableClass = cls;
 		}
-	}
 
-	static {
-		LuaTable table = new LuaTable();
-		table.set("new", new OneArgFunction() {
-			@Override
-			public LuaValue call(LuaValue arg) {
-				String searchType = arg.toString();
-				LuaInstancetypeData c = TYPES.get(searchType);
-				if ( c != null ) {
-					if ( c.instanceable ) {
-						try {
-							return (DataModel) c.instanceableClass.newInstance();
-						} catch (Exception e) {
-							//
-						}
-					} else {
-						LuaValue.error("Cannot instantiate object of type " + searchType);
-					}
-				}
-				return LuaValue.NIL;
-			}
-		});
-		table.set(LuaValue.INDEX, table);
-		LuaEngine.globals.set("Instance", table);
+		public boolean isInstanceable() {
+			return this.instanceable;
+		}
 	}
 	
 	@SuppressWarnings("unchecked")
