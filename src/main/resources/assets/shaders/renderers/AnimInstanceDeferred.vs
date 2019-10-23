@@ -25,13 +25,16 @@ layout(location = 3) in vec4 inColor;
 layout(location = 4) in vec4 boneIndices;
 layout(location = 5) in vec4 boneWeights;
 
-#define MAX_BONES 128
+#define MAX_BONES 64
 
 out vec2 pass_textureCoords;
 out vec3 pass_position;
 out mat3 TBN;
+out vec4 clipSpace;
+out vec4 clipSpacePrev;
 
 uniform mat4 transformationMatrix;
+uniform mat4 transformationMatrixPrev;
 uniform mat4 projectionMatrix;
 uniform mat4 viewMatrix;
 uniform mat4 jitterMatrix;
@@ -40,6 +43,7 @@ uniform int frame;
 uniform bool useTAA;
 
 uniform mat4 boneMat[MAX_BONES];
+uniform mat4 boneMatPrev[MAX_BONES];
 
 void main() {
 	mat4 boneTransform = boneMat[int(boneIndices[0])] * boneWeights[0];
@@ -52,11 +56,11 @@ void main() {
 
 	vec4 worldPosition = transformationMatrix * BToP;
 	vec4 positionRelativeToCam = viewMatrix * worldPosition;
+	clipSpace = projectionMatrix * positionRelativeToCam;
 	if (useTAA) {
-		vec4 preJitter = projectionMatrix * positionRelativeToCam;
-		gl_Position = jitterMatrix * preJitter;
+		gl_Position = jitterMatrix * clipSpace;
 	} else {
-		gl_Position = projectionMatrix * positionRelativeToCam;
+		gl_Position = clipSpace;
 	}
 	pass_textureCoords = textureCoords;
 
@@ -74,4 +78,15 @@ void main() {
 	TBN = mat3(T, B, N);
 
 	pass_position = worldPosition.xyz;
+
+	boneTransform = boneMatPrev[int(boneIndices[0])] * boneWeights[0];
+	boneTransform += boneMatPrev[int(boneIndices[1])] * boneWeights[1];
+	boneTransform += boneMatPrev[int(boneIndices[2])] * boneWeights[2];
+	boneTransform += boneMatPrev[int(boneIndices[3])] * boneWeights[3];
+
+	BToP = boneTransform * vec4(position, 1.0);
+
+	worldPosition = transformationMatrixPrev * BToP;
+	positionRelativeToCam = viewMatrix * worldPosition;
+	clipSpacePrev = projectionMatrix * positionRelativeToCam;
 }

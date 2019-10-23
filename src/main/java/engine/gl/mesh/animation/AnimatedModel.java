@@ -38,10 +38,11 @@ import engine.lua.type.object.insts.Model;
 import engine.lua.type.object.insts.Prefab;
 
 public class AnimatedModel {
-	protected static final int MAX_BONES = 128;
+	protected static final int MAX_BONES = 64;
 	protected static final int VALUES_PER_MATRIX = 16;
 
 	private final FloatBuffer boneBuffer = MemoryUtil.memAllocFloat(MAX_BONES * VALUES_PER_MATRIX);
+	private final FloatBuffer lastBoneBuffer = MemoryUtil.memAllocFloat(MAX_BONES * VALUES_PER_MATRIX);
 	private FloatBuffer matrixBuffer = MemoryUtil.memAllocFloat(VALUES_PER_MATRIX);
 	private HashMap<String, Integer> boneIndices;
 	private HashMap<Integer, String> indexToBoneMap;
@@ -235,6 +236,8 @@ public class AnimatedModel {
 		if ( boneIndices.size() == 0 )
 			return;
 
+		MemoryUtil.memCopy(boneBuffer, lastBoneBuffer);
+
 		// Store bones to buffer
 		boneBuffer.rewind();
 		for (int i = 0; i < boneIndices.size(); i++) {
@@ -321,6 +324,10 @@ public class AnimatedModel {
 
 	public FloatBuffer getBoneBuffer() {
 		return boneBuffer;
+	}
+
+	public FloatBuffer getPreviousBoneBuffer() {
+		return lastBoneBuffer;
 	}
 
 	public List<AnimatedModelSubMesh> getMeshes() {

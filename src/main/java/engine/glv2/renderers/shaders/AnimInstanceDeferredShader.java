@@ -36,6 +36,7 @@ import engine.lua.type.object.insts.Camera;
 public class AnimInstanceDeferredShader extends ShaderProgram {
 
 	private UniformMatrix4 transformationMatrix = new UniformMatrix4("transformationMatrix");
+	private UniformMatrix4 transformationMatrixPrev = new UniformMatrix4("transformationMatrixPrev");
 	private UniformMatrix4 projectionMatrix = new UniformMatrix4("projectionMatrix");
 	private UniformMatrix4 viewMatrix = new UniformMatrix4("viewMatrix");
 	private UniformMatrix4 jitterMatrix = new UniformMatrix4("jitterMatrix");
@@ -43,6 +44,7 @@ public class AnimInstanceDeferredShader extends ShaderProgram {
 	private UniformBoolean useTAA = new UniformBoolean("useTAA");
 
 	private UniformMatrix4 boneMat = new UniformMatrix4("boneMat");
+	private UniformMatrix4 boneMatPrev = new UniformMatrix4("boneMatPrev");
 
 	private Matrix4f jitter = new Matrix4f();
 
@@ -61,13 +63,17 @@ public class AnimInstanceDeferredShader extends ShaderProgram {
 		super("assets/shaders/renderers/AnimInstanceDeferred.vs", "assets/shaders/renderers/InstanceDeferred.fs",
 				new Attribute(0, "position"), new Attribute(1, "normals"), new Attribute(2, "textureCoords"),
 				new Attribute(3, "inColor"), new Attribute(4, "boneIndices"), new Attribute(5, "boneWeights"));
-		super.storeUniforms(transformationMatrix, material, projectionMatrix, viewMatrix, jitterMatrix, useTAA,
-				boneMat);
+		super.storeUniforms(transformationMatrix, material, projectionMatrix, viewMatrix, jitterMatrix, useTAA, boneMat,
+				transformationMatrixPrev, boneMatPrev);
 		super.validate();
 	}
 
 	public void loadTransformationMatrix(Matrix4f matrix) {
 		transformationMatrix.loadMatrix(matrix);
+	}
+
+	public void loadTransformationMatrixPrev(Matrix4f matrix) {
+		transformationMatrixPrev.loadMatrix(matrix);
 	}
 
 	public void loadMaterial(MaterialGL mat) {
@@ -76,6 +82,10 @@ public class AnimInstanceDeferredShader extends ShaderProgram {
 
 	public void loadBoneMat(FloatBuffer mat) {
 		boneMat.loadMatrix(mat);
+	}
+
+	public void loadBoneMatPrev(FloatBuffer mat) {
+		boneMatPrev.loadMatrix(mat);
 	}
 
 	public void loadCamera(Camera camera, Matrix4f projection, Vector2f resolution, boolean taa) {
@@ -94,7 +104,7 @@ public class AnimInstanceDeferredShader extends ShaderProgram {
 			jitter.translation(subsample.x, subsample.y, 0);
 			jitterMatrix.loadMatrix(jitter);
 			frameCont++;
-			frameCont %= 8;
+			frameCont %= 4;
 		}
 	}
 }

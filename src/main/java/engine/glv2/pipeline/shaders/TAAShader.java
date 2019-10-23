@@ -33,7 +33,8 @@ public class TAAShader extends BasePipelineShader {
 	private UniformSampler image = new UniformSampler("image");
 	private UniformSampler previous = new UniformSampler("previous");
 
-	private UniformSampler depth = new UniformSampler("depth");
+	private UniformSampler gMotion = new UniformSampler("gMotion");
+	private UniformSampler gDepth = new UniformSampler("gDepth");
 
 	private UniformVec3 cameraPosition = new UniformVec3("cameraPosition");
 	private UniformVec3 previousCameraPosition = new UniformVec3("previousCameraPosition");
@@ -46,8 +47,8 @@ public class TAAShader extends BasePipelineShader {
 
 	public TAAShader(String name) {
 		super("deferred/" + name);
-		this.storeUniforms(image, previous, depth, cameraPosition, previousCameraPosition, projectionMatrix,
-				inverseProjectionMatrix, inverseViewMatrix, previousViewMatrix);
+		this.storeUniforms(image, previous, gDepth, cameraPosition, previousCameraPosition, projectionMatrix,
+				inverseProjectionMatrix, inverseViewMatrix, previousViewMatrix, gMotion);
 		this.validate();
 		this.loadInitialData();
 	}
@@ -57,7 +58,8 @@ public class TAAShader extends BasePipelineShader {
 		super.start();
 		image.loadTexUnit(0);
 		previous.loadTexUnit(1);
-		depth.loadTexUnit(2);
+		gDepth.loadTexUnit(2);
+		gMotion.loadTexUnit(3);
 		super.stop();
 	}
 

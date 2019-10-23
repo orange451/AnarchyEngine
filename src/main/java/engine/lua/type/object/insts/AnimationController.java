@@ -27,7 +27,6 @@ public class AnimationController extends Instance {
 	
 	private LuaConnection linkedConnection = null;
 	private HashMap<String, Matrix4> boneAbsolutePositions;
-	private HashMap<String, Matrix4f> boneAbsolutePositionsPrevious;
 	private AnimatedModel animatedModel;
 	
 	public AnimationController() {
@@ -81,13 +80,10 @@ public class AnimationController extends Instance {
 		playingAnimations.clear();
 		System.out.println("Animations cleared");
 		
-		if ( boneAbsolutePositions != null ) {
+		if ( boneAbsolutePositions != null )
 			boneAbsolutePositions.clear();
-			boneAbsolutePositionsPrevious.clear();
-		} else {
-			boneAbsolutePositions = new HashMap<>();
-			boneAbsolutePositionsPrevious = new HashMap<>();
-		}
+		else
+			boneAbsolutePositions = new HashMap<>(); 
 		
 		animatedModel = new AnimatedModel(this);
 	}
@@ -222,28 +218,14 @@ public class AnimationController extends Instance {
 				if ( bone != null && bone instanceof Bone ) {
 					Matrix4f keyframeMatrix = ((AnimationKeyframe)keyframeBone).getMatrixInternal();
 					Matrix4f inverseRoot = ((Matrix4)bones.get(Bones.C_ROOTINVERSE)).getInternal();
+					
 					globalTransformation.mul(keyframeMatrix);
 					
-					String boneName = bone.getName();
-					
-					
-					// Update the previous bone transformation
-					Matrix4 curPosition = boneAbsolutePositions.get(boneName);
-					Matrix4f prevPosition = boneAbsolutePositionsPrevious.get(boneName);
-					if ( prevPosition == null ) {
-						prevPosition = new Matrix4f();
-						boneAbsolutePositionsPrevious.put(boneName, prevPosition);
-					}
-					if ( curPosition != null )
-						prevPosition.set(curPosition.getInternal());
-					
-					// Compute NEW bone transformation
 					Matrix4f finalTransform = new Matrix4f();
 					finalTransform.mul(inverseRoot);
 					finalTransform.mul(globalTransformation);
 					
-					// Apply
-					boneAbsolutePositions.put(boneName, new Matrix4(finalTransform));
+					boneAbsolutePositions.put(bone.getName(), new Matrix4(finalTransform));
 				}
 			}
 		}
@@ -260,10 +242,6 @@ public class AnimationController extends Instance {
 		return boneAbsolutePositions;
 	}
 
-	public HashMap<String, Matrix4f> getPreviousBoneAbsolutePositionsJOML() {
-		return boneAbsolutePositionsPrevious;
-	}
-	
 	public AnimatedModel getAnimatedModel() {
 		return animatedModel;
 	}

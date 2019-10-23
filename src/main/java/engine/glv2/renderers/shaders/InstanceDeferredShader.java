@@ -34,6 +34,7 @@ import engine.lua.type.object.insts.Camera;
 public class InstanceDeferredShader extends ShaderProgram {
 
 	private UniformMatrix4 transformationMatrix = new UniformMatrix4("transformationMatrix");
+	private UniformMatrix4 transformationMatrixPrev = new UniformMatrix4("transformationMatrixPrev");
 	private UniformMatrix4 projectionMatrix = new UniformMatrix4("projectionMatrix");
 	private UniformMatrix4 viewMatrix = new UniformMatrix4("viewMatrix");
 	private UniformMatrix4 jitterMatrix = new UniformMatrix4("jitterMatrix");
@@ -57,12 +58,17 @@ public class InstanceDeferredShader extends ShaderProgram {
 		super("assets/shaders/renderers/InstanceDeferred.vs", "assets/shaders/renderers/InstanceDeferred.fs",
 				new Attribute(0, "position"), new Attribute(1, "normals"), new Attribute(2, "textureCoords"),
 				new Attribute(3, "inColor"));
-		super.storeUniforms(transformationMatrix, material, projectionMatrix, viewMatrix, jitterMatrix, useTAA);
+		super.storeUniforms(transformationMatrix, material, projectionMatrix, viewMatrix, jitterMatrix, useTAA,
+				transformationMatrixPrev);
 		super.validate();
 	}
 
 	public void loadTransformationMatrix(Matrix4f matrix) {
 		transformationMatrix.loadMatrix(matrix);
+	}
+
+	public void loadTransformationMatrixPrev(Matrix4f matrix) {
+		transformationMatrixPrev.loadMatrix(matrix);
 	}
 
 	public void loadMaterial(MaterialGL mat) {
@@ -85,7 +91,7 @@ public class InstanceDeferredShader extends ShaderProgram {
 			jitter.translation(subsample.x, subsample.y, 0);
 			jitterMatrix.loadMatrix(jitter);
 			frameCont++;
-			frameCont %= 8;
+			frameCont %= 4;
 		}
 	}
 }

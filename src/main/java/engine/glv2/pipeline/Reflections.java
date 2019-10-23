@@ -22,7 +22,6 @@ package engine.glv2.pipeline;
 
 import static org.lwjgl.opengl.GL11C.GL_TEXTURE_2D;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE0;
-import static org.lwjgl.opengl.GL13C.GL_TEXTURE1;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE2;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE3;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE4;
@@ -58,7 +57,6 @@ public class Reflections extends DeferredPass<ReflectionsShader> {
 	@Override
 	protected void setupTextures(RendererData rnd, DeferredPipeline dp, Texture[] auxTex) {
 		super.activateTexture(GL_TEXTURE0, GL_TEXTURE_2D, dp.getDiffuseTex().getTexture());
-		//super.activateTexture(GL_TEXTURE1, GL_TEXTURE_2D, dp.getPositionTex().getTexture());
 		super.activateTexture(GL_TEXTURE2, GL_TEXTURE_2D, dp.getNormalTex().getTexture());
 		super.activateTexture(GL_TEXTURE3, GL_TEXTURE_2D, dp.getDepthTex().getTexture());
 		super.activateTexture(GL_TEXTURE4, GL_TEXTURE_2D, dp.getPbrTex().getTexture());

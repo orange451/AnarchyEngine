@@ -45,6 +45,8 @@ public class AnimInstanceRenderer implements IObjectRenderer {
 	// TODO: this should NOT be here
 	private static final LuaValue C_ANIMATIONCONTROLLER = LuaValue.valueOf("AnimationController");
 
+	private Matrix4f temp = new Matrix4f();
+
 	public AnimInstanceRenderer() {
 		shader = new AnimInstanceDeferredShader();
 		shadowRenderer = new AnimInstanceShadowRenderer();
@@ -115,6 +117,11 @@ public class AnimInstanceRenderer implements IObjectRenderer {
 		mat.scale(go.getPrefab().getScale());
 		shader.loadTransformationMatrix(mat);
 		shader.loadBoneMat(model.getBoneBuffer());
+
+		Matrix4f prevMat = temp.set(go.getPreviousWorldMatrixJOML());
+		prevMat.scale(go.getPrefab().getScale());
+		shader.loadTransformationMatrixPrev(prevMat);
+		shader.loadBoneMatPrev(model.getPreviousBoneBuffer());
 		for (int i = 0; i < model.getMeshes().size(); i++) {
 			AnimatedModelSubMesh mesh = model.getMeshes().get(i);
 

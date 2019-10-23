@@ -37,7 +37,6 @@ public class ReflectionsShader extends BasePipelineShader {
 	private UniformVec3 cameraPosition = new UniformVec3("cameraPosition");
 
 	private UniformSampler gDiffuse = new UniformSampler("gDiffuse");
-	private UniformSampler gPosition = new UniformSampler("gPosition");
 	private UniformSampler gNormal = new UniformSampler("gNormal");
 	private UniformSampler gDepth = new UniformSampler("gDepth");
 	private UniformSampler gPBR = new UniformSampler("gPBR");
@@ -51,8 +50,8 @@ public class ReflectionsShader extends BasePipelineShader {
 
 	public ReflectionsShader(String name) {
 		super("deferred/" + name);
-		super.storeUniforms(projectionMatrix, viewMatrix, cameraPosition, gDiffuse, gPosition, gNormal, gDepth, gPBR,
-				gMask, environmentCube, brdfLUT, inverseProjectionMatrix, inverseViewMatrix, pass);
+		super.storeUniforms(projectionMatrix, viewMatrix, cameraPosition, gDiffuse, gNormal, gDepth, gPBR, gMask,
+				environmentCube, brdfLUT, inverseProjectionMatrix, inverseViewMatrix, pass);
 		super.validate();
 		this.loadInitialData();
 	}
@@ -61,7 +60,6 @@ public class ReflectionsShader extends BasePipelineShader {
 	protected void loadInitialData() {
 		super.start();
 		gDiffuse.loadTexUnit(0);
-		gPosition.loadTexUnit(1);
 		gNormal.loadTexUnit(2);
 		gDepth.loadTexUnit(3);
 		gPBR.loadTexUnit(4);

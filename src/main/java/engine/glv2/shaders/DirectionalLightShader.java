@@ -41,7 +41,6 @@ public class DirectionalLightShader extends ShaderProgram {
 	private UniformVec3 cameraPosition = new UniformVec3("cameraPosition");
 
 	private UniformSampler gDiffuse = new UniformSampler("gDiffuse");
-	private UniformSampler gPosition = new UniformSampler("gPosition");
 	private UniformSampler gNormal = new UniformSampler("gNormal");
 	private UniformSampler gDepth = new UniformSampler("gDepth");
 	private UniformSampler gPBR = new UniformSampler("gPBR");
@@ -57,8 +56,8 @@ public class DirectionalLightShader extends ShaderProgram {
 
 	public DirectionalLightShader() {
 		super("assets/shaders/DirectionalLight.vs", "assets/shaders/DirectionalLight.fs", new Attribute(0, "position"));
-		super.storeUniforms(projectionMatrix, viewMatrix, cameraPosition, gDiffuse, gPosition, gNormal, gDepth, gPBR,
-				gMask, light, inverseProjectionMatrix, inverseViewMatrix, biasMatrix, useShadows);
+		super.storeUniforms(projectionMatrix, viewMatrix, cameraPosition, gDiffuse, gNormal, gDepth, gPBR, gMask, light,
+				inverseProjectionMatrix, inverseViewMatrix, biasMatrix, useShadows);
 		super.validate();
 		this.loadInitialData();
 	}
@@ -67,7 +66,6 @@ public class DirectionalLightShader extends ShaderProgram {
 	protected void loadInitialData() {
 		super.start();
 		gDiffuse.loadTexUnit(0);
-		gPosition.loadTexUnit(1);
 		gNormal.loadTexUnit(2);
 		gDepth.loadTexUnit(3);
 		gPBR.loadTexUnit(4);
@@ -86,7 +84,7 @@ public class DirectionalLightShader extends ShaderProgram {
 	public void loadDirectionalLight(DirectionalLightInternal l) {
 		light.loadLight(l, 6);
 	}
-	
+
 	public void loadUseShadows(boolean shadows) {
 		useShadows.loadBoolean(shadows);
 	}

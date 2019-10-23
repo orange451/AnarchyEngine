@@ -39,7 +39,6 @@ public class LightingShader extends BasePipelineShader {
 	private UniformVec3 uAmbient = new UniformVec3("uAmbient");
 
 	private UniformSampler gDiffuse = new UniformSampler("gDiffuse");
-	private UniformSampler gPosition = new UniformSampler("gPosition");
 	private UniformSampler gNormal = new UniformSampler("gNormal");
 	private UniformSampler gDepth = new UniformSampler("gDepth");
 	private UniformSampler gPBR = new UniformSampler("gPBR");
@@ -58,9 +57,9 @@ public class LightingShader extends BasePipelineShader {
 
 	public LightingShader(String name) {
 		super("deferred/" + name);
-		super.storeUniforms(projectionMatrix, viewMatrix, cameraPosition, uAmbient, gDiffuse, gPosition, gNormal,
-				gDepth, gPBR, gMask, volumetric, irradianceCube, environmentCube, brdfLUT, biasMatrix,
-				inverseProjectionMatrix, inverseViewMatrix, directionalLightData, pointLightData, spotLightData);
+		super.storeUniforms(projectionMatrix, viewMatrix, cameraPosition, uAmbient, gDiffuse, gNormal, gDepth, gPBR,
+				gMask, volumetric, irradianceCube, environmentCube, brdfLUT, biasMatrix, inverseProjectionMatrix,
+				inverseViewMatrix, directionalLightData, pointLightData, spotLightData);
 		super.validate();
 		this.loadInitialData();
 	}
@@ -69,7 +68,6 @@ public class LightingShader extends BasePipelineShader {
 	protected void loadInitialData() {
 		super.start();
 		gDiffuse.loadTexUnit(0);
-		gPosition.loadTexUnit(1);
 		gNormal.loadTexUnit(2);
 		gDepth.loadTexUnit(3);
 		gPBR.loadTexUnit(4);

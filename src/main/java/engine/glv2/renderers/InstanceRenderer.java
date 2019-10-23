@@ -59,6 +59,8 @@ public class InstanceRenderer implements IObjectRenderer {
 	private InstanceShadowRenderer shadowRenderer;
 	private InstanceForwardRenderer forwardRenderer;
 
+	private Matrix4f temp = new Matrix4f();
+
 	public InstanceRenderer() {
 		shader = new InstanceDeferredShader();
 		shadowRenderer = new InstanceShadowRenderer();
@@ -125,6 +127,11 @@ public class InstanceRenderer implements IObjectRenderer {
 		mat.translate(pfr.getAABBOffset());
 		mat.scale(pfr.getParent().getScale());
 		shader.loadTransformationMatrix(mat);
+
+		Matrix4f prevMat = temp.set(go.getPreviousWorldMatrixJOML());
+		prevMat.translate(pfr.getAABBOffset());
+		prevMat.scale(pfr.getParent().getScale());
+		shader.loadTransformationMatrixPrev(prevMat);
 		for (int i = 0; i < pfr.size(); i++) {
 			Model p = pfr.getModel(i);
 			BufferedMesh m = p.getMeshInternal();

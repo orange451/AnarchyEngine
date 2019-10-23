@@ -26,13 +26,15 @@ out vec4 out_Color;
 uniform sampler2D image;
 uniform sampler2D previous;
 
+uniform sampler2D gMotion;
+uniform sampler2D gDepth;
+
 uniform vec3 cameraPosition;
 uniform vec3 previousCameraPosition;
 uniform mat4 projectionMatrix;
 uniform mat4 inverseProjectionMatrix;
 uniform mat4 inverseViewMatrix;
 uniform mat4 previousViewMatrix;
-uniform sampler2D depth;
 
 uniform bool useTAA;
 
@@ -60,7 +62,7 @@ void main() {
 		nmax = max(nmax, neighbourhood[i]);
 	}
 
-	float depthSample = texture(depth, textureCoords).r;
+	float depthSample = texture(gDepth, textureCoords).r;
 #ifdef OneToOneDepth
 	vec4 currentPosition = vec4(textureCoords * 2.0 - 1.0, depthSample * 2.0 - 1.0, 1.0);
 #else
@@ -76,11 +78,17 @@ void main() {
 	previousPosition /= previousPosition.w;
 	vec2 vel = (previousPosition - currentPosition).xy * 0.5;
 
+	vel += texture(gMotion, textureCoords).rg * 0.5;
+
 	vec2 histUv = textureCoords + vel;
 
 	vec3 histSample = clamp(texture(previous, histUv).rgb, nmin, nmax);
 
-	float blend = 0.05;
+	float blend = 0.1;
+
+	// 0.2 3x TAA
+	// 0.1 4x TAA
+	// 0.05 8x TAA
 
 	bvec2 a = greaterThan(histUv, vec2(1.0, 1.0));
 	bvec2 b = lessThan(histUv, vec2(0.0, 0.0));
@@ -90,4 +98,5 @@ void main() {
 	out_Color.rgb = mix(histSample, curSample, vec3(blend));
 
 	//	out_Color.rgb = vec3(vel.x, 0, vel.y);
+	//out_Color.rgb = vec3(texture(gMotion, textureCoords).rg + 0.5, 0.0);
 }
