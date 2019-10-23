@@ -224,7 +224,7 @@ public class Assets extends Service implements TreeViewable {
 	 */
 	private static Prefab importPrefab(String filePath, float scale, int extraFlags, Instance parent) {
 		String specificFile = FileUtils.getFileNameFromPath(filePath);
-		Prefab prefab = new Prefab();
+		Prefab prefab = (Prefab) Instance.instanceLua(Prefab.class.getSimpleName());
 		
 		try {
 			// Get File
