@@ -224,14 +224,14 @@ public abstract class PhysicsBase extends Instance implements GameSubscriber {
 		this.playerOwns = null;
 	}
 	
-	private void setPhysics(LuaValue value) {
+	private void setPhysics(LuaValue gameObject) {
 		if ( this.destroyed )
 			return;
 		
-		if ( value == null || value.isnil() )
+		if ( gameObject == null || gameObject.isnil() )
 			return;
 		
-		if ( !(value instanceof GameObject) )
+		if ( !(gameObject instanceof GameObject) )
 			return;
 		
 		if ( physics != null ) {
@@ -239,12 +239,12 @@ public abstract class PhysicsBase extends Instance implements GameSubscriber {
 		}
 
 		// Linked object must have a prefab
-		LuaValue prefab = value.get(C_PREFAB);
+		LuaValue prefab = gameObject.get(C_PREFAB);
 		if ( prefab.isnil() && FLAG_REQUIRE_PREFAB )
 			return;
 		
 		// Link us to this game object
-		linked = (GameObject) value;
+		linked = (GameObject) gameObject;
 		this.rawset(C_LINKED, linked);
 		
 		// Cannot continue if we're not linked.
@@ -267,13 +267,21 @@ public abstract class PhysicsBase extends Instance implements GameSubscriber {
 		// Check for changes within parented physics object
 		connection = linked.changedEvent().connect((args)->{
 			LuaValue property = args[0];
+			LuaValue value = args[1];
 			
 			// Game object had its own matrix changed. Replicate to physics.
 			if ( property.eq_b(C_WORLDMATRIX) || property.eq_b(C_POSITION) ) {
 				if ( physics == null )
 					return;
 				
-				PhysicsBase.this.set(C_WORLDMATRIX, new Matrix4(((Matrix4)linked.get(C_WORLDMATRIX))));
+				Matrix4 linkedWorldMat = (Matrix4)value;
+				Matrix4 physicsWorldMat = this.getWorldMatrix();
+				
+				if ( linkedWorldMat.equals(physicsWorldMat) )
+					return;
+				
+				//PhysicsBase.this.set(C_WORLDMATRIX, new Matrix4(((Matrix4)linked.get(C_WORLDMATRIX))));
+				PhysicsBase.this.set(C_WORLDMATRIX, (Matrix4)linked.get(C_WORLDMATRIX));
 			}
 			
 			// Game object had its model changed. Replicate to physics object.

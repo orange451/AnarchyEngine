@@ -185,6 +185,21 @@ public class Matrix4 extends LuaValuetype {
 		this.internal.set(matrix);
 		update();
 	}
+	
+	public boolean eq_b(LuaValue value) {
+		return equals(value);
+	}
+	
+	public boolean equals(Object o) {
+		if ( o == this )
+			return true;
+		
+		if ( !(o instanceof Matrix4) )
+			return false;
+		
+		Matrix4f oi = ((Matrix4)o).internal;
+		return oi.equals(internal);
+	}
 
 	protected LuaValue newInstanceFunction() {
 		return new VarArgFunction() {

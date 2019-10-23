@@ -4,6 +4,8 @@ import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.luaj.vm2.LuaValue;
 
+import engine.Game;
+import engine.InternalGameThread;
 import engine.gl.shader.BaseShader;
 import engine.lua.type.NumberClamp;
 import engine.lua.type.data.Matrix4;
@@ -25,15 +27,25 @@ public class GameObject extends Instance implements RenderableInstance,TreeViewa
 	private final static LuaValue C_TRANSPARENCY = LuaValue.valueOf("Transparency");
 	
 	private final static String PHYSICSOBJECT = "PhysicsObject";
+	private final Matrix4f lastWorldMatrix;
 	
 	public GameObject() {
 		super("GameObject");
+
+		this.lastWorldMatrix = new Matrix4f();
 		
 		this.defineField(C_PREFAB.toString(), LuaValue.NIL, false);
 		this.defineField(C_WORLDMATRIX.toString(), new Matrix4(), false);
 		this.defineField(C_POSITION.toString(), new Vector3(), false );
 		this.defineField(C_TRANSPARENCY.toString(), LuaValue.valueOf(0), false);
 		this.getField(C_TRANSPARENCY).setClamp(new NumberClamp(0, 1));
+		
+		// Update the last world matrix BEFORE running physics simulation.
+		InternalGameThread.runLater(()->{
+			Game.runService().heartbeatEvent().connect((args)->{
+				lastWorldMatrix.set(this.getWorldMatrix().getInternal());
+			});
+		});
 	}
 	
 	public void render(BaseShader shader) {
@@ -83,6 +95,17 @@ public class GameObject extends Instance implements RenderableInstance,TreeViewa
 	}
 	
 	/**
+	 * Returns the world matrix from the previous frame in JOML format. NOT LUA FRIENDLY.
+	 * @return
+	 */
+	public Matrix4f getPreviousWorldMatrixJOML() {
+		if ( lastWorldMatrix == null )
+			return new Matrix4f();
+		
+		return lastWorldMatrix;
+	}
+	
+	/**
 	 * If no physics object exists within this game object, it will create one and return it.<br>
 	 * If a physics object already exists, it will return the current one.
 	 * @return
@@ -115,17 +138,27 @@ public class GameObject extends Instance implements RenderableInstance,TreeViewa
 	
 	@Override
 	protected LuaValue onValueSet(LuaValue key, LuaValue value) {
+		// Uset sets the position field
 		if ( key.eq_b(C_POSITION) && value instanceof Vector3 ) {
+			
+			// Get current world matrix
 			Matrix4 mat = ((Matrix4)this.rawget(C_WORLDMATRIX));
+			
+			// Update world matrix with new position
 			mat.setPosition((Vector3) value);
 			
 			// This is just to trigger Physics object (if it exists)
 			this.set(C_WORLDMATRIX, mat);
+			return value;
 		}
+		
+		// User sets the prefab field
 		if ( key.eq_b(C_PREFAB) ) {
 			if ( !value.isnil() && !(value instanceof Prefab) )
-				return null;
+				return null; // Disallow
 		}
+		
+		// Allow
 		return value;
 	}
 	
@@ -203,5 +236,10 @@ public class GameObject extends Instance implements RenderableInstance,TreeViewa
 	 */
 	public void setTransparency(float f) {
 		this.set(C_TRANSPARENCY, LuaValue.valueOf(f));
+	}
+
+	protected void updateLastMatrix() {
+		// TODO Auto-generated method stub
+		
 	}
 }

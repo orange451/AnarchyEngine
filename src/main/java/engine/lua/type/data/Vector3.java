@@ -180,6 +180,11 @@ public class Vector3 extends LuaValuetype {
 	}
 	
 	@Override
+	public boolean eq_b(LuaValue value) {
+		return this.equals(value);
+	}
+	
+	@Override
 	public boolean equals(Object vector) {
 		if ( vector == this )
 			return true;
