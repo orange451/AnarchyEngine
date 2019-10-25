@@ -69,16 +69,11 @@ public abstract class Runner extends RenderableApplication {
 		});
 		
 		// Tell the game to run
-		InternalGameThread.runLater(()->{
-			
-			// On first render, throw out an update.
-			InternalRenderThread.runLater(()->{
-				loadScene(args);
-				Game.setRunning(true);
-				Game.load();
-				
-				Game.getGame().gameUpdate(true);
-			});
+		InternalRenderThread.runLater(()->{
+			loadScene(args);
+			Game.load();
+			Game.getGame().gameUpdate(true);
+			Game.setRunning(true);
 		});
 	}
 

@@ -260,7 +260,7 @@ public class Game implements Tickable {
 	public static Instance getInstanceFromSID(long sid) {
 		if ( sid == -1 ) 
 			return null;
-		return game().createdInstances.get(sid);
+		return game().serverSidedInstances.get(sid);
 	}
 
 	public static void unload() {
@@ -356,7 +356,7 @@ public class Game implements Tickable {
 		List<Service> children = Game.getServices();
 		for (int i = 0; i < children.size(); i++) {
 			Instance c = children.get(i);
-			game().createdInstances.put( c.getSID(), c);
+			game().serverSidedInstances.put( c.getSID(), c);
 		}
 		
 		// Fire load event
@@ -504,14 +504,7 @@ public class Game implements Tickable {
 				sc.forceSetParent(p);
 				
 				// Simulate a client connection
-				if ( internalTesting ) {
-					ClientConnectFinishTCP finishCon = new ClientConnectFinishTCP();
-					finishCon.SID = p.getSID();
-					finishCon.clientProcess(null);
-				}
-				
-				// Set him as local
-				new engine.lua.network.internal.protocol.ClientConnectFinishTCP().clientProcess(null);
+				p.start();
 			}
 			
 			Game.runLater(()->{
@@ -541,7 +534,7 @@ public class Game implements Tickable {
 		if ( !Game.isServer() && Game.running )
 			return -1;
 		long t = instanceCounter.incrementAndGet();
-		while (game().createdInstances.containsKey(t) ) {
+		while (game().serverSidedInstances.containsKey(t) ) {
 			t = instanceCounter.incrementAndGet();
 		}
 		return t;

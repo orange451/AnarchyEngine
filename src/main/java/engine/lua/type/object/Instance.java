@@ -23,7 +23,6 @@ public abstract class Instance extends DataModel {
 	protected static final LuaValue C_NAME = LuaValue.valueOf("Name");
 	protected static final LuaValue C_ARCHIVABLE = LuaValue.valueOf("Archivable");
 	protected static final LuaValue C_SID = LuaValue.valueOf("SID");
-	protected static final LuaValue C_PLAYERSCRIPTS = LuaValue.valueOf("PlayerScripts");
 	
 	static {
 		LuaTable table = new LuaTable();
@@ -595,10 +594,6 @@ public abstract class Instance extends DataModel {
 		synchronized(propertySubscribers) {
 			propertySubscribers.add(propertySubscriber);
 		}
-	}
-
-	public Instance playerScripts() {
-		return findFirstChild(C_PLAYERSCRIPTS);
 	}
 
 	/**

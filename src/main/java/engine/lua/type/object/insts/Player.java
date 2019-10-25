@@ -1,5 +1,7 @@
 package engine.lua.type.object.insts;
 
+import java.util.List;
+
 import org.luaj.vm2.LuaValue;
 
 import engine.Game;
@@ -13,6 +15,7 @@ public class Player extends Instance implements TreeViewable {
 	private static final LuaValue C_CHARACTER = LuaValue.valueOf("Character");
 	private static final LuaValue C_CONNECTION = LuaValue.valueOf("Connection");
 	private static final LuaValue C_CLIENTOWNSPHYSICS = LuaValue.valueOf("ClientOwnsPhysics");
+	private static final LuaValue C_PLAYERSCRIPTS = LuaValue.valueOf("PlayerScripts");
 	
 	public Player() {
 		super("Player");
@@ -62,5 +65,29 @@ public class Player extends Instance implements TreeViewable {
 	public boolean doesClientOwnPhysics() {
 		LuaValue p = this.get(C_CLIENTOWNSPHYSICS);
 		return p.toboolean();
+	}
+
+
+	public Instance playerScripts() {
+		return findFirstChild(C_PLAYERSCRIPTS);
+	}
+
+	public void start() {
+		// Setup local player stuff
+		Game.players().rawset("LocalPlayer", this);
+		engine.lua.type.object.insts.Connection localConnection = Game.connections().getLocalConnection();
+		if ( localConnection != null ) {
+			localConnection.rawset("Player", this);
+			this.rawset("Connection", localConnection);
+		}
+		
+		// Copy starter player scripts in to player
+		Instance starterScripts = Game.starterPlayer().starterPlayerScripts();
+		List<Instance> cc = starterScripts.getChildren();
+		for (int j = 0; j < cc.size(); j++) {
+			Instance obj = cc.get(j);
+			Instance clo = obj.clone();
+			clo.forceSetParent(this.playerScripts());
+		}
 	}
 }

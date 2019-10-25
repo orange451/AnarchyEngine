@@ -1,7 +1,5 @@
 package engine.lua.network.internal.protocol;
 
-import java.util.List;
-
 import com.esotericsoftware.kryonet.Connection;
 
 import engine.Game;
@@ -29,21 +27,6 @@ public class ClientConnectFinishTCP implements ClientProcessable {
 		if ( player == null || !(player instanceof Player) )
 			return;
 		
-		// Setup local player stuff
-		Game.players().rawset("LocalPlayer", player);
-		engine.lua.type.object.insts.Connection localConnection = Game.connections().getLocalConnection();
-		if ( localConnection != null ) {
-			localConnection.rawset("Player", player);
-			player.rawset("Connection", localConnection);
-		}
-		
-		// Copy starter player scripts in to player
-		Instance starterScripts = Game.starterPlayer().starterPlayerScripts();
-		List<Instance> cc = starterScripts.getChildren();
-		for (int j = 0; j < cc.size(); j++) {
-			Instance obj = cc.get(j);
-			Instance clo = obj.clone();
-			clo.forceSetParent(player.playerScripts());
-		}
+		((Player)player).start();
 	}
 }
