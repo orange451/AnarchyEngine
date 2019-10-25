@@ -78,6 +78,7 @@ public class InstanceRenderer implements IObjectRenderer {
 	public void render(IRenderingData rd, RendererData rnd, Vector2f resolution) {
 		shader.start();
 		shader.loadCamera(rd.camera, rd.projectionMatrix, resolution, rnd.rs.taaEnabled);
+		shader.loadCameraPrev(rnd.previousViewMatrix, rnd.previousProjectionMatrix);
 		for (Instance instance : instances) {
 			renderInstance(instance);
 		}

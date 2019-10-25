@@ -20,13 +20,7 @@
 
 package engine.glv2.pipeline.shaders;
 
-import org.joml.Matrix4f;
-import org.joml.Vector3f;
-
-import engine.glv2.shaders.data.UniformMatrix4;
 import engine.glv2.shaders.data.UniformSampler;
-import engine.glv2.shaders.data.UniformVec3;
-import engine.lua.type.object.insts.Camera;
 
 public class TAAShader extends BasePipelineShader {
 
@@ -34,21 +28,10 @@ public class TAAShader extends BasePipelineShader {
 	private UniformSampler previous = new UniformSampler("previous");
 
 	private UniformSampler gMotion = new UniformSampler("gMotion");
-	private UniformSampler gDepth = new UniformSampler("gDepth");
-
-	private UniformVec3 cameraPosition = new UniformVec3("cameraPosition");
-	private UniformVec3 previousCameraPosition = new UniformVec3("previousCameraPosition");
-	private UniformMatrix4 projectionMatrix = new UniformMatrix4("projectionMatrix");
-	private UniformMatrix4 inverseProjectionMatrix = new UniformMatrix4("inverseProjectionMatrix");
-	private UniformMatrix4 inverseViewMatrix = new UniformMatrix4("inverseViewMatrix");
-	private UniformMatrix4 previousViewMatrix = new UniformMatrix4("previousViewMatrix");
-
-	private Matrix4f projInv = new Matrix4f(), viewInv = new Matrix4f();
 
 	public TAAShader(String name) {
 		super("deferred/" + name);
-		this.storeUniforms(image, previous, gDepth, cameraPosition, previousCameraPosition, projectionMatrix,
-				inverseProjectionMatrix, inverseViewMatrix, previousViewMatrix, gMotion);
+		this.storeUniforms(image, previous, gMotion);
 		this.validate();
 		this.loadInitialData();
 	}
@@ -58,18 +41,7 @@ public class TAAShader extends BasePipelineShader {
 		super.start();
 		image.loadTexUnit(0);
 		previous.loadTexUnit(1);
-		gDepth.loadTexUnit(2);
-		gMotion.loadTexUnit(3);
+		gMotion.loadTexUnit(2);
 		super.stop();
-	}
-
-	public void loadMotionBlurData(Camera camera, Matrix4f projectionMatrix, Matrix4f previousViewMatrix,
-			Vector3f previousCameraPosition) {
-		this.cameraPosition.loadVec3(camera.getPosition().getInternal());
-		this.projectionMatrix.loadMatrix(projectionMatrix);
-		this.inverseProjectionMatrix.loadMatrix(projectionMatrix.invert(projInv));
-		this.inverseViewMatrix.loadMatrix(camera.getViewMatrix().getInternal().invert(viewInv));
-		this.previousViewMatrix.loadMatrix(previousViewMatrix);
-		this.previousCameraPosition.loadVec3(previousCameraPosition);
 	}
 }

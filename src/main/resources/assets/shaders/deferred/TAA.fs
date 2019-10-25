@@ -27,14 +27,6 @@ uniform sampler2D image;
 uniform sampler2D previous;
 
 uniform sampler2D gMotion;
-uniform sampler2D gDepth;
-
-uniform vec3 cameraPosition;
-uniform vec3 previousCameraPosition;
-uniform mat4 projectionMatrix;
-uniform mat4 inverseProjectionMatrix;
-uniform mat4 inverseViewMatrix;
-uniform mat4 previousViewMatrix;
 
 uniform bool useTAA;
 
@@ -62,23 +54,7 @@ void main() {
 		nmax = max(nmax, neighbourhood[i]);
 	}
 
-	float depthSample = texture(gDepth, textureCoords).r;
-#ifdef OneToOneDepth
-	vec4 currentPosition = vec4(textureCoords * 2.0 - 1.0, depthSample * 2.0 - 1.0, 1.0);
-#else
-	vec4 currentPosition = vec4(textureCoords * 2.0 - 1.0, depthSample, 1.0);
-#endif
-	vec4 fragposition = inverseProjectionMatrix * currentPosition;
-	fragposition = inverseViewMatrix * fragposition;
-	fragposition /= fragposition.w;
-
-	vec4 previousPosition = fragposition;
-	previousPosition = previousViewMatrix * previousPosition;
-	previousPosition = projectionMatrix * previousPosition;
-	previousPosition /= previousPosition.w;
-	vec2 vel = (previousPosition - currentPosition).xy * 0.5;
-
-	vel += texture(gMotion, textureCoords).rg * 0.5;
+	vec2 vel = texture(gMotion, textureCoords).rg * 0.5;
 
 	vec2 histUv = textureCoords + vel;
 

@@ -34,12 +34,15 @@ import engine.lua.type.object.insts.Camera;
 public class InstanceDeferredShader extends ShaderProgram {
 
 	private UniformMatrix4 transformationMatrix = new UniformMatrix4("transformationMatrix");
-	private UniformMatrix4 transformationMatrixPrev = new UniformMatrix4("transformationMatrixPrev");
 	private UniformMatrix4 projectionMatrix = new UniformMatrix4("projectionMatrix");
 	private UniformMatrix4 viewMatrix = new UniformMatrix4("viewMatrix");
 	private UniformMatrix4 jitterMatrix = new UniformMatrix4("jitterMatrix");
 	private UniformMaterial material = new UniformMaterial("material");
 	private UniformBoolean useTAA = new UniformBoolean("useTAA");
+
+	private UniformMatrix4 transformationMatrixPrev = new UniformMatrix4("transformationMatrixPrev");
+	private UniformMatrix4 viewMatrixPrev = new UniformMatrix4("viewMatrixPrev");
+	private UniformMatrix4 projectionMatrixPrev = new UniformMatrix4("projectionMatrixPrev");
 
 	private Matrix4f jitter = new Matrix4f();
 
@@ -59,7 +62,7 @@ public class InstanceDeferredShader extends ShaderProgram {
 				new Attribute(0, "position"), new Attribute(1, "normals"), new Attribute(2, "textureCoords"),
 				new Attribute(3, "inColor"));
 		super.storeUniforms(transformationMatrix, material, projectionMatrix, viewMatrix, jitterMatrix, useTAA,
-				transformationMatrixPrev);
+				transformationMatrixPrev, viewMatrixPrev, projectionMatrixPrev);
 		super.validate();
 	}
 
@@ -73,6 +76,11 @@ public class InstanceDeferredShader extends ShaderProgram {
 
 	public void loadMaterial(MaterialGL mat) {
 		material.loadMaterial(mat);
+	}
+
+	public void loadCameraPrev(Matrix4f viewMatrixPrev, Matrix4f projectionMatrixPrev) {
+		this.viewMatrixPrev.loadMatrix(viewMatrixPrev);
+		this.projectionMatrixPrev.loadMatrix(projectionMatrixPrev);
 	}
 
 	public void loadCamera(Camera camera, Matrix4f projection, Vector2f resolution, boolean taa) {

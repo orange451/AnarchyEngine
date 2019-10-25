@@ -33,6 +33,8 @@ uniform mat4 transformationMatrix;
 uniform mat4 transformationMatrixPrev;
 uniform mat4 projectionMatrix;
 uniform mat4 viewMatrix;
+uniform mat4 projectionMatrixPrev;
+uniform mat4 viewMatrixPrev;
 uniform mat4 jitterMatrix;
 uniform int frame;
 
@@ -66,6 +68,6 @@ void main() {
 	pass_position = worldPosition.xyz;
 
 	worldPosition = transformationMatrixPrev * vec4(position, 1.0);
-	positionRelativeToCam = viewMatrix * worldPosition;
-	clipSpacePrev = projectionMatrix * positionRelativeToCam;
+	positionRelativeToCam = viewMatrixPrev * worldPosition;
+	clipSpacePrev = projectionMatrixPrev * positionRelativeToCam;
 }

@@ -62,7 +62,7 @@ void main() {
 	vec2 textureCoords = gl_FragCoord.xy * texel;
 
 	vec4 mask = texture(gMask, textureCoords);
-	vec3 result = vec3(1.0);
+	vec3 result = vec3(0.0);
 	if (MASK_COMPARE(mask.a, PBR_OBJECT)) {
 		vec4 image = texture(gDiffuse, textureCoords);
 		vec2 pbr = texture(gPBR, textureCoords).rg;

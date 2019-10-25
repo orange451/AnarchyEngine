@@ -20,6 +20,8 @@
 
 layout(location = 0) in vec3 position;
 
+out vec3 pass_position;
+
 uniform mat4 transformationMatrix;
 uniform mat4 projectionMatrix;
 uniform mat4 viewMatrix;
@@ -28,4 +30,5 @@ void main() {
 	vec4 worldPosition = transformationMatrix * vec4(position, 1.0);
 	vec4 positionRelativeToCam = viewMatrix * worldPosition;
 	gl_Position = projectionMatrix * positionRelativeToCam;
+	pass_position = worldPosition.xyz;
 }

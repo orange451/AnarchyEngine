@@ -57,14 +57,12 @@ public class MotionBlurShader extends BasePipelineShader {
 		super.stop();
 	}
 
-	public void loadMotionBlurData(Camera camera, Matrix4f projectionMatrix, Matrix4f previousViewMatrix,
-			Vector3f previousCameraPosition) {
+	public void loadMotionBlurData(Camera camera, Matrix4f projectionMatrix, Matrix4f previousViewMatrix) {
 		this.cameraPosition.loadVec3(camera.getPosition().getInternal());
 		this.projectionMatrix.loadMatrix(projectionMatrix);
 		this.inverseProjectionMatrix.loadMatrix(projectionMatrix.invert(projInv));
 		this.inverseViewMatrix.loadMatrix(camera.getViewMatrix().getInternal().invert(viewInv));
 		this.previousViewMatrix.loadMatrix(previousViewMatrix);
-		this.previousCameraPosition.loadVec3(previousCameraPosition);
 	}
 
 }

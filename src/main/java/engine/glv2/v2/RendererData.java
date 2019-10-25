@@ -37,7 +37,7 @@ public class RendererData {
 	public float saturation;
 	public Vector3f ambient = new Vector3f();
 	public Matrix4f previousViewMatrix = new Matrix4f();
-	public Vector3f previousCameraPosition = new Vector3f();
+	public Matrix4f previousProjectionMatrix = new Matrix4f();
 	public PointLightHandler plh;
 	public DirectionalLightHandler dlh;
 	public SpotLightHandler slh;

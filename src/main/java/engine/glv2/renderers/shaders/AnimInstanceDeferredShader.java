@@ -36,12 +36,15 @@ import engine.lua.type.object.insts.Camera;
 public class AnimInstanceDeferredShader extends ShaderProgram {
 
 	private UniformMatrix4 transformationMatrix = new UniformMatrix4("transformationMatrix");
-	private UniformMatrix4 transformationMatrixPrev = new UniformMatrix4("transformationMatrixPrev");
 	private UniformMatrix4 projectionMatrix = new UniformMatrix4("projectionMatrix");
 	private UniformMatrix4 viewMatrix = new UniformMatrix4("viewMatrix");
 	private UniformMatrix4 jitterMatrix = new UniformMatrix4("jitterMatrix");
 	private UniformMaterial material = new UniformMaterial("material");
 	private UniformBoolean useTAA = new UniformBoolean("useTAA");
+
+	private UniformMatrix4 transformationMatrixPrev = new UniformMatrix4("transformationMatrixPrev");
+	private UniformMatrix4 viewMatrixPrev = new UniformMatrix4("viewMatrixPrev");
+	private UniformMatrix4 projectionMatrixPrev = new UniformMatrix4("projectionMatrixPrev");
 
 	private UniformMatrix4 boneMat = new UniformMatrix4("boneMat");
 	private UniformMatrix4 boneMatPrev = new UniformMatrix4("boneMatPrev");
@@ -64,7 +67,7 @@ public class AnimInstanceDeferredShader extends ShaderProgram {
 				new Attribute(0, "position"), new Attribute(1, "normals"), new Attribute(2, "textureCoords"),
 				new Attribute(3, "inColor"), new Attribute(4, "boneIndices"), new Attribute(5, "boneWeights"));
 		super.storeUniforms(transformationMatrix, material, projectionMatrix, viewMatrix, jitterMatrix, useTAA, boneMat,
-				transformationMatrixPrev, boneMatPrev);
+				transformationMatrixPrev, viewMatrixPrev, projectionMatrixPrev, boneMatPrev);
 		super.validate();
 	}
 
@@ -86,6 +89,11 @@ public class AnimInstanceDeferredShader extends ShaderProgram {
 
 	public void loadBoneMatPrev(FloatBuffer mat) {
 		boneMatPrev.loadMatrix(mat);
+	}
+
+	public void loadCameraPrev(Matrix4f viewMatrixPrev, Matrix4f projectionMatrixPrev) {
+		this.viewMatrixPrev.loadMatrix(viewMatrixPrev);
+		this.projectionMatrixPrev.loadMatrix(projectionMatrixPrev);
 	}
 
 	public void loadCamera(Camera camera, Matrix4f projection, Vector2f resolution, boolean taa) {

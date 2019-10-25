@@ -44,7 +44,7 @@ public class MotionBlur extends PostProcesPass<MotionBlurShader> {
 
 	@Override
 	protected void setupShaderData(RendererData rnd, IRenderingData rd, MotionBlurShader shader) {
-		shader.loadMotionBlurData(rd.camera, rd.projectionMatrix, rnd.previousViewMatrix, rnd.previousCameraPosition);
+		shader.loadMotionBlurData(rd.camera, rd.projectionMatrix, rnd.previousViewMatrix);
 	}
 
 	@Override
