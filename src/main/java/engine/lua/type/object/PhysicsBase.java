@@ -6,6 +6,8 @@ import java.util.List;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.luaj.vm2.LuaValue;
+import org.luaj.vm2.lib.ThreeArgFunction;
+import org.luaj.vm2.lib.TwoArgFunction;
 
 import engine.Game;
 import engine.GameSubscriber;
@@ -20,6 +22,7 @@ import engine.lua.type.NumberClamp;
 import engine.lua.type.NumberClampPreferred;
 import engine.lua.type.data.Matrix4;
 import engine.lua.type.data.Vector3;
+import engine.lua.type.object.insts.Camera;
 import engine.lua.type.object.insts.GameObject;
 import engine.lua.type.object.insts.Mesh;
 import engine.lua.type.object.insts.Player;
@@ -86,6 +89,22 @@ public abstract class PhysicsBase extends Instance implements GameSubscriber {
 		this.getField(C_SHAPE).setEnum(new EnumType("Shape"));
 		
 		this.defineField(C_USECUSTOMMESH.toString(), LuaValue.valueOf(false), false);
+		
+		// Apply Force (FORCE, IMPULSE)
+		this.getmetatable().set("ApplyForce", new ThreeArgFunction() {
+			@Override
+			public LuaValue call(LuaValue myself, LuaValue arg2, LuaValue arg3) {
+				if ( !(arg2 instanceof Vector3) )
+					return LuaValue.NIL;
+				if ( !(arg3 instanceof Vector3) )
+					return LuaValue.NIL;
+				if ( physics == null )
+					return LuaValue.NIL;
+				physics.applyImpulse(((Vector3)arg2).getInternal(), ((Vector3)arg3).getInternal());
+				
+				return LuaValue.NIL;
+			}
+		});
 		
 		Game.getGame().subscribe(this);
 		

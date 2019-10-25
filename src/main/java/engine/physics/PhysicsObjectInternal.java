@@ -145,6 +145,8 @@ public class PhysicsObjectInternal {
 	public void applyImpulse( Vector3f impulse, Vector3f location ) {
 		if (this.destroyed)
 			return;
+		
+		this.wakeup();
 		body.applyImpulse( new Vector3( impulse.x, impulse.y, impulse.z ), new Vector3( location.x, location.y, location.z ));
 	}
 
