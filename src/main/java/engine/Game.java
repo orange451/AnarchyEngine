@@ -8,6 +8,7 @@ import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.json.simple.JSONArray;
@@ -257,10 +258,27 @@ public class Game implements Tickable {
 		return loaded;
 	}
 	
+	/**
+	 * Returns an instance from the server-generated id
+	 * @param sid
+	 * @return
+	 */
 	public static Instance getInstanceFromSID(long sid) {
 		if ( sid == -1 ) 
 			return null;
 		return game().serverSidedInstances.get(sid);
+	}
+	
+	/**
+	 * Returns an instance from the unique id. Every instance has a unique ID.
+	 * The same instance shared between applications will have different UUIDs.
+	 * @param uuid
+	 * @return
+	 */
+	public static Instance getInstanceFromUUID(UUID uuid) {
+		if ( uuid == null )
+			return null;
+		return game().uniqueInstances.get(uuid);
 	}
 
 	public static void unload() {

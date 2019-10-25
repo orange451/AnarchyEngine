@@ -1,6 +1,7 @@
 package engine.lua.type.object.services;
 
 import java.util.HashMap;
+import java.util.UUID;
 
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.OneArgFunction;
@@ -13,7 +14,8 @@ import engine.lua.type.object.Service;
 
 public class GameLua extends Instance {
 	
-	public HashMap<Long,Instance> createdInstances = new HashMap<Long,Instance>();
+	public HashMap<Long,Instance> serverSidedInstances = new HashMap<Long,Instance>();
+	public HashMap<UUID,Instance> uniqueInstances = new HashMap<>();
 	
 	public GameLua() {
 		super("Game");
@@ -40,12 +42,12 @@ public class GameLua extends Instance {
 		this.descendantRemovedEvent().connectLua(new OneArgFunction() {
 			@Override
 			public LuaValue call(LuaValue object) {
-				synchronized(createdInstances) {
+				synchronized(serverSidedInstances) {
 					if ( object instanceof Instance ) {
 						Instance inst = (Instance) object;
 						long sid = inst.getSID();
 						
-						createdInstances.remove(sid);
+						serverSidedInstances.remove(sid);
 					}
 				}
 				return LuaValue.NIL;
@@ -55,7 +57,7 @@ public class GameLua extends Instance {
 		this.descendantAddedEvent().connectLua(new OneArgFunction() {
 			@Override
 			public LuaValue call(LuaValue object) {
-				synchronized(createdInstances) {
+				synchronized(serverSidedInstances) {
 					if ( object instanceof Instance ) {
 						Instance inst = (Instance)object;
 						if ( Game.isServer() ) {
@@ -65,8 +67,10 @@ public class GameLua extends Instance {
 						long sid = inst.getSID();
 						
 						if ( sid != -1 ) {
-							createdInstances.put(sid, inst);
+							serverSidedInstances.put(sid, inst);
 						}
+						
+						uniqueInstances.put(inst.getUUID(), inst);
 					}
 				}
 				return LuaValue.NIL;
@@ -80,7 +84,7 @@ public class GameLua extends Instance {
 	
 	@SuppressWarnings("unchecked")
 	public HashMap<Long, Instance> getInstanceMap() {
-		return (HashMap<Long, Instance>) createdInstances.clone();
+		return (HashMap<Long, Instance>) serverSidedInstances.clone();
 	}
 	
 	public String getName() {
