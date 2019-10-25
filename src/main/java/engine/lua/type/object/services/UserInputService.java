@@ -46,6 +46,13 @@ public class UserInputService extends Service implements TreeViewable {
 			}
 		});
 		
+		this.getmetatable().set("GetForwardVector", new TwoArgFunction() {
+			@Override
+			public LuaValue call(LuaValue arg1, LuaValue freeCam) {
+				return getForwardVector(freeCam.toboolean());
+			}
+		});
+		
 		this.getmetatable().set("IsKeyDown", new TwoArgFunction() {
 			@Override
 			public LuaValue call(LuaValue myself, LuaValue arg2) {
@@ -76,6 +83,18 @@ public class UserInputService extends Service implements TreeViewable {
 	
 	public LuaEvent inputEndedEvent() {
 		return (LuaEvent) this.get(C_INPUTENDED);
+	}
+	
+	public Vector3 getForwardVector(boolean freeCam) {
+		Camera camera = Game.workspace().getCurrentCamera();
+		if ( camera == null )
+			return new Vector3();
+		
+		float yaw = (float) (camera.getYaw() - (Math.PI/2f));
+		float pitch = freeCam?camera.getPitch():0;
+		Vector3f forward = calculateDirectionVector(yaw, pitch);
+		
+		return new Vector3(forward);
 	}
 	
 	public Vector3 getMovementVector(boolean freeCam) {

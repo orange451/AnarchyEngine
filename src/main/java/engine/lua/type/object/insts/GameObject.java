@@ -153,14 +153,24 @@ public class GameObject extends Instance implements RenderableInstance,TreeViewa
 			// Get current world matrix
 			Matrix4 mat = ((Matrix4)this.rawget(C_WORLDMATRIX));
 			
+			// Update world matrix with new position
+			Matrix4 newMat = new Matrix4(mat.getInternal());
+			newMat.setPosition((Vector3) value);
+			
+			// This is just to trigger Physics object (if it exists)
+			this.set(C_WORLDMATRIX, newMat);
+			return value;
+		}
+		
+		// Uset sets the matrix field
+		if ( key.eq_b(C_WORLDMATRIX) ) {
+			// Get current world matrix
+			Matrix4 mat = ((Matrix4)this.rawget(C_WORLDMATRIX));
+			
 			// Update last position
 			this.lastWorldMatrix.set(mat.getInternal());
 			
-			// Update world matrix with new position
-			mat.setPosition((Vector3) value);
-			
-			// This is just to trigger Physics object (if it exists)
-			this.set(C_WORLDMATRIX, mat);
+			// Allow
 			return value;
 		}
 		
