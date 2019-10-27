@@ -111,13 +111,17 @@ public abstract class PhysicsBase extends Instance implements GameSubscriber {
 		// Update matrices
 		InternalRenderThread.runLater(()->{
 			Game.runService().renderPreEvent().connect((args)->{
-				if ( physics != null ) {
+				PhysicsObjectInternal tempPhys = this.physics;
+				GameObject tempLink = this.linked;
+				
+				if ( tempPhys != null ) {
+					Matrix4f worldMat = tempPhys.getWorldMatrix();
 					
-					if ( linked != null ) {
-						((Matrix4)linked.rawget(C_WORLDMATRIX)).setInternal(lastWorldMatrix);
+					if ( tempLink != null ) {
+						((Matrix4)linked.rawget(C_WORLDMATRIX)).setInternal(worldMat);
 					}
-					((Matrix4)this.rawget(C_WORLDMATRIX)).setInternal(lastWorldMatrix);
-				} else if ( linked != null ) {
+					((Matrix4)this.rawget(C_WORLDMATRIX)).setInternal(worldMat);
+				} else if ( tempLink != null ) {
 					this.rawset(C_WORLDMATRIX, linked.get(C_WORLDMATRIX));
 				}
 			});
