@@ -23,6 +23,8 @@ public class GameLua extends Instance {
 		// On load event
 		this.rawset("Loaded", new LuaEvent());
 		this.rawset("Started", new LuaEvent());
+		this.rawset("ResetEvent", new LuaEvent());
+		this.rawset("SelectionChanged", new LuaEvent());
 		
 		// Fields
 		this.defineField("Running", LuaValue.valueOf(false), true);

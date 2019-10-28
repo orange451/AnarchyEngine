@@ -381,6 +381,8 @@ public class Game implements Tickable {
 		if ( didLoad ) {
 			loadEvent().fire();
 		}
+		
+		resetEvent().fire();
 	}
 
 	public static void runLater(Runnable object) {
@@ -439,6 +441,7 @@ public class Game implements Tickable {
 		//}
 		
 		game.gameUpdate(false);
+		selectionChanged().fire();
 	}
 
 	public static void deselect(Instance inst) {
@@ -456,6 +459,7 @@ public class Game implements Tickable {
 
 		if ( r ) {
 			game.gameUpdate(false);
+			selectionChanged().fire();
 		}
 	}
 	
@@ -565,11 +569,31 @@ public class Game implements Tickable {
 	public static String version() {
 		return VERSION;
 	}
+	
+	public static LuaEvent selectionChanged() {
+		return ((LuaEvent)LuaEngine.globals.get("game").get("SelectionChanged"));
+	}
+	
+	/**
+	 * Event that gets fired whenever a game is reset via loading a new project.
+	 * @return
+	 */
+	public static LuaEvent resetEvent() {
+		return ((LuaEvent)LuaEngine.globals.get("game").get("ResetEvent"));
+	}
 
+	/**
+	 * Event that gets fired whenever new large chunks of data are loaded. i.e. new worlds.
+	 * @return
+	 */
 	public static LuaEvent loadEvent() {
 		return ((LuaEvent)LuaEngine.globals.get("game").get("Loaded"));
 	}
 	
+	/**
+	 * Event that gets fired when the game is finished initializing.
+	 * @return
+	 */
 	public static LuaEvent startEvent() {
 		return ((LuaEvent)LuaEngine.globals.get("game").get("Started"));
 	}

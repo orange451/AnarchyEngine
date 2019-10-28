@@ -1,6 +1,5 @@
 package ide.layout.windows;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -9,12 +8,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.luaj.vm2.LuaValue;
-import org.lwjgl.PointerBuffer;
 import org.lwjgl.glfw.GLFW;
-import org.lwjgl.system.MemoryUtil;
-import org.lwjgl.util.nfd.NFDPathSet;
-import org.lwjgl.util.nfd.NativeFileDialog;
-
 import engine.Game;
 import engine.GameSubscriber;
 import engine.lua.history.HistoryChange;
@@ -32,17 +26,12 @@ import engine.lua.type.object.insts.Folder;
 import engine.lua.type.object.insts.GameObject;
 import engine.lua.type.object.insts.GlobalScript;
 import engine.lua.type.object.insts.LocalScript;
-import engine.lua.type.object.insts.Mesh;
 import engine.lua.type.object.insts.PhysicsObject;
 import engine.lua.type.object.insts.PlayerPhysics;
 import engine.lua.type.object.insts.PointLight;
-import engine.lua.type.object.insts.Prefab;
 import engine.lua.type.object.insts.Script;
 import engine.lua.type.object.insts.SpotLight;
-import engine.lua.type.object.insts.Texture;
-import engine.lua.type.object.services.Assets;
 import engine.lua.type.object.services.StarterPlayerScripts;
-import engine.util.FileUtils;
 import ide.IDE;
 import ide.layout.IdePane;
 import ide.layout.windows.icons.Icons;
@@ -56,7 +45,6 @@ import lwjgui.scene.control.TreeBase;
 import lwjgui.scene.control.TreeItem;
 import lwjgui.scene.control.TreeNode;
 import lwjgui.scene.control.TreeView;
-import lwjgui.scene.image.ImageView;
 
 public class IdeExplorer extends IdePane implements GameSubscriber {
 	private ScrollPane scroller;

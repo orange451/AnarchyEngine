@@ -13,6 +13,7 @@ import engine.util.JVMUtil;
 import ide.IDE;
 import ide.layout.windows.IdeConsole;
 import ide.layout.windows.IdeExplorer;
+import ide.layout.windows.IdeExplorerNew;
 import ide.layout.windows.IdeGameView;
 import ide.layout.windows.IdeMaterialViewer;
 import ide.layout.windows.IdeProperties;
@@ -67,8 +68,7 @@ public class IdeLayout {
 		
 		// Add left
 		west = new IdeVerticalDock();
-		west.dockNorth(new IdeMaterialViewer());
-		//west.dockNorth(new IdeExplorer());
+		west.dockSouth(new IdeMaterialViewer());
 		split.getItems().add(west);
 		
 		// Add middle
@@ -76,7 +76,7 @@ public class IdeLayout {
 		
 		// Add right
 		east = new IdeVerticalDock();
-		east.dockNorth(new IdeExplorer());
+		east.dockNorth(new IdeExplorerNew());
 		east.dockSouth(new IdeProperties());
 		split.getItems().add(east);
 		
