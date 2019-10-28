@@ -42,7 +42,7 @@ public class LensFlares extends DeferredPass<LensFlaresShader> {
 	@Override
 	public void init(int width, int height) {
 		super.init(width, height);
-		lensColor = ResourcesManager.loadTextureMisc("textures/lens/lens_color.png", null).get();
+		lensColor = ResourcesManager.loadTextureMisc("assets/textures/lens/lens_color.png", null).get();
 	}
 
 	@Override

@@ -275,9 +275,15 @@ public class GLRenderer implements IPipeline {
 
 	private void deferredPass() {
 		GPUProfiler.start("Lighting");
+		GPUProfiler.start("Directional");
 		directionalLightHandler.render(currentCamera, projMatrix, dp, renderingSettings);
+		GPUProfiler.end();
+		GPUProfiler.start("Point");
 		pointLightHandler.render(currentCamera, projMatrix, dp, renderingSettings);
+		GPUProfiler.end();
+		GPUProfiler.start("Spot");
 		spotLightHandler.render(currentCamera, projMatrix, dp, renderingSettings);
+		GPUProfiler.end();
 		GPUProfiler.end();
 		GPUProfiler.start("Deferred Pass");
 		dp.process(rnd, rd);

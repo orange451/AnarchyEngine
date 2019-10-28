@@ -155,6 +155,10 @@ float computeContactShadows(vec3 pos, vec3 N, vec3 L, float imageDepth) {
 void main() {
 	vec4 mask = texture(gMask, textureCoords);
 	vec4 image = texture(gDiffuse, textureCoords);
+	vec4 lightData = vec4(0.0);
+
+	lightData += texture(spotLightData, textureCoords);
+
 	if (MASK_COMPARE(mask.a, PBR_OBJECT)) {
 		vec2 pbr = texture(gPBR, textureCoords).rg;
 		float depth = texture(gDepth, textureCoords).r;
@@ -174,7 +178,7 @@ void main() {
 
 		Lo += texture(directionalLightData, textureCoords).rgb;
 		Lo += texture(pointLightData, textureCoords).rgb;
-		Lo += texture(spotLightData, textureCoords).rgb;
+		Lo += lightData.rgb;
 
 		vec3 F = fresnelSchlickRoughness(max(dot(N, V), 0.0), F0, roughness);
 
@@ -207,7 +211,7 @@ void main() {
 
 		// image.rgb = vec3(computeContactShadows(position, N, L, depth));
 	}
-	vec4 vol = texture(volumetric, textureCoords);
-	image.rgb += vol.rgb;
+	//vec4 vol = texture(volumetric, textureCoords);
+	//image.rgb += vec3(lightData.a);
 	out_Color = image;
 }

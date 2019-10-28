@@ -64,7 +64,7 @@ public final class ResourcesManager {
 			OnFinished<Texture> dst) {
 		System.out.println("Texture scheduled to load: " + fileName);
 		return TaskManager.submitRenderBackgroundThread(
-				new LoadTextureTask("assets/" + fileName, filter, GL_REPEAT, GL_RGBA, textureMipMapAF)
+				new LoadTextureTask(fileName, filter, GL_REPEAT, GL_RGBA, textureMipMapAF)
 						.setOnFinished(dst));
 	}
 
@@ -76,7 +76,7 @@ public final class ResourcesManager {
 			OnFinished<Texture> dst) {
 		System.out.println("Texture scheduled to load: " + fileName);
 		return TaskManager.submitRenderBackgroundThread(
-				new LoadTextureTask("assets/" + fileName, filter, GL_REPEAT, GL_SRGB_ALPHA, textureMipMapAF)
+				new LoadTextureTask(fileName, filter, GL_REPEAT, GL_SRGB_ALPHA, textureMipMapAF)
 						.setOnFinished(dst));
 	}
 
