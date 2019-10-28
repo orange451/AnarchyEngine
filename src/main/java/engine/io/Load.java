@@ -198,6 +198,11 @@ public class Load {
 					continue;
 			}
 			
+			// Make sure user isn't trying to inject new fields!
+			boolean hasField = inst.instance.containsField(LuaValue.valueOf(key));
+			if ( !hasField )
+				continue;
+			
 			PropertyValue<?> p = properties.get(key);
 			Object value = p.getValue();
 			if ( p.pointer ) {
