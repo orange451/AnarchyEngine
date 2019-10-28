@@ -32,6 +32,7 @@ public class AnimatedModelSubMesh {
 	private static final int weightBoneWeightElementCount = 4;
 	
 	private static final int weightBoneIndicesByteCount = weightBoneIndicesElementCount * Vertex.elementBytes;
+	@SuppressWarnings("unused")
 	private static final int weightBoneWeightByteCount = weightBoneWeightElementCount * Vertex.elementBytes;
 	
 	private static final int elementCount = Vertex.elementCount + weightBoneIndicesElementCount + weightBoneWeightElementCount;

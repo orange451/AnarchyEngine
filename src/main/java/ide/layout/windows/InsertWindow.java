@@ -8,7 +8,6 @@ import java.util.List;
 import org.luaj.vm2.LuaValue;
 
 import engine.Game;
-import engine.InternalGameThread;
 import engine.InternalRenderThread;
 import engine.lua.type.object.Instance;
 import engine.lua.type.object.TreeViewable;

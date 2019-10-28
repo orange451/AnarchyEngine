@@ -430,6 +430,7 @@ public class Save {
 		copyAssets( resourcesPath + File.separator + "Meshes", Game.assets().getMeshes());
 	}
 	
+	@SuppressWarnings("unused")
 	private static boolean deleteDirectory(File directoryToBeDeleted) {
 	    File[] allContents = directoryToBeDeleted.listFiles();
 	    if (allContents != null) {

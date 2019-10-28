@@ -5,7 +5,6 @@ import java.util.HashMap;
 import org.joml.Vector3f;
 import org.luaj.vm2.LuaValue;
 
-import engine.Game;
 import engine.gl.Resources;
 import engine.gl.Texture2D;
 import engine.lua.type.LuaConnection;
@@ -14,8 +13,6 @@ import engine.lua.type.NumberClamp;
 import engine.lua.type.data.Color3;
 import engine.lua.type.data.Vector3;
 import engine.lua.type.object.Asset;
-import engine.lua.type.object.Instance;
-import engine.lua.type.object.Service;
 import engine.lua.type.object.TreeViewable;
 import ide.layout.windows.icons.Icons;
 import lwjgui.paint.Color;

@@ -6,7 +6,6 @@ import java.util.List;
 import org.luaj.vm2.LuaValue;
 
 import engine.Game;
-import engine.InternalGameThread;
 import engine.InternalRenderThread;
 import engine.application.RenderableApplication;
 import engine.gl.Pipeline;
@@ -22,20 +21,16 @@ import engine.lua.type.object.insts.PointLight;
 import engine.lua.type.object.insts.Prefab;
 import engine.lua.type.object.insts.Texture;
 import engine.lua.type.object.services.Workspace;
-import engine.observer.Renderable;
 import engine.observer.RenderableWorld;
 import ide.layout.IdePane;
-import lwjgui.LWJGUI;
 import lwjgui.geometry.Pos;
 import lwjgui.gl.GenericShader;
 import lwjgui.gl.Renderer;
-import lwjgui.paint.Color;
 import lwjgui.scene.Context;
 import lwjgui.scene.control.Label;
 import lwjgui.scene.control.ScrollPane;
 import lwjgui.scene.layout.GridView;
 import lwjgui.scene.layout.OpenGLPane;
-import lwjgui.scene.layout.StackPane;
 import lwjgui.scene.layout.VBox;
 
 public class IdeMaterialViewer extends IdePane {

@@ -2,7 +2,6 @@ package engine.lua.type.object.insts;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 
 import org.joml.Matrix4f;

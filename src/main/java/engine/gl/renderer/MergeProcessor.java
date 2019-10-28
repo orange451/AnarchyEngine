@@ -7,7 +7,6 @@ import org.joml.Vector3f;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL30;
 
-import engine.Game;
 import engine.gl.Pipeline;
 import engine.gl.PostProcessor;
 import engine.gl.Surface;

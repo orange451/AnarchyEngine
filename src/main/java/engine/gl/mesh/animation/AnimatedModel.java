@@ -27,7 +27,6 @@ import engine.lua.type.data.Matrix4;
 import engine.lua.type.object.Instance;
 import engine.lua.type.object.insts.AnimationController;
 import engine.lua.type.object.insts.Bone;
-import engine.lua.type.object.insts.BoneTree;
 import engine.lua.type.object.insts.BoneTreeNode;
 import engine.lua.type.object.insts.BoneWeight;
 import engine.lua.type.object.insts.Bones;

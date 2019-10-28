@@ -1,18 +1,14 @@
 package engine.lua.type.object;
 
-import java.io.IOException;
 import java.util.List;
 
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.ThreeArgFunction;
-import org.luaj.vm2.lib.TwoArgFunction;
-
 import engine.Game;
 import engine.GameSubscriber;
 import engine.InternalRenderThread;
-import engine.lua.LuaEngine;
 import engine.lua.lib.EnumType;
 import engine.lua.network.InternalClient;
 import engine.lua.network.InternalServer;
@@ -22,12 +18,10 @@ import engine.lua.type.NumberClamp;
 import engine.lua.type.NumberClampPreferred;
 import engine.lua.type.data.Matrix4;
 import engine.lua.type.data.Vector3;
-import engine.lua.type.object.insts.Camera;
 import engine.lua.type.object.insts.GameObject;
 import engine.lua.type.object.insts.Mesh;
 import engine.lua.type.object.insts.Player;
 import engine.lua.type.object.insts.Prefab;
-import engine.lua.type.object.services.Connections;
 import engine.physics.PhysicsObjectInternal;
 import engine.util.Pair;
 

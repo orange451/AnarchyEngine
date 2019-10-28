@@ -9,14 +9,10 @@ import org.luaj.vm2.lib.OneArgFunction;
 import org.luaj.vm2.lib.ThreeArgFunction;
 import org.luaj.vm2.lib.ZeroArgFunction;
 
-import engine.Game;
 import engine.lua.lib.LuaUtil;
-import engine.lua.type.LuaEvent;
 import engine.lua.type.NumberClampPreferred;
 import engine.lua.type.object.Asset;
-import engine.lua.type.object.Instance;
 import engine.lua.type.object.PrefabRenderer;
-import engine.lua.type.object.Service;
 import engine.lua.type.object.TreeViewable;
 import engine.util.AABBUtil;
 import engine.util.Pair;

@@ -2,14 +2,10 @@ package engine.lua.type.object.services;
 
 import org.luaj.vm2.LuaValue;
 
-import engine.Game;
 import engine.InternalGameThread;
-import engine.InternalRenderThread;
 import engine.application.RenderableApplication;
 import engine.gl.IPipeline;
 import engine.gl.Pipeline;
-import engine.gl.ibl.SkySphereIBL;
-import engine.io.Image;
 import engine.lua.lib.EnumType;
 import engine.lua.type.LuaConnection;
 import engine.lua.type.NumberClampPreferred;
@@ -19,7 +15,6 @@ import engine.lua.type.object.Service;
 import engine.lua.type.object.TreeViewable;
 import engine.lua.type.object.insts.DynamicSkybox;
 import engine.lua.type.object.insts.Skybox;
-import engine.lua.type.object.insts.Texture;
 import engine.tasks.TaskManager;
 import ide.layout.windows.icons.Icons;
 

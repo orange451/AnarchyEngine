@@ -149,19 +149,6 @@ public class Assets extends Service implements TreeViewable {
 		return Icons.icon_box;
 	}
 	
-	private List<AssetLoadable> getAssets(Instance directory) {
-		List<AssetLoadable> ret = new ArrayList<AssetLoadable>();
-		List<Instance> c = directory.getDescendants();
-		
-		for (int i = 0; i < c.size(); i++) {
-			Instance in = c.get(i);
-			if ( in instanceof AssetLoadable ) {
-				ret.add((AssetLoadable) in);
-			}
-		}
-		return ret;
-	}
-	
 	/**
 	 * Get list of all textures loaded
 	 * @return

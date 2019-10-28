@@ -25,15 +25,11 @@ import engine.Game;
 import engine.lua.type.LuaValuetype;
 import engine.lua.type.object.Instance;
 import engine.lua.type.object.Service;
-import engine.lua.type.object.services.GameLua;
 import engine.util.FileUtils;
 import ide.IDE;
 import ide.layout.windows.ErrorWindow;
 
 public class Load {
-	//private static ArrayList<LoadedInstance> instances;
-	//private static HashMap<Long, LoadedInstance> instancesMap;
-	//private static HashMap<Long, Instance> unmodifiedInstances;
 	
 	public static void load() {
 		String path = "";
@@ -250,6 +246,7 @@ public class Load {
 		if ( obj.get("Properties") != null ) {
 			JSONObject properties = (JSONObject) obj.get("Properties");
 			for (Object entry : properties.entrySet()) {
+				@SuppressWarnings("unchecked")
 				Map.Entry<Object,Object> entry2 = (Entry<Object, Object>) entry;
 				String key = entry2.getKey().toString();
 				Object t = entry2.getValue();

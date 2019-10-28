@@ -1,15 +1,11 @@
 package engine.application;
 
-import org.joml.Matrix4f;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
 
 import engine.Game;
-import engine.InternalGameThread;
 import engine.InternalRenderThread;
-import engine.gl.Pipeline;
 import engine.glv2.GLRenderer;
-import engine.io.Load;
 import engine.lua.type.object.services.UserInputService;
 import lwjgui.LWJGUI;
 import lwjgui.event.ScrollEvent;

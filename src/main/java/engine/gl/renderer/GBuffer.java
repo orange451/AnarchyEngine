@@ -184,7 +184,7 @@ public class GBuffer {
 	}
 
 	public BaseShader getShader() {
-		return this.shader;
+		return shader;
 	}
 	
 	public void postProcess() {

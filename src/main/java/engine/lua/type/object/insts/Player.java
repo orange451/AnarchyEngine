@@ -7,7 +7,6 @@ import org.luaj.vm2.LuaValue;
 import engine.Game;
 import engine.lua.type.object.Instance;
 import engine.lua.type.object.TreeViewable;
-import engine.lua.type.object.services.Connections;
 import ide.layout.windows.icons.Icons;
 
 public class Player extends Instance implements TreeViewable {

@@ -3,7 +3,6 @@ package engine.lua.history;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import engine.Game;
 import engine.lua.type.object.Instance;
 
 public class HistoryStack {

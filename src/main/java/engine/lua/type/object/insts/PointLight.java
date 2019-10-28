@@ -3,7 +3,6 @@ package engine.lua.type.object.insts;
 import org.joml.Vector3f;
 import org.luaj.vm2.LuaValue;
 
-import engine.InternalGameThread;
 import engine.InternalRenderThread;
 import engine.gl.IPipeline;
 import engine.gl.Pipeline;
