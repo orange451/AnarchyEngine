@@ -206,7 +206,7 @@ public class IdeMaterialViewer extends IdePane {
 						shader = new GenericShader();
 					}
 					
-					if ( materialPipeline == null && renderAllowence > 0 ) {
+					if ( materialPipeline == null && renderAllowence > 0 && Game.isLoaded() ) {
 						renderAllowence -= 1;
 						
 						materialPipeline = new Pipeline();
@@ -257,6 +257,8 @@ public class IdeMaterialViewer extends IdePane {
 						}
 						
 						materialPipeline.render();
+						renderMaterial();
+						return;
 					}
 					
 					if ( materialPipeline != null ) {
