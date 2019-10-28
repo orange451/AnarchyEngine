@@ -33,7 +33,7 @@ public abstract class LightBase extends Instance implements Positionable {
 		this.defineField(C_VISIBLE.toString(), LuaValue.valueOf(true), false);
 		
 		this.changedEvent().connect((args)->{
-			if ( args[0].toString().equals("Visible") ) {
+			if ( args[0].eq_b(C_VISIBLE) ) {
 				Light l = this.getLightInternal();
 				if ( l == null )
 					return;

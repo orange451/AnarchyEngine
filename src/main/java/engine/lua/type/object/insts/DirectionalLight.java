@@ -161,6 +161,8 @@ public class DirectionalLight extends LightBase implements TreeViewable {
 			Color color = ((Color3) this.get("Color")).toColor();
 			light.color = new Vector3f(Math.max(color.getRed(), 1) / 255f, Math.max(color.getGreen(), 1) / 255f,
 					Math.max(color.getBlue(), 1) / 255f);
+			
+			light.visible = this.get(C_VISIBLE).toboolean();
 
 			pipeline.getDirectionalLightHandler().addLight(light);
 		});
