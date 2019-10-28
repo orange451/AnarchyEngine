@@ -243,10 +243,11 @@ public class IdeExplorerNew extends IdePane {
 			if ( instance instanceof TreeViewable )
 				graphic = ((TreeViewable)instance).getIcon().getView();
 			
+			// CREATE NEW NODE
 			treeItem = new SortedTreeItem<Instance>(instance, graphic);
 			treeItem.setContextMenu(getContetxMenu(instance));
 			
-			// Open a script
+			// Open a script shortcut
 			treeItem.setOnMouseClicked(event -> {
 				int clicks = event.getClickCount();
 				if ( clicks == 2 ) {
@@ -463,6 +464,7 @@ public class IdeExplorerNew extends IdePane {
 		}
 		
 		protected void sort() {
+			
 			ArrayList<TreeNode<E>> nodules = new ArrayList<TreeNode<E>>();
 			for (int i = 0; i < nodes.size(); i++) {
 				nodules.add(nodes.get(i));

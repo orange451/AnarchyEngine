@@ -8,6 +8,7 @@ import org.luaj.vm2.LuaValue;
 import engine.Game;
 import engine.InternalGameThread;
 import engine.InternalRenderThread;
+import engine.application.RenderableApplication;
 import engine.gl.Pipeline;
 import engine.gl.Resources;
 import engine.gl.Surface;
@@ -21,6 +22,7 @@ import engine.lua.type.object.insts.PointLight;
 import engine.lua.type.object.insts.Prefab;
 import engine.lua.type.object.insts.Texture;
 import engine.lua.type.object.services.Workspace;
+import engine.observer.Renderable;
 import engine.observer.RenderableWorld;
 import ide.layout.IdePane;
 import lwjgui.LWJGUI;
@@ -43,6 +45,8 @@ public class IdeMaterialViewer extends IdePane {
 	private HashMap<Material, MaterialNode> materialToNodeMap;
 	private boolean createdConnections;
 	
+	private static int renderAllowence;
+	
 	public static final int NODE_SIZE = 120;
 
 	public IdeMaterialViewer() {
@@ -52,6 +56,13 @@ public class IdeMaterialViewer extends IdePane {
 			//init();
 		});
 		init();
+		
+		// Increase allowence
+		RenderableApplication.renderThread.attach(()->{
+			renderAllowence = renderAllowence+1;
+			if ( renderAllowence > 10 )
+				renderAllowence = 10;
+		});
 	}
 	
 	@Override
@@ -190,11 +201,14 @@ public class IdeMaterialViewer extends IdePane {
 
 				@Override
 				public void render(Context context) {
+					
 					if ( shader == null ) {
 						shader = new GenericShader();
 					}
 					
-					if ( materialPipeline == null ) {
+					if ( materialPipeline == null && renderAllowence > 0 ) {
+						renderAllowence -= 1;
+						
 						materialPipeline = new Pipeline();
 						materialPipeline.setRenderableWorld(renderableWorld);
 						materialPipeline.setSize(NODE_SIZE, NODE_SIZE);
@@ -244,8 +258,11 @@ public class IdeMaterialViewer extends IdePane {
 						
 						materialPipeline.render();
 					}
-					Surface surface = materialPipeline.getPipelineBuffer();
-					surface.render(shader);
+					
+					if ( materialPipeline != null ) {
+						Surface surface = materialPipeline.getPipelineBuffer();
+						surface.render(shader);
+					}
 				}
 			});
 			this.getChildren().add(oglPane);
