@@ -58,6 +58,9 @@ public class IdeMaterialViewer extends IdePane {
 			if ( renderAllowence > 10 )
 				renderAllowence = 10;
 		});
+		
+		// Add user controls
+		StandardUserControls.bind(this);
 	}
 	
 	@Override

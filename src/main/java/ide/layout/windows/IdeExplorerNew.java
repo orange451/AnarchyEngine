@@ -159,6 +159,9 @@ public class IdeExplorerNew extends IdePane {
 			// set cache
 			selectedCache = new ArrayList<Instance>(selected);
 		});
+		
+		// Add user controls
+		StandardUserControls.bind(this);
 	}
 	
 	private void clear() {

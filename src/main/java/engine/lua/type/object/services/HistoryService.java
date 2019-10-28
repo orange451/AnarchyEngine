@@ -50,17 +50,6 @@ public class HistoryService extends Service {
 				return LuaValue.valueOf(historyStack.canRedo());
 			}
 		});
-		
-		InternalGameThread.runLater(()->{
-			Game.userInputService().inputBeganEvent().connect((args)->{
-				LuaValue inputObject = args[0];
-				if ( inputObject.get("KeyCode").toint() == GLFW.GLFW_KEY_Z ) {
-					if ( Game.userInputService().isKeyDown(GLFW.GLFW_KEY_LEFT_CONTROL) ) {
-						undo();
-					}
-				}
-			});
-		});
 	}
 	
 	public HistoryStack getHistoryStack() {

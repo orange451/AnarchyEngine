@@ -87,6 +87,8 @@ public class IdeGameView extends IdePane {
 		this.internal.getChildren().add(fps);
 		this.internal.setAlignment(Pos.TOP_LEFT);
 		this.internal.setPadding(new Insets(2,2,2,2));
+		
+		StandardUserControls.bind(this);
 	}
 
 	@Override

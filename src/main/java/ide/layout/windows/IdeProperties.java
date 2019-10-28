@@ -94,6 +94,9 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 				last.set(System.currentTimeMillis());
 			}
 		});
+		
+		// Add user controls
+		StandardUserControls.bind(this);
 	}
 	
 	private long lastUpdate = -1;
