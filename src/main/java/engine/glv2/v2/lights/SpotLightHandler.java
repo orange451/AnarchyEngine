@@ -9,7 +9,7 @@ import static org.lwjgl.opengl.GL11C.GL_FLOAT;
 import static org.lwjgl.opengl.GL11C.GL_LINEAR;
 import static org.lwjgl.opengl.GL11C.GL_ONE;
 import static org.lwjgl.opengl.GL11C.GL_ONE_MINUS_SRC_ALPHA;
-import static org.lwjgl.opengl.GL11C.GL_RGB;
+import static org.lwjgl.opengl.GL11C.GL_RGBA;
 import static org.lwjgl.opengl.GL11C.GL_SRC_ALPHA;
 import static org.lwjgl.opengl.GL11C.GL_TEXTURE_2D;
 import static org.lwjgl.opengl.GL11C.GL_TEXTURE_MAG_FILTER;
@@ -31,7 +31,7 @@ import static org.lwjgl.opengl.GL13C.GL_TEXTURE5;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE6;
 import static org.lwjgl.opengl.GL13C.glActiveTexture;
 import static org.lwjgl.opengl.GL30C.GL_COLOR_ATTACHMENT0;
-import static org.lwjgl.opengl.GL30C.GL_RGB16F;
+import static org.lwjgl.opengl.GL30C.GL_RGBA16F;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -137,7 +137,7 @@ public class SpotLightHandler implements ISpotLightHandler {
 		TextureBuilder tb = new TextureBuilder();
 
 		tb.genTexture(GL_TEXTURE_2D).bindTexture();
-		tb.sizeTexture(width, height).texImage2D(0, GL_RGB16F, 0, GL_RGB, GL_FLOAT, 0);
+		tb.sizeTexture(width, height).texImage2D(0, GL_RGBA16F, 0, GL_RGBA, GL_FLOAT, 0);
 		tb.texParameteri(GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		tb.texParameteri(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		tb.texParameteri(GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);

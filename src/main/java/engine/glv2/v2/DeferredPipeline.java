@@ -138,12 +138,14 @@ public abstract class DeferredPipeline {
 		finalShader.stop();
 		previousFrame.unbind();
 		// Blit depth
+		GPUProfiler.start("blit");
 		glBindFramebuffer(GL_READ_FRAMEBUFFER, main.getFramebuffer());
 		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fb.getFramebuffer());
 		glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
 		// Blit color
 		glBindFramebuffer(GL_READ_FRAMEBUFFER, previousFrame.getFramebuffer());
 		glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+		GPUProfiler.end();
 	}
 
 	public void resize(int width, int height) {

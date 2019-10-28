@@ -22,7 +22,7 @@
 
 in vec3 pass_position;
 
-out vec3 out_Color;
+out vec4 out_Color;
 
 uniform vec2 texel;
 uniform vec3 cameraPosition;
@@ -60,6 +60,27 @@ uniform SpotLight light;
 
 #include variable MASK
 
+#define MAX_STEPS 200
+#define MAX_DIST 50000.
+#define SURF_DIST .01
+
+float GetDist(vec3 p) {
+	float sphereDist = length(p - light.position) - light.radius;
+	return sphereDist;
+}
+
+float RayMarch(vec3 ro, vec3 rd) {
+	float dO = 0.0;
+	for (int i = 0; i < MAX_STEPS; i++) {
+		vec3 p = ro + rd * dO;
+		float dS = GetDist(p);
+		dO += dS;
+		if (dO > MAX_DIST || dS < SURF_DIST)
+			break;
+	}
+	return dO;
+}
+
 void main() {
 	vec2 textureCoords = gl_FragCoord.xy * texel;
 
@@ -83,17 +104,27 @@ void main() {
 
 		result = calcSpotLight(light, position, image.rgb, N, V, F0, roughness, metallic);
 	}
-	/*vec3 cameraToWorld = position.xyz - cameraPosition;
-	float cameraToWorldDist = length(cameraToWorld);
-	vec3 cameraToWorldNorm = normalize(pass_position - cameraPosition);
 
-	vec3 rayTrace = cameraPosition;
+	/*vec3 rd = normalize(pass_position - cameraPosition);
+	vec3 ro = cameraPosition;
+
+	float d = RayMarch(ro, rd);
+	vec3 p = ro + rd * d;
+
+	vec3 cameraToWorld = position.xyz - cameraPosition;
+	float cameraToWorldDist = length(cameraToWorld);
+
+	vec3 rayTrace;
+	if (d > 0.0)
+		rayTrace = p;
+	else
+		rayTrace = cameraPosition;
 	float rayDist, incr = 0.1;
 	float rayDistRad = length(pass_position - cameraPosition);
 	vec3 rays;
 	vec3 randSample, finalTrace;
 	do {
-		rayTrace += cameraToWorldNorm * incr;
+		rayTrace += rd * incr;
 		incr *= 1.05;
 
 		rayDist = length(rayTrace - cameraPosition);
@@ -118,12 +149,11 @@ void main() {
 				shadow += texture(light.shadowMap, (temp / shadowCoord.w), 0);
 			}
 		}
-		vec3 rayColor = light.color * light.intensity * 0.005;
+		vec3 rayColor = light.color * light.intensity * 0.002;
 		rays += rayColor * intensity * attenuation * (shadow / 25.0);
 		if (rayDist > rayDistRad)
 			break;
-	} while (rayDist < rayDistRad);
-
-	result += rays;*/
-	out_Color = result;
+	} while (rayDist < rayDistRad);*/
+	out_Color.rgb = result;
+	//out_Color.a = rays.r;
 }

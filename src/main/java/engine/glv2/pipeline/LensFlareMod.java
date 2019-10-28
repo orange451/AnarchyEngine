@@ -45,8 +45,8 @@ public class LensFlareMod extends DeferredPass<LensFlareModShader> {
 	@Override
 	public void init(int width, int height) {
 		super.init(width, height);
-		lensDirt = ResourcesManager.loadTextureMisc("textures/lens/lens_dirt.png", null).get();
-		lensStar = ResourcesManager.loadTextureMisc("textures/lens/lens_star.png", null).get();
+		lensDirt = ResourcesManager.loadTextureMisc("assets/textures/lens/lens_dirt.png", null).get();
+		lensStar = ResourcesManager.loadTextureMisc("assets/textures/lens/lens_star.png", null).get();
 	}
 
 	@Override
