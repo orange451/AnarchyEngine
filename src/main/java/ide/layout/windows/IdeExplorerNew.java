@@ -32,6 +32,7 @@ import engine.lua.type.object.insts.PointLight;
 import engine.lua.type.object.insts.Script;
 import engine.lua.type.object.insts.SpotLight;
 import engine.lua.type.object.services.StarterPlayerScripts;
+import ide.IDE;
 import ide.layout.IdePane;
 import ide.layout.windows.icons.Icons;
 import lwjgui.collections.ObservableList;
@@ -48,6 +49,8 @@ import lwjgui.scene.control.TreeView;
 public class IdeExplorerNew extends IdePane {
 	private ScrollPane scroller;
 	private TreeView<Instance> tree;
+
+	private static final LuaValue C_NAME = LuaValue.valueOf("Name");
 	
 	private HashMap<Instance, TreeItem<Instance>> instanceToTreeItemMap;
 	private HashMap<TreeItem<Instance>, TreeBase<Instance>> treeItemToParentTreeItemMap;
@@ -230,8 +233,6 @@ public class IdeExplorerNew extends IdePane {
 		treeItemToChangedConnectionMap.remove(treeItem);
 	}
 	
-	private static final LuaValue C_NAME = LuaValue.valueOf("Name");
-	
 	private void buildNode(Instance instance) {
 		
 		// Get Tree Node
@@ -244,6 +245,17 @@ public class IdeExplorerNew extends IdePane {
 			
 			treeItem = new SortedTreeItem<Instance>(instance, graphic);
 			treeItem.setContextMenu(getContetxMenu(instance));
+			
+			// Open a script
+			treeItem.setOnMouseClicked(event -> {
+				int clicks = event.getClickCount();
+				if ( clicks == 2 ) {
+					if ( instance instanceof ScriptBase ) {
+						IdeLuaEditor lua = new IdeLuaEditor((ScriptBase) instance);
+						IDE.layout.getCenter().dock(lua);
+					}
+				}
+			});
 		}
 		
 		final TreeItem<Instance> newTreeItem = treeItem;
