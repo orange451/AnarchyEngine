@@ -140,6 +140,7 @@ public class IdeMaterialViewer extends IdePane {
 		public MaterialNode(Material material) {
 			this.setAlignment(Pos.CENTER);
 			this.setMaxWidth(NODE_SIZE);
+			this.setBackground(null);
 			
 			// Create secondary world
 			RenderableWorld renderableWorld = new Workspace();
@@ -256,7 +257,6 @@ public class IdeMaterialViewer extends IdePane {
 							l6.setParent(renderableWorld.getInstance() );
 						}
 						
-						materialPipeline.render();
 						renderMaterial();
 						return;
 					}
@@ -283,10 +283,6 @@ public class IdeMaterialViewer extends IdePane {
 			
 			// Update when textures change inside material
 			material.materialUpdateEvent().connect((args)->{
-				renderMaterial();
-			});
-			
-			InternalGameThread.runLater(()->{
 				renderMaterial();
 			});
 		}
