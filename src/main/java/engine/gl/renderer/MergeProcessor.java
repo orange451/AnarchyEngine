@@ -19,14 +19,16 @@ import engine.util.TextureUtils;
 import lwjgui.paint.Color;
 
 public class MergeProcessor implements PostProcessor {
-	private BaseShader shader;
+	private static BaseShader shader;
+	
 	private SkySphereIBL skyBox;
 	private Matrix3f skyBoxRotation = new Matrix3f();
 	private Surface surface;
 	private SkySphereIBL skyBoxBackup;
 	
 	public MergeProcessor() {
-		shader = new MergeShader();
+		if ( shader == null )
+			shader = new MergeShader();
 		
 		TextureUtils.autoResize = false;
 		//skyBox = SkySphereIBL.create("Resources/Testing/IBL/valley.hdr");

@@ -210,7 +210,7 @@ public class IdeMaterialViewer extends IdePane {
 					if ( materialPipeline == null && renderAllowence > 0 && Game.isLoaded() ) {
 						renderAllowence -= 1;
 						
-						materialPipeline = new Pipeline();
+						materialPipeline = new Pipeline(NODE_SIZE, NODE_SIZE);
 						materialPipeline.setRenderableWorld(renderableWorld);
 						materialPipeline.setSize(NODE_SIZE, NODE_SIZE);
 						

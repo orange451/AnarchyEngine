@@ -33,7 +33,7 @@ public class GBuffer {
 	private int buffer3Tex; // Emissive
 	
 	private Surface buffer;
-	private GBufferShader shader;
+	private static GBufferShader shader;
 	private Pipeline pipeline;
 	
 	private Surface finalBuffer;
@@ -54,7 +54,9 @@ public class GBuffer {
 	private Matrix4f iProjMatrix = new Matrix4f();
 	
 	public GBuffer(Pipeline pipeline, int width, int height) {
-		this.shader = new GBufferShader();
+		if ( shader == null )
+			shader = new GBufferShader();
+		
 		this.pipeline = pipeline;
 		
 		resize(width, height);

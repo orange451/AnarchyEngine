@@ -8,7 +8,7 @@ import engine.gl.renderer.LightProcessor;
 import engine.gl.shader.BaseShader;
 
 public class IBLHandler {
-	private BaseShader shader = new IBLShader();
+	private static BaseShader shader = new IBLShader();
 
 	private static final String U_TEXTURE_DEPTH = "texture_depth";
 	private static final String U_TEXTURE_DIFFUSE = "texture_diffuse";
@@ -41,7 +41,7 @@ public class IBLHandler {
 		pipeline.fullscreenQuad();
 	}
 	
-	class IBLShader extends BaseShader {
+	static class IBLShader extends BaseShader {
 		public IBLShader() {
 			super(
 				new URL[] {

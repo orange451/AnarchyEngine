@@ -32,7 +32,7 @@ import engine.util.MeshUtils;
 
 public class PointLightHandler implements IPointLightHandler {
 	private List<PointLightInternal> lights = Collections.synchronizedList(new ArrayList<PointLightInternal>());
-	private BaseShader lightShader = new PointLightShader();
+	private static BaseShader lightShader = new PointLightShader();
 	private BufferedMesh mesh = MeshUtils.sphere(1, 16);
 	
 	public void addLight(PointLightInternal l) {
@@ -113,7 +113,7 @@ public class PointLightHandler implements IPointLightHandler {
 		glDepthFunc(GL_LESS);
 	}
 	
-	class PointLightShader extends BaseShader {
+	static class PointLightShader extends BaseShader {
 		public PointLightShader() {
 			super(
 				new URL[] {

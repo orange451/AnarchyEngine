@@ -17,7 +17,7 @@ import engine.gl.light.PointLightInternal;
 import engine.gl.shader.BaseShader;
 
 public class TransparencyRenderer {
-	private TBufferShader shader;
+	private static TBufferShader shader;
 	private Pipeline pipeline;
 	
 	private int fboId;
@@ -28,7 +28,10 @@ public class TransparencyRenderer {
 	
 	public TransparencyRenderer(Pipeline pipeline, int x, int y) {
 		this.pipeline = pipeline;
-		this.shader = new TBufferShader();
+		
+		if ( shader == null )
+			shader = new TBufferShader();
+		
 		resize(x, y);
 	}
 	

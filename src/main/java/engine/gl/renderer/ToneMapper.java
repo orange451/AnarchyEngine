@@ -9,10 +9,11 @@ import engine.gl.shader.BaseShader;
 import lwjgui.paint.Color;
 
 public class ToneMapper implements PostProcessor {
-	private BaseShader shader;
+	private static BaseShader shader;
 	
 	public ToneMapper() {
-		shader = new ToneMapperShader();
+		if ( shader == null )
+			shader = new ToneMapperShader();
 	}
 	
 	@Override

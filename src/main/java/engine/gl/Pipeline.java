@@ -50,7 +50,7 @@ public class Pipeline implements IPipeline {
 	private Surface buffer;
 	private GBuffer gbuffer;
 	private TransparencyRenderer tbuffer;
-	private BaseShader genericShader;
+	private static BaseShader genericShader;
 	
 	private Matrix4f viewMatrix;
 	private Matrix4f projMatrix;
@@ -69,8 +69,15 @@ public class Pipeline implements IPipeline {
 	private static final Matrix4f IDENTITY = new Matrix4f().identity();
 
 	public Pipeline() {
-		this.setSize(RenderableApplication.windowWidth, RenderableApplication.windowHeight);
-		genericShader = new BaseShader();
+		this(RenderableApplication.windowWidth, RenderableApplication.windowHeight);
+	}
+	
+	public Pipeline(int width, int height) {
+		this.setSize(width, height);
+		
+		if ( genericShader == null )
+			genericShader = new BaseShader();
+		
 		gbuffer = new GBuffer(this, size.x,size.y);
 		tbuffer = new TransparencyRenderer(this, size.x,size.y);
 		viewMatrix = new Matrix4f();
@@ -112,6 +119,7 @@ public class Pipeline implements IPipeline {
 
 		if ( buffer != null )
 			this.buffer.cleanup();
+		
 		this.buffer = new Surface(width,height, GL11.GL_RGBA8);
 			
 		if ( gbuffer != null )
