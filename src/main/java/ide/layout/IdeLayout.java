@@ -67,7 +67,6 @@ public class IdeLayout {
 		
 		// Add left
 		west = new IdeVerticalDock();
-		west.dockSouth(new IdeMaterialViewer());
 		split.getItems().add(west);
 		
 		// Add middle
@@ -79,14 +78,19 @@ public class IdeLayout {
 		east.dockSouth(new IdeProperties());
 		split.getItems().add(east);
 		
+		// Dock south
+		south.dock(new IdeConsole());
+		south.dock(new IdeMaterialViewer());
+		
 		LWJGUI.runLater(() -> {
 			SplitPane.setResizableWithParent(split.getItems().get(0), false);
 			SplitPane.setResizableWithParent(split.getItems().get(2), false);
 			SplitPane.setResizableWithParent(middle.getItems().get(1), false);
 			
-			split.setDividerPosition(0, (IdeMaterialViewer.NODE_SIZE + 15f)/(float)RenderableApplication.windowWidth);
+			//split.setDividerPosition(0, (IdeMaterialViewer.NODE_SIZE + 15f)/(float)RenderableApplication.windowWidth);
+			split.setDividerPosition(0, 0);
 			split.setDividerPosition(1, 0.75);
-			middle.setDividerPosition(0, 0.8);
+			middle.setDividerPosition(0, 0.725);
 		});	
 	}
 	
@@ -107,7 +111,6 @@ public class IdeLayout {
 		
 		{
 			south = new IdeDockPane();
-			south.dock(new IdeConsole());
 			mid.getItems().add(south);
 		}
 		

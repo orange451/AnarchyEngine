@@ -125,6 +125,8 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 			currentInstance = temp;
 			currentInstance.attachPropertySubscriber(this);
 			grid.setInstance(currentInstance);
+			grid.updateChildren();
+			grid.render(LWJGUI.getCurrentContext());
 		});
 	}
 	
@@ -388,6 +390,7 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 			this.dropdown.setMaxHeight(20);
 			this.dropdown.setPrefWidth(100);
 			this.dropdown.setValue(instance.get(field).toString());
+			this.dropdown.setDisabled(!editable);
 			this.getChildren().add(dropdown);
 			
 			if ( editable ) {
@@ -777,6 +780,7 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 				return;
 			
 			if ( instance.getFields().length != props.size() ) {
+				this.inst = null;
 				setInstance(instance);
 				return;
 			}

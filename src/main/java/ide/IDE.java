@@ -16,6 +16,8 @@ import ide.layout.IdeLayout;
 import lwjgui.LWJGUI;
 import lwjgui.scene.Window;
 import lwjgui.scene.layout.Pane;
+import lwjgui.theme.Theme;
+import lwjgui.theme.ThemeDark;
 
 public class IDE extends RenderableApplication {
 	public static IdeLayout layout;
@@ -41,7 +43,7 @@ public class IDE extends RenderableApplication {
 		background.setBackground(null);
 		win.getScene().setRoot(background);
 		
-		//Theme.setTheme(new ThemeDark());
+		Theme.setTheme(new ThemeDark());
 		
 		// Redraw window if resized
 		GLFW.glfwSetWindowSizeCallback(window, new GLFWWindowSizeCallbackI() {
