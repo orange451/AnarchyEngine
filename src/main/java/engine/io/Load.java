@@ -187,14 +187,18 @@ public class Load {
 		
 		// Set all properties
 		HashMap<String, PropertyValue<?>> properties = inst.properties;
-		String[] propertyKeys = properties.keySet().toArray(new String[properties.keySet().size()]);
-		for (int j = 0; j < propertyKeys.length; j++) {
-			String key = propertyKeys[j];
+		Iterator<Entry<String, PropertyValue<?>>> entrySet = properties.entrySet().iterator();
+		while(entrySet.hasNext()) {
+			Entry<String, PropertyValue<?>> set = entrySet.next();
+			String key = set.getKey();
+			PropertyValue<?> val = set.getValue();
+			
+			// Dont load SID's if game is paused or if non existant
 			if ( key.equals("SID") ) {
 				if (!Game.isRunning())
 					continue;
 				
-				if ( Long.parseLong(properties.get(key).value.toString()) == -1 )
+				if ( Long.parseLong(val.value.toString()) == -1 )
 					continue;
 			}
 			
@@ -203,13 +207,14 @@ public class Load {
 			if ( !hasField )
 				continue;
 			
-			PropertyValue<?> p = properties.get(key);
-			Object value = p.getValue();
-			if ( p.pointer ) {
+			// Get value for property
+			Object value = val.getValue();
+			if ( val.pointer ) {
 				long pointer = ((Long) value).longValue();
 				value = getInstanceFromReference(instancesMap, pointer);
 			}
 			
+			// If value is set, set it in ECS
 			if ( value != null ) {
 				LuaValue lv = (value instanceof LuaValue)?(LuaValue)value:CoerceJavaToLua.coerce(value);
 				if ( !inst.instance.get(key).equals(lv) ) {
