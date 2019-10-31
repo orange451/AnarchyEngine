@@ -29,13 +29,13 @@ import lwjgui.gl.Renderer;
 import lwjgui.scene.Context;
 import lwjgui.scene.control.Label;
 import lwjgui.scene.control.ScrollPane;
-import lwjgui.scene.layout.GridView;
+import lwjgui.scene.layout.FlowPane;
 import lwjgui.scene.layout.OpenGLPane;
 import lwjgui.scene.layout.VBox;
 
 public class IdeMaterialViewer extends IdePane {
 	
-	private GridView materialBox;
+	private FlowPane materialBox;
 	private ScrollPane scrollPane;
 	private HashMap<Material, MaterialNode> materialToNodeMap;
 	private boolean createdConnections;
@@ -77,7 +77,7 @@ public class IdeMaterialViewer extends IdePane {
 			materialToNodeMap.clear();
 		} else {
 			materialToNodeMap = new HashMap<>();
-			materialBox = new GridView();
+			materialBox = new FlowPane();
 			materialBox.setAlignment(Pos.TOP_LEFT);
 			
 			scrollPane = new ScrollPane();
