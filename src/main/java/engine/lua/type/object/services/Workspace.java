@@ -7,6 +7,7 @@ import java.util.List;
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.OneArgFunction;
 
+import engine.InternalGameThread;
 import engine.lua.type.object.Instance;
 import engine.lua.type.object.RunScript;
 import engine.lua.type.object.Service;
@@ -52,6 +53,15 @@ public class Workspace extends Service implements RenderableWorld,TreeViewable,T
 				return LuaValue.NIL;
 			}
 		});
+		
+		InternalGameThread.runLater(()->{
+			Camera camera = this.getCurrentCamera();
+			if ( camera == null )
+				return;
+			
+			if ( camera.getParent().isnil() )
+				camera.forceSetParent(this);
+		});
 	}
 	
 	public Camera getCurrentCamera() {
@@ -83,14 +93,6 @@ public class Workspace extends Service implements RenderableWorld,TreeViewable,T
 				d.internalTick();
 			}
 		}
-		
-		// Camera should never be in nil.
-		Camera currentCamera = this.getCurrentCamera();
-		if ( currentCamera != null ) {
-			if ( currentCamera.getParent().isnil() ) {
-				currentCamera.setParent(this);
-			}
-		}
 	}
 
 	@Override
@@ -98,6 +100,11 @@ public class Workspace extends Service implements RenderableWorld,TreeViewable,T
 		if ( key.eq_b(C_CURRENTCAMERA) ) {
 			if ( value == null || (!value.isnil() && !(value instanceof Camera)) )
 				return null;
+			
+			System.out.println("CAMERA PARENT " + ((Instance)value).getParent());
+			
+			if ( ((Instance)value).getParent().isnil() )
+				((Instance)value).forceSetParent(this);
 		}
 		return value;
 	}
