@@ -11,7 +11,7 @@ plugins {
 sourceCompatibility = "8"
 mainClassName = "ide.IDE"
 project.ext.lwjglVersion = "3.2.3"
-project.ext.jomlVersion = "1.9.17"
+project.ext.jomlVersion = "1.9.19"
 project.ext.gdxVersion = "1.9.3"
 
 switch (OperatingSystem.current()) {
@@ -47,7 +47,7 @@ repositories {
 
 dependencies {
 	api "com.badlogicgames.gdx:gdx-bullet:$gdxVersion"
-	runtime "com.badlogicgames.gdx:gdx-bullet-platform:$gdxVersion:natives-desktop"
+	runtimeOnly "com.badlogicgames.gdx:gdx-bullet-platform:$gdxVersion:natives-desktop"
 	api "com.esotericsoftware:kryonet:2.22.0-RC1"
 	api "com.googlecode.json-simple:json-simple:1.1.1"
 	api "org.luaj:luaj-jse:3.0.1"
