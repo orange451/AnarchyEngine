@@ -428,6 +428,7 @@ public class Save {
 		String resourcesPath = resourcesFolder.getAbsolutePath();
 		copyAssets( resourcesPath + File.separator + "Textures", Game.assets().getTextures());
 		copyAssets( resourcesPath + File.separator + "Meshes", Game.assets().getMeshes());
+		copyAssets( resourcesPath + File.separator + "Audio", Game.assets().getAudio());
 	}
 	
 	@SuppressWarnings("unused")

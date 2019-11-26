@@ -20,6 +20,7 @@ public class Icons {
 	public static final Icons icon_new = new Icons("New.png");
 	public static final Icons icon_save = new Icons("Save.png");
 	public static final Icons icon_saveas = new Icons("SaveAs.png");
+	public static final Icons icon_sound = new Icons("Sound.png");
 	public static final Icons icon_script_service = new Icons("ScriptService.png");
 	public static final Icons icon_script = new Icons("Script.png");
 	public static final Icons icon_script_local = new Icons("ScriptLocal.png");

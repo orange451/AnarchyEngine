@@ -39,6 +39,7 @@ import engine.lua.type.object.insts.Bones;
 import engine.lua.type.object.insts.Material;
 import engine.lua.type.object.insts.Mesh;
 import engine.lua.type.object.insts.Prefab;
+import engine.lua.type.object.insts.AudioSource;
 import engine.lua.type.object.insts.Texture;
 import engine.util.FileUtils;
 import engine.util.IOUtil;
@@ -46,11 +47,12 @@ import ide.layout.windows.icons.Icons;
 
 public class Assets extends Service implements TreeViewable {
 
-	private static final LuaValue C_MATERIALS = LuaValue.valueOf("Materials");
-	private static final LuaValue C_MESHES = LuaValue.valueOf("Meshes");
-	private static final LuaValue C_TEXTURES = LuaValue.valueOf("Textures");
-	private static final LuaValue C_PREFABS = LuaValue.valueOf("Prefabs");
-
+	public static final LuaValue C_MATERIALS = LuaValue.valueOf("Materials");
+	public static final LuaValue C_MESHES = LuaValue.valueOf("Meshes");
+	public static final LuaValue C_TEXTURES = LuaValue.valueOf("Textures");
+	public static final LuaValue C_PREFABS = LuaValue.valueOf("Prefabs");
+	public static final LuaValue C_AUDIO = LuaValue.valueOf("Audio");
+	
 	public Assets() {
 		super("Assets");
 		
@@ -115,6 +117,13 @@ public class Assets extends Service implements TreeViewable {
 		});
 	}
 	
+	public AudioSource importSound(String filepath, Instance parent) {
+		AudioSource t = new AudioSource();
+		t.setFilePath(filepath);
+		t.forceSetParent(parent);
+		return t;
+	}
+	
 	public Texture importTexture(String filepath, Instance parent) {
 		Texture t = new Texture();
 		t.setFilePath(filepath);
@@ -127,6 +136,10 @@ public class Assets extends Service implements TreeViewable {
 	}
 
 	public static Instance newPackage(String name, Instance parent) {
+		return newPackage(LuaValue.valueOf(name), parent);
+	}
+
+	public static Instance newPackage(LuaValue name, Instance parent) {
 		AssetFolder folder = new AssetFolder();
 		folder.rawset("Name", name);
 		folder.forceSetParent(parent);
@@ -196,6 +209,24 @@ public class Assets extends Service implements TreeViewable {
 		for (int i = 0; i < d.size(); i++) {
 			Instance t = d.get(i);
 			if ( t instanceof Mesh ) {
+				assets.add((AssetLoadable) t);
+			}
+		}
+		
+		return assets;
+	}
+	
+	/**
+	 * Get list of all audio sources loaded
+	 * @return
+	 */
+	public List<AssetLoadable> getAudio() {
+		List<AssetLoadable> assets = new ArrayList<AssetLoadable>();
+		List<Instance> d = this.getDescendantsUnsafe();
+		
+		for (int i = 0; i < d.size(); i++) {
+			Instance t = d.get(i);
+			if ( t instanceof AudioSource ) {
 				assets.add((AssetLoadable) t);
 			}
 		}
@@ -517,10 +548,13 @@ public class Assets extends Service implements TreeViewable {
 	public AssetFolder textures() {
 		return (AssetFolder) this.findFirstChild(C_TEXTURES);
 	}
-	
 
 	public AssetFolder prefabs() {
 		return (AssetFolder) this.findFirstChild(C_PREFABS);
+	}
+
+	public AssetFolder audio() {
+		return (AssetFolder) this.findFirstChild(C_AUDIO);
 	}
 
 	public Mesh newMesh() {

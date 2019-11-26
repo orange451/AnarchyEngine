@@ -4,7 +4,7 @@ import engine.Game;
 import engine.GameEngine;
 import engine.application.launchstrategy.ServerLauncher;
 import engine.lua.LuaEngine;
-import engine.lua.type.object.services.GameLua;
+import engine.lua.type.object.services.GameECS;
 import engine.observer.Tickable;
 
 public abstract class Application extends GameEngine implements Tickable {
@@ -62,7 +62,7 @@ public abstract class Application extends GameEngine implements Tickable {
 		LuaEngine.initialize();
 		
 		// Create the game instance
-		Game.setGame(new GameLua());
+		Game.setGame(new GameECS());
 		
 		// Start a new project
 		Game.changes = false;

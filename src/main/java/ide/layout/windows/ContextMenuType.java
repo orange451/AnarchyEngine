@@ -19,6 +19,64 @@ import lwjgui.scene.image.ImageView;
 
 @SuppressWarnings("unchecked")
 public abstract class ContextMenuType {
+	public static final ContextMenuType NEW_AUDIO = new ContextMenuType(AssetFolder.class) {
+		{
+			this.setMustMatchName("Audio");
+		}
+
+		@Override
+		public String getMenuName() {
+			return "New Audio Source";
+		}
+
+		@Override
+		public ImageView getMenuGraphic() {
+			return Icons.icon_sound.getView();
+		}
+
+		@Override
+		public void onClick(Instance instance) {
+			Instance prefab = Instance.instanceLua(AudioSource.class.getSimpleName());
+			prefab.forceSetParent(instance);
+			
+			Game.historyService().pushChange(prefab, LuaValue.valueOf("Parent"), LuaValue.NIL, prefab.getParent());
+		}
+	};
+	
+	public static final ContextMenuType IMPORT_AUDIO = new ContextMenuType(AssetFolder.class) {
+		{
+			this.setMustMatchName("Audio");
+		}
+
+		@Override
+		public String getMenuName() {
+			return "Import Audio Source";
+		}
+
+		@Override
+		public ImageView getMenuGraphic() {
+			return Icons.icon_sound.getView();
+		}
+
+		@Override
+		public void onClick(Instance instance) {
+			String path = "";
+			PointerBuffer outPath = MemoryUtil.memAllocPointer(1);
+			int result = NativeFileDialog.NFD_OpenDialog(AudioSource.getFileTypes(), new File("").getAbsolutePath(), outPath);
+			if (result == NativeFileDialog.NFD_OKAY) {
+				path = outPath.getStringUTF8(0);
+				Instance t = Game.assets().importSound(path, instance);
+				File ff = new File(path);
+				if ( ff.exists() ) {
+					t.forceSetName(FileUtils.getFileNameWithoutExtension(ff.getName()));
+				}
+				Game.historyService().pushChange(t, LuaValue.valueOf("Parent"), LuaValue.NIL, t.getParent());
+			} else {
+				return;
+			}
+		}
+	};
+	
 	public static final ContextMenuType NEW_PREFAB = new ContextMenuType(AssetFolder.class) {
 		{
 			this.setMustMatchName("Prefabs");

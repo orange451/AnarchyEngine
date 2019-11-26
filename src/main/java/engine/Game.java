@@ -33,12 +33,13 @@ import engine.lua.type.object.services.Assets;
 import engine.lua.type.object.services.Connections;
 import engine.lua.type.object.services.Core;
 import engine.lua.type.object.services.Debris;
-import engine.lua.type.object.services.GameLua;
+import engine.lua.type.object.services.GameECS;
 import engine.lua.type.object.services.HistoryService;
 import engine.lua.type.object.services.Lighting;
 import engine.lua.type.object.services.Players;
 import engine.lua.type.object.services.RunService;
 import engine.lua.type.object.services.ScriptService;
+import engine.lua.type.object.services.SoundService;
 import engine.lua.type.object.services.StarterPlayer;
 import engine.lua.type.object.services.StarterPlayerScripts;
 import engine.lua.type.object.services.Storage;
@@ -101,6 +102,9 @@ public class Game implements Tickable {
 
 		if ( Game.getService("UserInputService") == null )
 			new UserInputService().forceSetParent(Game.game());
+		
+		if ( Game.getService("SoundService") == null )
+			new SoundService().forceSetParent(Game.game());
 
 		if ( Game.getService("RunService") == null )
 			new RunService().forceSetParent(Game.game());
@@ -108,7 +112,6 @@ public class Game implements Tickable {
 		if ( Game.getService("Debris") == null )
 			new Debris().forceSetParent(Game.game());
 		
-
 		if ( Game.getService("HistoryService") == null )
 			new HistoryService().forceSetParent(Game.game());
 		
@@ -151,7 +154,7 @@ public class Game implements Tickable {
 		if ( Game.game().isnil() )
 			return servs;
 		
-		List<Instance> children = ((GameLua)Game.game()).getChildren();
+		List<Instance> children = ((GameECS)Game.game()).getChildren();
 		for (int i = 0; i < children.size(); i++) {
 			Instance child = children.get(i);
 			if ( child instanceof Service ) {
@@ -179,12 +182,12 @@ public class Game implements Tickable {
 	private static final LuaValue C_HISTORYSERVICE = LuaValue.valueOf("HistoryService");
 	private static final LuaValue C_ASSETS = LuaValue.valueOf("Assets");
 
-	public static GameLua game() {
+	public static GameECS game() {
 		LuaValue game = LuaEngine.globals.get(C_GAME);
-		return game.isnil()?null:(GameLua) game;
+		return game.isnil()?null:(GameECS) game;
 	}
 	
-	public static void setGame(GameLua game) {
+	public static void setGame(GameECS game) {
 		LuaEngine.globals.set(C_GAME, game);
 	}
 
@@ -324,20 +327,20 @@ public class Game implements Tickable {
 					pls.forceSetParent(Game.starterPlayer());
 				}
 				
-				if ( Game.getService("Assets").findFirstChild("Prefabs") == null )
-					Assets.newPackage("Prefabs", Game.getService("Assets"));
+				if ( Game.assets().findFirstChild(Assets.C_PREFABS) == null )
+					Assets.newPackage(Assets.C_PREFABS, Game.assets());
 
-				if ( Game.getService("Assets").findFirstChild("Meshes") == null )
-					Assets.newPackage("Meshes", Game.getService("Assets"));
+				if ( Game.assets().findFirstChild(Assets.C_MESHES) == null )
+					Assets.newPackage(Assets.C_MESHES, Game.assets());
 
-				if ( Game.getService("Assets").findFirstChild("Materials") == null )
-					Assets.newPackage("Materials", Game.getService("Assets"));
+				if ( Game.assets().findFirstChild(Assets.C_MATERIALS) == null )
+					Assets.newPackage(Assets.C_MATERIALS, Game.assets());
 
-				if ( Game.getService("Assets").findFirstChild("Textures") == null )
-					Assets.newPackage("Textures", Game.getService("Assets"));
+				if ( Game.assets().findFirstChild(Assets.C_TEXTURES) == null )
+					Assets.newPackage(Assets.C_TEXTURES, Game.assets());
 
-				if ( Game.getService("Assets").findFirstChild("Audio") == null )
-					Assets.newPackage("Audio", Game.getService("Assets"));
+				if ( Game.assets().findFirstChild(Assets.C_AUDIO) == null )
+					Assets.newPackage(Assets.C_AUDIO, Game.assets());
 				
 				// Set changes to false, so we're not prompted with save dialog later.
 				InternalGameThread.runLater(()-> {
