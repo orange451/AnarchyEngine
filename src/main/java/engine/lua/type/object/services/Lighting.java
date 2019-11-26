@@ -107,9 +107,18 @@ public class Lighting extends Service implements TreeViewable {
 				pp.setStaticSkybox(null);
 			}
 			
-			skyboxDestroyed.disconnect();
-			skyboxChanged.disconnect();
-			skyboxImageChanged.disconnect();
+			if ( skyboxDestroyed != null )
+				skyboxDestroyed.disconnect();
+			
+			if ( skyboxChanged != null )
+				skyboxChanged.disconnect();
+			
+			if ( skyboxImageChanged != null )
+				skyboxImageChanged.disconnect();
+
+			skyboxDestroyed = null;
+			skyboxChanged = null;
+			skyboxImageChanged = null;
 			return value;
 		} else {
 			if ( value instanceof DynamicSkybox ) {
