@@ -23,6 +23,9 @@ public class MultipleViewport extends ClientApplication {
 	@Override
 	public void render() {
 		super.render();
+		
+		if ( secondaryPipeline == null )
+			return;
 
 		// Render secondary Buffer
 		secondaryPipeline.render();
