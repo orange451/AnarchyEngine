@@ -415,7 +415,8 @@ public class Game implements Tickable {
 				Camera c = new Camera();
 				c.setArchivable(false);
 				c.forceSetParent(Game.workspace());
-				workspace().setCurrentCamera(c);
+				Game.workspace().setCurrentCamera(c);
+				ticksNoCamera = 0;
 			}
 		} else {
 			ticksNoCamera = 0;

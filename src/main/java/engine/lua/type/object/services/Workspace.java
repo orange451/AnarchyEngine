@@ -101,8 +101,6 @@ public class Workspace extends Service implements RenderableWorld,TreeViewable,T
 			if ( value == null || (!value.isnil() && !(value instanceof Camera)) )
 				return null;
 			
-			System.out.println("CAMERA PARENT " + ((Instance)value).getParent());
-			
 			if ( ((Instance)value).getParent().isnil() )
 				((Instance)value).forceSetParent(this);
 		}
