@@ -46,10 +46,9 @@ public class IDE extends RenderableApplication {
 		Theme.setTheme(new ThemeDark());
 		
 		// Redraw window if resized
-		GLFW.glfwSetWindowSizeCallback(window, new GLFWWindowSizeCallbackI() {
+		win.addEventListener(new lwjgui.event.listener.WindowSizeListener() {
 			@Override
-			public void invoke(long handle, int wid, int hei) {
-				LWJGUI.render();
+			public void invoke(long arg0, int arg1, int arg2) {
 				renderThread.forceUpdate();
 			}
 		});
