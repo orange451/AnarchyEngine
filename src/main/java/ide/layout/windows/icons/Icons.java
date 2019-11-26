@@ -1,5 +1,7 @@
 package ide.layout.windows.icons;
 
+import lwjgui.scene.Context;
+import lwjgui.scene.Node;
 import lwjgui.scene.image.Image;
 import lwjgui.scene.image.ImageView;
 
@@ -33,6 +35,7 @@ public class Icons {
 	public static final Icons icon_player = new Icons("Player.png");
 	public static final Icons icon_play = new Icons("Play.png");
 	public static final Icons icon_play_server = new Icons("PlayServer.png");
+	public static final Icons icon_plus = new Icons("plus-small.png");
 	public static final Icons icon_camera = new Icons("Camera.png");
 	public static final Icons icon_keyboard = new Icons("Keyboard.png");
 	public static final Icons icon_network = new Icons("Network.png");
@@ -68,5 +71,25 @@ public class Icons {
 		ImageView iconView = new ImageView(image);
 		iconView.setPrefSize(16, 16);
 		return iconView;
+	}
+	
+	public ImageView getViewWithIcon(Icons icon) {
+		ImageView t = new ImageView(image) {
+			private ImageView internalIcon;
+			
+			{
+				this.internalIcon = new ImageView(icon.getImage());
+				this.internalIcon.setPrefSize(16, 16);
+			}
+			
+			@Override
+			public void render(Context context) {
+				super.render(context);
+				this.internalIcon.setAbsolutePosition(this.getX()+this.getWidth()/2-1, this.getY()+this.getHeight()/2-1);
+				this.internalIcon.render(context);
+			}
+		};
+		t.setPrefSize(16,16);
+		return t;
 	}
 }

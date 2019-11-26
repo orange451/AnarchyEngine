@@ -56,6 +56,13 @@ public class HistoryService extends Service {
 		return this.historyStack;
 	}
 	
+	/**
+	 * Push a generic change of an Instance. Creates a single HistorySnapshot.
+	 * @param object
+	 * @param field
+	 * @param oldValue
+	 * @param newValue
+	 */
 	public void pushChange(Instance object, LuaValue field, LuaValue oldValue, LuaValue newValue) {
 		if ( this.checkEquals(oldValue, newValue) )
 			return;
@@ -77,9 +84,23 @@ public class HistoryService extends Service {
 		this.pushChange(snapshot);
 	}
 	
+	/**
+	 * Push a History Snapshot to the stack.
+	 * @param snapshot
+	 */
 	public void pushChange(HistorySnapshot snapshot) {
 		// Push to history
 		this.historyStack.push(snapshot);
+	}
+	
+	/**
+	 * Pushes a Instance's parent change from A to B. This generates a new History Snapshot.
+	 * @param object
+	 * @param from
+	 * @param to
+	 */
+	public void pushChangeParent(Instance object, LuaValue from, LuaValue to) {
+		pushChange(object, LuaValue.valueOf("Parent"), from, to);
 	}
 	
 	public void undo() {

@@ -31,7 +31,7 @@ public abstract class ContextMenuType {
 
 		@Override
 		public ImageView getMenuGraphic() {
-			return Icons.icon_sound.getView();
+			return Icons.icon_sound.getViewWithIcon(Icons.icon_plus);
 		}
 
 		@Override
@@ -39,7 +39,7 @@ public abstract class ContextMenuType {
 			Instance prefab = Instance.instanceLua(AudioSource.class.getSimpleName());
 			prefab.forceSetParent(instance);
 			
-			Game.historyService().pushChange(prefab, LuaValue.valueOf("Parent"), LuaValue.NIL, prefab.getParent());
+			Game.historyService().pushChangeParent(prefab, LuaValue.NIL, prefab.getParent());
 		}
 	};
 	
@@ -55,7 +55,7 @@ public abstract class ContextMenuType {
 
 		@Override
 		public ImageView getMenuGraphic() {
-			return Icons.icon_sound.getView();
+			return Icons.icon_sound.getViewWithIcon(Icons.icon_plus);
 		}
 
 		@Override
@@ -89,7 +89,7 @@ public abstract class ContextMenuType {
 
 		@Override
 		public ImageView getMenuGraphic() {
-			return Icons.icon_model.getView();
+			return Icons.icon_model.getViewWithIcon(Icons.icon_plus);
 		}
 
 		@Override
@@ -113,7 +113,7 @@ public abstract class ContextMenuType {
 
 		@Override
 		public ImageView getMenuGraphic() {
-			return Icons.icon_model.getView();
+			return Icons.icon_model.getViewWithIcon(Icons.icon_plus);
 		}
 
 		@Override
@@ -143,7 +143,7 @@ public abstract class ContextMenuType {
 
 		@Override
 		public ImageView getMenuGraphic() {
-			return Icons.icon_texture.getView();
+			return Icons.icon_texture.getViewWithIcon(Icons.icon_plus);
 		}
 
 		@Override
@@ -166,7 +166,7 @@ public abstract class ContextMenuType {
 
 		@Override
 		public ImageView getMenuGraphic() {
-			return Icons.icon_texture.getView();
+			return Icons.icon_texture.getViewWithIcon(Icons.icon_plus);
 		}
 
 		@Override
@@ -202,7 +202,7 @@ public abstract class ContextMenuType {
 
 		@Override
 		public ImageView getMenuGraphic() {
-			return Icons.icon_material.getView();
+			return Icons.icon_material.getViewWithIcon(Icons.icon_plus);
 		}
 
 		@Override
@@ -225,7 +225,7 @@ public abstract class ContextMenuType {
 
 		@Override
 		public ImageView getMenuGraphic() {
-			return Icons.icon_mesh.getView();
+			return Icons.icon_mesh.getViewWithIcon(Icons.icon_plus);
 		}
 
 		@Override
@@ -245,7 +245,7 @@ public abstract class ContextMenuType {
 
 		@Override
 		public ImageView getMenuGraphic() {
-			return Icons.icon_wat.getView();
+			return Icons.icon_wat.getViewWithIcon(Icons.icon_plus);
 		}
 
 		@Override
@@ -263,7 +263,7 @@ public abstract class ContextMenuType {
 
 		@Override
 		public ImageView getMenuGraphic() {
-			return Icons.icon_gameobject.getView();
+			return Icons.icon_gameobject.getViewWithIcon(Icons.icon_plus);
 		}
 
 		@Override
