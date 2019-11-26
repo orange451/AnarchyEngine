@@ -43,7 +43,7 @@ public class IDE extends RenderableApplication {
 		background.setBackground(null);
 		win.getScene().setRoot(background);
 		
-		Theme.setTheme(new ThemeDark());
+		//Theme.setTheme(new ThemeDark());
 		
 		// Redraw window if resized
 		win.addEventListener(new lwjgui.event.listener.WindowSizeListener() {
