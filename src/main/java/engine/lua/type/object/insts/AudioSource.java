@@ -57,6 +57,6 @@ public class AudioSource extends AssetLoadable implements TreeViewable {
 	}
 
 	public static String getFileTypes() {
-		return "midi,ogg";
+		return "midi,ogg,wav";
 	}
 }
