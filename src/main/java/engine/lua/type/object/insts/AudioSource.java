@@ -1,6 +1,9 @@
 package engine.lua.type.object.insts;
 
 import org.luaj.vm2.LuaValue;
+import org.luaj.vm2.lib.ZeroArgFunction;
+
+import engine.Game;
 import engine.lua.type.object.AssetLoadable;
 import engine.lua.type.object.TreeViewable;
 import engine.lua.type.object.services.Assets;
@@ -10,6 +13,19 @@ public class AudioSource extends AssetLoadable implements TreeViewable {
 	
 	public AudioSource() {
 		super("AudioSource");
+		
+		this.getmetatable().set("Play", new ZeroArgFunction() {
+
+			@Override
+			public LuaValue call() {
+				try {
+					Game.soundService().playSound(AudioSource.this);
+				} catch(Exception e) {
+					e.printStackTrace();
+				}
+				return LuaValue.NIL;
+			}
+		});
 	}
 
 	@Override
@@ -41,6 +57,6 @@ public class AudioSource extends AssetLoadable implements TreeViewable {
 	}
 
 	public static String getFileTypes() {
-		return "ogg";
+		return "midi,ogg";
 	}
 }

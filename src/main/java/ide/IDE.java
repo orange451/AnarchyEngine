@@ -4,8 +4,6 @@ import java.io.IOException;
 
 import org.joml.Vector2f;
 import org.lwjgl.glfw.GLFW;
-import org.lwjgl.glfw.GLFWWindowSizeCallbackI;
-
 import engine.Game;
 import engine.InternalGameThread;
 import engine.InternalRenderThread;
@@ -16,8 +14,6 @@ import ide.layout.IdeLayout;
 import lwjgui.LWJGUI;
 import lwjgui.scene.Window;
 import lwjgui.scene.layout.Pane;
-import lwjgui.theme.Theme;
-import lwjgui.theme.ThemeDark;
 
 public class IDE extends RenderableApplication {
 	public static IdeLayout layout;

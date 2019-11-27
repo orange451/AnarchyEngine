@@ -1,5 +1,7 @@
 package engine.al;
 
+import org.joml.Vector3f;
+
 import paulscode.sound.SoundSystem;
 import paulscode.sound.SoundSystemConfig;
 import paulscode.sound.SoundSystemException;
@@ -25,5 +27,13 @@ public class InternalSoundService {
 	public void stopSoundSystem() {
 		soundSystem.cleanup();
 		soundSystem = null;
+	}
+	
+	public String quickPlay(String filepath, Vector3f position) {
+		return soundSystem.quickPlay(false, filepath, false, position.x, position.y, position.z, SoundSystemConfig.ATTENUATION_ROLLOFF, SoundSystemConfig.getDefaultRolloff());
+	}
+	
+	public SoundSystem getSoundSystem() {
+		return this.soundSystem;
 	}
 }
