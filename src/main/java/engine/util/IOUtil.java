@@ -24,15 +24,20 @@ public final class IOUtil {
 	}
 
 	public static URL ioResourceGetURL( String resource ) {
+		// Search inside jar
 		URL url = IOUtil.class.getClassLoader().getResource(resource);
+		
+		// File not found. Search outside jar
 		if (url == null) {
 			try {
-				return new File(resource).toURI().toURL();
+				url = new File(resource).toURI().toURL();
 			} catch (MalformedURLException e) {
-				//
+				// NO FILE
+				return null;
 			}
 		}
 
+		// Return url;
 		return url;
 	}
 

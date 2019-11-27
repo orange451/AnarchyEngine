@@ -2,6 +2,8 @@ package paulscode.sound;
 
 import java.net.URL;
 
+import engine.util.IOUtil;
+
 /**
  * The FilenameURL class is designed to associate a String filename/identifier
  * with a URL.  Handles either case where user supplies a String path or user
@@ -126,8 +128,9 @@ public class FilenameURL
             else
             {
                 // Inside the JAR
-                url = getClass().getClassLoader().getResource(
-                      SoundSystemConfig.getSoundFilesPackage() + filename );
+            	url = IOUtil.ioResourceGetURL(filename);
+                /*url = getClass().getClassLoader().getResource(
+                      SoundSystemConfig.getSoundFilesPackage() + filename );*/
             }
         }
         return url;
