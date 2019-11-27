@@ -6,6 +6,7 @@ import paulscode.sound.SoundSystem;
 import paulscode.sound.SoundSystemConfig;
 import paulscode.sound.SoundSystemException;
 import paulscode.sound.codecs.CodecJOgg;
+import paulscode.sound.codecs.CodecWav;
 import paulscode.sound.libraries.LibraryLWJGLOpenAL;
 
 public class InternalSoundService {
@@ -15,6 +16,7 @@ public class InternalSoundService {
 		try {
 			SoundSystemConfig.addLibrary(LibraryLWJGLOpenAL.class);
 			SoundSystemConfig.setCodec("ogg", CodecJOgg.class);
+			SoundSystemConfig.setCodec("wav", CodecWav.class);
 		} catch (SoundSystemException e) {
 			System.out.println("Error loading libraries or codecs");
 		}

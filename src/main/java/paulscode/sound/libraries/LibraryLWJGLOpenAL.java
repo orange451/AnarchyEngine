@@ -13,6 +13,7 @@ import javax.sound.sampled.AudioFormat;
 import org.lwjgl.BufferUtils;
 import org.lwjglx.openal.AL;
 import org.lwjgl.openal.AL10;
+import org.lwjgl.openal.EXTFloat32;
 
 import paulscode.sound.Channel;
 import paulscode.sound.FilenameURL;
@@ -410,6 +411,10 @@ public class LibraryLWJGLOpenAL extends Library
             {
                 soundFormat = AL10.AL_FORMAT_MONO16;
             }
+            else if( audioFormat.getSampleSizeInBits() == 32 )
+			{
+				soundFormat = EXTFloat32.AL_FORMAT_MONO_FLOAT32;
+			}
             else
             {
                 errorMessage( "Illegal sample size in method 'loadSound'" );
@@ -426,6 +431,10 @@ public class LibraryLWJGLOpenAL extends Library
             {
                 soundFormat = AL10.AL_FORMAT_STEREO16;
             }
+            else if( audioFormat.getSampleSizeInBits() == 32 )
+			{
+				soundFormat = EXTFloat32.AL_FORMAT_STEREO_FLOAT32;
+			}
             else
             {
                 errorMessage( "Illegal sample size in method 'loadSound'" );
@@ -522,6 +531,10 @@ public class LibraryLWJGLOpenAL extends Library
             {
                 soundFormat = AL10.AL_FORMAT_MONO16;
             }
+            else if( audioFormat.getSampleSizeInBits() == 32 )
+			{
+				soundFormat = EXTFloat32.AL_FORMAT_MONO_FLOAT32;
+			}
             else
             {
                 errorMessage( "Illegal sample size in method 'loadSound'" );
@@ -538,6 +551,10 @@ public class LibraryLWJGLOpenAL extends Library
             {
                 soundFormat = AL10.AL_FORMAT_STEREO16;
             }
+            else if( audioFormat.getSampleSizeInBits() == 32 )
+			{
+				soundFormat = EXTFloat32.AL_FORMAT_STEREO_FLOAT32;
+			}
             else
             {
                 errorMessage( "Illegal sample size in method 'loadSound'" );
