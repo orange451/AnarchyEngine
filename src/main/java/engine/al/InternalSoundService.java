@@ -27,8 +27,10 @@ public class InternalSoundService {
 	}
 
 	public void stopSoundSystem() {
+		System.out.println("Stopping sound system...");
 		soundSystem.cleanup();
 		soundSystem = null;
+		System.out.println("Sound system stopped");
 	}
 	
 	public String quickPlay(String filepath, Vector3f position) {

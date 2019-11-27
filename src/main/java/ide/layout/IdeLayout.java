@@ -83,6 +83,8 @@ public class IdeLayout {
 		south.dock(new IdeMaterialViewer());
 		
 		LWJGUI.runLater(() -> {
+			south.select(south.getTabs().get(0));
+			
 			SplitPane.setResizableWithParent(split.getItems().get(0), false);
 			SplitPane.setResizableWithParent(split.getItems().get(2), false);
 			SplitPane.setResizableWithParent(middle.getItems().get(1), false);

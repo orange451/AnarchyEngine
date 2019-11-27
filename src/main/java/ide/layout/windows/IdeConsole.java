@@ -44,6 +44,7 @@ public class IdeConsole extends IdePane {
 		editBox.setCenter(console);
 
 		TextField luaInput = new TextField();
+		luaInput.setFont(Font.COURIER);
 		luaInput.setPrompt("Lua Command Line");
 		luaInput.setFillToParentWidth(true);
 		editBox.setBottom(luaInput);
