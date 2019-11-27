@@ -10,16 +10,19 @@ import engine.lua.type.object.services.Assets;
 import ide.layout.windows.icons.Icons;
 
 public class AudioSource extends AssetLoadable implements TreeViewable {
+	private static final LuaValue C_PLAY = LuaValue.valueOf("Play");
 	
 	public AudioSource() {
 		super("AudioSource");
+		
+		this.defineField(C_PLAY.toString(), LuaValue.FALSE, false);
 		
 		this.getmetatable().set("Play", new ZeroArgFunction() {
 
 			@Override
 			public LuaValue call() {
 				try {
-					Game.soundService().playSound(AudioSource.this);
+					playSource();
 				} catch(Exception e) {
 					e.printStackTrace();
 				}
@@ -33,7 +36,16 @@ public class AudioSource extends AssetLoadable implements TreeViewable {
 		if ( this.containsField(key) ) {
 			//changed = true;
 		}
+		
+		if ( key.eq_b(C_PLAY) ) {
+			playSource();
+			value = LuaValue.FALSE;
+		}
 		return value;
+	}
+
+	public void playSource() {
+		Game.soundService().playSound(this);
 	}
 
 	@Override
