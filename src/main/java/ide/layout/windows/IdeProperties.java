@@ -246,6 +246,7 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 			this.setMaxHeight(20);
 			this.setMinHeight(20);
 			this.setAlignment(Pos.CENTER_LEFT);
+			this.setFillToParentWidth(true);
 		}
 	}
 	
@@ -282,6 +283,7 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 			if ( editable ) {
 				this.check.setOnAction(event -> {
 					setWithHistory(this.instance, field, LuaValue.valueOf(this.check.isChecked()));
+					this.check.setChecked(this.instance.get(field).toboolean());
 					this.check.setText(""+this.check.isChecked());
 				});
 			}
@@ -505,6 +507,14 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 	static class StringPropertyModifier extends PropertyModifierInput {
 		public StringPropertyModifier(Instance instance, String field, LuaValue initialValue, boolean editable) {
 			super(instance, field, initialValue, editable);
+			
+			this.textField.setFillToParentWidth(true);
+		}
+		
+		@Override
+		public void position(Node parent) {
+			super.position(parent);
+			this.textField.forceWidth(this.getWidth()-this.getPadding().getWidth());
 		}
 
 		@Override
@@ -703,9 +713,7 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 			// Create column constraints
 			ColumnConstraint const1 = new ColumnConstraint( 100 );
 			const1.setFillWidth(true);
-			ColumnConstraint const2 = new ColumnConstraint( 0 );
-			const2.setHgrow(Priority.ALWAYS);
-			const2.setFillWidth(true);
+			ColumnConstraint const2 = new ColumnConstraint( 0, Priority.ALWAYS );
 			
 			// Create grid
 			internal = new GridPane();
@@ -768,9 +776,11 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 			}
 			
 			this.updateChildren();
-			this.updateChildrenLocalRecursive();
+			this.position(this.getParent());
 			this.position(this.getParent());
 			this.render(this.cached_context);
+			this.render(this.cached_context);
+			this.updateChildrenLocalRecursive();
 			
 			this.internal.updateChildren();
 		}
