@@ -67,6 +67,6 @@ public class SoundService extends Service implements TreeViewable {
 	}
 
 	public void playSound(AudioSource audioSource) {
-		this.internalSound.quickPlay(audioSource.getFilePath(), new Vector3f());
+		this.internalSound.quickPlay(audioSource.getAbsoluteFilePath(), new Vector3f());
 	}
 }

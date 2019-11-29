@@ -2,6 +2,7 @@ package engine.lua.type.object;
 
 import org.luaj.vm2.LuaValue;
 
+import engine.FilePath;
 import engine.io.FileResource;
 
 public abstract class AssetLoadable extends Asset implements FileResource {
@@ -24,6 +25,10 @@ public abstract class AssetLoadable extends Asset implements FileResource {
 	@Override
 	public String getFilePath() {
 		return this.get(C_FILEPATH).toString();
+	}
+	
+	public String getAbsoluteFilePath() {
+		return FilePath.convertToSystem(getFilePath());
 	}
 	
 	public void resetFilePath() {
