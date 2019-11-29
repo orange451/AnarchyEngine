@@ -128,6 +128,7 @@ public class InternalGameThread extends Observable implements Runnable {
 	
 	private void cleanup() {
 		System.out.println("Cleaning up ECS");
+		List<Service> services = Game.getServices();
 		
 		// Clean up all lua objects
 		Game.unload();
@@ -136,7 +137,6 @@ public class InternalGameThread extends Observable implements Runnable {
 		System.out.println("Destroying services");
 		
 		// Stop services
-		ArrayList<Service> services = Game.getServices();
 		for (int i = 0; i < services.size(); i++) {
 			services.get(i).destroy();
 		}

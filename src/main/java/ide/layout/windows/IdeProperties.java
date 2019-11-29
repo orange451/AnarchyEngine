@@ -445,6 +445,7 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 			//this.textField.setPreferredColumnCount(1024);
 			//this.textField.setFillToParentWidth(true);
 			this.textField.setAlignment(Pos.CENTER_LEFT);
+			this.textField.setFillToParentWidth(true);
 			
 			if ( editable ) {
 				this.setOnMouseReleased(event -> {
@@ -493,7 +494,9 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 		
 		@Override
 		public void position(Node parent) {
+			this.textField.setPrefWidth(0);
 			super.position(parent);
+			this.textField.forceWidth(this.getWidth()-this.getPadding().getWidth());
 			
 			if ( !this.isDescendentSelected() ) {
 				cancel();
@@ -507,14 +510,6 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 	static class StringPropertyModifier extends PropertyModifierInput {
 		public StringPropertyModifier(Instance instance, String field, LuaValue initialValue, boolean editable) {
 			super(instance, field, initialValue, editable);
-			
-			this.textField.setFillToParentWidth(true);
-		}
-		
-		@Override
-		public void position(Node parent) {
-			super.position(parent);
-			this.textField.forceWidth(this.getWidth()-this.getPadding().getWidth());
 		}
 
 		@Override

@@ -48,11 +48,16 @@ public class InternalRenderThread {
 
 				// Do external rendering
 				for (int i = 0; i < externalNotify.size(); i++) {
+					if ( !InternalGameThread.isRunning() )
+						continue;
 					externalNotify.get(i).render();
 				}
 
 				// Do external post-rendering
 				for (int i = 0; i < externalNotify.size(); i++) {
+					if ( !InternalGameThread.isRunning() )
+						continue;
+					
 					if ( externalNotify.get(i) instanceof PostRenderable ) {
 						((PostRenderable)externalNotify.get(i)).postRender();
 					}

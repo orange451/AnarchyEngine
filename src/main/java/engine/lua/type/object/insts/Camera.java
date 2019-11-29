@@ -182,6 +182,8 @@ public class Camera extends Instance implements TreeViewable {
 	}
 	
 	public Vector3 getPosition() {
+		if ( this.destroyed )
+			return new Vector3();
 		return (Vector3)this.get(C_POSITION);
 	}
 	
@@ -190,6 +192,9 @@ public class Camera extends Instance implements TreeViewable {
 	}
 	
 	public Vector3 getLookAt() {
+		if ( this.destroyed )
+			return new Vector3();
+		
 		return (Vector3)this.get(C_LOOKAT);
 	}
 

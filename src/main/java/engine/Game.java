@@ -146,8 +146,8 @@ public class Game implements Tickable {
 		return null;
 	}
 	
-	public static ArrayList<Service> getServices() {
-		ArrayList<Service> servs = new ArrayList<Service>();
+	public static List<Service> getServices() {
+		List<Service> servs = new ArrayList<Service>();
 		
 		if ( !loaded )
 			return servs;
@@ -305,7 +305,7 @@ public class Game implements Tickable {
 	}
 	
 	public static void clearServices() {
-		ArrayList<Service> services = Game.getServices();
+		List<Service> services = Game.getServices();
 		for (int i = 0; i < services.size(); i++) {
 			List<Instance> desc = services.get(i).getDescendants();
 			for (int j = 0; j < desc.size(); j++) {

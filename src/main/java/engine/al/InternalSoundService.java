@@ -28,12 +28,16 @@ public class InternalSoundService {
 
 	public void stopSoundSystem() {
 		System.out.println("Stopping sound system...");
-		soundSystem.cleanup();
+		if ( soundSystem != null )
+			soundSystem.cleanup();
 		soundSystem = null;
 		System.out.println("Sound system stopped");
 	}
 	
 	public String quickPlay(String filepath, Vector3f position) {
+		if ( soundSystem == null )
+			return null;
+		
 		return soundSystem.quickPlay(false, filepath, false, position.x, position.y, position.z, SoundSystemConfig.ATTENUATION_ROLLOFF, SoundSystemConfig.getDefaultRolloff());
 	}
 	
