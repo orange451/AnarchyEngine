@@ -56,6 +56,7 @@ public class Icons {
 	public static final Icons icon_skybox = new Icons("Skybox.png");
 	public static final Icons icon_undo = new Icons("Undo.png");
 	public static final Icons icon_redo = new Icons("Redo.png");
+	public static final Icons icon_value = new Icons("Value2.png");
 	
 	private final Image image;
 	
