@@ -13,10 +13,13 @@ import engine.lua.type.NumberClamp;
 import engine.lua.type.data.Matrix4;
 import engine.lua.type.data.Vector3;
 import engine.lua.type.object.Instance;
+import engine.lua.type.object.Positionable;
 import engine.lua.type.object.TreeViewable;
+import engine.util.AABBUtil;
+import engine.util.Pair;
 import ide.layout.windows.icons.Icons;
 
-public class Camera extends Instance implements TreeViewable {
+public class Camera extends Instance implements TreeViewable,Positionable {
 
 	private static final LuaValue C_VIEWMATRIX = LuaValue.valueOf("ViewMatrix");
 	private static final LuaValue C_FOV = LuaValue.valueOf("Fov");
@@ -266,5 +269,15 @@ public class Camera extends Instance implements TreeViewable {
 
 	public void setCameraType(String type) {
 		this.set(C_CAMERATYPE, LuaValue.valueOf(type));
+	}
+
+	@Override
+	public Pair<Vector3f, Vector3f> getAABB() {
+		return AABBUtil.newAABB(new Vector3f(), new Vector3f());
+	}
+	
+	@Override
+	public Matrix4 getWorldMatrix() {
+		return new Matrix4(getPosition());
 	}
 }
