@@ -19,7 +19,7 @@ public class Vector3 extends LuaValuetype {
 	protected static final LuaValue C_MAGNITUDE = LuaValue.valueOf("Magnitude");
 	
 	private Vector3f internal;
-	private boolean modified;
+	private boolean modified = true;
 	
 	@Override
 	public String typename() {
@@ -306,13 +306,13 @@ public class Vector3 extends LuaValuetype {
 
 	@Override
 	protected LuaValue onValueSet(LuaValue key, LuaValue value) {
-		return null; // Unmodifiable
+		return null; // Unmodifiable from lua side
 	}
 
 	@Override
 	protected boolean onValueGet(LuaValue key) {
 		if ( key.eq_b(C_UNIT) || key.eq_b(C_MAGNITUDE) ) {
-			if ( modified ) {
+			if ( modified || (key.eq_b(C_UNIT) && this.rawget(C_UNIT).isnil()) ) {
 				modified = false;
 				
 				// Compute magnitude
@@ -324,11 +324,15 @@ public class Vector3 extends LuaValuetype {
 				this.rawset(C_MAGNITUDE, LuaValue.valueOf(magnitude));
 				
 				// Compute unit vector
-				this.rawset(C_UNIT, new Vector3(new Vector3f(
-						getX() / magnitude,
-						getY() / magnitude,
-						getZ() / magnitude
-				)));
+				if ( magnitude > 0 ) {
+					this.rawset(C_UNIT, new Vector3(new Vector3f(
+							getX() / magnitude,
+							getY() / magnitude,
+							getZ() / magnitude
+					)));
+				} else {
+					this.rawset(C_UNIT, new Vector3());
+				}
 			}
 		}
 		
@@ -348,6 +352,7 @@ public class Vector3 extends LuaValuetype {
 	 * @return
 	 */
 	public Vector3f getInternal() {
+		this.modified = true;
 		return this.internal;
 	}
 

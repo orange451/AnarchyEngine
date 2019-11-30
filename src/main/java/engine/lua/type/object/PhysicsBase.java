@@ -188,25 +188,13 @@ public abstract class PhysicsBase extends Instance implements GameSubscriber {
 			}
 		}
 		
-		// Update our velocity to the physics objects velocity (if its different).
-		Vector3 vel = (Vector3)this.get(C_VELOCITY);
-		Vector3f tv = vel.toJoml();
+		// Update our velocity to the physics objects velocity.
 		Vector3f pv = internalPhys.getVelocity();
-		if ( !tv.equals(pv) ) {
-			vel.setInternal(pv);
-			this.rawset(C_VELOCITY, vel);
-			this.notifyPropertySubscribers(C_VELOCITY, vel);
-		}
+		this.set(C_VELOCITY, new Vector3(pv));
 		
 		// Update our angular velocity to the physics objets angular velocity
-		Vector3 angvel = (Vector3)this.get(C_ANGULARVELOCITY);
-		Vector3f tav = angvel.toJoml();
 		Vector3f pav = internalPhys.getAngularVelocity();
-		if ( !tav.equals(pav) ) {
-			angvel.setInternal(pav);
-			this.rawset(C_ANGULARVELOCITY, angvel);
-			this.notifyPropertySubscribers(C_ANGULARVELOCITY, angvel);
-		}
+		this.set(C_ANGULARVELOCITY, new Vector3(pav));
 	}
 	
 	/**

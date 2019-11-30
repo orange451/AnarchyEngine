@@ -65,6 +65,12 @@ public class IdeLayout {
 		split.setOrientation(Orientation.VERTICAL);
 		pane.setCenter(split);
 		
+		// Bottom bar
+		{
+			MenuBar bar = new MenuBar();
+			pane.setBottom(bar);
+		}
+		
 		// Add left
 		west = new IdeVerticalDock();
 		split.getItems().add(west);
