@@ -34,7 +34,7 @@ public class PhysicsWorld {
 	}
 
 	public void tick() {
-		float dt = 1/(float)InternalGameThread.desiredTPS;
+		double dt = 1f/(float)InternalGameThread.desiredTPS;
 		
 		if ( Game.isRunning() && !Game.isServer() ) {
 			//System.out.println("CLIENT PHYSICS! " + objects.size() + " / " + this.dynamicsWorld.getNumCollisionObjects());
@@ -43,13 +43,8 @@ public class PhysicsWorld {
 		synchronized(dynamicsWorld) {
 			dynamicsWorld.setGravity(new Vector3(0, 0, -Game.workspace().getGravity()));
 			try{
-				int reps = 4;
-				float ndt = dt/(float)reps;
-				
-				for (int i = 0; i < reps; i++) {
-					Game.runService().physicsSteppedEvent().fire(LuaValue.valueOf(ndt));
-					dynamicsWorld.stepSimulation(ndt,1,ndt);
-				}
+				Game.runService().physicsSteppedEvent().fire(LuaValue.valueOf(dt));
+				dynamicsWorld.stepSimulation((float)dt,2,(float)dt);
 			}catch(Exception e) {
 				System.err.println("Error Stepping Physics");
 				e.printStackTrace();
