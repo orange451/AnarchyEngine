@@ -4,7 +4,6 @@ import org.json.simple.JSONObject;
 
 import engine.Game;
 import engine.InternalGameThread;
-import engine.application.RenderableApplication;
 import engine.application.impl.ClientApplication;
 import engine.application.impl.ServerApplication;
 import engine.io.Load;

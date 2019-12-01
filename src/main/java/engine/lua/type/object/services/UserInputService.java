@@ -9,7 +9,6 @@ import org.luaj.vm2.lib.ZeroArgFunction;
 import org.lwjgl.glfw.GLFW;
 
 import engine.Game;
-import engine.InternalRenderThread;
 import engine.application.RenderableApplication;
 import engine.lua.lib.LuaTableReadOnly;
 import engine.lua.type.LuaEvent;
@@ -18,9 +17,7 @@ import engine.lua.type.data.Vector3;
 import engine.lua.type.object.Service;
 import engine.lua.type.object.TreeViewable;
 import engine.lua.type.object.insts.Camera;
-import ide.IDE;
 import ide.layout.windows.icons.Icons;
-import lwjgui.event.listener.KeyListener;
 
 public class UserInputService extends Service implements TreeViewable {
 

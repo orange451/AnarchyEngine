@@ -4,17 +4,26 @@ import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.ZeroArgFunction;
 
 import engine.Game;
+import engine.lua.type.NumberClampPreferred;
 import engine.lua.type.object.Instance;
 import engine.lua.type.object.TreeViewable;
 import ide.layout.windows.icons.Icons;
 
 public class AudioPlayer2D extends Instance implements TreeViewable {
 	private static final LuaValue C_SOURCE = LuaValue.valueOf("Source");
+	private static final LuaValue C_VOLUME = LuaValue.valueOf("Volume");
+	private static final LuaValue C_PITCH = LuaValue.valueOf("Pitch");
 	
 	public AudioPlayer2D() {
 		super("AudioPlayer2D");
 		
 		this.defineField(C_SOURCE.toString(), LuaValue.NIL, false);
+		
+		this.defineField(C_VOLUME.toString(), LuaValue.valueOf(1.0f), false);
+		this.getField(C_VOLUME).setClamp(new NumberClampPreferred(0, 10, 0, 1));
+		
+		this.defineField(C_PITCH.toString(), LuaValue.valueOf(1.0f), false);
+		this.getField(C_PITCH).setClamp(new NumberClampPreferred(0, 8, 0, 2));
 		
 		this.getmetatable().set("Play", new ZeroArgFunction() {
 
@@ -52,7 +61,7 @@ public class AudioPlayer2D extends Instance implements TreeViewable {
 		if ( source == null )
 			return;
 		
-		Game.soundService().playSound(source);
+		Game.soundService().playSound2D(source, getVolume(), getPitch());
 	}
 
 	@Override
@@ -68,5 +77,21 @@ public class AudioPlayer2D extends Instance implements TreeViewable {
 	@Override
 	public Icons getIcon() {
 		return Icons.icon_sound;
+	}
+
+	public float getVolume() {
+		return this.get(C_VOLUME).tofloat();
+	}
+	
+	public void setVolume(float volume) {
+		this.set(C_VOLUME, LuaValue.valueOf(volume));
+	}
+
+	public float getPitch() {
+		return this.get(C_PITCH).tofloat();
+	}
+	
+	public void setPitch(float pitch) {
+		this.set(C_PITCH, LuaValue.valueOf(pitch));
 	}
 }

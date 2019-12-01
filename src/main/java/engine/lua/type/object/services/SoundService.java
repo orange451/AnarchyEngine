@@ -2,7 +2,6 @@ package engine.lua.type.object.services;
 
 import org.joml.Vector3f;
 import org.luaj.vm2.LuaValue;
-import org.luaj.vm2.lib.ZeroArgFunction;
 
 import engine.Game;
 import engine.InternalGameThread;
@@ -66,7 +65,13 @@ public class SoundService extends Service implements TreeViewable {
 		return Icons.icon_sound;
 	}
 
-	public void playSound(AudioSource audioSource) {
-		this.internalSound.quickPlay(audioSource.getAbsoluteFilePath(), new Vector3f());
+	public void playSound2D(AudioSource audioSource) {
+		this.playSound2D(audioSource, 1.0f, 1.0f);
+	}
+	
+	public void playSound2D(AudioSource audioSource, float volumeMultiplier, float pitchMultiplier) {
+		String source = this.internalSound.quickPlay(audioSource.getAbsoluteFilePath(), new Vector3f());
+		this.internalSound.getSoundSystem().setVolume(source, audioSource.getVolume()*volumeMultiplier);
+		this.internalSound.getSoundSystem().setPitch(source, audioSource.getPitch()*pitchMultiplier);
 	}
 }
