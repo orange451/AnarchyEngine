@@ -2,7 +2,7 @@ package engine.gl.renderer;
 
 import java.net.URL;
 
-import engine.gl.Pipeline;
+import engine.gl.LegacyPipeline;
 import engine.gl.PostProcessor;
 import engine.gl.Surface;
 import engine.gl.shader.BaseShader;
@@ -17,8 +17,8 @@ public class ToneMapper implements PostProcessor {
 	}
 	
 	@Override
-	public void process(Pipeline pipeline) {
-		if ( Pipeline.pipeline_get() == null )
+	public void process(LegacyPipeline pipeline) {
+		if ( LegacyPipeline.pipeline_get() == null )
 			return;
 		
 		GBuffer gbuffer = pipeline.getGBuffer();

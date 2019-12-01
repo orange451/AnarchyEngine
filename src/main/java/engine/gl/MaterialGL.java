@@ -184,7 +184,7 @@ public class MaterialGL {
 		shader.texture_set_stage(shader.roughnessTextureLoc, roughnessTexture, 3);
 		
 		// Bind environment map
-		SkyBox cubemap = Pipeline.pipeline_get().getGBuffer().getMergeProcessor().getSkybox();
+		SkyBox cubemap = LegacyPipeline.pipeline_get().getGBuffer().getMergeProcessor().getSkybox();
 		
 		// Bind IBL map (if it exists)
 		SkySphere ibl = null;
@@ -205,7 +205,7 @@ public class MaterialGL {
 		shader.shader_set_uniform_f(shader.shader_get_uniform(U_REFLECTIVE), reflective);
 		shader.shader_set_uniform_f(shader.shader_get_uniform(U_MATERIALCOLOR), color);
 		shader.shader_set_uniform_f(shader.shader_get_uniform(U_MATERIALEMISSIVE), emissive);
-		shader.shader_set_uniform_f(shader.shader_get_uniform(U_AMBIENT), Pipeline.pipeline_get().getGBuffer().getAmbient());
+		shader.shader_set_uniform_f(shader.shader_get_uniform(U_AMBIENT), LegacyPipeline.pipeline_get().getGBuffer().getAmbient());
 		shader.shader_set_uniform_f(shader.shader_get_uniform(U_ENABLESKYBOX), cubemap == null ? 0:1);
 		shader.shader_set_uniform_f(shader.shader_get_uniform(U_ENABLEIBL), ibl == null ? 0:1);
 		shader.shader_set_uniform_f(shader.shader_get_uniform(U_NORMALMAPENABLED), normalTexture.equals(Resources.TEXTURE_NORMAL_RGBA) ? 0:1);

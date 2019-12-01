@@ -5,7 +5,7 @@ import org.lwjgl.opengl.GL11;
 
 import engine.Game;
 import engine.application.impl.ClientApplication;
-import engine.gl.Pipeline;
+import engine.gl.LegacyPipeline;
 import engine.lua.type.data.Color3;
 import engine.lua.type.data.Vector3;
 import engine.lua.type.object.insts.Camera;
@@ -18,7 +18,7 @@ import engine.lua.type.object.services.Workspace;
 import engine.observer.RenderableWorld;
 
 public class MultipleViewport extends ClientApplication {
-	private Pipeline secondaryPipeline;
+	private LegacyPipeline secondaryPipeline;
 
 	@Override
 	public void render() {
@@ -48,7 +48,7 @@ public class MultipleViewport extends ClientApplication {
 		RenderableWorld renderableWorld = new Workspace();
 
 		// Create secondary pipeline
-		secondaryPipeline = new Pipeline();
+		secondaryPipeline = new LegacyPipeline();
 		secondaryPipeline.setRenderableWorld(renderableWorld);
 		secondaryPipeline.setSize(400, 400);
 

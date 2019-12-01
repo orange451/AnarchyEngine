@@ -7,7 +7,7 @@ import org.joml.Vector3f;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL30;
 
-import engine.gl.Pipeline;
+import engine.gl.LegacyPipeline;
 import engine.gl.PostProcessor;
 import engine.gl.Surface;
 import engine.gl.Texture2D;
@@ -54,7 +54,7 @@ public class MergeProcessor implements PostProcessor {
 	}
 	
 	@Override
-	public void process(Pipeline pipeline) {
+	public void process(LegacyPipeline pipeline) {
 		if ( pipeline.getCamera() == null )
 			return;
 		

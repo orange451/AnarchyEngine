@@ -19,7 +19,7 @@ public abstract class SkyBoxDynamic extends SkyBox {
 	}
 
 	@Override
-	public boolean draw(Pipeline pipeline) {
+	public boolean draw(LegacyPipeline pipeline) {
 		// Bind cubemap
 		glBindTexture(GL_TEXTURE_CUBE_MAP, cubemap);
 		glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
@@ -90,6 +90,6 @@ public abstract class SkyBoxDynamic extends SkyBox {
 
 
 
-	protected abstract void renderGeometry(Pipeline pipeline);
+	protected abstract void renderGeometry(LegacyPipeline pipeline);
 
 }

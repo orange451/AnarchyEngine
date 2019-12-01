@@ -2,7 +2,7 @@ package engine.gl.ibl;
 
 import java.net.URL;
 
-import engine.gl.Pipeline;
+import engine.gl.LegacyPipeline;
 import engine.gl.SkyBox;
 import engine.gl.renderer.LightProcessor;
 import engine.gl.shader.BaseShader;
@@ -21,7 +21,7 @@ public class IBLHandler {
 	private static final String U_SKYBOX_POWER = "uSkyBoxLightPower";
 	private static final String U_SKYBOX_MULTIPLIER = "uSkyBoxLightMultiplier";
 
-	public void handle(Pipeline pipeline) {
+	public void handle(LegacyPipeline pipeline) {
 		SkyBox skybox = pipeline.getGBuffer().getMergeProcessor().getSkybox();
 		
 		if ( skybox == null || !(skybox instanceof SkySphereIBL) )

@@ -8,7 +8,7 @@ import org.luaj.vm2.LuaValue;
 import engine.Game;
 import engine.InternalRenderThread;
 import engine.application.RenderableApplication;
-import engine.gl.Pipeline;
+import engine.gl.LegacyPipeline;
 import engine.gl.Resources;
 import engine.gl.Surface;
 import engine.lua.type.data.Vector3;
@@ -133,7 +133,7 @@ public class IdeMaterialViewer extends IdePane {
 	
 	static class MaterialNode extends VBox {
 		private OpenGLPane oglPane;
-		private Pipeline materialPipeline;
+		private LegacyPipeline materialPipeline;
 		
 		public MaterialNode(Material material) {
 			this.setAlignment(Pos.CENTER);
@@ -208,7 +208,7 @@ public class IdeMaterialViewer extends IdePane {
 					if ( materialPipeline == null && renderAllowence > 0 && Game.isLoaded() ) {
 						renderAllowence -= 1;
 						
-						materialPipeline = new Pipeline(NODE_SIZE, NODE_SIZE);
+						materialPipeline = new LegacyPipeline(NODE_SIZE, NODE_SIZE);
 						materialPipeline.setRenderableWorld(renderableWorld);
 						materialPipeline.setSize(NODE_SIZE, NODE_SIZE);
 						

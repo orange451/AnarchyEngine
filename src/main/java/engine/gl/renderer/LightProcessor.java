@@ -1,6 +1,6 @@
 package engine.gl.renderer;
 
-import engine.gl.Pipeline;
+import engine.gl.LegacyPipeline;
 import engine.gl.PostProcessor;
 import engine.gl.Surface;
 import engine.gl.ibl.IBLHandler;
@@ -12,7 +12,7 @@ public class LightProcessor implements PostProcessor {
 	private IBLHandler iblHandler = new IBLHandler();
 	
 	@Override
-	public void process(Pipeline pipeline) {
+	public void process(LegacyPipeline pipeline) {
 		Surface buffer = pipeline.getGBuffer().getAccumulationBuffer();
 		
 		buffer.bind();

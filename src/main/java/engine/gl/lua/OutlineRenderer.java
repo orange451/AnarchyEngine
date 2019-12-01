@@ -4,7 +4,7 @@ import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
 import engine.gl.MaterialGL;
-import engine.gl.Pipeline;
+import engine.gl.LegacyPipeline;
 import engine.gl.Resources;
 import engine.gl.mesh.BufferedMesh;
 import engine.gl.shader.BaseShader;
@@ -78,7 +78,7 @@ public class OutlineRenderer {
 		t12.scale(new Vector3f(THICKNESS, THICKNESS, height-j));
 		
 		// Draw
-		BaseShader shader = Pipeline.pipeline_get().shader_get();
+		BaseShader shader = LegacyPipeline.pipeline_get().shader_get();
 		MESH.render(shader, t1, MATERIAL);
 		MESH.render(shader, t2, MATERIAL);
 		MESH.render(shader, t3, MATERIAL);

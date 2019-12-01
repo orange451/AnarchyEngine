@@ -5,7 +5,7 @@ import org.luaj.vm2.LuaValue;
 import engine.InternalGameThread;
 import engine.application.RenderableApplication;
 import engine.gl.IPipeline;
-import engine.gl.Pipeline;
+import engine.gl.LegacyPipeline;
 import engine.lua.lib.EnumType;
 import engine.lua.type.LuaConnection;
 import engine.lua.type.NumberClampPreferred;
@@ -100,8 +100,8 @@ public class Lighting extends Service implements TreeViewable {
 		IPipeline pp = RenderableApplication.pipeline;
 		
 		if ( value.isnil() ) {
-			if (RenderableApplication.pipeline instanceof Pipeline) {
-				((Pipeline)pp).getGBuffer().getMergeProcessor().setSkybox(null);
+			if (RenderableApplication.pipeline instanceof LegacyPipeline) {
+				((LegacyPipeline)pp).getGBuffer().getMergeProcessor().setSkybox(null);
 			} else {
 				pp.setDyamicSkybox(null);
 				pp.setStaticSkybox(null);

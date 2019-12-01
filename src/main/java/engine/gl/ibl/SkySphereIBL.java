@@ -1,6 +1,6 @@
 package engine.gl.ibl;
 
-import engine.gl.Pipeline;
+import engine.gl.LegacyPipeline;
 import engine.io.Image;
 import engine.util.TextureUtils;
 
@@ -27,7 +27,7 @@ public class SkySphereIBL extends SkySphere {
 	}
 	
 	@Override
-	public boolean draw(Pipeline pipeline) {
+	public boolean draw(LegacyPipeline pipeline) {
 		if ( buffers > 5 )
 			return true;
 		

@@ -10,7 +10,7 @@ import org.lwjgl.opengl.GL11;
 
 import engine.application.RenderableApplication;
 import engine.gl.MaterialGL;
-import engine.gl.Pipeline;
+import engine.gl.LegacyPipeline;
 import engine.gl.Resources;
 import engine.lua.type.data.Vector3;
 import engine.lua.type.object.Instance;
@@ -135,15 +135,15 @@ public class HandlesRenderer {
 	 */
 	private static Vector3f projectMouseTo3D(Vector3f origin, Vector3f moveDirection) {
 		// Get 2d line
-		Vector2f p1 = MatrixUtils.project3Dto2D(origin, Pipeline.pipeline_get().getProjectionMatrix(),
-				Pipeline.pipeline_get().getViewMatrix(),
-				new Vector2f(Pipeline.pipeline_get().getWidth(), Pipeline.pipeline_get().getHeight()));
+		Vector2f p1 = MatrixUtils.project3Dto2D(origin, LegacyPipeline.pipeline_get().getProjectionMatrix(),
+				LegacyPipeline.pipeline_get().getViewMatrix(),
+				new Vector2f(LegacyPipeline.pipeline_get().getWidth(), LegacyPipeline.pipeline_get().getHeight()));
 		Vector2f p2 = MatrixUtils.project3Dto2D(origin.add(moveDirection, new Vector3f()),
-				Pipeline.pipeline_get().getProjectionMatrix(), Pipeline.pipeline_get().getViewMatrix(),
-				new Vector2f(Pipeline.pipeline_get().getWidth(), Pipeline.pipeline_get().getHeight()));
+				LegacyPipeline.pipeline_get().getProjectionMatrix(), LegacyPipeline.pipeline_get().getViewMatrix(),
+				new Vector2f(LegacyPipeline.pipeline_get().getWidth(), LegacyPipeline.pipeline_get().getHeight()));
 		Vector2f p3 = MatrixUtils.project3Dto2D(origin.sub(moveDirection, new Vector3f()),
-				Pipeline.pipeline_get().getProjectionMatrix(), Pipeline.pipeline_get().getViewMatrix(),
-				new Vector2f(Pipeline.pipeline_get().getWidth(), Pipeline.pipeline_get().getHeight()));
+				LegacyPipeline.pipeline_get().getProjectionMatrix(), LegacyPipeline.pipeline_get().getViewMatrix(),
+				new Vector2f(LegacyPipeline.pipeline_get().getWidth(), LegacyPipeline.pipeline_get().getHeight()));
 		p2.sub(p1).normalize().mul(256).add(p1);
 		p3.sub(p1).normalize().mul(256).add(p1);
 
@@ -152,15 +152,15 @@ public class HandlesRenderer {
 		Vector2f closest = getProjectedPointLine(p2, p3, mouse);
 
 		// Reproject the closest point to 3d ray
-		Vector3f ray = MatrixUtils.project2Dto3D(closest, Pipeline.pipeline_get().getProjectionMatrix(),
-				Pipeline.pipeline_get().getCamera(),
-				new Vector2f(Pipeline.pipeline_get().getWidth(), Pipeline.pipeline_get().getHeight()));
+		Vector3f ray = MatrixUtils.project2Dto3D(closest, LegacyPipeline.pipeline_get().getProjectionMatrix(),
+				LegacyPipeline.pipeline_get().getCamera(),
+				new Vector2f(LegacyPipeline.pipeline_get().getWidth(), LegacyPipeline.pipeline_get().getHeight()));
 
 		// Generate a plane along the moveDirection
 		Vector3f normal = getPlaneNormal(moveDirection);
 
 		// Return the intersection from ray to normal plane
-		return linePlaneIntersection(origin, normal, Pipeline.pipeline_get().getCamera().getPosition().toJoml(), ray)
+		return linePlaneIntersection(origin, normal, LegacyPipeline.pipeline_get().getCamera().getPosition().toJoml(), ray)
 				.mul(moveDirection);
 	}
 
@@ -271,16 +271,16 @@ public class HandlesRenderer {
 		baseMaterial.setColor(selected ? col.mul(0.25f) : col);
 
 		// Draw
-		Resources.MESH_CYLINDER.render(Pipeline.pipeline_get().shader_get(), worldMat, baseMaterial);
-		Resources.MESH_CONE.render(Pipeline.pipeline_get().shader_get(), headMat, baseMaterial);
+		Resources.MESH_CYLINDER.render(LegacyPipeline.pipeline_get().shader_get(), worldMat, baseMaterial);
+		Resources.MESH_CONE.render(LegacyPipeline.pipeline_get().shader_get(), headMat, baseMaterial);
 
 		Vector3f arrowPos = headMat.getTranslation(new Vector3f());
-		Vector2f pos = MatrixUtils.project3Dto2D(arrowPos, Pipeline.pipeline_get().getProjectionMatrix(),
-				Pipeline.pipeline_get().getViewMatrix(),
-				new Vector2f(Pipeline.pipeline_get().getWidth(), Pipeline.pipeline_get().getHeight()));
+		Vector2f pos = MatrixUtils.project3Dto2D(arrowPos, LegacyPipeline.pipeline_get().getProjectionMatrix(),
+				LegacyPipeline.pipeline_get().getViewMatrix(),
+				new Vector2f(LegacyPipeline.pipeline_get().getWidth(), LegacyPipeline.pipeline_get().getHeight()));
 		Vector2f mou = new Vector2f((float) RenderableApplication.mouseX, (float) RenderableApplication.mouseY);
 		boolean closer = true;
-		Vector3f cameraPosition = Pipeline.pipeline_get().getCamera().getPosition().toJoml();
+		Vector3f cameraPosition = LegacyPipeline.pipeline_get().getCamera().getPosition().toJoml();
 		float d1 = arrowPos.distance(cameraPosition);
 		if (tempPos != null) {
 			float d2 = tempPos.distance(cameraPosition);

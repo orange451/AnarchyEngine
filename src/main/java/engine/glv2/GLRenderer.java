@@ -52,7 +52,7 @@ import engine.Game;
 import engine.InternalRenderThread;
 import engine.application.RenderableApplication;
 import engine.gl.IPipeline;
-import engine.gl.Pipeline;
+import engine.gl.LegacyPipeline;
 import engine.gl.Surface;
 import engine.gl.light.DirectionalLightInternal;
 import engine.gl.light.SpotLightInternal;
@@ -407,7 +407,7 @@ public class GLRenderer implements IPipeline {
 	@Override
 	public void setRenderableWorld(RenderableWorld instance) {
 		this.renderableWorld = instance;
-		Pipeline.set(this, instance);
+		LegacyPipeline.set(this, instance);
 	}
 
 	@Override

@@ -3,7 +3,7 @@ package engine.gl.ibl;
 import org.joml.Matrix4f;
 
 import engine.gl.MaterialGL;
-import engine.gl.Pipeline;
+import engine.gl.LegacyPipeline;
 import engine.gl.SkyBoxDynamic;
 import engine.gl.mesh.BufferedMesh;
 import engine.io.Image;
@@ -28,7 +28,7 @@ public class SkySphere extends SkyBoxDynamic {
 	private Matrix4f worldMatrix;
 
 	@Override
-	protected void renderGeometry(Pipeline pipeline) {
+	protected void renderGeometry(LegacyPipeline pipeline) {
 		if ( worldMatrix == null ) {
 			worldMatrix = new Matrix4f();
 			worldMatrix.rotateX((float) (Math.PI/2f));

@@ -143,7 +143,7 @@ public class SkyBox {
 		glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 	}
 
-	public boolean draw(Pipeline pipeline) {
+	public boolean draw(LegacyPipeline pipeline) {
 		return true;
 	}
 

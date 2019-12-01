@@ -7,7 +7,7 @@ import engine.Game;
 import engine.InternalGameThread;
 import engine.InternalRenderThread;
 import engine.gl.IPipeline;
-import engine.gl.Pipeline;
+import engine.gl.LegacyPipeline;
 import engine.gl.light.Light;
 import engine.lua.type.NumberClamp;
 import engine.lua.type.NumberClampPreferred;
@@ -100,7 +100,7 @@ public class SpotLight extends LightBase implements TreeViewable {
 		// Search for renderable world
 		while ( t != null && !t.isnil() ) {
 			if ( t instanceof RenderableWorld ) {
-				IPipeline tempPipeline = Pipeline.get((RenderableWorld)t);
+				IPipeline tempPipeline = LegacyPipeline.get((RenderableWorld)t);
 				if ( tempPipeline == null )
 					break;
 				// Light exists inside old pipeline. No need to recreate.

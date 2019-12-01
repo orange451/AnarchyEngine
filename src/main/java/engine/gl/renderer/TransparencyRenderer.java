@@ -10,7 +10,7 @@ import org.joml.Vector3f;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 import org.lwjgl.opengl.GL30;
-import engine.gl.Pipeline;
+import engine.gl.LegacyPipeline;
 import engine.gl.SkyBox;
 import engine.gl.ibl.SkySphereIBL;
 import engine.gl.light.PointLightInternal;
@@ -18,7 +18,7 @@ import engine.gl.shader.BaseShader;
 
 public class TransparencyRenderer {
 	private static TBufferShader shader;
-	private Pipeline pipeline;
+	private LegacyPipeline pipeline;
 	
 	private int fboId;
 	private int textureId;
@@ -26,7 +26,7 @@ public class TransparencyRenderer {
 	private int width;
 	private int height;
 	
-	public TransparencyRenderer(Pipeline pipeline, int x, int y) {
+	public TransparencyRenderer(LegacyPipeline pipeline, int x, int y) {
 		this.pipeline = pipeline;
 		
 		if ( shader == null )

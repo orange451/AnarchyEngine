@@ -24,7 +24,7 @@ import java.util.List;
 import org.joml.Matrix4f;
 import org.joml.Vector4f;
 
-import engine.gl.Pipeline;
+import engine.gl.LegacyPipeline;
 import engine.gl.mesh.BufferedMesh;
 import engine.gl.shader.BaseShader;
 import engine.glv2.v2.lights.IPointLightHandler;
@@ -60,7 +60,7 @@ public class PointLightHandler implements IPointLightHandler {
 	private static final String U_L_POSITION = "lightPosition";
 	private static final String U_L_COLOR = "lightColor";
 	
-	public void handle(Pipeline pipeline) {
+	public void handle(LegacyPipeline pipeline) {
 		glEnable(GL_CULL_FACE);
 		glCullFace(GL_FRONT);
 		glEnable(GL_BLEND);

@@ -18,7 +18,7 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL30;
 
 import engine.Game;
-import engine.gl.Pipeline;
+import engine.gl.LegacyPipeline;
 import engine.gl.PostProcessor;
 import engine.gl.Surface;
 import engine.gl.Texture2D;
@@ -34,7 +34,7 @@ public class GBuffer {
 	
 	private Surface buffer;
 	private static GBufferShader shader;
-	private Pipeline pipeline;
+	private LegacyPipeline pipeline;
 	
 	private Surface finalBuffer;
 	private Surface accumulationBuffer;
@@ -53,7 +53,7 @@ public class GBuffer {
 	private Matrix4f projMatrix = new Matrix4f();
 	private Matrix4f iProjMatrix = new Matrix4f();
 	
-	public GBuffer(Pipeline pipeline, int width, int height) {
+	public GBuffer(LegacyPipeline pipeline, int width, int height) {
 		if ( shader == null )
 			shader = new GBufferShader();
 		

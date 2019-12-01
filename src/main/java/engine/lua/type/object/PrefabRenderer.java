@@ -9,7 +9,7 @@ import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
 import engine.gl.MaterialGL;
-import engine.gl.Pipeline;
+import engine.gl.LegacyPipeline;
 import engine.gl.Resources;
 import engine.gl.mesh.BufferedMesh;
 import engine.gl.shader.BaseShader;
@@ -70,7 +70,7 @@ public class PrefabRenderer {
 				
 				// If transparent send to transparent queue
 				if ( material.getTransparency() > 0 ) {
-					Pipeline.pipeline_get().addTransparentRenderableToQueue(p, wmat, 0.0f);
+					LegacyPipeline.pipeline_get().addTransparentRenderableToQueue(p, wmat, 0.0f);
 					continue;
 				}
 				

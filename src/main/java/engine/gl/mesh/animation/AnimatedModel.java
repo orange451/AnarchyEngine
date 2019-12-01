@@ -18,7 +18,7 @@ import org.lwjgl.system.MemoryUtil;
 
 import engine.InternalRenderThread;
 import engine.gl.MaterialGL;
-import engine.gl.Pipeline;
+import engine.gl.LegacyPipeline;
 import engine.gl.Resources;
 import engine.gl.mesh.BufferedMesh;
 import engine.gl.renderer.GBuffer;
@@ -274,8 +274,8 @@ public class AnimatedModel {
 		updateBones();
 		
 		// Apply skinning shader
-		BaseShader oldShader = Pipeline.pipeline_get().shader_get();
-		Pipeline.pipeline_get().shader_set(shader);
+		BaseShader oldShader = LegacyPipeline.pipeline_get().shader_get();
+		LegacyPipeline.pipeline_get().shader_set(shader);
 		
 		// Send bones to GPU
 		int boneLocation = this.shader.shader_get_uniform("boneMat");
@@ -311,7 +311,7 @@ public class AnimatedModel {
 			mesh.unbind();
 		}
 		
-		Pipeline.pipeline_get().shader_set(oldShader);
+		LegacyPipeline.pipeline_get().shader_set(oldShader);
 	}
 	
 	// TODO: In fact, only rebuilds the buffers
