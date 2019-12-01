@@ -781,8 +781,8 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 		}
 
 		public void update(Instance instance, LuaValue property, LuaValue value) {
-			if ( SELECTING_OBJECT )
-				return;
+			//if ( SELECTING_OBJECT )
+				//return;
 			
 			if ( inst != null && !instance.equals(inst))
 				return;
@@ -793,6 +793,7 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 				return;
 			}
 			
+			// Hack to prevent script source
 			if ( instance instanceof ScriptBase && property.toString().equals("Source") )
 				return;
 			
