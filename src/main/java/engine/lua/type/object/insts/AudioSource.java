@@ -1,7 +1,6 @@
 package engine.lua.type.object.insts;
 
 import org.luaj.vm2.LuaValue;
-import org.luaj.vm2.lib.ZeroArgFunction;
 
 import engine.Game;
 import engine.lua.type.object.AssetLoadable;
@@ -16,19 +15,6 @@ public class AudioSource extends AssetLoadable implements TreeViewable {
 		super("AudioSource");
 		
 		this.defineField(C_PLAY.toString(), LuaValue.FALSE, false);
-		
-		this.getmetatable().set("Play", new ZeroArgFunction() {
-
-			@Override
-			public LuaValue call() {
-				try {
-					playSource();
-				} catch(Exception e) {
-					e.printStackTrace();
-				}
-				return LuaValue.NIL;
-			}
-		});
 	}
 
 	@Override
