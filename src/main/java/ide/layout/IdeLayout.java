@@ -241,10 +241,12 @@ public class IdeLayout {
 					// End Test
 					Game.internalTesting = false;
 					Game.setRunning(false);
-					
+
 					// Reload from stored JSON
-					Load.parseJSON(true, gameJson);
-					Game.load();
+					InternalGameThread.runLater(()->{
+						Load.parseJSON(true, gameJson);
+						Game.load();
+					});
 				} catch(Exception e) {
 					e.printStackTrace();
 				}

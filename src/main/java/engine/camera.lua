@@ -55,14 +55,15 @@ RunService.RenderStepped:Connect(function(delta)
 	
 	-- Get Camera speed
 	local CameraSpeed = CAMERA_SPEED * (UserInputService:IsKeyDown(Enum.KeyCode.LeftShift) and 0.25 or 1)
+	local IsModifierDown = UserInputService:IsModifierDown();
 	
 	-- Vertical UP moving
-	if ( UserInputService:IsKeyDown(Enum.KeyCode.E) ) then
+	if ( not IsModifierDown and UserInputService:IsKeyDown(Enum.KeyCode.E) ) then
 		camera:Translate(Vector3.new(0, 0, 1)*delta*CameraSpeed*0.5)
 	end
 	
 	-- Vertical DOWN moving
-	if ( UserInputService:IsKeyDown(Enum.KeyCode.Q) ) then
+	if ( not IsModifierDown and UserInputService:IsKeyDown(Enum.KeyCode.Q) ) then
 		camera:Translate(Vector3.new(0, 0, -1)*delta*CameraSpeed*0.5)
 	end
 	
@@ -84,6 +85,6 @@ RunService.RenderStepped:Connect(function(delta)
 	end
 	
 	-- Translate camera from keyboard input
-	local cameraOffset = UserInputService:GetMovementVector(true)*delta*CameraSpeed
+	local cameraOffset = UserInputService:GetMovementVector(true)*delta*CameraSpeed*(IsModifierDown and 0 or 1)
 	camera:Translate(cameraOffset)
 end)

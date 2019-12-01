@@ -9,6 +9,7 @@ import org.luaj.vm2.lib.ZeroArgFunction;
 import org.lwjgl.glfw.GLFW;
 
 import engine.Game;
+import engine.InternalRenderThread;
 import engine.application.RenderableApplication;
 import engine.lua.lib.LuaTableReadOnly;
 import engine.lua.type.LuaEvent;
@@ -17,7 +18,9 @@ import engine.lua.type.data.Vector3;
 import engine.lua.type.object.Service;
 import engine.lua.type.object.TreeViewable;
 import engine.lua.type.object.insts.Camera;
+import ide.IDE;
 import ide.layout.windows.icons.Icons;
+import lwjgui.event.listener.KeyListener;
 
 public class UserInputService extends Service implements TreeViewable {
 
@@ -57,6 +60,17 @@ public class UserInputService extends Service implements TreeViewable {
 			@Override
 			public LuaValue call(LuaValue myself, LuaValue arg2) {
 				return isKeyDown(arg2.toint())?LuaValue.TRUE:LuaValue.FALSE;
+			}
+		});
+		
+		this.getmetatable().set("IsModifierDown", new ZeroArgFunction() {
+			@Override
+			public LuaValue call() {
+				boolean isCtrlDown = isKeyDown(GLFW.GLFW_KEY_LEFT_SUPER)
+									|| isKeyDown(GLFW.GLFW_KEY_RIGHT_SUPER)
+									|| isKeyDown(GLFW.GLFW_KEY_LEFT_CONTROL)
+									|| isKeyDown(GLFW.GLFW_KEY_RIGHT_CONTROL);
+				return LuaValue.valueOf(isCtrlDown);
 			}
 		});
 		
