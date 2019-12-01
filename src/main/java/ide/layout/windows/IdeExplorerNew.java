@@ -51,6 +51,7 @@ public class IdeExplorerNew extends IdePane {
 	private TreeView<Instance> tree;
 
 	private static final LuaValue C_NAME = LuaValue.valueOf("Name");
+	private static final LuaValue C_PARENT = LuaValue.valueOf("Parent");
 	
 	private HashMap<Instance, TreeItem<Instance>> instanceToTreeItemMap;
 	private HashMap<TreeItem<Instance>, TreeBase<Instance>> treeItemToParentTreeItemMap;
@@ -288,6 +289,11 @@ public class IdeExplorerNew extends IdePane {
 			
 			if ( key.eq_b(C_NAME) ) {
 				newTreeItem.setText(val.toString());
+			}
+			
+			if ( key.eq_b(C_PARENT) ) {
+				destroyNode(instance);
+				buildNode(instance);
 			}
 		});
 		treeItemToChangedConnectionMap.put(newTreeItem, changedConnection);
