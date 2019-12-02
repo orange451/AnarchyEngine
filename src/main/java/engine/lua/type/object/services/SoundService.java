@@ -67,17 +67,41 @@ public class SoundService extends Service implements TreeViewable {
 		return Icons.icon_sound;
 	}
 
+	/**
+	 * Plays a simple sound in 2d.
+	 * @param audioSource
+	 * @return
+	 */
 	public String playSound2D(AudioSource audioSource) {
 		return this.playSound2D(audioSource, 1.0f, 1.0f);
 	}
 	
+	/**
+	 * Plays a 2d sound with specified volume and pitch multiplier.
+	 * @param audioSource
+	 * @param volumeMultiplier
+	 * @param pitchMultiplier
+	 * @return
+	 */
 	public String playSound2D(AudioSource audioSource, float volumeMultiplier, float pitchMultiplier) {
 		Vector3D position = this.internalSound.getSoundSystem().getListenerData().position;
 		Vector3 p = new Vector3(position.x, position.y, position.z);
 		return this.playSound3D(audioSource, p, volumeMultiplier, pitchMultiplier, 64.0f);
 	}
 	
+	/**
+	 * Plays a 3d sound with specified volume and pitch multiplier.
+	 * @param audioSource
+	 * @param position
+	 * @param volumeMultiplier
+	 * @param pitchMultiplier
+	 * @param range
+	 * @return
+	 */
 	public String playSound3D(AudioSource audioSource, Vector3 position, float volumeMultiplier, float pitchMultiplier, float range) {
+		if ( audioSource.getAbsoluteFilePath().length() == 0 )
+			return null;
+		
 		String source = this.internalSound.quickPlay(audioSource.getAbsoluteFilePath(), position.getInternal());
 		this.internalSound.getSoundSystem().setVolume(source, audioSource.getVolume()*volumeMultiplier);
 		this.internalSound.getSoundSystem().setPitch(source, audioSource.getPitch()*pitchMultiplier);
@@ -85,6 +109,10 @@ public class SoundService extends Service implements TreeViewable {
 		return source;
 	}
 
+	/**
+	 * Stops a specific sound
+	 * @param source
+	 */
 	public void stopSound(String source) {
 		this.internalSound.getSoundSystem().stop(source);
 	}
