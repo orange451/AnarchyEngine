@@ -84,4 +84,8 @@ public class SoundService extends Service implements TreeViewable {
 		
 		return source;
 	}
+
+	public void stopSound(String source) {
+		this.internalSound.getSoundSystem().stop(source);
+	}
 }

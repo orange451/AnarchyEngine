@@ -14,6 +14,8 @@ public class AudioSource extends AssetLoadable implements TreeViewable {
 	private static final LuaValue C_VOLUME = LuaValue.valueOf("Volume");
 	private static final LuaValue C_PITCH = LuaValue.valueOf("Pitch");
 	
+	private String lastSource;
+	
 	public AudioSource() {
 		super("AudioSource");
 
@@ -40,7 +42,9 @@ public class AudioSource extends AssetLoadable implements TreeViewable {
 	}
 
 	public void playSource() {
-		Game.soundService().playSound2D(this);
+		if ( lastSource != null )
+			Game.soundService().stopSound(lastSource);
+		lastSource = Game.soundService().playSound2D(this);
 	}
 
 	@Override
