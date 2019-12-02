@@ -59,6 +59,14 @@ public class Enums extends TwoArgFunction {
 				}
 			});
 			
+			// Position Enum
+			this.rawset("PositionType", new LuaTableReadOnly() {
+				{
+					this.rawset("Absolute", "Absolute");
+					this.rawset("Relative", "Relative");
+				}
+			});
+			
 			// Shape Enum
 			this.rawset("Shape", new LuaTableReadOnly() {
 				{
