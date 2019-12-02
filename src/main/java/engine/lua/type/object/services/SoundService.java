@@ -103,19 +103,20 @@ public class SoundService extends Service implements TreeViewable {
 		if ( audioSource.getAbsoluteFilePath().length() == 0 )
 			return null;
 		
-		// Compute 3d range
+		// Compute 3d range (Internally multiplied with the built-in linear to make squared volume decrease)
 		Vector3D pos = internalSound.getSoundSystem().getListenerData().position;
 		float distSq = position.getInternal().distanceSquared(pos.x, pos.y, pos.z); // Distance to listener
 		float ratio = 1.0f-(distSq/(range*range));
 		ratio = Math.max(0, ratio);
 		ratio = Math.min(1, ratio);
-		ratio *= ratio;
 		
 		// Play sound
 		String source = this.internalSound.quickPlay(audioSource.getAbsoluteFilePath(), position.getInternal());
 		this.internalSound.getSoundSystem().setVolume(source, ratio*audioSource.getVolume()*volumeMultiplier);
 		this.internalSound.getSoundSystem().setPitch(source, audioSource.getPitch()*pitchMultiplier);
-		this.internalSound.getSoundSystem().setAttenuation(source, SoundSystemConfig.ATTENUATION_NONE);
+		this.internalSound.getSoundSystem().setAttenuation(source, SoundSystemConfig.ATTENUATION_LINEAR);
+		this.internalSound.getSoundSystem().setDistOrRoll(source, range);
+		this.internalSound.getSoundSystem().setPosition(source, position.getX(), position.getY(), position.getZ());
 		
 		return source;
 	}
