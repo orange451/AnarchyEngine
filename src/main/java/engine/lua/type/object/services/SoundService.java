@@ -12,6 +12,7 @@ import engine.lua.type.object.TreeViewable;
 import engine.lua.type.object.insts.AudioSource;
 import engine.lua.type.object.insts.Camera;
 import ide.layout.windows.icons.Icons;
+import paulscode.sound.SoundSystemConfig;
 import paulscode.sound.Vector3D;
 
 public class SoundService extends Service implements TreeViewable {
@@ -86,7 +87,7 @@ public class SoundService extends Service implements TreeViewable {
 	public String playSound2D(AudioSource audioSource, float volumeMultiplier, float pitchMultiplier) {
 		Vector3D position = this.internalSound.getSoundSystem().getListenerData().position;
 		Vector3 p = new Vector3(position.x, position.y, position.z);
-		return this.playSound3D(audioSource, p, volumeMultiplier, pitchMultiplier, 64.0f);
+		return this.playSound3D(audioSource, p, volumeMultiplier, pitchMultiplier, 1024.0f);
 	}
 	
 	/**
@@ -102,9 +103,19 @@ public class SoundService extends Service implements TreeViewable {
 		if ( audioSource.getAbsoluteFilePath().length() == 0 )
 			return null;
 		
+		// Compute 3d range
+		Vector3D pos = internalSound.getSoundSystem().getListenerData().position;
+		float distSq = position.getInternal().distanceSquared(pos.x, pos.y, pos.z); // Distance to listener
+		float ratio = 1.0f-(distSq/(range*range));
+		ratio = Math.max(0, ratio);
+		ratio = Math.min(1, ratio);
+		ratio *= ratio;
+		
+		// Play sound
 		String source = this.internalSound.quickPlay(audioSource.getAbsoluteFilePath(), position.getInternal());
-		this.internalSound.getSoundSystem().setVolume(source, audioSource.getVolume()*volumeMultiplier);
+		this.internalSound.getSoundSystem().setVolume(source, ratio*audioSource.getVolume()*volumeMultiplier);
 		this.internalSound.getSoundSystem().setPitch(source, audioSource.getPitch()*pitchMultiplier);
+		this.internalSound.getSoundSystem().setAttenuation(source, SoundSystemConfig.ATTENUATION_NONE);
 		
 		return source;
 	}
