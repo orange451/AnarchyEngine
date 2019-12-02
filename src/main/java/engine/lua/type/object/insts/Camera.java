@@ -200,6 +200,10 @@ public class Camera extends Instance implements TreeViewable,Positionable {
 		
 		return (Vector3)this.get(C_LOOKAT);
 	}
+	
+	public Vector3 getLookVector() {
+		return (Vector3) this.getLookAt().sub(this.getPosition());
+	}
 
 	@Override
 	public void onValueUpdated( LuaValue key, LuaValue value ) {

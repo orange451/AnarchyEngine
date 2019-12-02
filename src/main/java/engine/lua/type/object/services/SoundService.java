@@ -32,8 +32,10 @@ public class SoundService extends Service implements TreeViewable {
 					return;
 				
 				Vector3 position = camera.getPosition();
+				Vector3 look = camera.getLookVector();
 				
 				this.internalSound.getSoundSystem().setListenerPosition(position.getX(), position.getY(), position.getZ());
+				this.internalSound.getSoundSystem().setListenerOrientation(look.getX(), look.getY(), look.getZ(), 0, 0, 1);
 			});
 		});
 	}
