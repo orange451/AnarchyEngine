@@ -1,4 +1,4 @@
-package org.lwjglx.openal;
+package paulscode.sound.libraries;
 
 import static org.lwjgl.openal.ALC10.ALC_DEFAULT_DEVICE_SPECIFIER;
 import static org.lwjgl.openal.ALC10.ALC_FREQUENCY;
@@ -17,33 +17,41 @@ import static org.lwjgl.openal.ALC11.ALC_MONO_SOURCES;
 import static org.lwjgl.openal.ALC11.ALC_STEREO_SOURCES;
 import static org.lwjgl.system.MemoryUtil.NULL;
 
-import java.nio.ByteBuffer;
-import java.nio.IntBuffer;
 import java.util.List;
 
+import org.lwjgl.openal.AL;
 import org.lwjgl.openal.ALC;
 import org.lwjgl.openal.ALCCapabilities;
+import org.lwjgl.openal.ALCapabilities;
 import org.lwjgl.openal.ALUtil;
 
-public class AL {
+public class ALContext {
 
-	static long device;
-	static long context;
+	private static long device;
+	private static long context;
 
 	private static boolean created = false;
 
 	public static void create() throws IllegalStateException {
-		device = alcOpenDevice((ByteBuffer) null);
+		String defaultDeviceName = alcGetString(0, ALC_DEFAULT_DEVICE_SPECIFIER);
+		System.out.println("Default device: " + defaultDeviceName);
+		device = alcOpenDevice(defaultDeviceName);
 		if (device == NULL)
 			throw new IllegalStateException("Failed to open the default device.");
 
-		ALCCapabilities deviceCaps = ALC.createCapabilities(device);
+		int[] attributes = { 0 };
+		context = alcCreateContext(device, attributes);
+		alcMakeContextCurrent(context);
 
-		System.out.println("OpenALC10: " + deviceCaps.OpenALC10);
-		System.out.println("OpenALC11: " + deviceCaps.OpenALC11);
-		System.out.println("ALC_EXT_EFX = " + deviceCaps.ALC_EXT_EFX);
+		ALCCapabilities alcCapabilities = ALC.createCapabilities(device);
+		ALCapabilities alCapabilities = AL.createCapabilities(alcCapabilities);
 
-		if (deviceCaps.OpenALC11) {
+		System.out.println("OpenALC10: " + alcCapabilities.OpenALC10);
+		System.out.println("OpenALC11: " + alcCapabilities.OpenALC11);
+		System.out.println("ALC_EXT_EFX = " + alcCapabilities.ALC_EXT_EFX);
+		System.out.println("AL_EXT_FLOAT32 = " + alCapabilities.AL_EXT_FLOAT32);
+
+		if (alcCapabilities.OpenALC11) {
 			List<String> devices = ALUtil.getStringList(device, ALC_ALL_DEVICES_SPECIFIER);
 			if (devices == null)
 				throw new IllegalStateException("Unable to initialize devices");
@@ -52,13 +60,6 @@ public class AL {
 					System.out.println(i + ": " + devices.get(i));
 			}
 		}
-
-		String defaultDeviceSpecifier = alcGetString(device, ALC_DEFAULT_DEVICE_SPECIFIER);
-		System.out.println("Default device: " + defaultDeviceSpecifier);
-
-		context = alcCreateContext(device, (IntBuffer) null);
-		alcMakeContextCurrent(context);
-		org.lwjgl.openal.AL.createCapabilities(deviceCaps);
 
 		System.out.println("ALC_FREQUENCY: " + alcGetInteger(device, ALC_FREQUENCY) + "Hz");
 		System.out.println("ALC_REFRESH: " + alcGetInteger(device, ALC_REFRESH) + "Hz");

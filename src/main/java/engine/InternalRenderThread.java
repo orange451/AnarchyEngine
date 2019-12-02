@@ -1,7 +1,6 @@
 package engine;
 
 import static org.lwjgl.glfw.GLFW.glfwMakeContextCurrent;
-import static org.lwjgl.glfw.GLFW.glfwTerminate;
 import static org.lwjgl.system.MemoryUtil.NULL;
 
 import java.util.ArrayList;
@@ -126,9 +125,6 @@ public class InternalRenderThread {
 
 		glfwMakeContextCurrent(NULL);
 		GL.setCapabilities(null);
-
-		// Close OpenGL
-		glfwTerminate();
 	}
 
 	public static void runLater(Runnable runnable) {

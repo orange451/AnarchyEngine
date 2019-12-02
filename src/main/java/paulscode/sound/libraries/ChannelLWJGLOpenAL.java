@@ -1,19 +1,26 @@
 package paulscode.sound.libraries;
 
+import static org.lwjgl.system.MemoryStack.stackPush;
+import static org.lwjgl.system.MemoryUtil.memAlloc;
+import static org.lwjgl.system.MemoryUtil.memAllocInt;
+import static org.lwjgl.system.MemoryUtil.memFree;
+import static org.lwjgl.system.MemoryUtil.memRealloc;
+
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.util.LinkedList;
+
 import javax.sound.sampled.AudioFormat;
 
-// From the lwjgl library, http://www.lwjgl.org
-import org.lwjgl.BufferUtils;
 import org.lwjgl.openal.AL10;
 import org.lwjgl.openal.AL11;
 import org.lwjgl.openal.EXTFloat32;
+import org.lwjgl.system.MemoryStack;
 
 import paulscode.sound.Channel;
 import paulscode.sound.SoundSystemConfig;
 
+//@formatter:off
 /**
  * The ChannelLWJGLOpenAL class is used to reserve a sound-card voice using the
  * lwjgl binding of OpenAL.  Channels can be either normal or streaming 
@@ -90,615 +97,541 @@ import paulscode.sound.SoundSystemConfig;
  *    http://www.paulscode.com
  * </b>
  */
-public class ChannelLWJGLOpenAL extends Channel
-{
-/**
- * OpenAL's IntBuffer identifier for this channel.
- */    
-    public int ALSource;
-    
-/**
- * OpenAL data format to use when playing back the assigned source.
- */    
-    public int ALformat;	// OpenAL data format
-    
-/**
- * Sample rate (speed) to use for play-back.
- */    
-    public int sampleRate;	// sample rate        
+//@formatter:on
+public class ChannelLWJGLOpenAL extends Channel {
+	/**
+	 * OpenAL's IntBuffer identifier for this channel.
+	 */
+	public int ALSource;
 
-/**
- * Miliseconds of buffers previously played (streaming sources).
- */
-    public float millisPreviouslyPlayed = 0;
+	/**
+	 * OpenAL data format to use when playing back the assigned source.
+	 */
+	public int ALformat; // OpenAL data format
 
-/**
- * Constructor:  takes channelType identifier and a handle to the OpenAL 
- * IntBuffer identifier to use for this channel.  Possible values for channel 
- * type can be found in the 
- * {@link paulscode.sound.SoundSystemConfig SoundSystemConfig} class.
- * @param type Type of channel (normal or streaming).
- * @param src Handle to the OpenAL source identifier.
- */
-    public ChannelLWJGLOpenAL( int type, IntBuffer src )
-    {
-        super( type );
-        libraryType = LibraryLWJGLOpenAL.class;
-        ALSource = src.get(0);
-    }
-    
-/**
- * Empties the streamBuffers list, stops and deletes the ALSource, shuts the 
- * channel down, and removes references to all instantiated objects.
- */
-    @Override
-    public void cleanup()
-    {
-        if( ALSource != 0 )
-        {
-            try
-            {
-                // Stop playing the source:
-                AL10.alSourceStop( ALSource );
-                AL10.alGetError();
-            }
-            catch( Exception e )
-            {}
-            try
-            {
-                // Delete the source:
-                AL10.alDeleteSources( ALSource );
-                AL10.alGetError();
-            }
-            catch( Exception e )
-            {}
-        }
-        ALSource = 0;
-        
-        super.cleanup();
-    }
-    
-/**
- * Attaches an OpenAL sound-buffer identifier for the sound data to be played 
- * back for a normal source.
- * @param buf Intbuffer identifier for the sound data to play.
- * @return False if an error occurred.
- */
-    public boolean attachBuffer( IntBuffer buf )
-    {
-        // A sound buffer can only be attached to a normal source:
-        if( errorCheck( channelType != SoundSystemConfig.TYPE_NORMAL,
-                        "Sound buffers may only be attached to normal " +
-                        "sources." ) )
-            return false;
-        
-        // send the sound buffer to the channel:
-        AL10.alSourcei( ALSource, AL10.AL_BUFFER,
-                        buf.get(0) );
+	/**
+	 * Sample rate (speed) to use for play-back.
+	 */
+	public int sampleRate; // sample rate
 
+	/**
+	 * Miliseconds of buffers previously played (streaming sources).
+	 */
+	public float millisPreviouslyPlayed = 0;
 
-        // save the format for later, for determining milliseconds played
-        if( attachedSource != null && attachedSource.soundBuffer != null &&
-            attachedSource.soundBuffer.audioFormat != null )
-            setAudioFormat( attachedSource.soundBuffer.audioFormat );
+	/**
+	 * Constructor: takes channelType identifier and a handle to the OpenAL
+	 * IntBuffer identifier to use for this channel. Possible values for channel
+	 * type can be found in the {@link paulscode.sound.SoundSystemConfig
+	 * SoundSystemConfig} class.
+	 * 
+	 * @param type Type of channel (normal or streaming).
+	 * @param src  Handle to the OpenAL source identifier.
+	 */
+	public ChannelLWJGLOpenAL(int type, IntBuffer src) {
+		super(type);
+		libraryType = LibraryLWJGLOpenAL.class;
+		ALSource = src.get(0);
+	}
 
-        // Check for errors and return:
-        return checkALError();
-    }
-/**
- * Sets the channel up to receive the specified audio format.
- * @param audioFormat Format to use when playing the stream data.
- */
-    @Override
-    public void setAudioFormat( AudioFormat audioFormat )
-    {
-        int soundFormat = 0;
-        if( audioFormat.getChannels() == 1 )
-        {
-            if( audioFormat.getSampleSizeInBits() == 8 )
-            {
-                soundFormat = AL10.AL_FORMAT_MONO8;
-            }
-            else if( audioFormat.getSampleSizeInBits() == 16 )
-            {
-                soundFormat = AL10.AL_FORMAT_MONO16;
-            }
-            else if( audioFormat.getSampleSizeInBits() == 32 )
-			{
+	/**
+	 * Empties the streamBuffers list, stops and deletes the ALSource, shuts the
+	 * channel down, and removes references to all instantiated objects.
+	 */
+	@Override
+	public void cleanup() {
+		if (ALSource != 0) {
+			try {
+				// Stop playing the source:
+				AL10.alSourceStop(ALSource);
+				AL10.alGetError();
+			} catch (Exception e) {
+			}
+			try {
+				// Delete the source:
+				AL10.alDeleteSources(ALSource);
+				AL10.alGetError();
+			} catch (Exception e) {
+			}
+		}
+		ALSource = 0;
+
+		super.cleanup();
+	}
+
+	/**
+	 * Attaches an OpenAL sound-buffer identifier for the sound data to be played
+	 * back for a normal source.
+	 * 
+	 * @param buf Intbuffer identifier for the sound data to play.
+	 * @return False if an error occurred.
+	 */
+	public boolean attachBuffer(int buf) {
+		// A sound buffer can only be attached to a normal source:
+		if (errorCheck(channelType != SoundSystemConfig.TYPE_NORMAL,
+				"Sound buffers may only be attached to normal " + "sources."))
+			return false;
+
+		// send the sound buffer to the channel:
+		AL10.alSourcei(ALSource, AL10.AL_BUFFER, buf);
+
+		// save the format for later, for determining milliseconds played
+		if (attachedSource != null && attachedSource.soundBuffer != null
+				&& attachedSource.soundBuffer.audioFormat != null)
+			setAudioFormat(attachedSource.soundBuffer.audioFormat);
+
+		// Check for errors and return:
+		return checkALError();
+	}
+
+	/**
+	 * Sets the channel up to receive the specified audio format.
+	 * 
+	 * @param audioFormat Format to use when playing the stream data.
+	 */
+	@Override
+	public void setAudioFormat(AudioFormat audioFormat) {
+		int soundFormat = 0;
+		if (audioFormat.getChannels() == 1) {
+			if (audioFormat.getSampleSizeInBits() == 8) {
+				soundFormat = AL10.AL_FORMAT_MONO8;
+			} else if (audioFormat.getSampleSizeInBits() == 16) {
+				soundFormat = AL10.AL_FORMAT_MONO16;
+			} else if (audioFormat.getSampleSizeInBits() == 32) {
 				soundFormat = EXTFloat32.AL_FORMAT_MONO_FLOAT32;
+			} else {
+				errorMessage("Illegal sample size in method " + "'setAudioFormat'");
+				return;
 			}
-            else
-            {
-                errorMessage( "Illegal sample size in method " +
-                              "'setAudioFormat'" );
-                return;
-            }
-        }
-        else if( audioFormat.getChannels() == 2 )
-        {
-            if( audioFormat.getSampleSizeInBits() == 8 )
-            {
-                soundFormat = AL10.AL_FORMAT_STEREO8;
-            }
-            else if( audioFormat.getSampleSizeInBits() == 16 )
-            {
-                soundFormat = AL10.AL_FORMAT_STEREO16;
-            }
-            else if( audioFormat.getSampleSizeInBits() == 32 )
-			{
+		} else if (audioFormat.getChannels() == 2) {
+			if (audioFormat.getSampleSizeInBits() == 8) {
+				soundFormat = AL10.AL_FORMAT_STEREO8;
+			} else if (audioFormat.getSampleSizeInBits() == 16) {
+				soundFormat = AL10.AL_FORMAT_STEREO16;
+			} else if (audioFormat.getSampleSizeInBits() == 32) {
 				soundFormat = EXTFloat32.AL_FORMAT_STEREO_FLOAT32;
+			} else {
+				errorMessage("Illegal sample size in method " + "'setAudioFormat'");
+				return;
 			}
-            else
-            {
-                errorMessage( "Illegal sample size in method " +
-                              "'setAudioFormat'" );
-                return;
-            }
-        }
-        else
-        {
-            errorMessage( "Audio data neither mono nor stereo in " +
-                          "method 'setAudioFormat'" );
-            return;
-        }
-        ALformat = soundFormat;
-        sampleRate = (int) audioFormat.getSampleRate();
-    }
-/**
- * Sets the channel up to receive the specified OpenAL audio format and sample
- * rate.
- * @param format Format to use.
- * @param rate Sample rate (speed) to use.
- */
-    public void setFormat( int format, int rate )
-    {
-        ALformat = format;
-        sampleRate = rate;
-    }
-    
-/**
- * Queues up the initial byte[] buffers of data to be streamed.
- * @param bufferList List of the first buffers to be played for a streaming source.
- * @return False if problem occurred or if end of stream was reached.
- */
-    @Override
-    public boolean preLoadBuffers( LinkedList<byte[]> bufferList )
-    {
-        // Stream buffers can only be queued for streaming sources:
-        if( errorCheck( channelType != SoundSystemConfig.TYPE_STREAMING,
-                        "Buffers may only be queued for streaming sources." ) )
-            return false;
-        
-        if( errorCheck( bufferList == null,
-                        "Buffer List null in method 'preLoadBuffers'" ) )
-            return false;
-        
-        IntBuffer streamBuffers;
-        
-        // Remember if the channel was playing:
-        boolean playing = playing();
-        // stop the channel if it is playing:
-        if( playing )
-        {
-            AL10.alSourceStop( ALSource );
-            checkALError();
-        }
-        // Clear out any previously queued buffers:
-        int processed = AL10.alGetSourcei( ALSource,
-                                           AL10.AL_BUFFERS_PROCESSED );
-        if( processed > 0 )
-        {
-            streamBuffers = BufferUtils.createIntBuffer( processed );
-            AL10.alGenBuffers( streamBuffers );
-            if( errorCheck( checkALError(),
-                 "Error clearing stream buffers in method 'preLoadBuffers'" ) )
-                return false;
-            AL10.alSourceUnqueueBuffers( ALSource, streamBuffers );
-            if( errorCheck( checkALError(),
-                 "Error unqueuing stream buffers in method 'preLoadBuffers'" ) )
-                return false;
-        }
+		} else {
+			errorMessage("Audio data neither mono nor stereo in " + "method 'setAudioFormat'");
+			return;
+		}
+		ALformat = soundFormat;
+		sampleRate = (int) audioFormat.getSampleRate();
+	}
 
-        // restart the channel if it was previously playing:
-        if( playing )
-        {
-            AL10.alSourcePlay( ALSource );
-            checkALError();
-        }
-        
-        streamBuffers = BufferUtils.createIntBuffer( bufferList.size() );
-        AL10.alGenBuffers( streamBuffers );
-        if( errorCheck( checkALError(),
-             "Error generating stream buffers in method 'preLoadBuffers'" ) )
-            return false;
-        
-        ByteBuffer byteBuffer = null;
-        for( int i = 0; i < bufferList.size(); i++ )
-        {
-            //byteBuffer = ByteBuffer.wrap( bufferList.get(i), 0,
-            //                              bufferList.get(i).length );
-            byteBuffer = (ByteBuffer) BufferUtils.createByteBuffer(
-                   bufferList.get(i).length ).put( bufferList.get( i ) ).flip();
+	/**
+	 * Sets the channel up to receive the specified OpenAL audio format and sample
+	 * rate.
+	 * 
+	 * @param format Format to use.
+	 * @param rate   Sample rate (speed) to use.
+	 */
+	public void setFormat(int format, int rate) {
+		ALformat = format;
+		sampleRate = rate;
+	}
 
-            try
-            {
-                AL10.alBufferData( streamBuffers.get(i), ALformat, byteBuffer,
-                                   sampleRate );
-            }
-            catch( Exception e )
-            {
-                errorMessage( "Error creating buffers in method " +
-                              "'preLoadBuffers'" );
-                printStackTrace( e );
-                return false;
-            }
-            if( errorCheck( checkALError(),
-                         "Error creating buffers in method 'preLoadBuffers'" ) )
-                return false;
+	/**
+	 * Queues up the initial byte[] buffers of data to be streamed.
+	 * 
+	 * @param bufferList List of the first buffers to be played for a streaming
+	 *                   source.
+	 * @return False if problem occurred or if end of stream was reached.
+	 */
+	@Override
+	public boolean preLoadBuffers(LinkedList<byte[]> bufferList) {
+		// Stream buffers can only be queued for streaming sources:
+		if (errorCheck(channelType != SoundSystemConfig.TYPE_STREAMING,
+				"Buffers may only be queued for streaming sources."))
+			return false;
 
-        }
-        
-        try
-        {
-            AL10.alSourceQueueBuffers( ALSource, streamBuffers );
-        }
-        catch( Exception e )
-        {
-            errorMessage( "Error queuing buffers in method 'preLoadBuffers'" );
-            printStackTrace( e );
-            return false;
-        }
-        if( errorCheck( checkALError(),
-                        "Error queuing buffers in method 'preLoadBuffers'" ) )
-            return false;
+		if (errorCheck(bufferList == null, "Buffer List null in method 'preLoadBuffers'"))
+			return false;
 
-        AL10.alSourcePlay( ALSource );
-        if( errorCheck( checkALError(),
-                        "Error playing source in method 'preLoadBuffers'" ) )
-            return false;
-        
-        // Success:
-        return true;
-    }
-    
-/**
- * Queues up a byte[] buffer of data to be streamed.
- * @param buffer The next buffer to be played for a streaming source.
- * @return False if an error occurred or if the channel is shutting down.
- */
-    @Override
-    public boolean queueBuffer( byte[] buffer )
-    {
-        // Stream buffers can only be queued for streaming sources:
-        if( errorCheck( channelType != SoundSystemConfig.TYPE_STREAMING,
-                        "Buffers may only be queued for streaming sources." ) )
-            return false;
-        
-        //ByteBuffer byteBuffer = ByteBuffer.wrap( buffer, 0, buffer.length );
-        ByteBuffer byteBuffer = (ByteBuffer) BufferUtils.createByteBuffer(
-                                           buffer.length ).put( buffer ).flip();
+		// Remember if the channel was playing:
+		boolean playing = playing();
+		// stop the channel if it is playing:
+		if (playing) {
+			AL10.alSourceStop(ALSource);
+			checkALError();
+		}
+		try (MemoryStack stack = stackPush()) {
 
-        IntBuffer intBuffer = BufferUtils.createIntBuffer( 1 );
+		}
+		IntBuffer streamBuffers = null;
+		// Clear out any previously queued buffers:
+		int processed = AL10.alGetSourcei(ALSource, AL10.AL_BUFFERS_PROCESSED);
+		if (processed > 0) {
+			streamBuffers = memAllocInt(processed);
+			AL10.alGenBuffers(streamBuffers);
+			if (errorCheck(checkALError(), "Error clearing stream buffers in method 'preLoadBuffers'"))
+				return false;
+			AL10.alSourceUnqueueBuffers(ALSource, streamBuffers);
+			if (errorCheck(checkALError(), "Error unqueuing stream buffers in method 'preLoadBuffers'"))
+				return false;
+		}
 
-        AL10.alSourceUnqueueBuffers( ALSource, intBuffer );
-        if( checkALError() )
-            return false;
+		// restart the channel if it was previously playing:
+		if (playing) {
+			AL10.alSourcePlay(ALSource);
+			checkALError();
+		}
 
-        if( AL10.alIsBuffer( intBuffer.get( 0 ) ) )
-            millisPreviouslyPlayed += millisInBuffer( intBuffer.get( 0 ) );
-        checkALError();
+		memRealloc(streamBuffers, bufferList.size());
+		AL10.alGenBuffers(streamBuffers);
+		if (errorCheck(checkALError(), "Error generating stream buffers in method 'preLoadBuffers'"))
+			return false;
 
-        AL10.alBufferData( intBuffer.get(0), ALformat, byteBuffer, sampleRate );
-        if( checkALError() )
-            return false;
+		for (int i = 0; i < bufferList.size(); i++) {
+			// byteBuffer = ByteBuffer.wrap( bufferList.get(i), 0,
+			// bufferList.get(i).length );
+			ByteBuffer data = memAlloc(bufferList.get(i).length);
+			data.put(bufferList.get(i));
+			data.flip();
+			try {
+				AL10.alBufferData(streamBuffers.get(i), ALformat, data, sampleRate);
+			} catch (Exception e) {
+				errorMessage("Error creating buffers in method " + "'preLoadBuffers'");
+				printStackTrace(e);
+				return false;
+			} finally {
+				memFree(data);
+			}
+			if (errorCheck(checkALError(), "Error creating buffers in method 'preLoadBuffers'"))
+				return false;
 
-        AL10.alSourceQueueBuffers( ALSource, intBuffer );
-        if( checkALError() )
-            return false;
+		}
 
-        return true;
-    }
+		try {
+			AL10.alSourceQueueBuffers(ALSource, streamBuffers);
+		} catch (Exception e) {
+			errorMessage("Error queuing buffers in method 'preLoadBuffers'");
+			printStackTrace(e);
+			return false;
+		} finally {
+			memFree(streamBuffers);
+		}
+		if (errorCheck(checkALError(), "Error queuing buffers in method 'preLoadBuffers'"))
+			return false;
 
-/**
- * Feeds raw data to the stream.
- * @param buffer Buffer containing raw audio data to stream.
- * @return Number of prior buffers that have been processed., or -1 if error.
- */
-    @Override
-    public int feedRawAudioData( byte[] buffer )
-    {
-        // Stream buffers can only be queued for streaming sources:
-        if( errorCheck( channelType != SoundSystemConfig.TYPE_STREAMING,
-                      "Raw audio data can only be fed to streaming sources." ) )
-            return -1;
+		AL10.alSourcePlay(ALSource);
+		if (errorCheck(checkALError(), "Error playing source in method 'preLoadBuffers'"))
+			return false;
 
-        //ByteBuffer byteBuffer = ByteBuffer.wrap( buffer, 0, buffer.length );
-        ByteBuffer byteBuffer = (ByteBuffer) BufferUtils.createByteBuffer(
-                                           buffer.length ).put( buffer ).flip();
+		// Success:
+		return true;
+	}
 
-        IntBuffer intBuffer;
+	/**
+	 * Queues up a byte[] buffer of data to be streamed.
+	 * 
+	 * @param buffer The next buffer to be played for a streaming source.
+	 * @return False if an error occurred or if the channel is shutting down.
+	 */
+	@Override
+	public boolean queueBuffer(byte[] buffer) {
+		// Stream buffers can only be queued for streaming sources:
+		if (errorCheck(channelType != SoundSystemConfig.TYPE_STREAMING,
+				"Buffers may only be queued for streaming sources."))
+			return false;
 
-        // Clear out any previously queued buffers:
-        int processed = AL10.alGetSourcei( ALSource,
-                                           AL10.AL_BUFFERS_PROCESSED );
-        if( processed > 0 )
-        {
-            intBuffer = BufferUtils.createIntBuffer( processed );
-            AL10.alGenBuffers( intBuffer );
-            if( errorCheck( checkALError(),
-                "Error clearing stream buffers in method 'feedRawAudioData'" ) )
-                return -1;
-            AL10.alSourceUnqueueBuffers( ALSource, intBuffer );
-            if( errorCheck( checkALError(),
-               "Error unqueuing stream buffers in method 'feedRawAudioData'" ) )
-                return -1;
-            int i;
-            intBuffer.rewind();
-            while( intBuffer.hasRemaining() )
-            {
-                i = intBuffer.get();
-                if( AL10.alIsBuffer( i ) )
-                {
-                    millisPreviouslyPlayed += millisInBuffer( i );
-                }
-                checkALError();
-            }
-            AL10.alDeleteBuffers( intBuffer );
-            checkALError();
-        }
-        intBuffer = BufferUtils.createIntBuffer( 1 );
-        AL10.alGenBuffers( intBuffer );
-        if( errorCheck( checkALError(),
-                        "Error generating stream buffers in method 'preLoadBuffers'" ) )
-            return -1;
+		// ByteBuffer byteBuffer = ByteBuffer.wrap( buffer, 0, buffer.length );
+		ByteBuffer data = memAlloc(buffer.length);
+		data.put(buffer);
+		data.flip();
 
-        AL10.alBufferData( intBuffer.get(0), ALformat, byteBuffer, sampleRate );
-        if( checkALError() )
-            return -1;
+		int intBuffer = AL10.alSourceUnqueueBuffers(ALSource);
+		if (checkALError())
+			return false;
 
-        AL10.alSourceQueueBuffers( ALSource, intBuffer );
-        if( checkALError() )
-            return -1;
-        
-        if( attachedSource != null && attachedSource.channel == this &&
-            attachedSource.active() )
-        {
-            // restart the channel if it was previously playing:
-            if( !playing() )
-            {
-                AL10.alSourcePlay( ALSource );
-                checkALError();
-            }
-        }
+		if (AL10.alIsBuffer(intBuffer))
+			millisPreviouslyPlayed += millisInBuffer(intBuffer);
+		checkALError();
 
-        return processed;
-    }
-    
-/**
- * Returns the number of milliseconds of audio contained in specified buffer.
- * @return milliseconds, or 0 if unable to calculate.
- */
-    public float millisInBuffer( int alBufferi )
-    {
-        return( ( (float) AL10.alGetBufferi( alBufferi, AL10.AL_SIZE ) /
-                (float) AL10.alGetBufferi( alBufferi, AL10.AL_CHANNELS ) /
-                ( (float) AL10.alGetBufferi( alBufferi, AL10.AL_BITS ) / 8.0f ) /
-                (float) sampleRate ) * 1000 );
-    }
+		AL10.alBufferData(intBuffer, ALformat, data, sampleRate);
+		if (checkALError())
+			return false;
+		memFree(data);
 
-/**
- * Calculates the number of milliseconds since the channel began playing.
- * @return Milliseconds, or -1 if unable to calculate.
- */
-    @Override
-    public float millisecondsPlayed()
-    {
-        // get number of samples played in current buffer
-        float offset = (float)AL10.alGetSourcei( ALSource,
-                                               AL11.AL_BYTE_OFFSET );
+		AL10.alSourceQueueBuffers(ALSource, intBuffer);
+		if (checkALError())
+			return false;
 
-        float bytesPerFrame = 1f;
-        switch( ALformat )
-        {
-            case AL10.AL_FORMAT_MONO8 :
-                bytesPerFrame = 1f;
-                break;
-            case AL10.AL_FORMAT_MONO16 :
-                bytesPerFrame = 2f;
-                break;
-            case AL10.AL_FORMAT_STEREO8 :
-                bytesPerFrame = 2f;
-                break;
-            case AL10.AL_FORMAT_STEREO16 :
-                bytesPerFrame = 4f;
-                break;
-            default :
-                break;
-        }
+		return true;
+	}
 
-        offset = ( ( (float) offset / bytesPerFrame ) / (float) sampleRate )
-                                                                         * 1000;
+	/**
+	 * Feeds raw data to the stream.
+	 * 
+	 * @param buffer Buffer containing raw audio data to stream.
+	 * @return Number of prior buffers that have been processed., or -1 if error.
+	 */
+	@Override
+	public int feedRawAudioData(byte[] buffer) {
+		// Stream buffers can only be queued for streaming sources:
+		if (errorCheck(channelType != SoundSystemConfig.TYPE_STREAMING,
+				"Raw audio data can only be fed to streaming sources."))
+			return -1;
 
-        // add the milliseconds from stream-buffers that played previously
-        if( channelType == SoundSystemConfig.TYPE_STREAMING )
-            offset += millisPreviouslyPlayed;
+		// ByteBuffer byteBuffer = ByteBuffer.wrap( buffer, 0, buffer.length );
+		ByteBuffer data = memAlloc(buffer.length);
+		data.put(buffer);
+		data.flip();
 
-        // Return millis played:
-        return( offset );
-    }
+		// Clear out any previously queued buffers:
+		int processed = AL10.alGetSourcei(ALSource, AL10.AL_BUFFERS_PROCESSED);
+		if (processed > 0) {
+			IntBuffer intBuffer = memAllocInt(processed);
+			AL10.alGenBuffers(intBuffer);
+			if (errorCheck(checkALError(), "Error clearing stream buffers in method 'feedRawAudioData'"))
+				return -1;
+			AL10.alSourceUnqueueBuffers(ALSource, intBuffer);
+			if (errorCheck(checkALError(), "Error unqueuing stream buffers in method 'feedRawAudioData'"))
+				return -1;
+			int i;
+			intBuffer.rewind();
+			while (intBuffer.hasRemaining()) {
+				i = intBuffer.get();
+				if (AL10.alIsBuffer(i)) {
+					millisPreviouslyPlayed += millisInBuffer(i);
+				}
+				checkALError();
+			}
+			AL10.alDeleteBuffers(intBuffer);
+			memFree(intBuffer);
+			checkALError();
+		}
 
-/**
- * Returns the number of queued byte[] buffers that have finished playing.
- * @return Number of buffers processed.
- */
-    @Override
-    public int buffersProcessed()
-    {
-        // Only streaming sources process buffers:
-        if( channelType != SoundSystemConfig.TYPE_STREAMING )
-            return 0;
-        
-        // determine how many have been processed:
-        int processed = AL10.alGetSourcei( ALSource,
-                                           AL10.AL_BUFFERS_PROCESSED );
-        
-        // Check for errors:
-        if( checkALError() )
-            return 0;
-        
-        // Return how many were processed:
-        return processed;
-    }
-    
-/**
- * Dequeues all previously queued data.
- */
-    @Override
-    public void flush()
-    {
-        // Only a streaming source can be flushed, because only streaming
-        // sources have queued buffers:
-        if( channelType != SoundSystemConfig.TYPE_STREAMING )
-            return;
-        
-        // determine how many buffers have been queued:
-        int queued = AL10.alGetSourcei( ALSource,
-                                        AL10.AL_BUFFERS_QUEUED );
-        // Check for errors:
-        if( checkALError() )
-            return;
-        
-        IntBuffer intBuffer = BufferUtils.createIntBuffer( 1 );
-        while( queued > 0 )
-        {
-            try
-            {
-                AL10.alSourceUnqueueBuffers( ALSource, intBuffer );
-            }
-            catch( Exception e )
-            {
-                return;
-            }
-            if( checkALError() )
-                return;
-            queued--;
-        }
-       	millisPreviouslyPlayed = 0;
-    }
-    
-/**
- * Stops the channel, dequeues any queued data, and closes the channel.
- */
-    @Override
-    public void close()
-    {
-        try
-        {
-            AL10.alSourceStop( ALSource );
-            AL10.alGetError();
-        }
-        catch( Exception e )
-        {}
-        
-        if( channelType == SoundSystemConfig.TYPE_STREAMING )
-            flush();
-    }
-    
-/**
- * Plays the currently attached normal source, opens this channel up for 
- * streaming, or resumes playback if this channel was paused.
- */
-    @Override
-    public void play()
-    {
-        AL10.alSourcePlay( ALSource );
-        checkALError();
-    }
-    
-/**
- * Temporarily stops playback for this channel.
- */
-    @Override
-    public void pause()
-    {
-        AL10.alSourcePause( ALSource );
-        checkALError();
-    }
-    
-/**
- * Stops playback for this channel and rewinds the attached source to the 
- * beginning.
- */
-    @Override
-    public void stop()
-    {
-        AL10.alSourceStop( ALSource );
-        if( !checkALError() )
-            millisPreviouslyPlayed = 0;
-    }
-    
-/**
- * Rewinds the attached source to the beginning.  Stops the source if it was 
- * paused.
- */
-    @Override
-    public void rewind()
-    {
-        // rewinding for streaming sources is handled elsewhere
-        if( channelType == SoundSystemConfig.TYPE_STREAMING )
-            return;
-        
-        AL10.alSourceRewind( ALSource );
-        if( !checkALError() )
-            millisPreviouslyPlayed = 0;
-    }
-    
-    
-/**
- * Used to determine if a channel is actively playing a source.  This method 
- * will return false if the channel is paused or stopped and when no data is 
- * queued to be streamed.
- * @return True if this channel is playing a source.
- */
-    @Override
-    public boolean playing()
-    {
-        int state = AL10.alGetSourcei( ALSource,
-                                       AL10.AL_SOURCE_STATE );
-        if( checkALError() )
-            return false;
-        
-        return( state == AL10.AL_PLAYING );
-    }
-    
-/**
- * Checks for OpenAL errors, and prints a message if there is an error.
- * @return True if there was an error, False if not.
- */
-    private boolean checkALError()
-    {
-        switch( AL10.alGetError() )
-        {
-            case AL10.AL_NO_ERROR:
-                return false;
-            case AL10.AL_INVALID_NAME:
-                errorMessage( "Invalid name parameter." );
-                return true;
-            case AL10.AL_INVALID_ENUM:
-                errorMessage( "Invalid parameter." );
-                return true;
-            case AL10.AL_INVALID_VALUE:
-                errorMessage( "Invalid enumerated parameter value." );
-                return true;
-            case AL10.AL_INVALID_OPERATION:
-                errorMessage( "Illegal call." );
-                return true;
-            case AL10.AL_OUT_OF_MEMORY:
-                errorMessage( "Unable to allocate memory." );
-                return true;
-            default:
-                errorMessage( "An unrecognized error occurred." );
-                return true;
-        }
-    }
+		int bufferName = AL10.alGenBuffers();
+		if (errorCheck(checkALError(), "Error generating stream buffers in method 'preLoadBuffers'"))
+			return -1;
+
+		AL10.alBufferData(bufferName, ALformat, data, sampleRate);
+		if (checkALError())
+			return -1;
+		memFree(data);
+
+		AL10.alSourceQueueBuffers(ALSource, bufferName);
+		if (checkALError())
+			return -1;
+
+		if (attachedSource != null && attachedSource.channel == this && attachedSource.active()) {
+			// restart the channel if it was previously playing:
+			if (!playing()) {
+				AL10.alSourcePlay(ALSource);
+				checkALError();
+			}
+		}
+
+		return processed;
+	}
+
+	/**
+	 * Returns the number of milliseconds of audio contained in specified buffer.
+	 * 
+	 * @return milliseconds, or 0 if unable to calculate.
+	 */
+	public float millisInBuffer(int alBufferi) {
+		return (((float) AL10.alGetBufferi(alBufferi, AL10.AL_SIZE)
+				/ (float) AL10.alGetBufferi(alBufferi, AL10.AL_CHANNELS)
+				/ ((float) AL10.alGetBufferi(alBufferi, AL10.AL_BITS) / 8.0f) / (float) sampleRate) * 1000);
+	}
+
+	/**
+	 * Calculates the number of milliseconds since the channel began playing.
+	 * 
+	 * @return Milliseconds, or -1 if unable to calculate.
+	 */
+	@Override
+	public float millisecondsPlayed() {
+		// get number of samples played in current buffer
+		float offset = (float) AL10.alGetSourcei(ALSource, AL11.AL_BYTE_OFFSET);
+
+		float bytesPerFrame = 1f;
+		switch (ALformat) {
+		case AL10.AL_FORMAT_MONO8:
+			bytesPerFrame = 1f;
+			break;
+		case AL10.AL_FORMAT_MONO16:
+			bytesPerFrame = 2f;
+			break;
+		case AL10.AL_FORMAT_STEREO8:
+			bytesPerFrame = 2f;
+			break;
+		case AL10.AL_FORMAT_STEREO16:
+			bytesPerFrame = 4f;
+			break;
+		default:
+			break;
+		}
+
+		offset = (((float) offset / bytesPerFrame) / (float) sampleRate) * 1000;
+
+		// add the milliseconds from stream-buffers that played previously
+		if (channelType == SoundSystemConfig.TYPE_STREAMING)
+			offset += millisPreviouslyPlayed;
+
+		// Return millis played:
+		return (offset);
+	}
+
+	/**
+	 * Returns the number of queued byte[] buffers that have finished playing.
+	 * 
+	 * @return Number of buffers processed.
+	 */
+	@Override
+	public int buffersProcessed() {
+		// Only streaming sources process buffers:
+		if (channelType != SoundSystemConfig.TYPE_STREAMING)
+			return 0;
+
+		// determine how many have been processed:
+		int processed = AL10.alGetSourcei(ALSource, AL10.AL_BUFFERS_PROCESSED);
+
+		// Check for errors:
+		if (checkALError())
+			return 0;
+
+		// Return how many were processed:
+		return processed;
+	}
+
+	/**
+	 * Dequeues all previously queued data.
+	 */
+	@Override
+	public void flush() {
+		// Only a streaming source can be flushed, because only streaming
+		// sources have queued buffers:
+		if (channelType != SoundSystemConfig.TYPE_STREAMING)
+			return;
+
+		// determine how many buffers have been queued:
+		int queued = AL10.alGetSourcei(ALSource, AL10.AL_BUFFERS_QUEUED);
+		// Check for errors:
+		if (checkALError())
+			return;
+
+		while (queued > 0) {
+			try {
+				AL10.alSourceUnqueueBuffers(ALSource);
+			} catch (Exception e) {
+				return;
+			}
+			if (checkALError())
+				return;
+			queued--;
+		}
+		millisPreviouslyPlayed = 0;
+	}
+
+	/**
+	 * Stops the channel, dequeues any queued data, and closes the channel.
+	 */
+	@Override
+	public void close() {
+		try {
+			AL10.alSourceStop(ALSource);
+			AL10.alGetError();
+		} catch (Exception e) {
+		}
+
+		if (channelType == SoundSystemConfig.TYPE_STREAMING)
+			flush();
+	}
+
+	/**
+	 * Plays the currently attached normal source, opens this channel up for
+	 * streaming, or resumes playback if this channel was paused.
+	 */
+	@Override
+	public void play() {
+		AL10.alSourcePlay(ALSource);
+		checkALError();
+	}
+
+	/**
+	 * Temporarily stops playback for this channel.
+	 */
+	@Override
+	public void pause() {
+		AL10.alSourcePause(ALSource);
+		checkALError();
+	}
+
+	/**
+	 * Stops playback for this channel and rewinds the attached source to the
+	 * beginning.
+	 */
+	@Override
+	public void stop() {
+		AL10.alSourceStop(ALSource);
+		if (!checkALError())
+			millisPreviouslyPlayed = 0;
+	}
+
+	/**
+	 * Rewinds the attached source to the beginning. Stops the source if it was
+	 * paused.
+	 */
+	@Override
+	public void rewind() {
+		// rewinding for streaming sources is handled elsewhere
+		if (channelType == SoundSystemConfig.TYPE_STREAMING)
+			return;
+
+		AL10.alSourceRewind(ALSource);
+		if (!checkALError())
+			millisPreviouslyPlayed = 0;
+	}
+
+	/**
+	 * Used to determine if a channel is actively playing a source. This method will
+	 * return false if the channel is paused or stopped and when no data is queued
+	 * to be streamed.
+	 * 
+	 * @return True if this channel is playing a source.
+	 */
+	@Override
+	public boolean playing() {
+		int state = AL10.alGetSourcei(ALSource, AL10.AL_SOURCE_STATE);
+		if (checkALError())
+			return false;
+
+		return (state == AL10.AL_PLAYING);
+	}
+
+	/**
+	 * Checks for OpenAL errors, and prints a message if there is an error.
+	 * 
+	 * @return True if there was an error, False if not.
+	 */
+	private boolean checkALError() {
+		switch (AL10.alGetError()) {
+		case AL10.AL_NO_ERROR:
+			return false;
+		case AL10.AL_INVALID_NAME:
+			errorMessage("Invalid name parameter.");
+			return true;
+		case AL10.AL_INVALID_ENUM:
+			errorMessage("Invalid parameter.");
+			return true;
+		case AL10.AL_INVALID_VALUE:
+			errorMessage("Invalid enumerated parameter value.");
+			return true;
+		case AL10.AL_INVALID_OPERATION:
+			errorMessage("Illegal call.");
+			return true;
+		case AL10.AL_OUT_OF_MEMORY:
+			errorMessage("Unable to allocate memory.");
+			return true;
+		default:
+			errorMessage("An unrecognized error occurred.");
+			return true;
+		}
+	}
 }

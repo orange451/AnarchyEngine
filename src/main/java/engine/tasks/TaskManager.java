@@ -133,7 +133,6 @@ public class TaskManager {
 	public static void runAndStopMainThread() {
 		while (!tasksMainThread.isEmpty())
 			tasksMainThread.poll().callI();
-		System.out.println("Stopped main thread");
 	}
 
 	public static void addTaskRenderThread(Runnable task) {
