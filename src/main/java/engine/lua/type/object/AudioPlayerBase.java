@@ -19,10 +19,10 @@ public class AudioPlayerBase extends Instance implements TreeViewable {
 		this.defineField(C_SOURCE.toString(), LuaValue.NIL, false);
 		
 		this.defineField(C_VOLUME.toString(), LuaValue.valueOf(1.0f), false);
-		this.getField(C_VOLUME).setClamp(new NumberClampPreferred(0, 10, 0, 1));
+		this.getField(C_VOLUME).setClamp(new NumberClampPreferred(0, 10, 0, 2));
 		
 		this.defineField(C_PITCH.toString(), LuaValue.valueOf(1.0f), false);
-		this.getField(C_PITCH).setClamp(new NumberClampPreferred(0, 8, 0, 2));
+		this.getField(C_PITCH).setClamp(new NumberClampPreferred(0, 16, 0, 4));
 		
 		this.getmetatable().set("Play", new ZeroArgFunction() {
 
