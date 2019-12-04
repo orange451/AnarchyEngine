@@ -5,14 +5,15 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicLong;
+import java.util.Map;
 
 import org.luaj.vm2.LuaValue;
-import org.lwjgl.glfw.GLFW;
+
 import engine.Game;
-import engine.GameSubscriber;
+import engine.InternalGameThread;
 import engine.lua.history.HistoryChange;
 import engine.lua.history.HistorySnapshot;
+import engine.lua.type.LuaConnection;
 import engine.lua.type.object.Instance;
 import engine.lua.type.object.PhysicsBase;
 import engine.lua.type.object.ScriptBase;
@@ -20,17 +21,30 @@ import engine.lua.type.object.TreeViewable;
 import engine.lua.type.object.insts.AnimationController;
 import engine.lua.type.object.insts.AnimationData;
 import engine.lua.type.object.insts.AssetFolder;
+import engine.lua.type.object.insts.AudioPlayer2D;
+import engine.lua.type.object.insts.AudioPlayer3D;
+import engine.lua.type.object.insts.AudioSource;
+import engine.lua.type.object.insts.BoolValue;
 import engine.lua.type.object.insts.Camera;
+import engine.lua.type.object.insts.Color3Value;
 import engine.lua.type.object.insts.DirectionalLight;
+import engine.lua.type.object.insts.NumberValue;
 import engine.lua.type.object.insts.Folder;
 import engine.lua.type.object.insts.GameObject;
 import engine.lua.type.object.insts.GlobalScript;
+import engine.lua.type.object.insts.IntValue;
 import engine.lua.type.object.insts.LocalScript;
+import engine.lua.type.object.insts.Matrix4Value;
+import engine.lua.type.object.insts.ObjectValue;
 import engine.lua.type.object.insts.PhysicsObject;
 import engine.lua.type.object.insts.PlayerPhysics;
 import engine.lua.type.object.insts.PointLight;
 import engine.lua.type.object.insts.Script;
 import engine.lua.type.object.insts.SpotLight;
+import engine.lua.type.object.insts.StringValue;
+import engine.lua.type.object.insts.Vector2Value;
+import engine.lua.type.object.insts.Vector3Value;
+import engine.lua.type.object.services.RenderSettings;
 import engine.lua.type.object.services.StarterPlayerScripts;
 import ide.IDE;
 import ide.layout.IdePane;
@@ -46,21 +60,27 @@ import lwjgui.scene.control.TreeItem;
 import lwjgui.scene.control.TreeNode;
 import lwjgui.scene.control.TreeView;
 
-public class IdeExplorer extends IdePane implements GameSubscriber {
+public class IdeExplorer extends IdePane {
 	private ScrollPane scroller;
 	private TreeView<Instance> tree;
 
-	private HashMap<Instance, SortedTreeItem<Instance>> instanceMap;
-	private HashMap<Instance, SortedTreeItem<Instance>> instanceMapTemp;
-	private HashMap<SortedTreeItem<Instance>,Instance> treeItemMap;
-	private ArrayList<SortedTreeItem<Instance>> treeItems;
-	private boolean updating;
+	private static final LuaValue C_NAME = LuaValue.valueOf("Name");
+	private static final LuaValue C_PARENT = LuaValue.valueOf("Parent");
+	
+	private Map<Instance, TreeItem<Instance>> instanceToTreeItemMap;
+	private Map<TreeItem<Instance>, TreeBase<Instance>> treeItemToParentTreeItemMap;
+	private Map<TreeItem<Instance>, LuaConnection> treeItemToChangedConnectionMap;
+	private List<Instance> selectedCache;
 	
 	private static HashMap<Class<? extends Instance>, Integer> priority = new HashMap<>();
 	
 	static {
 		priority.put(Camera.class, 50);
+
 		priority.put(StarterPlayerScripts.class, 41);
+		priority.put(AssetFolder.class, 41);
+		priority.put(RenderSettings.class, 41);
+		priority.put(AnimationData.class, 40);
 		
 		priority.put(ScriptBase.class, 35);
 		priority.put(Script.class, 35);
@@ -78,9 +98,20 @@ public class IdeExplorer extends IdePane implements GameSubscriber {
 		priority.put(PhysicsBase.class, 6);
 		priority.put(PhysicsObject.class, 6);
 		priority.put(PlayerPhysics.class, 6);
-		
-		priority.put(AssetFolder.class, 2);
-		priority.put(AnimationData.class, 2);
+
+		priority.put(IntValue.class, 5);
+		priority.put(BoolValue.class, 5);
+		priority.put(StringValue.class, 5);
+		priority.put(NumberValue.class, 5);
+		priority.put(ObjectValue.class, 5);
+		priority.put(Color3Value.class, 5);
+		priority.put(Vector2Value.class, 5);
+		priority.put(Vector3Value.class, 5);
+		priority.put(Matrix4Value.class, 5);
+
+		priority.put(AudioSource.class, 4);
+		priority.put(AudioPlayer2D.class, 4);
+		priority.put(AudioPlayer3D.class, 4);
 	}
 	
 	protected static int getPriority(Class<? extends Instance> cls) {
@@ -98,190 +129,210 @@ public class IdeExplorer extends IdePane implements GameSubscriber {
 		this.scroller.setFillToParentHeight(true);
 		this.scroller.setFillToParentWidth(true);
 		this.getChildren().add(scroller);
+		
+		// Object Added
+		Game.game().descendantAddedEvent().connect((args)->{
+			if ( !Game.isLoaded() )
+				return;
+			buildNode((Instance) args[0]);
+		});
+		
+		// Object removed
+		Game.game().descendantRemovedEvent().connect((args)->{
+			destroyNode((Instance) args[0]);
+		});
+		
+		// Game reset
+		Game.resetEvent().connect((args)-> {
+			rebuild();
+		});
+		
+		// First (initial) load
+		InternalGameThread.runLater(()->{
+			rebuild();
+		});
+		
+		// Selection change
+		Game.selectionChanged().connect((args)->{
+			List<Instance> selected = Game.selected();
+			List<Instance> toSelect = new ArrayList<Instance>();
+			List<Instance> toUnselect = new ArrayList<Instance>();
+			
+			// Prune left
+			for (int i = 0; i < selectedCache.size(); i++) {
+				Instance alreadySelected = selectedCache.get(i);
+				if ( !selected.contains(alreadySelected) )
+					toUnselect.add(alreadySelected);
+			}
+			
+			// Prune right
+			for (int i = 0; i < selected.size(); i++) {
+				Instance potentialNotYetSelected = selected.get(i);
+				if ( !selectedCache.contains(potentialNotYetSelected) )
+					toSelect.add(potentialNotYetSelected);
+			}
+			
+			// Unselect old ones
+			for (int i = 0; i < toUnselect.size(); i++) {
+				Instance t = toUnselect.get(i);
+				TreeItem<Instance> t2 = instanceToTreeItemMap.get(t);
+				tree.deselectItem(t2);
+			}
+			
+			// select new ones
+			for (int i = 0; i < toSelect.size(); i++) {
+				Instance t = toSelect.get(i);
+				TreeItem<Instance> t2 = instanceToTreeItemMap.get(t);
+				tree.selectItem(t2);
+			}
+			
+			// set cache
+			selectedCache = new ArrayList<Instance>(selected);
+		});
+		
+		// Add user controls
+		StandardUserControls.bind(this);
+	}
+	
+	private void clear() {
+		if ( this.tree != null ) {
+			this.tree.clearSelectedItems();
+			this.tree.getItems().clear();
+		}
+		
+		if ( instanceToTreeItemMap != null )
+			instanceToTreeItemMap.clear();
+		this.instanceToTreeItemMap = Collections.synchronizedMap(new HashMap<>());
+		
+		if ( treeItemToParentTreeItemMap != null )
+			treeItemToParentTreeItemMap.clear();
+		this.treeItemToParentTreeItemMap = Collections.synchronizedMap(new HashMap<>());
+		
+		if ( treeItemToChangedConnectionMap != null )
+			treeItemToChangedConnectionMap.clear();
+		this.treeItemToChangedConnectionMap = Collections.synchronizedMap(new HashMap<>());
+		
+		if ( selectedCache != null )
+			selectedCache.clear();
+		this.selectedCache = new ArrayList<Instance>();
 
-		tree = new SortedTreeView<Instance>();
+		this.tree = new SortedTreeView<Instance>();
 		this.scroller.setContent(tree);
 		
 		tree.setOnSelectItem(event -> {
-			if ( updating )
-				return;
-			
 			TreeItem<Instance> item = event.object;
 			Instance inst = item.getRoot();
 			Game.select(inst);
 		});
 		tree.setOnDeselectItem(event -> {
-			if ( updating )
-				return;
-			
 			TreeItem<Instance> item = event.object;
 			Instance inst = item.getRoot();
 			Game.deselect(inst);
 		});
-		
-		instanceMap = new HashMap<>();
-		treeItemMap = new HashMap<>();
-		instanceMapTemp = new HashMap<>();
-		treeItems = new ArrayList<SortedTreeItem<Instance>>();
-		
-		Game.getGame().subscribe(this);
-		update(true);
-
-		AtomicLong last = new AtomicLong();
-		AtomicLong bigUpdate = new AtomicLong();
-		Game.runService().renderSteppedEvent().connect((args)->{
-			long now = System.currentTimeMillis();
-			
-			// Little update
-			if ( now-last.get() > 200 ) {
-				last.set(System.currentTimeMillis());
-				update(false);
-			}
-			
-			// Big update
-			if ( now-bigUpdate.get() > 1000 ) {
-				bigUpdate.set(System.currentTimeMillis());
-				update(true);
-			}
-			
-			// Forced update
-			if ( requiresUpdate ) {
-				updating = false;
-				lastUpdate = -1;
-				update(false);
-			}
-		});
-		
-		Game.userInputService().inputBeganEvent().connect((args)->{
-			if ( args[0].get("KeyCode").eq_b(LuaValue.valueOf(GLFW.GLFW_KEY_Q))) {
-				System.out.println("Pressed Q");
-				update(true);
-			}
-		});
-	}
-
-	private long lastUpdate = -1;
-	private boolean requiresUpdate;
-
-	private void update(boolean b) {
-		if ( updating )
-			return;
-
-		// Non important updates only happen at MOST every 50 ms
-		if (System.currentTimeMillis()-lastUpdate < 50 && !b ) {
-			//System.out.println("Blocked excess unimportant update.");
-			return;
-		}
-		
-		if ( b ) {
-			requiresUpdate = true;
-			//System.out.println("Deferring explorer update until next frame.");
-			return;
-		}
-		
-		lastUpdate = System.currentTimeMillis();
-		updating = true;
-		
-		// Refresh the tree
-		if ( b || treeItems.size() == 0 || requiresUpdate ) {
-			instanceMapTemp.clear();
-			instanceMapTemp.putAll(instanceMap);
-			instanceMap.clear();
-
-			treeItemMap.clear();
-			treeItems.clear();
-			
-			list(tree, Game.game());
-		}
-		
-		// Handle selections
-		for (int i = 0; i < treeItems.size(); i++) {
-			tree.deselectItem(treeItems.get(i));
-
-			// Update names
-			TreeItem<Instance> item = treeItems.get(i);
-			String name = item.getRoot().getName();
-			item.setText(name);
-		}
-		List<Instance> selected = Game.selected();
-		for (int i = 0; i < selected.size(); i++) {
-			Instance sel = selected.get(i);
-			TreeItem<Instance> t = instanceMap.get(sel);
-			if ( t != null ) {
-				tree.selectItem(t);
-			}
-		}
-
-		requiresUpdate = false;
-		updating = false;
 	}
 	
-	private void list(TreeBase<Instance> treeItem, Instance root) {
-		// Remove all the items in this tree item that are no longer parented to it
-		ObservableList<TreeItem<Instance>> items = treeItem.getItems();
-		for (int i = 0; i < items.size(); i++) {
-			TreeItem<Instance> item = items.get(i);
-			Instance obj = item.getRoot();
-			LuaValue par = obj.getParent();
-			if( par == null || par.isnil() || par != root ) {
-				items.remove(item);
-				instanceMapTemp.remove(obj);
-			}
-		}
+	private void rebuild() {
+		clear();
 		
-		// Start adding items to tree
-		List<Instance> c = root.getChildren();
-		for ( int i = 0; i < c.size(); i++) {
-			Instance inst = c.get(i);
+		buildDescendents(Game.game());
+	}
+	
+	private void buildDescendents(Instance parent) {
+		List<Instance> gameDescendents = parent.getDescendantsUnsafe();
+		for (int i = 0; i < gameDescendents.size(); i++) {
+			if ( i >= gameDescendents.size() )
+				continue;
 			
-			// Get the tree item
-			SortedTreeItem<Instance> newTreeItem = instanceMapTemp.get(inst);
-			if ( newTreeItem == null ) {
+			Instance desc = gameDescendents.get(i);
+			if ( desc == null )
+				continue;
+			
+			buildNode(desc);
+		}
+	}
+	
+	private void destroyNode(Instance instance) {
+		synchronized(instanceToTreeItemMap) {
+			TreeItem<Instance> treeItem = instanceToTreeItemMap.get(instance);
+			if ( treeItem == null )
+				return;
+			
+			TreeBase<Instance> parentTreeItem = treeItemToParentTreeItemMap.get(treeItem);
+			if ( parentTreeItem == null )
+				return;
+			
+			parentTreeItem.getItems().remove(treeItem);
+			instanceToTreeItemMap.remove(instance);
+			treeItemToParentTreeItemMap.remove(treeItem);
+			
+			LuaConnection con = treeItemToChangedConnectionMap.get(treeItem);
+			if ( con != null )
+				con.disconnect();
+			treeItemToChangedConnectionMap.remove(treeItem);
+		}
+	}
+	
+	private synchronized void buildNode(Instance instance) {
+		synchronized(instanceToTreeItemMap) {
+			// Get Tree Node
+			TreeItem<Instance> treeItem = instanceToTreeItemMap.get(instance);
+			if ( treeItem == null ) {
 				// What graphic does it need?
 				Node graphic = Icons.icon_wat.getView();
-				if ( inst instanceof TreeViewable )
-					graphic = ((TreeViewable)inst).getIcon().getView();
+				if ( instance instanceof TreeViewable )
+					graphic = ((TreeViewable)instance).getIcon().getView();
 				
-				// New one
-				newTreeItem = new SortedTreeItem<Instance>(inst, graphic);
-
-				// Create context menu
-				ContextMenu con = getContetxMenu(inst);
-				newTreeItem.setContextMenu(con);
+				// CREATE NEW NODE
+				treeItem = new SortedTreeItem<Instance>(instance, graphic);
+				treeItem.setContextMenu(getContetxMenu(instance));
 				
-				// Open a script
-				newTreeItem.setOnMouseClicked(event -> {
+				// Open a script shortcut
+				treeItem.setOnMouseClicked(event -> {
 					int clicks = event.getClickCount();
 					if ( clicks == 2 ) {
-						if ( inst instanceof ScriptBase ) {
-							IdeLuaEditor lua = new IdeLuaEditor((ScriptBase) inst);
-							IDE.layout.getCenter().dock(lua);
+						if ( instance instanceof ScriptBase ) {
+							IDE.openScript((ScriptBase)instance);
 						}
 					}
 				});
 			}
 			
-			// Add this item in if it was reparented.
-			Instance obj = newTreeItem.getRoot();
-			if ( obj == inst && !treeItem.getItems().contains(newTreeItem) ) {
-				treeItem.getItems().add(newTreeItem);
+			// The tree node to be added (Or it may already be there)
+			final TreeItem<Instance> newTreeItem = treeItem;
+			
+			// Get Parent node
+			TreeBase<Instance> parentTreeItem = instanceToTreeItemMap.get(instance.getParent());
+			if ( parentTreeItem == null )
+				parentTreeItem = tree;
+			
+			// Add to parent
+			parentTreeItem.getItems().add(newTreeItem);
+			
+			// Sort?
+			if ( parentTreeItem instanceof SortedTreeItem ) {
+				((SortedTreeItem<Instance>)parentTreeItem).sort();
 			}
 			
-			// Update name
-			String name = newTreeItem.getRoot().getName();
-			newTreeItem.setText(name);
 			
-			// cache it for easier lookups
-			instanceMap.put(inst, newTreeItem);
-			treeItemMap.put(newTreeItem, inst);
-			treeItems.add(newTreeItem);
+			// Add connections
+			instanceToTreeItemMap.put(instance, newTreeItem);
+			treeItemToParentTreeItemMap.put(newTreeItem, parentTreeItem);
 			
-			// Look ma it's recursion!
-			list(newTreeItem, inst);
-		}
-		
-		if ( treeItem instanceof SortedTreeItem ) {
-			((SortedTreeItem<Instance>)treeItem).sort();
+			LuaConnection changedConnection = instance.changedEvent().connect((args)->{
+				LuaValue key = args[0];
+				LuaValue val = args[1];
+				
+				if ( key.eq_b(C_NAME) ) {
+					newTreeItem.setText(val.toString());
+				}
+				
+				if ( key.eq_b(C_PARENT) ) {
+					destroyNode(instance);
+					buildNode(instance);
+					buildDescendents(instance);
+				}
+			});
+			treeItemToChangedConnectionMap.put(newTreeItem, changedConnection);
 		}
 	}
 	
@@ -424,109 +475,6 @@ public class IdeExplorer extends IdePane implements GameSubscriber {
 		// Add separator
 		c.getItems().add(new SeparatorMenuItem());
 
-		// New Model
-		/*if ( inst instanceof Prefab ) {
-			// New Prefab
-			MenuItem pref = new MenuItem("Add Model", Icons.icon_wat.getView());
-			pref.setOnAction(event -> {
-				((Prefab)inst).get("AddModel").invoke(LuaValue.NIL,LuaValue.NIL,LuaValue.NIL);
-			});
-			c.getItems().add(pref);
-
-			// Create gameobject
-			MenuItem gobj = new MenuItem("Create GameObject", Icons.icon_gameobject.getView());
-			gobj.setOnAction(event -> {
-				GameObject g = new GameObject();
-				g.setPrefab((Prefab) inst);
-				g.setParent(Game.workspace());
-				Game.historyService().pushChange(g, LuaValue.valueOf("Parent"), LuaValue.NIL, g.getParent());
-			});
-			c.getItems().add(gobj);
-			
-			
-		}*/
-		
-		// Asset functions
-		/*if ( inst instanceof Assets ) {
-			
-			// New Prefab
-			MenuItem prefi = new MenuItem("Import Prefab", Icons.icon_model.getView());
-			prefi.setOnAction(event -> {
-				String path = "";
-				PointerBuffer outPath = MemoryUtil.memAllocPointer(1);
-				int result = NativeFileDialog.NFD_OpenDialog(Mesh.getFileTypes(), new File("").getAbsolutePath(), outPath);
-				if ( result == NativeFileDialog.NFD_OKAY ) {
-					path = outPath.getStringUTF8(0);
-					Prefab prefab = Game.assets().importPrefab(path);
-					Game.historyService().pushChange(prefab, LuaValue.valueOf("Parent"), LuaValue.NIL, prefab.getParent());
-				} else {
-					return;
-				}
-			});
-			c.getItems().add(prefi);
-			
-			// Import Texture
-			MenuItem texi = new MenuItem("Import Texture", Icons.icon_texture.getView());
-			texi.setOnAction(event -> {
-				NFDPathSet outPaths = NFDPathSet.calloc();
-				int result = NativeFileDialog.NFD_OpenDialogMultiple(Texture.getFileTypes(), new File("").getAbsolutePath(), outPaths);
-				if ( result == NativeFileDialog.NFD_OKAY ) {
-					long count = NativeFileDialog.NFD_PathSet_GetCount(outPaths);
-					for (long i = 0; i < count; i++) {
-						String path = NativeFileDialog.NFD_PathSet_GetPath(outPaths, i);
-						Instance t = Game.assets().importTexture(path);
-						File ff = new File(path);
-						if ( ff.exists() ) {
-							t.forceSetName(FileUtils.getFileNameWithoutExtension(ff.getName()));
-						}
-						Game.historyService().pushChange(t, LuaValue.valueOf("Parent"), LuaValue.NIL, t.getParent());
-					}
-				} else {
-					return;
-				}
-			});
-			c.getItems().add(texi);
-			
-			// Separate
-			c.getItems().add(new SeparatorMenuItem());
-			
-			// New Prefab
-			MenuItem pref = new MenuItem("New Prefab", Icons.icon_model.getView());
-			pref.setOnAction(event -> {
-				Prefab p = Game.assets().newPrefab();
-				Game.historyService().pushChange(p, LuaValue.valueOf("Parent"), LuaValue.NIL, p.getParent());
-			});
-			c.getItems().add(pref);
-			
-			// New Mesh
-			MenuItem mesh = new MenuItem("New Mesh", Icons.icon_mesh.getView());
-			mesh.setOnAction(event -> {
-				Instance p = Game.assets().newMesh();
-				Game.historyService().pushChange(p, LuaValue.valueOf("Parent"), LuaValue.NIL, p.getParent());
-			});
-			c.getItems().add(mesh);
-
-			// New Material
-			MenuItem mat = new MenuItem("New Material", Icons.icon_material.getView());
-			mat.setOnAction(event -> {
-				Instance p = Game.assets().newMaterial();
-				Game.historyService().pushChange(p, LuaValue.valueOf("Parent"), LuaValue.NIL, p.getParent());
-			});
-			c.getItems().add(mat);
-
-			// New Texture
-			MenuItem tex = new MenuItem("New Texture", Icons.icon_texture.getView());
-			tex.setOnAction(event -> {
-				Instance p = Game.assets().newTexture();
-				Game.historyService().pushChange(p, LuaValue.valueOf("Parent"), LuaValue.NIL, p.getParent());
-			});
-			c.getItems().add(tex);
-			
-			// Separate
-			c.getItems().add(new SeparatorMenuItem());
-		}*/
-
-
 		// Cut
 		MenuItem insert = new MenuItem("Insert Object  \u25ba", Icons.icon_new.getView());
 		insert.setOnAction(event -> {
@@ -535,11 +483,6 @@ public class IdeExplorer extends IdePane implements GameSubscriber {
 		c.getItems().add(insert);
 		
 		return c;
-	}
-
-	@Override
-	public void gameUpdateEvent(boolean important) {
-		update(important);
 	}
 
 	@Override
@@ -552,7 +495,6 @@ public class IdeExplorer extends IdePane implements GameSubscriber {
 		//
 	}
 
-	
 	class SortedTreeView<E> extends TreeView<E> {
 		//
 	}
@@ -568,6 +510,7 @@ public class IdeExplorer extends IdePane implements GameSubscriber {
 		}
 		
 		protected void sort() {
+			
 			ArrayList<TreeNode<E>> nodules = new ArrayList<TreeNode<E>>();
 			for (int i = 0; i < nodes.size(); i++) {
 				nodules.add(nodes.get(i));
