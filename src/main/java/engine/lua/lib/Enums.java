@@ -59,6 +59,14 @@ public class Enums extends TwoArgFunction {
 				}
 			});
 			
+			// AliasingType
+			this.rawset("AntiAliasingType", new LuaTableReadOnly() {
+				{
+					this.rawset("FXAA", "FXAA");
+					this.rawset("TAA", "TAA");
+				}
+			});
+			
 			// Position Enum
 			this.rawset("PositionType", new LuaTableReadOnly() {
 				{

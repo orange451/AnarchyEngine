@@ -1,5 +1,6 @@
 package engine.gl;
 
+import engine.glv2.v2.RenderingSettings;
 import engine.glv2.v2.lights.IDirectionalLightHandler;
 import engine.glv2.v2.lights.IPointLightHandler;
 import engine.glv2.v2.lights.ISpotLightHandler;
@@ -31,4 +32,6 @@ public interface IPipeline extends Renderable {
 	public void setStaticSkybox(Skybox skybox);
 
 	public void reloadStaticSkybox();
+	
+	public RenderingSettings getRenderSettings();
 }

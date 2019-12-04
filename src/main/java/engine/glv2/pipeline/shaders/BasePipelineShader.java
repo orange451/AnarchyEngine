@@ -33,8 +33,6 @@ public class BasePipelineShader extends ShaderProgram {
 
 	private UniformVec2 resolution = new UniformVec2("resolution");
 
-	private UniformInteger shadowDrawDistance = new UniformInteger("shadowDrawDistance");
-
 	private UniformBoolean useFXAA = new UniformBoolean("useFXAA");
 	private UniformBoolean useDOF = new UniformBoolean("useDOF");
 	private UniformBoolean useMotionBlur = new UniformBoolean("useMotionBlur");
@@ -50,7 +48,7 @@ public class BasePipelineShader extends ShaderProgram {
 
 	public BasePipelineShader(String path) {
 		super("assets/shaders/" + path + ".vs", "assets/shaders/" + path + ".fs", new Attribute(0, "position"));
-		super.storeUniforms(resolution, shadowDrawDistance, useFXAA, useDOF, useMotionBlur, useReflections,
+		super.storeUniforms(resolution, useFXAA, useDOF, useMotionBlur, useReflections,
 				useVolumetricLight, useAmbientOcclusion, useChromaticAberration, useLensFlares, useShadows, frame,
 				useTAA);
 		super.validate();
@@ -63,7 +61,6 @@ public class BasePipelineShader extends ShaderProgram {
 		this.useVolumetricLight.loadBoolean(rs.volumetricLightEnabled);
 		this.useReflections.loadBoolean(rs.ssrEnabled);
 		this.useAmbientOcclusion.loadBoolean(rs.ambientOcclusionEnabled);
-		this.shadowDrawDistance.loadInteger(rs.shadowsDrawDistance);
 		this.useChromaticAberration.loadBoolean(rs.chromaticAberrationEnabled);
 		this.useLensFlares.loadBoolean(rs.lensFlaresEnabled);
 		this.useShadows.loadBoolean(rs.shadowsEnabled);

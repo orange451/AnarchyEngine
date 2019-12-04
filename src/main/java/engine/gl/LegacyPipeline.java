@@ -25,6 +25,7 @@ import engine.gl.mesh.BufferedMesh;
 import engine.gl.renderer.GBuffer;
 import engine.gl.renderer.TransparencyRenderer;
 import engine.gl.shader.BaseShader;
+import engine.glv2.v2.RenderingSettings;
 import engine.glv2.v2.lights.IDirectionalLightHandler;
 import engine.glv2.v2.lights.IPointLightHandler;
 import engine.glv2.v2.lights.ISpotLightHandler;
@@ -513,5 +514,11 @@ public class LegacyPipeline implements IPipeline {
 	public void reloadStaticSkybox() {
 		// TODO Auto-generated method stub
 
+	}
+
+	@Override
+	public RenderingSettings getRenderSettings() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

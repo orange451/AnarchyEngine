@@ -320,6 +320,10 @@ public class GLRenderer implements IPipeline {
 		pp.process(rnd, rd);
 		GPUProfiler.end();
 	}
+	
+	public RenderingSettings getRenderSettings() {
+		return this.renderingSettings;
+	}
 
 	@Override
 	public void render() {
