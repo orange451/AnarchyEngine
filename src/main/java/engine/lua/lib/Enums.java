@@ -62,6 +62,7 @@ public class Enums extends TwoArgFunction {
 			// AliasingType
 			this.rawset("AntiAliasingType", new LuaTableReadOnly() {
 				{
+					this.rawset("NONE", "NONE");
 					this.rawset("FXAA", "FXAA");
 					this.rawset("TAA", "TAA");
 				}

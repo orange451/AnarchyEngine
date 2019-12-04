@@ -35,7 +35,7 @@ public class RenderSettings extends Instance implements TreeViewable {
 		this.defineField(C_TEXTURESIZE.toString(), LuaValue.valueOf(1024), false);
 		this.getField(C_TEXTURESIZE).setEnum(new EnumType("TextureSize"));
 		
-		this.defineField(C_ALIASING.toString(), LuaValue.valueOf("FXAA"), false);
+		this.defineField(C_ALIASING.toString(), LuaValue.valueOf("NONE"), false);
 		this.getField(C_ALIASING).setEnum(new EnumType("AntiAliasingType"));
 
 		this.defineField(C_MOTIONBLUR.toString(), LuaValue.valueOf(false), false);
@@ -102,9 +102,12 @@ public class RenderSettings extends Instance implements TreeViewable {
 			if ( value.eq_b(LuaValue.valueOf("FXAA")) ) {
 				settings.fxaaEnabled = true;
 				settings.taaEnabled = false;
+			} if ( value.eq_b(LuaValue.valueOf("TAA")) ) {
+				settings.fxaaEnabled = true;
+				settings.taaEnabled = true;
 			} else {
 				settings.fxaaEnabled = false;
-				settings.taaEnabled = true;
+				settings.taaEnabled = false;
 			}
 		}
 		return value;
