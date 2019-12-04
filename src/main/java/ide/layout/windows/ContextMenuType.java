@@ -12,8 +12,10 @@ import org.lwjgl.util.nfd.NativeFileDialog;
 
 import engine.Game;
 import engine.lua.type.object.Instance;
+import engine.lua.type.object.ScriptBase;
 import engine.lua.type.object.insts.*;
 import engine.util.FileUtils;
+import ide.IDE;
 import ide.layout.windows.icons.Icons;
 import lwjgui.scene.image.ImageView;
 
@@ -94,7 +96,7 @@ public abstract class ContextMenuType {
 
 		@Override
 		public void onClick(Instance instance) {
-			Instance prefab = Instance.instanceLua(Prefab.class.getSimpleName());
+			Instance prefab = (Prefab) Instance.instanceLua(Prefab.class.getSimpleName());
 			prefab.forceSetParent(instance);
 			
 			Game.historyService().pushChange(prefab, LuaValue.valueOf("Parent"), LuaValue.NIL, prefab.getParent());
@@ -272,6 +274,24 @@ public abstract class ContextMenuType {
 			g.setPrefab((Prefab) instance);
 			g.setParent(Game.workspace());
 			Game.historyService().pushChange(g, LuaValue.valueOf("Parent"), LuaValue.NIL, g.getParent());
+		}
+	};
+	
+	public static final ContextMenuType EDIT_SCRIPT = new ContextMenuType(ScriptBase.class, LocalScript.class, GlobalScript.class, Script.class) {
+
+		@Override
+		public String getMenuName() {
+			return "Edit Script";
+		}
+
+		@Override
+		public ImageView getMenuGraphic() {
+			return Icons.icon_script.getView();
+		}
+
+		@Override
+		public void onClick(Instance instance) {
+			IDE.openScript((ScriptBase) instance);
 		}
 	};
 	

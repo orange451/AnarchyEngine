@@ -265,66 +265,67 @@ public class IdeExplorerNew extends IdePane {
 		treeItemToChangedConnectionMap.remove(treeItem);
 	}
 	
-	private void buildNode(Instance instance) {
-		
-		// Get Tree Node
-		TreeItem<Instance> treeItem = instanceToTreeItemMap.get(instance);
-		if ( treeItem == null ) {
-			// What graphic does it need?
-			Node graphic = Icons.icon_wat.getView();
-			if ( instance instanceof TreeViewable )
-				graphic = ((TreeViewable)instance).getIcon().getView();
-			
-			// CREATE NEW NODE
-			treeItem = new SortedTreeItem<Instance>(instance, graphic);
-			treeItem.setContextMenu(getContetxMenu(instance));
-			
-			// Open a script shortcut
-			treeItem.setOnMouseClicked(event -> {
-				int clicks = event.getClickCount();
-				if ( clicks == 2 ) {
-					if ( instance instanceof ScriptBase ) {
-						IdeLuaEditor lua = new IdeLuaEditor((ScriptBase) instance);
-						IDE.layout.getCenter().dock(lua);
+	private synchronized void buildNode(Instance instance) {
+		synchronized(instanceToTreeItemMap) {
+			// Get Tree Node
+			TreeItem<Instance> treeItem = instanceToTreeItemMap.get(instance);
+			if ( treeItem == null ) {
+				// What graphic does it need?
+				Node graphic = Icons.icon_wat.getView();
+				if ( instance instanceof TreeViewable )
+					graphic = ((TreeViewable)instance).getIcon().getView();
+				
+				// CREATE NEW NODE
+				treeItem = new SortedTreeItem<Instance>(instance, graphic);
+				treeItem.setContextMenu(getContetxMenu(instance));
+				
+				// Open a script shortcut
+				treeItem.setOnMouseClicked(event -> {
+					int clicks = event.getClickCount();
+					if ( clicks == 2 ) {
+						if ( instance instanceof ScriptBase ) {
+							IDE.openScript((ScriptBase)instance);
+						}
 					}
+				});
+			}
+			
+			// The tree node to be added (Or it may already be there)
+			final TreeItem<Instance> newTreeItem = treeItem;
+			
+			// Get Parent node
+			TreeBase<Instance> parentTreeItem = instanceToTreeItemMap.get(instance.getParent());
+			if ( parentTreeItem == null )
+				parentTreeItem = tree;
+			
+			// Add to parent
+			parentTreeItem.getItems().add(newTreeItem);
+			
+			// Sort?
+			if ( parentTreeItem instanceof SortedTreeItem ) {
+				((SortedTreeItem<Instance>)parentTreeItem).sort();
+			}
+			
+			
+			// Add connections
+			instanceToTreeItemMap.put(instance, newTreeItem);
+			treeItemToParentTreeItemMap.put(newTreeItem, parentTreeItem);
+			
+			LuaConnection changedConnection = instance.changedEvent().connect((args)->{
+				LuaValue key = args[0];
+				LuaValue val = args[1];
+				
+				if ( key.eq_b(C_NAME) ) {
+					newTreeItem.setText(val.toString());
+				}
+				
+				if ( key.eq_b(C_PARENT) ) {
+					destroyNode(instance);
+					buildNode(instance);
 				}
 			});
+			treeItemToChangedConnectionMap.put(newTreeItem, changedConnection);
 		}
-		
-		final TreeItem<Instance> newTreeItem = treeItem;
-		
-		// Get Parent node
-		TreeBase<Instance> parentTreeItem = instanceToTreeItemMap.get(instance.getParent());
-		if ( parentTreeItem == null )
-			parentTreeItem = tree;
-		
-		// Add to parent
-		parentTreeItem.getItems().add(newTreeItem);
-		
-		// Sort?
-		if ( parentTreeItem instanceof SortedTreeItem ) {
-			((SortedTreeItem<Instance>)parentTreeItem).sort();
-		}
-		
-		
-		// Add connections
-		instanceToTreeItemMap.put(instance, newTreeItem);
-		treeItemToParentTreeItemMap.put(newTreeItem, parentTreeItem);
-		
-		LuaConnection changedConnection = instance.changedEvent().connect((args)->{
-			LuaValue key = args[0];
-			LuaValue val = args[1];
-			
-			if ( key.eq_b(C_NAME) ) {
-				newTreeItem.setText(val.toString());
-			}
-			
-			if ( key.eq_b(C_PARENT) ) {
-				destroyNode(instance);
-				buildNode(instance);
-			}
-		});
-		treeItemToChangedConnectionMap.put(newTreeItem, changedConnection);
 	}
 	
 	private ContextMenu getContetxMenu(Instance inst) {
