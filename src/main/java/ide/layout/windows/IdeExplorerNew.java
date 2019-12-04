@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.luaj.vm2.LuaValue;
 
@@ -66,9 +67,9 @@ public class IdeExplorerNew extends IdePane {
 	private static final LuaValue C_NAME = LuaValue.valueOf("Name");
 	private static final LuaValue C_PARENT = LuaValue.valueOf("Parent");
 	
-	private HashMap<Instance, TreeItem<Instance>> instanceToTreeItemMap;
-	private HashMap<TreeItem<Instance>, TreeBase<Instance>> treeItemToParentTreeItemMap;
-	private HashMap<TreeItem<Instance>, LuaConnection> treeItemToChangedConnectionMap;
+	private Map<Instance, TreeItem<Instance>> instanceToTreeItemMap;
+	private Map<TreeItem<Instance>, TreeBase<Instance>> treeItemToParentTreeItemMap;
+	private Map<TreeItem<Instance>, LuaConnection> treeItemToChangedConnectionMap;
 	private List<Instance> selectedCache;
 	
 	private static HashMap<Class<? extends Instance>, Integer> priority = new HashMap<>();
@@ -201,15 +202,15 @@ public class IdeExplorerNew extends IdePane {
 		
 		if ( instanceToTreeItemMap != null )
 			instanceToTreeItemMap.clear();
-		this.instanceToTreeItemMap = new HashMap<>();
+		this.instanceToTreeItemMap = Collections.synchronizedMap(new HashMap<>());
 		
 		if ( treeItemToParentTreeItemMap != null )
 			treeItemToParentTreeItemMap.clear();
-		this.treeItemToParentTreeItemMap = new HashMap<>();
+		this.treeItemToParentTreeItemMap = Collections.synchronizedMap(new HashMap<>());
 		
 		if ( treeItemToChangedConnectionMap != null )
 			treeItemToChangedConnectionMap.clear();
-		this.treeItemToChangedConnectionMap = new HashMap<>();
+		this.treeItemToChangedConnectionMap = Collections.synchronizedMap(new HashMap<>());
 		
 		if ( selectedCache != null )
 			selectedCache.clear();
@@ -233,7 +234,11 @@ public class IdeExplorerNew extends IdePane {
 	private void rebuild() {
 		clear();
 		
-		List<Instance> gameDescendents = Game.game().getDescendantsUnsafe();
+		buildDescendents(Game.game());
+	}
+	
+	private void buildDescendents(Instance parent) {
+		List<Instance> gameDescendents = parent.getDescendantsUnsafe();
 		for (int i = 0; i < gameDescendents.size(); i++) {
 			if ( i >= gameDescendents.size() )
 				continue;
@@ -247,22 +252,24 @@ public class IdeExplorerNew extends IdePane {
 	}
 	
 	private void destroyNode(Instance instance) {
-		TreeItem<Instance> treeItem = instanceToTreeItemMap.get(instance);
-		if ( treeItem == null )
-			return;
-		
-		TreeBase<Instance> parentTreeItem = treeItemToParentTreeItemMap.get(treeItem);
-		if ( parentTreeItem == null )
-			return;
-		
-		parentTreeItem.getItems().remove(treeItem);
-		instanceToTreeItemMap.remove(instance);
-		treeItemToParentTreeItemMap.remove(treeItem);
-		
-		LuaConnection con = treeItemToChangedConnectionMap.get(treeItem);
-		if ( con != null )
-			con.disconnect();
-		treeItemToChangedConnectionMap.remove(treeItem);
+		synchronized(instanceToTreeItemMap) {
+			TreeItem<Instance> treeItem = instanceToTreeItemMap.get(instance);
+			if ( treeItem == null )
+				return;
+			
+			TreeBase<Instance> parentTreeItem = treeItemToParentTreeItemMap.get(treeItem);
+			if ( parentTreeItem == null )
+				return;
+			
+			parentTreeItem.getItems().remove(treeItem);
+			instanceToTreeItemMap.remove(instance);
+			treeItemToParentTreeItemMap.remove(treeItem);
+			
+			LuaConnection con = treeItemToChangedConnectionMap.get(treeItem);
+			if ( con != null )
+				con.disconnect();
+			treeItemToChangedConnectionMap.remove(treeItem);
+		}
 	}
 	
 	private synchronized void buildNode(Instance instance) {
@@ -322,6 +329,7 @@ public class IdeExplorerNew extends IdePane {
 				if ( key.eq_b(C_PARENT) ) {
 					destroyNode(instance);
 					buildNode(instance);
+					buildDescendents(instance);
 				}
 			});
 			treeItemToChangedConnectionMap.put(newTreeItem, changedConnection);
