@@ -20,17 +20,30 @@ import engine.lua.type.object.TreeViewable;
 import engine.lua.type.object.insts.AnimationController;
 import engine.lua.type.object.insts.AnimationData;
 import engine.lua.type.object.insts.AssetFolder;
+import engine.lua.type.object.insts.AudioPlayer2D;
+import engine.lua.type.object.insts.AudioPlayer3D;
+import engine.lua.type.object.insts.AudioSource;
+import engine.lua.type.object.insts.BoolValue;
 import engine.lua.type.object.insts.Camera;
+import engine.lua.type.object.insts.Color3Value;
 import engine.lua.type.object.insts.DirectionalLight;
+import engine.lua.type.object.insts.NumberValue;
 import engine.lua.type.object.insts.Folder;
 import engine.lua.type.object.insts.GameObject;
 import engine.lua.type.object.insts.GlobalScript;
+import engine.lua.type.object.insts.IntValue;
 import engine.lua.type.object.insts.LocalScript;
+import engine.lua.type.object.insts.Matrix4Value;
+import engine.lua.type.object.insts.ObjectValue;
 import engine.lua.type.object.insts.PhysicsObject;
 import engine.lua.type.object.insts.PlayerPhysics;
 import engine.lua.type.object.insts.PointLight;
 import engine.lua.type.object.insts.Script;
 import engine.lua.type.object.insts.SpotLight;
+import engine.lua.type.object.insts.StringValue;
+import engine.lua.type.object.insts.Vector2Value;
+import engine.lua.type.object.insts.Vector3Value;
+import engine.lua.type.object.services.RenderSettings;
 import engine.lua.type.object.services.StarterPlayerScripts;
 import ide.IDE;
 import ide.layout.IdePane;
@@ -62,7 +75,11 @@ public class IdeExplorerNew extends IdePane {
 	
 	static {
 		priority.put(Camera.class, 50);
+
 		priority.put(StarterPlayerScripts.class, 41);
+		priority.put(AssetFolder.class, 41);
+		priority.put(RenderSettings.class, 41);
+		priority.put(AnimationData.class, 40);
 		
 		priority.put(ScriptBase.class, 35);
 		priority.put(Script.class, 35);
@@ -80,9 +97,20 @@ public class IdeExplorerNew extends IdePane {
 		priority.put(PhysicsBase.class, 6);
 		priority.put(PhysicsObject.class, 6);
 		priority.put(PlayerPhysics.class, 6);
-		
-		priority.put(AssetFolder.class, 2);
-		priority.put(AnimationData.class, 2);
+
+		priority.put(IntValue.class, 5);
+		priority.put(BoolValue.class, 5);
+		priority.put(StringValue.class, 5);
+		priority.put(NumberValue.class, 5);
+		priority.put(ObjectValue.class, 5);
+		priority.put(Color3Value.class, 5);
+		priority.put(Vector2Value.class, 5);
+		priority.put(Vector3Value.class, 5);
+		priority.put(Matrix4Value.class, 5);
+
+		priority.put(AudioSource.class, 4);
+		priority.put(AudioPlayer2D.class, 4);
+		priority.put(AudioPlayer3D.class, 4);
 	}
 	
 	protected static int getPriority(Class<? extends Instance> cls) {

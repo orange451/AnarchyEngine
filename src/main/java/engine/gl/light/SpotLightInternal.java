@@ -28,7 +28,7 @@ public class SpotLightInternal extends Light {
 		this.intensity = intensity;
 
 		InternalGameThread.runLater(() -> {
-			this.shadowResolution = Game.lighting().getShadowMapSize();
+			this.shadowResolution = Game.core().getRenderSettings().getShadowMapSize();
 		});
 	}
 

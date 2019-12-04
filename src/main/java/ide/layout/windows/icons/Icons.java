@@ -36,6 +36,7 @@ public class Icons {
 	public static final Icons icon_play = new Icons("Play.png");
 	public static final Icons icon_play_server = new Icons("PlayServer.png");
 	public static final Icons icon_plus = new Icons("plus-small.png");
+	public static final Icons icon_properties = new Icons("Properties.png");
 	public static final Icons icon_camera = new Icons("Camera.png");
 	public static final Icons icon_keyboard = new Icons("Keyboard.png");
 	public static final Icons icon_network = new Icons("Network.png");

@@ -23,7 +23,7 @@ public class DirectionalLightInternal extends Light {
 		// Light may be created before game is setup (on load), so Game.Lighting is not
 		// available yet. Next frame it will be.
 		InternalGameThread.runLater(() -> {
-			this.shadowResolution = Game.lighting().getShadowMapSize();
+			this.shadowResolution = Game.core().getRenderSettings().getShadowMapSize();
 		});
 	}
 

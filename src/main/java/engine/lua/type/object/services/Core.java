@@ -21,4 +21,8 @@ public class Core extends Service implements TreeInvisible,RunScript {
 	protected boolean onValueGet(LuaValue key) {
 		return true;
 	}
+	
+	public RenderSettings getRenderSettings() {
+		return (RenderSettings) this.get("RenderSettings");
+	}
 }

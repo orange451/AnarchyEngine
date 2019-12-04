@@ -25,7 +25,6 @@ public class Lighting extends Service implements TreeViewable {
 	private static final LuaValue C_SATURATION = LuaValue.valueOf("Saturation");
 	private static final LuaValue C_GAMMA = LuaValue.valueOf("Gamma");
 	private static final LuaValue C_SKYBOX = LuaValue.valueOf("Skybox");
-	private static final LuaValue C_SHADOWMAPSIZE = LuaValue.valueOf("ShadowMapSize");
 
 	public Lighting() {
 		super("Lighting");
@@ -42,13 +41,6 @@ public class Lighting extends Service implements TreeViewable {
 		
 		this.defineField(C_GAMMA.toString(), LuaValue.valueOf(2.2f), false);
 		this.getField(C_GAMMA).setClamp(new NumberClampPreferred(0, 10, 0, 4));
-		
-		this.defineField(C_SHADOWMAPSIZE.toString(), LuaValue.valueOf(1024), false);
-		this.getField(C_SHADOWMAPSIZE).setEnum(new EnumType("TextureSize"));
-	}
-	
-	public int getShadowMapSize() {
-		return this.get(C_SHADOWMAPSIZE).toint();
 	}
 	
 	public Color3 getAmbient() {

@@ -37,6 +37,7 @@ import engine.lua.type.object.services.GameECS;
 import engine.lua.type.object.services.HistoryService;
 import engine.lua.type.object.services.Lighting;
 import engine.lua.type.object.services.Players;
+import engine.lua.type.object.services.RenderSettings;
 import engine.lua.type.object.services.RunService;
 import engine.lua.type.object.services.ScriptService;
 import engine.lua.type.object.services.SoundService;
@@ -117,6 +118,9 @@ public class Game implements Tickable {
 		
 		if ( Game.getService("Core") == null )
 			new Core().forceSetParent(Game.game());
+		
+		if ( Game.getService("Core").findFirstChild("RenderSettings") == null )
+			new RenderSettings().forceSetParent(Game.core());
 		
 		if ( Game.getService("Core").findFirstChild("CameraController") == null ) {
 			GlobalScript camera = new GlobalScript();

@@ -62,8 +62,6 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 	
 	private PropertyGrid grid;
 	
-	static Color alt = Theme.current().getControlAlt();
-	
 	public IdeProperties() {
 		super("Properties", true);
 		
@@ -744,7 +742,7 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 				// Cell 1
 				StackPane t1 = new StackPane();
 				if ( i % 2 == 1 )
-					t1.setBackground(alt);
+					t1.setBackground(Theme.current().getControlAlt());
 				t1.setPadding(new Insets(2,0,2,12));
 				t1.setPrefSize(1, 1);
 				t1.getChildren().add(fieldLabel);
@@ -755,7 +753,7 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 					return;
 				
 				if ( i % 2 == 1 )
-					t2.setBackground(alt);
+					t2.setBackground(Theme.current().getControlAlt());
 				
 				// Make cell 1 text color match cell 2
 				boolean editable = inst.getField(field).canModify();
