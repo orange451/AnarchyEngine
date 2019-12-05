@@ -10,7 +10,9 @@ import engine.InternalRenderThread;
 import engine.application.RenderableApplication;
 import engine.glv2.GLRenderer;
 import engine.io.Load;
+import engine.lua.type.object.ScriptBase;
 import ide.layout.IdeLayout;
+import ide.layout.windows.IdeLuaEditor;
 import lwjgui.LWJGUI;
 import lwjgui.scene.Window;
 import lwjgui.scene.layout.Pane;
@@ -31,8 +33,8 @@ public class IDE extends RenderableApplication {
 		win.setWindowAutoDraw(false); // We want to draw the main IDE window manually
 		win.setWindowAutoClear(false); // We want control of clearing
 		
-		InternalRenderThread.desiredFPS = 60;
-		InternalGameThread.desiredTPS = 60;
+		InternalRenderThread.desiredFPS = 30;
+		InternalGameThread.desiredTPS = 30;
 		
 		// Setup background pane
 		Pane background = new Pane();
@@ -50,7 +52,7 @@ public class IDE extends RenderableApplication {
 		});
 		
 		// Create rendering pipeline
-		//this.attachRenderable(pipeline = new Pipeline());
+		//this.attachRenderable(pipeline = new LegacyPipeline());
 		this.attachRenderable(pipeline = new GLRenderer());
 		
 		// Setup mane IDE layout
@@ -116,5 +118,10 @@ public class IDE extends RenderableApplication {
 
 	public static void main(String[] args) throws IOException {
 		launch(args);
+	}
+
+	public static void openScript(ScriptBase instance) {
+		IdeLuaEditor lua = new IdeLuaEditor((ScriptBase) instance);
+		layout.getCenter().dock(lua);
 	}
 }
