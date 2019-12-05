@@ -1,9 +1,12 @@
 package ide.layout.windows;
 
+import java.util.List;
+
 import org.lwjgl.glfw.GLFW;
 
 import engine.Game;
 import engine.io.Save;
+import engine.lua.type.object.Instance;
 import lwjgui.LWJGUI;
 import lwjgui.scene.Node;
 
@@ -14,6 +17,14 @@ public class StandardUserControls {
 			// Node must be selected
 			if ( !LWJGUI.getCurrentContext().isSelected(object) && !object.isDescendentSelected() )
 				return;
+			
+			// Delete
+			if ( event.getKey() == GLFW.GLFW_KEY_DELETE ) {
+				List<Instance> selected = Game.selected();
+				for (int i = 0; i < selected.size(); i++) {
+					selected.get(i).destroy();
+				}
+			}
 			
 			// Undo control
 			if ( event.isCtrlDown && event.getKey() == GLFW.GLFW_KEY_Z ) {
