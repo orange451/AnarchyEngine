@@ -190,11 +190,13 @@ public abstract class PhysicsBase extends Instance implements GameSubscriber {
 		
 		// Update our velocity to the physics objects velocity.
 		Vector3f pv = internalPhys.getVelocity();
-		this.set(C_VELOCITY, new Vector3(pv));
+		this.rawset(C_VELOCITY, new Vector3(pv));
+		this.notifyPropertySubscribers(C_VELOCITY, this.rawget(C_VELOCITY));
 		
 		// Update our angular velocity to the physics objets angular velocity
 		Vector3f pav = internalPhys.getAngularVelocity();
-		this.set(C_ANGULARVELOCITY, new Vector3(pav));
+		this.rawset(C_ANGULARVELOCITY, new Vector3(pav));
+		this.notifyPropertySubscribers(C_ANGULARVELOCITY, this.rawget(C_ANGULARVELOCITY));
 	}
 	
 	/**
