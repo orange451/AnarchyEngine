@@ -752,8 +752,7 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 				if ( t2 == null )
 					return;
 				
-				if ( i % 2 == 1 )
-					t2.setBackground(Theme.current().getControlAlt());
+				t2.setBackground(t1.getBackground());
 				
 				// Make cell 1 text color match cell 2
 				boolean editable = inst.getField(field).canModify();
