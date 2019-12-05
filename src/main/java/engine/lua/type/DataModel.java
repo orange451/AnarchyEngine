@@ -99,6 +99,12 @@ public abstract class DataModel extends LuaDatatype {
 		this.uuid = UUID.randomUUID();
 	}
 	
+	public LuaValue setmetatable(LuaValue metatable) {
+		if ( initialized )
+			return LuaValue.NIL;
+		return super.setmetatable(metatable);
+	}
+	
 	/**
 	 * Returns whether or not the DataModel is archivable. An archivable DataModel will not be written to disk when saved.
 	 * @return
