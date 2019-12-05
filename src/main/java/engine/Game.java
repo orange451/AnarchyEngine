@@ -21,6 +21,8 @@ import engine.io.AsynchronousResourceLoader;
 import engine.io.Load;
 import engine.io.Save;
 import engine.lua.LuaEngine;
+import engine.lua.history.HistoryChange;
+import engine.lua.history.HistorySnapshot;
 import engine.lua.type.LuaEvent;
 import engine.lua.type.ScriptRunner;
 import engine.lua.type.object.Instance;
@@ -677,9 +679,10 @@ public class Game implements Tickable {
 	 * @return
 	 */
 	public static List<Instance> paste(Instance parent) {
-		ArrayList<Instance> ret = new ArrayList<>();
+		ArrayList<Instance> instances = new ArrayList<>();
         JSONParser parser = new JSONParser();
 
+        // Parse objects
         try (Reader reader = new FileReader("TEMPCOPY.json")) {
         	JSONArray jsonObjects = (JSONArray) parser.parse(reader);
         	for (int i = 0; i < jsonObjects.size(); i++) {
@@ -689,7 +692,7 @@ public class Game implements Tickable {
         			continue;
         		
         		if ( inst != null ) {
-        			ret.add(inst);
+        			instances.add(inst);
         		}
         		inst.forceSetParent(parent);
         	}
@@ -701,6 +704,123 @@ public class Game implements Tickable {
 			e.printStackTrace();
 		}
         
-        return ret;
+		// History snapshot for pasting
+		HistorySnapshot snapshot = new HistorySnapshot();
+		{
+			for (int j = 0; j < instances.size(); j++) {
+				Instance root = instances.get(j);
+				List<Instance> desc = root.getDescendants();
+				desc.add(0, root);
+				for (int i = 0; i < desc.size(); i++) {
+					Instance tempInstance = desc.get(i);
+					
+					HistoryChange change = new HistoryChange(
+							Game.historyService().getHistoryStack().getObjectReference(tempInstance),
+							LuaValue.valueOf("Parent"),
+							LuaValue.NIL,
+							tempInstance.getParent()
+					);
+					snapshot.changes.add(change);
+				}
+			}
+		}
+		Game.historyService().pushChange(snapshot);
+        
+        return instances;
+	}
+
+	/**
+	 * Duplicates the current selected objects
+	 */
+	public static void duplicateSelection() {
+		List<Instance> instances = Game.getRootInstances(Game.selected());
+		
+		// History snapshot for duplicating
+		HistorySnapshot snapshot = new HistorySnapshot();
+		{
+			for (int j = 0; j < instances.size(); j++) {
+				Instance root = instances.get(j);
+				if ( !root.isInstanceable() ) {
+					instances.remove(j--);
+					continue;
+				}
+
+				// Clone the root instance
+				Instance t = root.clone();
+				if ( t == null || t.isnil() )
+					continue;
+				t.forceSetParent(root.getParent());
+				
+				// Add snapshot change for root clone & all descendents
+				List<Instance> desc = t.getDescendants();
+				desc.add(0, t);
+				for (int i = 0; i < desc.size(); i++) {
+					Instance tempInstance = desc.get(i);
+					
+					HistoryChange change = new HistoryChange(
+							Game.historyService().getHistoryStack().getObjectReference(tempInstance),
+							LuaValue.valueOf("Parent"),
+							LuaValue.NIL,
+							tempInstance.getParent()
+					);
+					snapshot.changes.add(change);
+				}
+			}
+		}
+		Game.historyService().pushChange(snapshot);
+	}
+
+	public static void copySelection() {
+		List<Instance> selected = Game.selected();
+		List<Instance> rootObjects = getRootInstances(selected);
+		for (int i = 0; i < rootObjects.size(); i++) {
+			Instance t = rootObjects.get(i);
+			if ( !t.isInstanceable() )
+				rootObjects.remove(i--);
+		}
+		
+		Game.copy(rootObjects);
+	}
+	
+	public static void deleteSelection() {
+		List<Instance> instances = Game.getRootInstances(Game.selected());
+		
+		// History snapshot for deleting
+		HistorySnapshot snapshot = new HistorySnapshot();
+		{
+			for (int j = 0; j < instances.size(); j++) {
+				Instance root = instances.get(j);
+				if ( !root.isInstanceable() ) {
+					instances.remove(j--);
+					continue;
+				}
+				List<Instance> desc = root.getDescendants();
+				desc.add(0, root);
+				for (int i = 0; i < desc.size(); i++) {
+					Instance tempInstance = desc.get(i);
+					
+					HistoryChange change = new HistoryChange(
+							Game.historyService().getHistoryStack().getObjectReference(tempInstance),
+							LuaValue.valueOf("Parent"),
+							tempInstance.getParent(),
+							LuaValue.NIL
+					);
+					snapshot.changes.add(change);
+				}
+			}
+		}
+		Game.historyService().pushChange(snapshot);
+		
+		// Destroy parent object
+		for (int i = 0; i < instances.size(); i++) {
+			Game.deselect(instances.get(i));
+			instances.get(i).destroy();
+		}
+	}
+
+	public static void cutSelection() {
+		List<Instance> instances = Game.getRootInstances(Game.selected());
+		Game.copy(instances);
+		deleteSelection();
 	}
 }

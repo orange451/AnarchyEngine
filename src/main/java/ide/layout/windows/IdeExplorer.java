@@ -273,6 +273,12 @@ public class IdeExplorer extends IdePane {
 	}
 	
 	private synchronized void buildNode(Instance instance) {
+		if ( instance.getParent().isnil() )
+			return;
+		
+		if ( instance.isDestroyed() )
+			return;
+		
 		synchronized(instanceToTreeItemMap) {
 			// Get Tree Node
 			TreeItem<Instance> treeItem = instanceToTreeItemMap.get(instance);
@@ -343,119 +349,28 @@ public class IdeExplorer extends IdePane {
 		// Cut
 		MenuItem cut = new MenuItem("Cut", Icons.icon_cut.getView());
 		cut.setOnAction(event -> {
-			List<Instance> instances = Game.getRootInstances(Game.selected());
-			Game.copy(instances);
-			
-			// History snapshot for deleting
-			HistorySnapshot snapshot = new HistorySnapshot();
-			{
-				for (int j = 0; j < instances.size(); j++) {
-					Instance root = instances.get(j);
-					if ( !root.isInstanceable() ) {
-						instances.remove(j--);
-						continue;
-					}
-					List<Instance> desc = root.getDescendants();
-					desc.add(0, root);
-					for (int i = 0; i < desc.size(); i++) {
-						Instance tempInstance = desc.get(i);
-						
-						HistoryChange change = new HistoryChange(
-								Game.historyService().getHistoryStack().getObjectReference(tempInstance),
-								LuaValue.valueOf("Parent"),
-								tempInstance.getParent(),
-								LuaValue.NIL
-						);
-						snapshot.changes.add(change);
-					}
-				}
-			}
-			Game.historyService().pushChange(snapshot);
-			
-			// Destroy parent object
-			for (int i = 0; i < instances.size(); i++) {
-				Game.deselect(instances.get(i));
-				instances.get(i).destroy();
-			}
+			Game.cutSelection();
 		});
 		c.getItems().add(cut);
 
 		// Copy
 		MenuItem copy = new MenuItem("Copy", Icons.icon_copy.getView());
 		copy.setOnAction(event -> {
-			if ( inst.isInstanceable() ) {
-				Game.copy(Game.selected());
-			}
+			Game.copySelection();
 		});
 		c.getItems().add(copy);
 
 		// Paste
 		MenuItem paste = new MenuItem("Paste", Icons.icon_paste.getView());
 		paste.setOnAction(event -> {
-			List<Instance> instances = Game.paste(inst);
-			
-			// History snapshot for deleting
-			HistorySnapshot snapshot = new HistorySnapshot();
-			{
-				for (int j = 0; j < instances.size(); j++) {
-					Instance root = instances.get(j);
-					List<Instance> desc = root.getDescendants();
-					desc.add(0, root);
-					for (int i = 0; i < desc.size(); i++) {
-						Instance tempInstance = desc.get(i);
-						
-						HistoryChange change = new HistoryChange(
-								Game.historyService().getHistoryStack().getObjectReference(tempInstance),
-								LuaValue.valueOf("Parent"),
-								LuaValue.NIL,
-								tempInstance.getParent()
-						);
-						snapshot.changes.add(change);
-					}
-				}
-			}
-			Game.historyService().pushChange(snapshot);
+			Game.paste(inst);
 		});
 		c.getItems().add(paste);
 
 		// Copy
 		MenuItem duplicate = new MenuItem("Duplicate", Icons.icon_copy.getView());
 		duplicate.setOnAction(event -> {
-			List<Instance> instances = Game.getRootInstances(Game.selected());
-			
-			// History snapshot for duplicating
-			HistorySnapshot snapshot = new HistorySnapshot();
-			{
-				for (int j = 0; j < instances.size(); j++) {
-					Instance root = instances.get(j);
-					if ( !root.isInstanceable() ) {
-						instances.remove(j--);
-						continue;
-					}
-
-					// Clone the root instance
-					Instance t = root.clone();
-					if ( t == null || t.isnil() )
-						continue;
-					t.forceSetParent(root.getParent());
-					
-					// Add snapshot change for root clone & all descendents
-					List<Instance> desc = t.getDescendants();
-					desc.add(0, t);
-					for (int i = 0; i < desc.size(); i++) {
-						Instance tempInstance = desc.get(i);
-						
-						HistoryChange change = new HistoryChange(
-								Game.historyService().getHistoryStack().getObjectReference(tempInstance),
-								LuaValue.valueOf("Parent"),
-								LuaValue.NIL,
-								tempInstance.getParent()
-						);
-						snapshot.changes.add(change);
-					}
-				}
-			}
-			Game.historyService().pushChange(snapshot);
+			Game.duplicateSelection();
 		});
 		c.getItems().add(duplicate);
 		

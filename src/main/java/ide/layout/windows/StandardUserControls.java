@@ -18,13 +18,38 @@ public class StandardUserControls {
 			if ( !LWJGUI.getCurrentContext().isSelected(object) && !object.isDescendentSelected() )
 				return;
 			
-			// Delete
+			// Delete Selection
 			if ( event.getKey() == GLFW.GLFW_KEY_DELETE ) {
-				List<Instance> selected = Game.selected();
-				for (int i = 0; i < selected.size(); i++) {
-					selected.get(i).destroy();
-				}
+				Game.deleteSelection();
 			}
+			
+			// Duplicate object
+			if ( event.isCtrlDown && event.getKey() == GLFW.GLFW_KEY_D ) {
+				Game.duplicateSelection();
+			}
+			
+			// Cut object
+			if ( event.isCtrlDown && event.getKey() == GLFW.GLFW_KEY_X ) {
+				Game.cutSelection();
+			}
+			
+			// Copy object
+			if ( event.isCtrlDown && event.getKey() == GLFW.GLFW_KEY_C ) {
+				Game.copySelection();
+			}
+			
+			// Paste object
+			if ( event.isCtrlDown && event.getKey() == GLFW.GLFW_KEY_C ) {
+				Instance sel = Game.workspace();
+				List<Instance> t = Game.selected();
+				if ( t.size() == 1 )
+					sel = t.get(0);
+				
+				Game.paste(sel);
+			}
+			
+			
+			
 			
 			// Undo control
 			if ( event.isCtrlDown && event.getKey() == GLFW.GLFW_KEY_Z ) {
@@ -35,6 +60,9 @@ public class StandardUserControls {
 			if ( event.isCtrlDown && event.getKey() == GLFW.GLFW_KEY_Y ) {
 				Game.historyService().redo();
 			}
+			
+			
+			
 			
 			// Save control
 			if ( event.isCtrlDown && event.getKey() == GLFW.GLFW_KEY_S ) {
