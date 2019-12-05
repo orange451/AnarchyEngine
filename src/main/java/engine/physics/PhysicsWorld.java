@@ -2,7 +2,9 @@ package engine.physics;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.luaj.vm2.LuaValue;
 
@@ -28,6 +30,7 @@ import engine.InternalGameThread;
 public class PhysicsWorld {
 	public btDynamicsWorld dynamicsWorld;
 	private List<PhysicsObjectInternal> objects = Collections.synchronizedList(new ArrayList<PhysicsObjectInternal>());
+	private Map<btRigidBody, PhysicsObjectInternal> btToInternal = Collections.synchronizedMap(new HashMap<>());
 
 	public PhysicsWorld() {
 		refresh();
@@ -67,7 +70,7 @@ public class PhysicsWorld {
 		}
 	}
 
-	public PhysicsObjectInternal find( btRigidBody body ) {
+	/*public PhysicsObjectInternal find( btRigidBody body ) {
 		synchronized(objects) {
 			for (int i = 0; i < objects.size(); i++) {
 				PhysicsObjectInternal obj = objects.get(i);
@@ -77,7 +80,7 @@ public class PhysicsWorld {
 			}
 		}
 		return null;
-	}
+	}*/
 
 	private static boolean initialized;
 	public void refresh() {
@@ -95,6 +98,7 @@ public class PhysicsWorld {
 			temp.add(obj);
 		}
 		objects.clear();
+		btToInternal.clear();
 
 		cleanup();
 
@@ -108,8 +112,10 @@ public class PhysicsWorld {
 			objects.add(obj);
 			
 			Game.runLater(() -> {
-				if ( !obj.destroyed )
+				if ( !obj.destroyed ) {
 					dynamicsWorld.addRigidBody(obj.getBody());
+					btToInternal.put(obj.getBody(), obj);
+				}
 			});
 		}
 	}
@@ -134,6 +140,8 @@ public class PhysicsWorld {
 	 * @param physObj
 	 * @return
 	 */
+	private Vector3 tempMinBound = new Vector3();
+	private Vector3 tempMaxBound = new Vector3();
 	public ClosestRayResultCallback rayTest( org.joml.Vector3f origin, org.joml.Vector3f direction, PhysicsObjectInternal physObj ) {
 
 		btRigidBody collisionObject = physObj.body;
@@ -150,12 +158,8 @@ public class PhysicsWorld {
 		ClosestRayResultCallback callback = new ClosestRayResultCallback( from, to );
 
 		// Get AABB
-		Vector3 minBound = new Vector3();
-		Vector3 maxBound = new Vector3();
-		collisionObject.getAabb(minBound, maxBound);
-
-		// Test if inside AABB
-		boolean aabb = aabbTest( origin, direction, minBound, maxBound );
+		collisionObject.getAabb(tempMinBound, tempMaxBound);
+		boolean aabb = aabbTest( origin, direction, tempMinBound, tempMaxBound );
 
 		// Perform more intensive ray test now
 		if ( aabb ) {
@@ -165,12 +169,17 @@ public class PhysicsWorld {
 		return callback;
 	}
 
+	private volatile org.joml.Vector3f tempDirection;
 	private boolean aabbTest(org.joml.Vector3f from, org.joml.Vector3f to, Vector3 lb, Vector3 rt) {
-		org.joml.Vector3f direction = new org.joml.Vector3f(to).normalize();
+		if ( tempDirection == null )
+			tempDirection = new org.joml.Vector3f(to).normalize();
+		else
+			tempDirection.set(to).normalize();
+		
 		// r.dir is unit direction vector of ray
-		float dirfracx = 1.0f / direction.x;
-		float dirfracy = 1.0f / direction.y;
-		float dirfracz = 1.0f / direction.z;
+		float dirfracx = 1.0f / tempDirection.x;
+		float dirfracy = 1.0f / tempDirection.y;
+		float dirfracz = 1.0f / tempDirection.z;
 		// lb is the corner of AABB with minimal coordinates - left bottom, rt is maximal corner
 		// r.org is origin of ray
 		float t1 = (lb.x - from.x)*dirfracx;
@@ -208,7 +217,7 @@ public class PhysicsWorld {
 		float maxDist = Float.MAX_VALUE;
 		ClosestRayResultCallback ret = new ClosestRayResultCallback(new Vector3(origin.x, origin.y, origin.z), new Vector3(origin.x, origin.y, origin.z));
 		synchronized(objects) {
-			for (int i = 0; i < objects.size(); i++) {
+			checkObject: for (int i = 0; i < objects.size(); i++) {
 				PhysicsObjectInternal obj = objects.get(i);
 
 				// Check if we exclude this object from the ray-test
@@ -216,18 +225,15 @@ public class PhysicsWorld {
 				if ( excluding != null ) {
 					for (int j = 0; j < excluding.length && !exclude; j++) {
 						if ( excluding[j].equals(obj) ) {
-							exclude = true;
+							continue checkObject;
 						}
 					}
-					// If we exclude it. Do not ray-test
-					if ( exclude )
-						continue;
 				}
 
 				// Raytest
 				ClosestRayResultCallback c = rayTest( origin, direction, obj );
 				if ( c.hasHit() ) {
-					if ( find((btRigidBody) c.getCollisionObject()) != null ) {
+					if ( btToInternal.containsKey((btRigidBody) c.getCollisionObject()) ) {
 						Vector3 vec = new Vector3();
 						c.getRayFromWorld(new Vector3());
 						
@@ -261,6 +267,7 @@ public class PhysicsWorld {
 		object.destroyed = true;
 		try {
 			synchronized(dynamicsWorld) {
+				btToInternal.remove(object.getBody());
 				dynamicsWorld.removeRigidBody(object.getBody());
 				object.getBody().dispose();
 			}
@@ -286,6 +293,7 @@ public class PhysicsWorld {
 		
 		// Make sure objects list is clear
 		objects.clear();
+		btToInternal.clear();
 	}
 	
 	public void cleanup() {
