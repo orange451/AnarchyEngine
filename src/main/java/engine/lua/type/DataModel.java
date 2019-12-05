@@ -629,6 +629,9 @@ public abstract class DataModel extends LuaDatatype {
 	 * @return
 	 */
 	public boolean isInstanceable() {
+		if ( this.destroyed )
+			return false;
+		
 		return TYPES.get(this.get(C_CLASSNAME).toString()).instanceable;
 	}
 	
