@@ -541,6 +541,10 @@ public abstract class PhysicsBase extends Instance implements GameSubscriber {
 			}
 		}
 	}
+	
+	public PhysicsObjectInternal getInternal() {
+		return this.physics;
+	}
 
 	@Override
 	public void gameUpdateEvent(boolean important) {

@@ -4,14 +4,17 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.luaj.vm2.LuaTable;
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.OneArgFunction;
+import org.luaj.vm2.lib.ThreeArgFunction;
 import org.luaj.vm2.lib.TwoArgFunction;
 
 import com.badlogic.gdx.physics.bullet.collision.ClosestRayResultCallback;
 import com.badlogic.gdx.physics.bullet.dynamics.btRigidBody;
 
 import engine.InternalGameThread;
+import engine.lua.lib.LuaUtil;
 import engine.lua.type.data.Ray;
 import engine.lua.type.data.Vector3;
 import engine.lua.type.object.Instance;
@@ -49,23 +52,35 @@ public class Workspace extends Service implements RenderableWorld,TreeViewable,T
 						return LuaValue.NIL;
 					Ray r = (Ray)ray;
 					ClosestRayResultCallback callback = physicsWorld.rayTestClosest(r.getOrigin().getInternal(), r.getDirection().getInternal());
-	
-					com.badlogic.gdx.math.Vector3 hitWorld;
-					callback.getHitPointWorld(hitWorld = new com.badlogic.gdx.math.Vector3());
-					com.badlogic.gdx.math.Vector3 hitNormal;
-					callback.getHitNormalWorld(hitNormal = new com.badlogic.gdx.math.Vector3());
+					return getRayResult(callback);
+				} catch(Exception e) {
+					e.printStackTrace();
+				}
+				return LuaValue.NIL;
+			}
+		});
+		
+		this.getmetatable().set("RayTestExcluding", new ThreeArgFunction() {
+			@Override
+			public LuaValue call(LuaValue myself, LuaValue ray, LuaValue exclusionList) {
+				try {
+					if ( !(ray instanceof Ray) )
+						return LuaValue.NIL;
+					if ( exclusionList.isnil() )
+						exclusionList = new LuaTable();
+					if ( !(exclusionList instanceof LuaTable) )
+						return LuaValue.NIL;
 					
-					PhysicsBase p = null;
-					btRigidBody body = (btRigidBody) callback.getCollisionObject();
-					if ( body != null ) {
-						PhysicsObjectInternal phys = physicsWorld.getPhysicsObject(body);
-						p = phys.getPhysicsObject();
+					LuaTable table = (LuaTable)exclusionList;
+					LuaValue[] temp = LuaUtil.tableToArray(table, PhysicsBase.class);
+					PhysicsObjectInternal[] excluding = new PhysicsObjectInternal[temp.length];
+					for (int i = 0; i < excluding.length; i++) {
+						excluding[i] = ((PhysicsBase)temp[i]).getInternal();
 					}
-	
-					Vector3 world = new Vector3(hitWorld.x, hitWorld.y, hitWorld.z);
-					Vector3 normal = new Vector3(hitNormal.x, hitNormal.y, hitNormal.z);
 					
-					return new RayResult(p, world, normal);
+					Ray r = (Ray)ray;
+					ClosestRayResultCallback callback = physicsWorld.rayTestExcluding(r.getOrigin().getInternal(), r.getDirection().getInternal(), excluding);
+					return getRayResult(callback);
 				} catch(Exception e) {
 					e.printStackTrace();
 				}
@@ -106,6 +121,25 @@ public class Workspace extends Service implements RenderableWorld,TreeViewable,T
 		});
 	}
 	
+	protected RayResult getRayResult(ClosestRayResultCallback callback) {
+		com.badlogic.gdx.math.Vector3 hitWorld;
+		callback.getHitPointWorld(hitWorld = new com.badlogic.gdx.math.Vector3());
+		com.badlogic.gdx.math.Vector3 hitNormal;
+		callback.getHitNormalWorld(hitNormal = new com.badlogic.gdx.math.Vector3());
+		
+		PhysicsBase p = null;
+		btRigidBody body = (btRigidBody) callback.getCollisionObject();
+		if ( body != null ) {
+			PhysicsObjectInternal phys = physicsWorld.getPhysicsObject(body);
+			p = phys.getPhysicsObject();
+		}
+
+		Vector3 world = new Vector3(hitWorld.x, hitWorld.y, hitWorld.z);
+		Vector3 normal = new Vector3(hitNormal.x, hitNormal.y, hitNormal.z);
+		
+		return new RayResult(p, world, normal);
+	}
+
 	public Camera getCurrentCamera() {
 		if ( this.get(C_CURRENTCAMERA).isnil() )
 			return null;

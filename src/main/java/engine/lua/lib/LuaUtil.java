@@ -1,5 +1,6 @@
 package engine.lua.lib;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.json.simple.JSONObject;
@@ -37,20 +38,35 @@ public class LuaUtil {
 	}
 
 	/**
-	 * Converts JSON object into lua table.
-	 * @param obj
+	 * Convert Lua Table into Java List of LuaValue's
+	 * @param table
+	 * @param filter
 	 * @return
 	 */
-	public static LuaValue jsonToTable(JSONObject obj) {
-		return new LuaTable();
+	public static List<LuaValue> tableToList(LuaTable table, Class<?>... filter) {
+		List<LuaValue> array = new ArrayList<>();
+		item: for (int i = 0; i < table.length(); i++) {
+			LuaValue t = table.get(LuaValue.valueOf(i));
+			for (int j = 0; j < filter.length; j++) {
+				Class<?> c = filter[j];
+				if ( !t.getClass().equals(c) && !t.getClass().isAssignableFrom(c) )
+					continue item;
+			}
+			array.add(t);
+		}
+		
+		return array;
 	}
-
+	
+	
 	/**
-	 * Converts lua table to JSON
-	 * @param data
+	 * Convert Lua Table into Java Array of LuaValue's
+	 * @param table
+	 * @param filter
 	 * @return
 	 */
-	public static JSONObject tableToJson(LuaTable data) {
-		return new JSONObject();
+	public static LuaValue[] tableToArray(LuaTable table, Class<?>... filter) {
+		List<LuaValue> list = tableToList(table, filter);
+		return list.toArray(new LuaValue[list.size()]);
 	}
 }

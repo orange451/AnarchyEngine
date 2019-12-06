@@ -18,6 +18,7 @@ import com.badlogic.gdx.physics.bullet.collision.btCollisionConfiguration;
 import com.badlogic.gdx.physics.bullet.collision.btCollisionDispatcher;
 import com.badlogic.gdx.physics.bullet.collision.btCollisionWorld;
 import com.badlogic.gdx.physics.bullet.collision.btDefaultCollisionConfiguration;
+import com.badlogic.gdx.physics.bullet.collision.btGhostPairCallback;
 import com.badlogic.gdx.physics.bullet.dynamics.btConstraintSolver;
 import com.badlogic.gdx.physics.bullet.dynamics.btDiscreteDynamicsWorld;
 import com.badlogic.gdx.physics.bullet.dynamics.btDynamicsWorld;
@@ -216,50 +217,59 @@ public class PhysicsWorld {
 		return true;
 	}
 
+	private List<PhysicsObjectInternal> tempExclusionList = new ArrayList<>();
 	public ClosestRayResultCallback rayTestExcluding( org.joml.Vector3f origin, org.joml.Vector3f direction, PhysicsObjectInternal... excluding ) {
-		//ArrayList<ClosestRayResultCallback> callbacks = new ArrayList<ClosestRayResultCallback>();
-		float maxDist = Float.MAX_VALUE;
 		ClosestRayResultCallback ret = new ClosestRayResultCallback(new Vector3(origin.x, origin.y, origin.z), new Vector3(origin.x, origin.y, origin.z));
-		synchronized(objects) {
-			checkObject: for (int i = 0; i < objects.size(); i++) {
-				PhysicsObjectInternal obj = objects.get(i);
-
-				// Check if we exclude this object from the ray-test
-				boolean exclude = false;
-				if ( excluding != null ) {
-					for (int j = 0; j < excluding.length && !exclude; j++) {
-						if ( excluding[j].equals(obj) ) {
+		
+		synchronized(tempExclusionList) {
+			
+			// Add to exclusion list
+			tempExclusionList.clear();
+			for (int j = 0; j < excluding.length; j++) {
+				tempExclusionList.add(excluding[j]);
+			}
+			
+			// Test each object
+			float maxDist = Float.MAX_VALUE;
+			synchronized(objects) {
+				checkObject: for (int i = 0; i < objects.size(); i++) {
+					PhysicsObjectInternal obj = objects.get(i);
+	
+					// Check if we exclude this object from the ray-test
+					for (int j = 0; j < tempExclusionList.size(); j++) {
+						if ( tempExclusionList.get(j).equals(obj) ) {
+							tempExclusionList.remove(j);
 							continue checkObject;
 						}
 					}
-				}
-
-				// Raytest
-				ClosestRayResultCallback c = rayTest( origin, direction, obj );
-				if ( c.hasHit() ) {
-					if ( btToInternal.containsKey((btRigidBody) c.getCollisionObject()) ) {
-						Vector3 vec = new Vector3();
-						c.getRayFromWorld(new Vector3());
-						
-						Vector3 hit = new Vector3();
-						c.getHitPointWorld(hit);
-						
-						vec.sub(hit);
-						
-						float dist = vec.len();
-						if ( dist < maxDist ) {
-							maxDist = dist;
-							ret.dispose();
-							ret = c;
+	
+					// Raytest
+					ClosestRayResultCallback c = rayTest( origin, direction, obj );
+					if ( c.hasHit() ) {
+						if ( btToInternal.containsKey((btRigidBody) c.getCollisionObject()) ) {
+							Vector3 vec = new Vector3();
+							c.getRayFromWorld(new Vector3());
+							
+							Vector3 hit = new Vector3();
+							c.getHitPointWorld(hit);
+							
+							vec.sub(hit);
+							
+							float dist = vec.len();
+							if ( dist < maxDist ) {
+								maxDist = dist;
+								ret.dispose();
+								ret = c;
+							} else {
+								c.dispose();
+							}
 						} else {
+							c.getCollisionObject().dispose();
 							c.dispose();
 						}
 					} else {
-						((btRigidBody)c.getCollisionObject()).dispose();
 						c.dispose();
 					}
-				} else {
-					c.dispose();
 				}
 			}
 		}
@@ -313,5 +323,8 @@ public class PhysicsWorld {
 		dynamicsWorld = new btDiscreteDynamicsWorld(dispatcher, sweepBP, solver, collisionConfiguration);
 		
 		//btGImpactCollisionAlgorithm.registerAlgorithm( dispatcher );
+		
+		// Allow ghost objects
+		dynamicsWorld.getBroadphase().getOverlappingPairCache().setInternalGhostPairCallback(new btGhostPairCallback());
 	}
 }
