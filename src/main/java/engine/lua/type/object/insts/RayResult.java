@@ -10,9 +10,9 @@ import ide.layout.windows.icons.Icons;
 
 public class RayResult extends Instance implements TreeViewable {
 
-	protected static final LuaValue C_OBJECT = LuaValue.valueOf("Object");
-	protected static final LuaValue C_POSITION = LuaValue.valueOf("Position");
-	protected static final LuaValue C_NORMAL = LuaValue.valueOf("Normal");
+	protected static final LuaValue C_OBJECT = LuaValue.valueOf("HitObject");
+	protected static final LuaValue C_POSITION = LuaValue.valueOf("HitPosition");
+	protected static final LuaValue C_NORMAL = LuaValue.valueOf("HitNormal");
 	
 	public RayResult() {
 		super("RayResult");
@@ -30,6 +30,19 @@ public class RayResult extends Instance implements TreeViewable {
 		this.rawset(C_OBJECT,  object);
 		((Vector3)this.rawget(C_POSITION)).setInternal(position.getInternal());
 		((Vector3)this.rawget(C_NORMAL)).setInternal(normal.getInternal());
+	}
+	
+	public PhysicsBase getHitObject() {
+		LuaValue t = this.get(C_OBJECT);
+		return t.isnil()?null:(PhysicsBase)t;
+	}
+	
+	public Vector3 getHitPosition() {
+		return (Vector3) this.get(C_POSITION);
+	}
+	
+	public Vector3 getHitNormal() {
+		return (Vector3) this.get(C_NORMAL);
 	}
 
 	@Override
