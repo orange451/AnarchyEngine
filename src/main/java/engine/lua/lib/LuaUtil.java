@@ -3,7 +3,6 @@ package engine.lua.lib;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.json.simple.JSONObject;
 import org.luaj.vm2.LuaTable;
 import org.luaj.vm2.LuaValue;
 
@@ -39,11 +38,13 @@ public class LuaUtil {
 
 	/**
 	 * Convert Lua Table into Java List of LuaValue's
+	 * @param <T>
 	 * @param table
 	 * @param filter
 	 * @return
 	 */
-	public static List<LuaValue> tableToList(LuaTable table, Class<?>... filter) {
+	@SuppressWarnings("unchecked")
+	public static <T> List<T> tableToList(LuaTable table, Class<?>... filter) {
 		List<LuaValue> array = new ArrayList<>();
 		item: for (int i = 0; i < table.length(); i++) {
 			LuaValue t = table.get(LuaValue.valueOf(i));
@@ -55,7 +56,7 @@ public class LuaUtil {
 			array.add(t);
 		}
 		
-		return array;
+		return (List<T>) array;
 	}
 	
 	
@@ -65,8 +66,9 @@ public class LuaUtil {
 	 * @param filter
 	 * @return
 	 */
-	public static LuaValue[] tableToArray(LuaTable table, Class<?>... filter) {
-		List<LuaValue> list = tableToList(table, filter);
-		return list.toArray(new LuaValue[list.size()]);
+	@SuppressWarnings("unchecked")
+	public static <T> T[] tableToArray(LuaTable table, Class<?>... filter) {
+		List<T> list = tableToList(table, filter);
+		return (T[]) list.toArray(new Object[list.size()]);
 	}
 }

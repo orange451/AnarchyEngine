@@ -1,5 +1,6 @@
 package engine.lua.lib;
 
+import org.luaj.vm2.LuaString;
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.TwoArgFunction;
 import org.lwjgl.glfw.GLFW;
@@ -76,6 +77,14 @@ public class Enums extends TwoArgFunction {
 				}
 			});
 			
+			// Raycasting ignorelist or whitelist
+			this.rawset("RayIgnoreType", new LuaTableReadOnly() {
+				{
+					this.rawset("Whitelist", "Whitelist");
+					this.rawset("Blacklist", "Blacklist");
+				}
+			});
+			
 			// Shape Enum
 			this.rawset("Shape", new LuaTableReadOnly() {
 				{
@@ -147,5 +156,23 @@ public class Enums extends TwoArgFunction {
 				}
 			});
 		}
+	}
+
+	/**
+	 * Matches an enum. Returns nil if enum is not found.
+	 * @param enumType
+	 * @param enumName
+	 * @return
+	 */
+	public static LuaValue matchEnum(LuaString enumType, LuaValue enumName) {
+		LuaValue p = Enums.get().get(enumType);
+		if ( p == null || p.isnil() )
+			return LuaValue.NIL;
+		
+		LuaValue c = p.get(enumName);
+		if ( c == null || c.isnil() )
+			return LuaValue.NIL;
+		
+		return c;
 	}
 }

@@ -6,14 +6,13 @@ import java.util.List;
 
 import org.luaj.vm2.LuaTable;
 import org.luaj.vm2.LuaValue;
-import org.luaj.vm2.lib.OneArgFunction;
-import org.luaj.vm2.lib.ThreeArgFunction;
-import org.luaj.vm2.lib.TwoArgFunction;
-
 import com.badlogic.gdx.physics.bullet.collision.ClosestRayResultCallback;
 import com.badlogic.gdx.physics.bullet.dynamics.btRigidBody;
 
+import engine.Game;
 import engine.InternalGameThread;
+import engine.lua.lib.Enums;
+import engine.lua.lib.FourArgFunction;
 import engine.lua.lib.LuaUtil;
 import engine.lua.type.data.Ray;
 import engine.lua.type.data.Vector3;
@@ -43,43 +42,65 @@ public class Workspace extends Service implements RenderableWorld,TreeViewable,T
 		this.defineField(C_CURRENTCAMERA.toString(), new Camera(), false);
 		this.defineField(C_GRAVITY.toString(), LuaValue.valueOf(16), false);
 		
-		this.getmetatable().set("RayTest", new TwoArgFunction() {
+		// RayTest( Ray, [ExclusionList], [RayIgnoreType])
+		this.getmetatable().set("RayTest", new FourArgFunction() {
 			@Override
-			public LuaValue call(LuaValue myself, LuaValue ray) {
+			public LuaValue call(LuaValue myself, LuaValue ray, LuaValue exclusionList, LuaValue rayTypeEnum) {
 				try {
 					if ( !(ray instanceof Ray) )
 						return LuaValue.NIL;
-					Ray r = (Ray)ray;
-					ClosestRayResultCallback callback = physicsWorld.rayTestClosest(r.getOrigin().getInternal(), r.getDirection().getInternal());
-					return getRayResult(callback);
-				} catch(Exception e) {
-					e.printStackTrace();
-				}
-				return LuaValue.NIL;
-			}
-		});
-		
-		this.getmetatable().set("RayTestExcluding", new ThreeArgFunction() {
-			@Override
-			public LuaValue call(LuaValue myself, LuaValue ray, LuaValue exclusionList) {
-				try {
-					if ( !(ray instanceof Ray) )
-						return LuaValue.NIL;
+					
 					if ( exclusionList.isnil() )
 						exclusionList = new LuaTable();
+					
+					if ( rayTypeEnum.isnil() )
+						rayTypeEnum = LuaValue.valueOf("Blacklist");
+					
 					if ( !(exclusionList instanceof LuaTable) )
 						return LuaValue.NIL;
 					
-					LuaTable table = (LuaTable)exclusionList;
-					LuaValue[] temp = LuaUtil.tableToArray(table, PhysicsBase.class);
-					PhysicsObjectInternal[] excluding = new PhysicsObjectInternal[temp.length];
-					for (int i = 0; i < excluding.length; i++) {
-						excluding[i] = ((PhysicsBase)temp[i]).getInternal();
-					}
+					LuaValue e = Enums.matchEnum(LuaValue.valueOf("RayIgnoreType"), rayTypeEnum);
+					if ( e == null )
+						return LuaValue.NIL;
 					
-					Ray r = (Ray)ray;
-					ClosestRayResultCallback callback = physicsWorld.rayTestExcluding(r.getOrigin().getInternal(), r.getDirection().getInternal(), excluding);
-					return getRayResult(callback);
+					if ( !exclusionList.isnil() ) {
+						// Get all root instances in the selection
+						LuaTable table = (LuaTable)exclusionList;
+						List<Instance> rootObjects = Game.getRootInstances(LuaUtil.tableToList(table, Instance.class));
+						
+						// Get all PHYSICS BASE descendents of the root instances (inclusive)
+						List<Instance> descendents = new ArrayList<Instance>();
+						for (int i = 0; i < rootObjects.size(); i++) {
+							Instance root = rootObjects.get(i);
+							if ( root instanceof PhysicsBase )
+								descendents.add(root);
+							
+							List<Instance> desc = root.getDescendantsUnsafe();
+							for (int j = 0; j < desc.size(); j++) {
+								Instance t = desc.get(j);
+								if ( t instanceof PhysicsBase ) {
+									descendents.add(t);
+								}
+							}
+						}
+						
+						// Get array of internal physics objects from previous list
+						PhysicsObjectInternal[] excluding = new PhysicsObjectInternal[descendents.size()];
+						for (int i = 0; i < excluding.length; i++) {
+							excluding[i] = ((PhysicsBase)descendents.get(i)).getInternal();
+						}
+						
+						// Perform ray exclusion test
+						Ray r = (Ray)ray;
+						ClosestRayResultCallback callback = physicsWorld.rayTestExcluding(r.getOrigin().getInternal(), r.getDirection().getInternal(), excluding);
+						return getRayResult(callback);
+					} else {
+						
+						// Perform standard ray test
+						Ray r = (Ray)ray;
+						ClosestRayResultCallback callback = physicsWorld.rayTestClosest(r.getOrigin().getInternal(), r.getDirection().getInternal());
+						return getRayResult(callback);
+					}
 				} catch(Exception e) {
 					e.printStackTrace();
 				}
@@ -87,29 +108,25 @@ public class Workspace extends Service implements RenderableWorld,TreeViewable,T
 			}
 		});
 		
+		// Setup physics world
 		if ( physicsWorld == null )
 			physicsWorld = new PhysicsWorld();
 		
-		this.descendantRemovedEvent().connectLua(new OneArgFunction() {
-			@Override
-			public LuaValue call(LuaValue object) {
-				synchronized(descendants) {
-					descendants.remove((Instance) object);
-				}
-				return LuaValue.NIL;
+		// Remove from CUSTOM descendAnts array
+		this.descendantRemovedEvent().connect((args)->{
+			synchronized(descendants) {
+				descendants.remove((Instance) args[0]);
 			}
 		});
 		
-		this.descendantAddedEvent().connectLua(new OneArgFunction() {
-			@Override
-			public LuaValue call(LuaValue object) {
-				synchronized(descendants) {
-					descendants.add((Instance) object);
-				}
-				return LuaValue.NIL;
+		// Add to CUSTOM descendAnts array
+		this.descendantAddedEvent().connect((args)->{
+			synchronized(descendants) {
+				descendants.add((Instance) args[0]);
 			}
 		});
 		
+		// Make sure camera is inside workspace :wink:
 		InternalGameThread.runLater(()->{
 			Camera camera = this.getCurrentCamera();
 			if ( camera == null )
