@@ -449,4 +449,8 @@ public class PhysicsObjectInternal {
 		this.refresh = true;
 		this.desiredShape = null;
 	}
+	
+	public PhysicsBase getPhysicsObject() {
+		return this.luaFrontEnd;
+	}
 }

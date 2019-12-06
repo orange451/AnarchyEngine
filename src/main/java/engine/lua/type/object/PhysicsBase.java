@@ -547,10 +547,10 @@ public abstract class PhysicsBase extends Instance implements GameSubscriber {
 		if ( !important )
 			return;
 		
-		if ( !Game.isRunning() ) {
+		/*if ( !Game.isRunning() ) {
 			this.cleanupPhysics();
 			return;
-		}
+		}*/
 		
 		checkAddPhysics();
 	}

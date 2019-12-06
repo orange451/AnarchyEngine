@@ -4,6 +4,7 @@ import org.luaj.vm2.LuaValue;
 
 import engine.lua.type.data.Vector3;
 import engine.lua.type.object.Instance;
+import engine.lua.type.object.PhysicsBase;
 import engine.lua.type.object.TreeViewable;
 import ide.layout.windows.icons.Icons;
 
@@ -21,6 +22,14 @@ public class RayResult extends Instance implements TreeViewable {
 		this.defineField(C_NORMAL.toString(), new Vector3(), true);
 		
 		this.setInstanceable(false);
+	}
+	
+	public RayResult(PhysicsBase object, Vector3 position, Vector3 normal) {
+		this();
+		
+		this.rawset(C_OBJECT,  object);
+		((Vector3)this.rawget(C_POSITION)).setInternal(position.getInternal());
+		((Vector3)this.rawget(C_NORMAL)).setInternal(normal.getInternal());
 	}
 
 	@Override

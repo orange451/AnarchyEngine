@@ -6,15 +6,25 @@ import java.util.List;
 
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.OneArgFunction;
+import org.luaj.vm2.lib.TwoArgFunction;
+
+import com.badlogic.gdx.physics.bullet.collision.ClosestRayResultCallback;
+import com.badlogic.gdx.physics.bullet.dynamics.btRigidBody;
 
 import engine.InternalGameThread;
+import engine.lua.type.data.Ray;
+import engine.lua.type.data.Vector3;
 import engine.lua.type.object.Instance;
+import engine.lua.type.object.PhysicsBase;
 import engine.lua.type.object.RunScript;
 import engine.lua.type.object.Service;
 import engine.lua.type.object.TreeViewable;
 import engine.lua.type.object.insts.Camera;
+import engine.lua.type.object.insts.PhysicsObject;
+import engine.lua.type.object.insts.RayResult;
 import engine.observer.RenderableWorld;
 import engine.observer.Tickable;
+import engine.physics.PhysicsObjectInternal;
 import engine.physics.PhysicsWorld;
 import ide.layout.windows.icons.Icons;
 
@@ -30,6 +40,38 @@ public class Workspace extends Service implements RenderableWorld,TreeViewable,T
 
 		this.defineField(C_CURRENTCAMERA.toString(), new Camera(), false);
 		this.defineField(C_GRAVITY.toString(), LuaValue.valueOf(16), false);
+		
+		this.getmetatable().set("RayTest", new TwoArgFunction() {
+			@Override
+			public LuaValue call(LuaValue myself, LuaValue ray) {
+				try {
+					if ( !(ray instanceof Ray) )
+						return LuaValue.NIL;
+					Ray r = (Ray)ray;
+					ClosestRayResultCallback callback = physicsWorld.rayTestClosest(r.getOrigin().getInternal(), r.getDirection().getInternal());
+	
+					com.badlogic.gdx.math.Vector3 hitWorld;
+					callback.getHitPointWorld(hitWorld = new com.badlogic.gdx.math.Vector3());
+					com.badlogic.gdx.math.Vector3 hitNormal;
+					callback.getHitNormalWorld(hitNormal = new com.badlogic.gdx.math.Vector3());
+					
+					PhysicsBase p = null;
+					btRigidBody body = (btRigidBody) callback.getCollisionObject();
+					if ( body != null ) {
+						PhysicsObjectInternal phys = physicsWorld.getPhysicsObject(body);
+						p = phys.getPhysicsObject();
+					}
+	
+					Vector3 world = new Vector3(hitWorld.x, hitWorld.y, hitWorld.z);
+					Vector3 normal = new Vector3(hitNormal.x, hitNormal.y, hitNormal.z);
+					
+					return new RayResult(p, world, normal);
+				} catch(Exception e) {
+					e.printStackTrace();
+				}
+				return LuaValue.NIL;
+			}
+		});
 		
 		if ( physicsWorld == null )
 			physicsWorld = new PhysicsWorld();

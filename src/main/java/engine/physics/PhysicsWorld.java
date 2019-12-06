@@ -111,7 +111,7 @@ public class PhysicsWorld {
 		synchronized(objects) {
 			objects.add(obj);
 			
-			Game.runLater(() -> {
+			InternalGameThread.runLater(() -> {
 				if ( !obj.destroyed ) {
 					dynamicsWorld.addRigidBody(obj.getBody());
 					btToInternal.put(obj.getBody(), obj);
@@ -123,10 +123,14 @@ public class PhysicsWorld {
 	public btDynamicsWorld getDynamicsWorld() {
 		return dynamicsWorld;
 	}
+	
+	public PhysicsObjectInternal getPhysicsObject(btRigidBody body) {
+		return btToInternal.get(body);
+	}
 
 	public ClosestRayResultCallback rayTestClosest(org.joml.Vector3f origin, org.joml.Vector3f direction) {
 		Vector3 from = new Vector3( origin.x, origin.y, origin.z );
-		Vector3 to   = new Vector3( origin.x + (direction.x * 1024), origin.y + (direction.y * 1024), origin.z + (direction.z * 1024) );
+		Vector3 to   = new Vector3( origin.x + direction.x, origin.y + direction.y, origin.z + direction.z );
 		RayResultCallback callback  = new ClosestRayResultCallback( from, to );
 		dynamicsWorld.rayTest(from, to, callback);
 
