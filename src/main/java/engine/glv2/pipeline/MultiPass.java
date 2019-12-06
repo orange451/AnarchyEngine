@@ -38,6 +38,7 @@ public class MultiPass extends DeferredPipeline {
 	private LensFlareMod lensFlareMod; // Done
 	private Bloom bloom; // Done
 	private TAA taa; // Done
+	private MotionBlur mblur;
 
 	public void setupPasses() {
 		volumetricLight = new VolumetricLight(0.5f);
@@ -72,6 +73,9 @@ public class MultiPass extends DeferredPipeline {
 
 		colorCorrection = new ColorCorrection();
 		super.passes.add(colorCorrection);
+
+		mblur = new MotionBlur();
+		super.passes.add(mblur);
 
 		taa = new TAA();
 		super.passes.add(taa);

@@ -30,7 +30,6 @@ public class PostProcess extends PostProcessPipeline {
 
 	private FXAA fxaa; // Done
 	private ChromaticAberration chromaticAberration; // Done
-	private MotionBlur motionBlur; // Done
 	private DepthOfField depthOfField;
 	private FinalColorCorrection finalColorCorrection;
 
@@ -44,9 +43,6 @@ public class PostProcess extends PostProcessPipeline {
 
 		depthOfField = new DepthOfField();
 		super.passes.add(depthOfField);
-
-		motionBlur = new MotionBlur();
-		super.passes.add(motionBlur);
 
 		fxaa = new FXAA();
 		super.passes.add(fxaa);

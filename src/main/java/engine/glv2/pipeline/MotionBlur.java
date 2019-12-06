@@ -26,12 +26,11 @@ import static org.lwjgl.opengl.GL13C.GL_TEXTURE1;
 
 import engine.glv2.objects.Texture;
 import engine.glv2.pipeline.shaders.MotionBlurShader;
-import engine.glv2.v2.IRenderingData;
-import engine.glv2.v2.PostProcesPass;
-import engine.glv2.v2.PostProcessPipeline;
+import engine.glv2.v2.DeferredPass;
+import engine.glv2.v2.DeferredPipeline;
 import engine.glv2.v2.RendererData;
 
-public class MotionBlur extends PostProcesPass<MotionBlurShader> {
+public class MotionBlur extends DeferredPass<MotionBlurShader> {
 
 	public MotionBlur() {
 		super("MotionBlur");
@@ -43,14 +42,9 @@ public class MotionBlur extends PostProcesPass<MotionBlurShader> {
 	}
 
 	@Override
-	protected void setupShaderData(RendererData rnd, IRenderingData rd, MotionBlurShader shader) {
-		shader.loadMotionBlurData(rd.camera, rd.projectionMatrix, rnd.previousViewMatrix);
-	}
-
-	@Override
-	protected void setupTextures(RendererData rnd, PostProcessPipeline pp, Texture[] auxTex) {
+	protected void setupTextures(RendererData rnd, DeferredPipeline dp, Texture[] auxTex) {
 		super.activateTexture(GL_TEXTURE0, GL_TEXTURE_2D, auxTex[0].getTexture());
-		super.activateTexture(GL_TEXTURE1, GL_TEXTURE_2D, pp.getDepthTex().getTexture());
+		super.activateTexture(GL_TEXTURE1, GL_TEXTURE_2D, dp.getMotionTex().getTexture());
 	}
 
 }
