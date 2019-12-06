@@ -10,6 +10,8 @@ public abstract class Service extends Instance {
 		
 		this.getField(LuaValue.valueOf("Name")).setLocked(true);
 		this.getField(LuaValue.valueOf("Parent")).setLocked(true);
+		
+		this.setLocked(true);
 	}
 
 	public void onDestroy() {

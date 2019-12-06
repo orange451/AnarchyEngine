@@ -790,7 +790,7 @@ public class Game implements Tickable {
 		{
 			for (int j = 0; j < instances.size(); j++) {
 				Instance root = instances.get(j);
-				if ( !root.isInstanceable() ) {
+				if ( root.isLocked() ) {
 					instances.remove(j--);
 					continue;
 				}

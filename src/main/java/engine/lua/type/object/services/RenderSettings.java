@@ -42,8 +42,8 @@ public class RenderSettings extends Instance implements TreeViewable {
 		this.defineField(C_DEPTHOFFIELD.toString(), LuaValue.valueOf(false), false);
 		this.defineField(C_SSRENABLED.toString(), LuaValue.valueOf(false), false);
 
-		//this.setLocked(true);
 		this.setInstanceable(false);
+		this.setLocked(true);
 		
 		// Make sure it's in CORE
 		InternalGameThread.runLater(()->{

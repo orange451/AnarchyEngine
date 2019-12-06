@@ -151,7 +151,7 @@ public abstract class Instance extends DataModel {
 		this.getmetatable().set("Destroy", new ZeroArgFunction() {
 			@Override
 			public LuaValue call() {
-				if ( !locked && isInstanceable() ) {
+				if ( !locked ) {
 					Instance.this.destroy();
 				} else {
 					LuaValue.error("This object cannot be destroyed.");
