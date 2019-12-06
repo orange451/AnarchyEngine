@@ -23,7 +23,6 @@ import engine.lua.type.object.RunScript;
 import engine.lua.type.object.Service;
 import engine.lua.type.object.TreeViewable;
 import engine.lua.type.object.insts.Camera;
-import engine.lua.type.object.insts.PhysicsObject;
 import engine.lua.type.object.insts.RayResult;
 import engine.observer.RenderableWorld;
 import engine.observer.Tickable;

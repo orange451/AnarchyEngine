@@ -39,22 +39,20 @@ public class PhysicsWorld {
 
 	public void tick() {
 		double dt = 1f/(float)InternalGameThread.desiredTPS;
-		
-		if ( Game.isRunning() && !Game.isServer() ) {
-			//System.out.println("CLIENT PHYSICS! " + objects.size() + " / " + this.dynamicsWorld.getNumCollisionObjects());
-		}
 
-		synchronized(dynamicsWorld) {
-			dynamicsWorld.setGravity(new Vector3(0, 0, -Game.workspace().getGravity()));
-			try{
-				Game.runService().physicsSteppedEvent().fire(LuaValue.valueOf(dt));
-				dynamicsWorld.stepSimulation((float)dt,2,(float)dt);
-			}catch(Exception e) {
-				System.err.println("Error Stepping Physics");
-				e.printStackTrace();
-
-				if ( e instanceof NullPointerException || e instanceof ArrayIndexOutOfBoundsException ) {
-					//GameEngine.game_end();
+		if ( Game.isRunning() ) {
+			synchronized(dynamicsWorld) {
+				dynamicsWorld.setGravity(new Vector3(0, 0, -Game.workspace().getGravity()));
+				try{
+					Game.runService().physicsSteppedEvent().fire(LuaValue.valueOf(dt));
+					dynamicsWorld.stepSimulation((float)dt,2,(float)dt);
+				}catch(Exception e) {
+					System.err.println("Error Stepping Physics");
+					e.printStackTrace();
+	
+					if ( e instanceof NullPointerException || e instanceof ArrayIndexOutOfBoundsException ) {
+						//GameEngine.game_end();
+					}
 				}
 			}
 		}

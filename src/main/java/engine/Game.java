@@ -435,17 +435,19 @@ public class Game implements Tickable {
 		} else {
 			ticksNoCamera = 0;
 		}
+
+		// Tick workspace
+		Game.workspace().tick();
 		
-		if ( !running )
-			return;
-		
-		synchronized(runnables) {
-			while(runnables.size() > 0) {
-				runnables.get(0).run();
-				runnables.remove(0);
+		// Tick runnables in game
+		if ( running ) {
+			synchronized(runnables) {
+				while(runnables.size() > 0) {
+					runnables.get(0).run();
+					runnables.remove(0);
+				}
 			}
 		}
-		Game.workspace().tick();
 	}
 
 	public static void select(Instance inst) {
