@@ -1,8 +1,12 @@
 package engine.lua.lib;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
+import org.json.simple.JSONObject;
 import org.luaj.vm2.LuaTable;
 import org.luaj.vm2.LuaValue;
 
@@ -16,7 +20,7 @@ public class LuaUtil {
 	public static LuaTable listToTable(List<? extends LuaValue> list) {
 		LuaTable table = new LuaTable();
 		for (int i = 0; i < list.size(); i++) {
-			table.set(i+1, (LuaValue) list.get(i));
+			table.set(i+1, list.get(i));
 		}
 		
 		return table;
@@ -50,7 +54,7 @@ public class LuaUtil {
 			LuaValue t = table.get(LuaValue.valueOf(i));
 			for (int j = 0; j < filter.length; j++) {
 				Class<?> c = filter[j];
-				if ( !t.getClass().equals(c) && !t.getClass().isAssignableFrom(c) )
+				if ( !t.getClass().equals(c) && !c.isAssignableFrom(t.getClass()) )
 					continue item;
 			}
 			array.add(t);
@@ -70,5 +74,41 @@ public class LuaUtil {
 	public static <T> T[] tableToArray(LuaTable table, Class<?>... filter) {
 		List<T> list = tableToList(table, filter);
 		return (T[]) list.toArray(new Object[list.size()]);
+	}
+
+	/**
+	 * Convert LuaTable to JSONObject. Keys are converted to Strings
+	 * @param data
+	 * @return
+	 */
+	public static JSONObject tableToJson(LuaTable data) {
+		JSONObject json = new JSONObject();
+		
+		LuaValue[] keys = data.keys();
+		for (int i = 0; i < keys.length; i++) {
+			LuaValue key = keys[i];
+			json.put(key.toString(), data.get(key));
+		}
+		
+		return json;
+	}
+
+	/**
+	 * convert json object to LuaTable. JSON Object values should all extend LuaValue in some way. Keys should be strings.
+	 * @param obj
+	 * @return
+	 */
+	public static LuaTable jsonToTable(JSONObject obj) {
+		LuaTable table = new LuaTable();
+		
+		Set<?> entryset = obj.entrySet();
+		Iterator<?> iterator = entryset.iterator();
+		while(iterator.hasNext()) {
+			Map.Entry entry = (Map.Entry)iterator.next();
+			table.set(LuaValue.valueOf(entry.getKey().toString()), (LuaValue)entry.getValue());
+		}
+		
+		
+		return table;
 	}
 }
