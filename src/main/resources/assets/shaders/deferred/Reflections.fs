@@ -35,6 +35,7 @@ uniform sampler2D gDepth;
 uniform samplerCube environmentCube;
 uniform sampler2D brdfLUT;
 uniform sampler2D pass;
+uniform sampler2D aux;
 
 uniform int useReflections;
 
@@ -54,35 +55,42 @@ uniform int useReflections;
 
 void main(void) {
 	vec2 texcoord = textureCoords;
-	vec4 image = texture(pass, texcoord);
+	vec3 image = texture(pass, texcoord).rgb;
 	vec4 mask = texture(gMask, texcoord);
 	if (MASK_COMPARE(mask.a, PBR_OBJECT)) {
+		vec4 diffuse = texture(gDiffuse, textureCoords);
+		vec2 pbr = texture(gPBR, textureCoords).rg;
+		float frameDepth = texture(gDepth, textureCoords).r;
+		vec3 position = positionFromDepth(textureCoords, frameDepth, inverseProjectionMatrix,
+										  inverseViewMatrix);
+		vec3 normal = texture(gNormal, textureCoords).rgb;
+		vec4 auxData = texture(aux, textureCoords);
+
+		vec3 N = normalize(normal);
+		vec3 V = normalize(cameraPosition - position);
+		vec3 R = reflect(-V, N);
+
+		float roughness = pbr.r;
+		float metallic = pbr.g;
+
+		vec3 F0 = vec3(0.04);
+		F0 = mix(F0, diffuse.rgb, metallic);
+		vec3 F = fresnelSchlickRoughness(max(dot(N, V), 0.0), F0, roughness);
+
+		vec3 prefilteredColor = textureLod(environmentCube, R, roughness * MAX_REFLECTION_LOD).rgb;
+		vec2 envBRDF = texture(brdfLUT, vec2(max(dot(N, V), 0.0), roughness)).rg;
+		vec3 specular = prefilteredColor * (F * envBRDF.x + envBRDF.y);
+
+		vec3 light = auxData.rgb;
+		float ao = auxData.a;
+
+		// Reverse AO operation
+		light *= ao;
+		image -= light;
+		light /= ao;
+		light -= specular;
+
 		if (useReflections == 1) {
-			vec4 diffuse = texture(gDiffuse, textureCoords);
-			vec2 pbr = texture(gPBR, textureCoords).rg;
-			float frameDepth = texture(gDepth, textureCoords).r;
-			vec3 position = positionFromDepth(textureCoords, frameDepth, inverseProjectionMatrix,
-											  inverseViewMatrix);
-			vec3 normal = texture(gNormal, textureCoords).rgb;
-
-			vec3 N = normalize(normal);
-			vec3 V = normalize(cameraPosition - position);
-			vec3 R = reflect(-V, N);
-
-			float roughness = pbr.r;
-			float metallic = pbr.g;
-
-			vec3 F0 = vec3(0.04);
-			F0 = mix(F0, diffuse.rgb, metallic);
-			vec3 F = fresnelSchlickRoughness(max(dot(N, V), 0.0), F0, roughness);
-
-			vec3 prefilteredColor =
-				textureLod(environmentCube, R, roughness * MAX_REFLECTION_LOD).rgb;
-			vec2 envBRDF = texture(brdfLUT, vec2(max(dot(N, V), 0.0), roughness)).rg;
-			vec3 specular = prefilteredColor * (F * envBRDF.x + envBRDF.y);
-
-			image.rgb += specular;
-
 			vec3 camToWorld = position - cameraPosition.xyz;
 			vec3 camToWorldNorm = normalize(camToWorld);
 			vec3 newPos;
@@ -143,11 +151,17 @@ void main(void) {
 					break;
 			}
 			if (hit) {
-				vec3 newColor = texture(pass, newCoords).xyz;
-				image.rgb -= specular;
-				image.rgb += newColor * (F * envBRDF.x + envBRDF.y);
+				vec3 newColor = texture(pass, newCoords).rgb;
+				light += newColor * (F * envBRDF.x + envBRDF.y);
+			} else {
+				light += specular;
 			}
+		} else {
+			light += specular;
 		}
+		light *= ao; // Re apply AO
+		image += light;
 	}
-	out_Color = image;
+	out_Color.rgb = image;
+	out_Color.a = 0.0;
 }

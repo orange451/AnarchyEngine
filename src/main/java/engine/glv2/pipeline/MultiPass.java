@@ -41,14 +41,14 @@ public class MultiPass extends DeferredPipeline {
 	private MotionBlur mblur;
 
 	public void setupPasses() {
-		volumetricLight = new VolumetricLight(0.5f);
-		super.passes.add(volumetricLight);
+		//volumetricLight = new VolumetricLight(0.5f);
+		//super.passes.add(volumetricLight);
 
 		gH1 = new GaussianBlur(false, 0.5f);
-		super.passes.add(gH1);
+		//super.passes.add(gH1);
 
 		gV1 = new GaussianBlur(true, 0.5f);
-		super.passes.add(gV1);
+		//super.passes.add(gV1);
 
 		lighting = new Lighting();
 		super.passes.add(lighting);

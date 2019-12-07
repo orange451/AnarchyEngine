@@ -67,7 +67,7 @@ public abstract class PipelinePass<T extends BasePipelineShader, P> {
 		shader.stop();
 	}
 
-	public void process(RendererData rnd, IRenderingData rd, P pl, Texture[] auxTex, VAO quad) {
+	public void process(RendererData rnd, IRenderingData rd, P pl, Texture[] auxTextures, VAO quad) {
 		frameCont += 1;
 		frameCont %= Integer.MAX_VALUE;
 		GPUProfiler.start(name);
@@ -77,12 +77,23 @@ public abstract class PipelinePass<T extends BasePipelineShader, P> {
 		shader.loadSettings(rnd.rs);
 		shader.loadFrame(frameCont);
 		setupShaderData(rnd, rd, shader);
-		setupTextures(rnd, pl, auxTex);
+		setupTextures(rnd, pl, auxTextures);
 		glDrawArrays(GL_TRIANGLE_STRIP, 0, quad.getVertexCount());
 		shader.stop();
 		mainBuf.unbind();
 		GPUProfiler.end();
-		auxTex[0] = mainTex;
+		this.setupAuxTextures(auxTextures);
+	}
+
+	/**
+	 * 
+	 * Setups the output aux texture slots used as input for the next pass, by
+	 * default sets the [0] slot as the current pass texture
+	 * 
+	 * @param auxTextures Array of auxiliary texture slots
+	 */
+	protected void setupAuxTextures(Texture[] auxTextures) {
+		auxTextures[0] = mainTex;
 	}
 
 	protected abstract T setupShader();
@@ -126,7 +137,7 @@ public abstract class PipelinePass<T extends BasePipelineShader, P> {
 
 	protected abstract void generateFramebuffer(int width, int height);
 
-	private void disposeFramebuffer() {
+	protected void disposeFramebuffer() {
 		mainBuf.dispose();
 		mainTex.dispose();
 	}

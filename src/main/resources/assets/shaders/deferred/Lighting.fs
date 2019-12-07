@@ -22,35 +22,30 @@
 
 in vec2 textureCoords;
 
-out vec4 out_Color;
+out vec4[2] out_Color;
 
+uniform vec2 resolution;
 uniform vec3 cameraPosition;
-uniform vec3 lightPosition;
 uniform vec3 uAmbient;
 uniform sampler2D gDiffuse;
 uniform sampler2D gNormal;
 uniform sampler2D gPBR; // R = roughness, G = metallic
 uniform sampler2D gMask;
 uniform sampler2D gDepth;
-uniform sampler2D volumetric;
+// uniform sampler2D volumetric;
 uniform samplerCube irradianceCube;
 uniform samplerCube environmentCube;
 uniform sampler2D brdfLUT;
-uniform int useAmbientOcclusion;
-uniform int useShadows;
-uniform int useReflections;
-uniform vec2 resolution;
-uniform mat4 projectionLightMatrix[4];
-uniform mat4 viewLightMatrix;
 uniform mat4 biasMatrix;
 uniform mat4 projectionMatrix;
 uniform mat4 viewMatrix;
 uniform mat4 inverseProjectionMatrix;
 uniform mat4 inverseViewMatrix;
-uniform sampler2DArrayShadow shadowMap;
 uniform sampler2D directionalLightData;
 uniform sampler2D pointLightData;
 uniform sampler2D spotLightData;
+
+uniform int useAmbientOcclusion;
 
 #include variable GLOBAL
 
@@ -67,6 +62,8 @@ uniform sampler2D spotLightData;
 #include function fresnelSchlick
 
 #include function fresnelSchlickRoughness
+
+#include function getDepth
 
 #include function computeAmbientOcclusionV2
 
@@ -154,8 +151,9 @@ float computeContactShadows(vec3 pos, vec3 N, vec3 L, float imageDepth) {
 
 void main() {
 	vec4 mask = texture(gMask, textureCoords);
-	vec4 image = texture(gDiffuse, textureCoords);
+	vec3 image = texture(gDiffuse, textureCoords).rgb;
 	vec4 lightData = vec4(0.0);
+	vec4 auxData = vec4(0.0);
 
 	lightData += texture(spotLightData, textureCoords);
 
@@ -192,26 +190,29 @@ void main() {
 
 		vec3 ambient = kD * diffuse;
 
-		if (useReflections != 1) { // Using SSR
-			vec3 prefilteredColor =
-				textureLod(environmentCube, R, roughness * MAX_REFLECTION_LOD).rgb;
-			vec2 envBRDF = texture(brdfLUT, vec2(max(dot(N, V), 0.0), roughness)).rg;
-			vec3 specular = prefilteredColor * (F * envBRDF.x + envBRDF.y);
-			ambient += specular;
-			if (useAmbientOcclusion == 1) {
-				float ao = computeAmbientOcclusion(textureCoords, position, N, gDepth,
-												   inverseProjectionMatrix, inverseViewMatrix);
-				ambient *= ao;
-			}
+		vec3 prefilteredColor = textureLod(environmentCube, R, roughness * MAX_REFLECTION_LOD).rgb;
+		vec2 envBRDF = texture(brdfLUT, vec2(max(dot(N, V), 0.0), roughness)).rg;
+		vec3 specular = prefilteredColor * (F * envBRDF.x + envBRDF.y);
+
+		ambient += specular;
+
+		vec3 light = ambient + Lo;
+
+		auxData.rgb = light; // Store light for use in SSR pass
+		auxData.a = 1.0;	 // Initial value 1.0
+
+		if (useAmbientOcclusion == 1) {
+			float ao = computeAmbientOcclusion(textureCoords, position, N, gDepth, projectionMatrix,
+											   inverseProjectionMatrix, inverseViewMatrix);
+			auxData.a = ao; // Store AO for use in SSR pass
+			light *= ao;	// Apply AO, operation will be reverse in SSR pass
 		}
 
 		vec3 emissive = texture(gMask, textureCoords).rgb;
-		vec3 color = ambient + emissive + Lo;
+		vec3 color = light + emissive;
 		image.rgb = color;
-
-		// image.rgb = vec3(computeContactShadows(position, N, L, depth));
 	}
-	//vec4 vol = texture(volumetric, textureCoords);
-	//image.rgb += vec3(lightData.a);
-	out_Color = image;
+	out_Color[0].rgb = image;
+	out_Color[0].a = 0.0;
+	out_Color[1] = auxData;
 }

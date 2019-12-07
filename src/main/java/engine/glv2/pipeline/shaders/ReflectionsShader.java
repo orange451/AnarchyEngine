@@ -45,13 +45,14 @@ public class ReflectionsShader extends BasePipelineShader {
 	private UniformSampler environmentCube = new UniformSampler("environmentCube");
 	private UniformSampler brdfLUT = new UniformSampler("brdfLUT");
 	private UniformSampler pass = new UniformSampler("pass");
+	private UniformSampler aux = new UniformSampler("aux");
 
 	private Matrix4f projInv = new Matrix4f(), viewInv = new Matrix4f();
 
 	public ReflectionsShader(String name) {
 		super("deferred/" + name);
 		super.storeUniforms(projectionMatrix, viewMatrix, cameraPosition, gDiffuse, gNormal, gDepth, gPBR, gMask,
-				environmentCube, brdfLUT, inverseProjectionMatrix, inverseViewMatrix, pass);
+				environmentCube, brdfLUT, inverseProjectionMatrix, inverseViewMatrix, pass, aux);
 		super.validate();
 		this.loadInitialData();
 	}
@@ -60,13 +61,15 @@ public class ReflectionsShader extends BasePipelineShader {
 	protected void loadInitialData() {
 		super.start();
 		gDiffuse.loadTexUnit(0);
-		gNormal.loadTexUnit(2);
-		gDepth.loadTexUnit(3);
-		gPBR.loadTexUnit(4);
-		gMask.loadTexUnit(5);
-		environmentCube.loadTexUnit(6);
-		brdfLUT.loadTexUnit(7);
-		pass.loadTexUnit(8);
+		gNormal.loadTexUnit(1);
+		gDepth.loadTexUnit(2);
+		gPBR.loadTexUnit(3);
+		gMask.loadTexUnit(4);
+		environmentCube.loadTexUnit(5);
+		brdfLUT.loadTexUnit(6);
+		pass.loadTexUnit(7);
+		aux.loadTexUnit(8);
+		super.stop();
 	}
 
 	public void loadCameraData(Camera camera, Matrix4f projection) {

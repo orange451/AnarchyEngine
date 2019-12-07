@@ -27,5 +27,5 @@ uniform sampler2D image;
 void main() {
 	vec3 color = texture(image, textureCoords).rgb;
 	out_Color.rgb = max((color - 1.0), 0.0);
-	out_Color.a = 1.0;
+	out_Color.a = 0.0;
 }

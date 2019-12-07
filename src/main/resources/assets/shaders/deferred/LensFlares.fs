@@ -32,14 +32,14 @@ const float ghostDispersal = 0.4;
 const float haloWidth = 0.47;
 const float distortion = 1.5;
 
-vec4 textureDistorted(sampler2D tex, vec2 texcoord, vec2 direction, vec3 distortion) {
-	return vec4(texture(tex, texcoord + direction * distortion.r).r,
+vec3 textureDistorted(sampler2D tex, vec2 texcoord, vec2 direction, vec3 distortion) {
+	return vec3(texture(tex, texcoord + direction * distortion.r).r,
 				texture(tex, texcoord + direction * distortion.g).g,
-				texture(tex, texcoord + direction * distortion.b).b, 1.0);
+				texture(tex, texcoord + direction * distortion.b).b);
 }
 
 void main() {
-	vec4 result = vec4(0.0);
+	vec3 result = vec3(0.0);
 	if (useLensFlares == 1) {
 		vec2 texcoord = -textureCoords + vec2(1.0);
 		vec2 ghostVec = (vec2(0.5) - texcoord) * ghostDispersal;
@@ -56,7 +56,8 @@ void main() {
 		float weight = length(vec2(0.5) - fract(texcoord + haloVec)) / length(vec2(0.5));
 		weight = pow(1.0 - weight, 5.0);
 		result += textureDistorted(bloom, texcoord + haloVec, direction, distortion) * weight;
-		result *= texture(lensColor, vec2(length(vec2(0.5) - texcoord) / length(vec2(0.5)), 0.0));
+		result *= texture(lensColor, vec2(length(vec2(0.5) - texcoord) / length(vec2(0.5)), 0.0)).rgb;
 	}
-	out_Color = result;
+	out_Color.rgb = result;
+	out_Color.a = 0.0;
 }

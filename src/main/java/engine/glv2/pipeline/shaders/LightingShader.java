@@ -43,7 +43,6 @@ public class LightingShader extends BasePipelineShader {
 	private UniformSampler gDepth = new UniformSampler("gDepth");
 	private UniformSampler gPBR = new UniformSampler("gPBR");
 	private UniformSampler gMask = new UniformSampler("gMask");
-	private UniformSampler volumetric = new UniformSampler("volumetric");
 	private UniformSampler irradianceCube = new UniformSampler("irradianceCube");
 	private UniformSampler environmentCube = new UniformSampler("environmentCube");
 	private UniformSampler brdfLUT = new UniformSampler("brdfLUT");
@@ -58,8 +57,8 @@ public class LightingShader extends BasePipelineShader {
 	public LightingShader(String name) {
 		super("deferred/" + name);
 		super.storeUniforms(projectionMatrix, viewMatrix, cameraPosition, uAmbient, gDiffuse, gNormal, gDepth, gPBR,
-				gMask, volumetric, irradianceCube, environmentCube, brdfLUT, biasMatrix, inverseProjectionMatrix,
-				inverseViewMatrix, directionalLightData, pointLightData, spotLightData);
+				gMask, irradianceCube, environmentCube, brdfLUT, biasMatrix, inverseProjectionMatrix, inverseViewMatrix,
+				directionalLightData, pointLightData, spotLightData);
 		super.validate();
 		this.loadInitialData();
 	}
@@ -68,17 +67,16 @@ public class LightingShader extends BasePipelineShader {
 	protected void loadInitialData() {
 		super.start();
 		gDiffuse.loadTexUnit(0);
-		gNormal.loadTexUnit(2);
-		gDepth.loadTexUnit(3);
-		gPBR.loadTexUnit(4);
-		gMask.loadTexUnit(5);
-		volumetric.loadTexUnit(6);
-		irradianceCube.loadTexUnit(7);
-		environmentCube.loadTexUnit(8);
-		brdfLUT.loadTexUnit(9);
-		directionalLightData.loadTexUnit(10);
-		pointLightData.loadTexUnit(11);
-		spotLightData.loadTexUnit(12);
+		gNormal.loadTexUnit(1);
+		gDepth.loadTexUnit(2);
+		gPBR.loadTexUnit(3);
+		gMask.loadTexUnit(4);
+		irradianceCube.loadTexUnit(5);
+		environmentCube.loadTexUnit(6);
+		brdfLUT.loadTexUnit(7);
+		directionalLightData.loadTexUnit(8);
+		pointLightData.loadTexUnit(9);
+		spotLightData.loadTexUnit(10);
 		Matrix4f bias = new Matrix4f();
 		bias.m00(0.5f);
 		bias.m11(0.5f);

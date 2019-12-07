@@ -20,7 +20,7 @@
 
 in vec2 textureCoords;
 
-out vec3 out_Color;
+out vec4 out_Color;
 
 uniform sampler2D image;
 
@@ -45,5 +45,6 @@ void main() {
 		sum = sum / samples;
 		textureColor = sum;
 	}
-	out_Color = textureColor;
+	out_Color.rgb = textureColor;
+	out_Color.a = 0.0;
 }

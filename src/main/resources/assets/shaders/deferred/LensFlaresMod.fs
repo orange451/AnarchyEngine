@@ -32,12 +32,13 @@ uniform int useLensFlares;
 const float mult = 2.0;
 
 void main() {
-	vec4 textureColor = texture(image, textureCoords);
+	vec3 color = texture(image, textureCoords).rgb;
 	if (useLensFlares == 1) {
-		vec4 lensMod = texture(lensDirt, textureCoords);
-		lensMod += texture(lensStar, textureCoords);
-		vec4 lensFlare = texture(lensFlare, textureCoords) * (lensMod * mult);
-		textureColor += lensFlare;
+		vec3 lensMod = texture(lensDirt, textureCoords).rgb;
+		lensMod += texture(lensStar, textureCoords).rgb;
+		vec3 lensFlare = texture(lensFlare, textureCoords).rgb * (lensMod * mult);
+		color += lensFlare;
 	}
-	out_Color = textureColor;
+	out_Color.rgb = color;
+	out_Color.a = 0.0;
 }

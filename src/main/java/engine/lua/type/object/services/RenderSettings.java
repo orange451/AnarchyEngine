@@ -21,6 +21,7 @@ public class RenderSettings extends Instance implements TreeViewable {
 	private static final LuaValue C_MOTIONBLUR = LuaValue.valueOf("MotionBlur");
 	private static final LuaValue C_DEPTHOFFIELD = LuaValue.valueOf("DepthOfField");
 	private static final LuaValue C_SSRENABLED = LuaValue.valueOf("Reflections");
+	private static final LuaValue C_AOENABLED = LuaValue.valueOf("AmbientOcclusion");
 	
 	private RenderingSettings settings;
 	
@@ -41,6 +42,7 @@ public class RenderSettings extends Instance implements TreeViewable {
 		this.defineField(C_MOTIONBLUR.toString(), LuaValue.valueOf(false), false);
 		this.defineField(C_DEPTHOFFIELD.toString(), LuaValue.valueOf(false), false);
 		this.defineField(C_SSRENABLED.toString(), LuaValue.valueOf(false), false);
+		this.defineField(C_AOENABLED.toString(), LuaValue.valueOf(false), false);
 
 		this.setInstanceable(false);
 		this.setLocked(true);
@@ -84,6 +86,10 @@ public class RenderSettings extends Instance implements TreeViewable {
 		return this.get(C_SSRENABLED).toboolean();
 	}
 
+	public boolean getAOEnabled() {
+		return this.get(C_AOENABLED).toboolean();
+	}
+
 	@Override
 	protected LuaValue onValueSet(LuaValue key, LuaValue value) {
 		if ( settings == null )
@@ -93,6 +99,8 @@ public class RenderSettings extends Instance implements TreeViewable {
 			settings.shadowsEnabled = value.toboolean();
 		if ( key.eq_b(C_SSRENABLED) )
 			settings.ssrEnabled = value.toboolean();
+		if ( key.eq_b(C_AOENABLED) )
+			settings.ambientOcclusionEnabled = value.toboolean();
 		if ( key.eq_b(C_DEPTHOFFIELD) )
 			settings.depthOfFieldEnabled = value.toboolean();
 		if ( key.eq_b(C_MOTIONBLUR) )

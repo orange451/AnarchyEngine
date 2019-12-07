@@ -25,5 +25,6 @@ out vec4 out_Color;
 uniform sampler2D image;
 
 void main() {
-	out_Color = texture(image, textureCoords);
+	out_Color.rgb = texture(image, textureCoords).rgb;
+	out_Color.a = 1.0;
 }

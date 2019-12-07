@@ -88,7 +88,7 @@ public class FramebufferBuilder {
 		return this;
 	}
 
-	public FramebufferBuilder drawBuffers(int[] bufs) {
+	public FramebufferBuilder drawBuffers(int... bufs) {
 		check();
 		glDrawBuffers(bufs);
 		return this;

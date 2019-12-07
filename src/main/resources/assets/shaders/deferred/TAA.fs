@@ -31,21 +31,21 @@ uniform sampler2D gMotion;
 uniform bool useTAA;
 
 void main() {
-	out_Color = texture(image, textureCoords);
-	out_Color.a = 1;
+	out_Color.rgb = texture(image, textureCoords).rgb;
+	out_Color.a = 0.0;
 	if (!useTAA)
 		return;
 	vec3 neighbourhood[9];
 
-	neighbourhood[0] = texture(image, textureCoords + vec2(-1, -1) * pixelSize).xyz;
-	neighbourhood[1] = texture(image, textureCoords + vec2(+0, -1) * pixelSize).xyz;
-	neighbourhood[2] = texture(image, textureCoords + vec2(+1, -1) * pixelSize).xyz;
-	neighbourhood[3] = texture(image, textureCoords + vec2(-1, +0) * pixelSize).xyz;
-	neighbourhood[4] = texture(image, textureCoords + vec2(+0, +0) * pixelSize).xyz;
-	neighbourhood[5] = texture(image, textureCoords + vec2(+1, +0) * pixelSize).xyz;
-	neighbourhood[6] = texture(image, textureCoords + vec2(-1, +1) * pixelSize).xyz;
-	neighbourhood[7] = texture(image, textureCoords + vec2(+0, +1) * pixelSize).xyz;
-	neighbourhood[8] = texture(image, textureCoords + vec2(+1, +1) * pixelSize).xyz;
+	neighbourhood[0] = texture(image, textureCoords + vec2(-1, -1) * pixelSize).rgb;
+	neighbourhood[1] = texture(image, textureCoords + vec2(+0, -1) * pixelSize).rgb;
+	neighbourhood[2] = texture(image, textureCoords + vec2(+1, -1) * pixelSize).rgb;
+	neighbourhood[3] = texture(image, textureCoords + vec2(-1, +0) * pixelSize).rgb;
+	neighbourhood[4] = texture(image, textureCoords + vec2(+0, +0) * pixelSize).rgb;
+	neighbourhood[5] = texture(image, textureCoords + vec2(+1, +0) * pixelSize).rgb;
+	neighbourhood[6] = texture(image, textureCoords + vec2(-1, +1) * pixelSize).rgb;
+	neighbourhood[7] = texture(image, textureCoords + vec2(+0, +1) * pixelSize).rgb;
+	neighbourhood[8] = texture(image, textureCoords + vec2(+1, +1) * pixelSize).rgb;
 
 	vec3 nmin = neighbourhood[0];
 	vec3 nmax = neighbourhood[0];

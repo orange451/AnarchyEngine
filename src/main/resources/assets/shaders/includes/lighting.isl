@@ -244,7 +244,7 @@ vec3 positionFromDepth(vec2 texCoords, float depth, mat4 invProjection, mat4 inv
 #end
 
 #function computeAmbientOcclusionV2
-const float distanceThreshold = 1;
+const float distanceThreshold = 0.5;
 const int sample_count = 16;
 const vec2 poisson16[] = vec2[](
 	vec2(-0.94201624, -0.39906216), vec2(0.94558609, -0.76890725), vec2(-0.094184101, -0.92938870),
@@ -255,21 +255,22 @@ const vec2 poisson16[] = vec2[](
 	vec2(0.14383161, -0.14100790));
 
 float computeAmbientOcclusion(vec2 texCoords, vec3 position, vec3 normal, sampler2D gDepth,
-							  mat4 invProjection, mat4 invView) {
+							  mat4 projection, mat4 invProjection, mat4 invView) {
 	float ambientOcclusion = 0;
-	vec2 filterRadius = vec2(10) / resolution;
+	float depth = getDepth(projection, gDepth, texCoords);
+	vec2 filterRadius = vec2(0.05) / depth;
 	for (int i = 0; i < sample_count; ++i) {
 		vec2 sampleTexCoord = texCoords + (poisson16[i] * filterRadius);
-		float depth = texture(gDepth, sampleTexCoord).r;
-		vec3 samplePos = positionFromDepth(sampleTexCoord, depth, invProjection, invView);
+		float depthRaw = texture(gDepth, sampleTexCoord).r;
+		vec3 samplePos = positionFromDepth(sampleTexCoord, depthRaw, invProjection, invView);
 		vec3 sampleDir = normalize(samplePos - position);
 		float NdotS = max(dot(normal, sampleDir), 0.0);
 		float VPdistSP = distance(position, samplePos);
 		float a = 1.0 - smoothstep(distanceThreshold, distanceThreshold * 2, VPdistSP);
 		float b = NdotS;
-		ambientOcclusion += max(a * b, 0.0) * 1.5;
+		ambientOcclusion += (a * b);
 	}
-	return -(ambientOcclusion / sample_count) + 1.0;
+	return max(-(ambientOcclusion / sample_count) + 1.0, 0.0);
 }
 #end
 
@@ -341,14 +342,14 @@ vec3 calcSpotLight(SpotLight light, vec3 position, vec3 diffuse, vec3 N, vec3 V,
 		vec4 shadowCoord = biasMatrix * (light.projectionMatrix * posLight);
 		vec2 multTex = 1.0 / textureSize(light.shadowMap, 0).xy;
 		float shadow = 0.0;
-		for (int x = -2; x <= 2; ++x) {
-			for (int y = -2; y <= 2; ++y) {
+		for (int x = -1; x <= 1; ++x) {
+			for (int y = -1; y <= 1; ++y) {
 				vec2 offset = vec2(x, y) * multTex;
-				vec3 temp = shadowCoord.xyz + vec3(offset * shadowCoord.z, 0);
+				vec3 temp = shadowCoord.xyz + vec3(offset/* * shadowCoord.z*/, 0);
 				shadow += texture(light.shadowMap, (temp / shadowCoord.w), 0);
 			}
 		}
-		NdotL *= shadow / 25.0;
+		NdotL *= shadow / 9.0; // -2~2 = 25.0
 	}
 	return (kD * diffuse / PI + brdf) * radiance * NdotL;
 }

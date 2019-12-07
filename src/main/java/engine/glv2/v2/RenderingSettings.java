@@ -34,7 +34,7 @@ public class RenderingSettings {
 	public volatile boolean depthOfFieldEnabled = Game.core().getRenderSettings().getDepthOfFieldEnabled();
 	public volatile boolean ssrEnabled = Game.core().getRenderSettings().getSSREnabled();
 	public volatile boolean parallaxEnabled = false;
-	public volatile boolean ambientOcclusionEnabled = false;
+	public volatile boolean ambientOcclusionEnabled = Game.core().getRenderSettings().getAOEnabled();
 	public volatile boolean chromaticAberrationEnabled = false;
 	public volatile boolean lensFlaresEnabled = false;
 

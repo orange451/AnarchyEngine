@@ -41,5 +41,5 @@ void main() {
 
 	// Write
 	out_Color.rgb = final;
-	out_Color.a = 1;
+	out_Color.a = 0.0;
 }

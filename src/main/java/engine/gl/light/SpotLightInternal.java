@@ -13,7 +13,7 @@ public class SpotLightInternal extends Light {
 	public float innerFOV = 70;
 	public float radius = 10;
 	public Vector3f direction = new Vector3f(1, 1, -1);
-	public int shadowResolution = 512;
+	public int shadowResolution = 1024;
 	public boolean shadows = true;;
 	private SpotLightShadowMap shadowMap;
 	private SpotLightCamera lightCamera;
