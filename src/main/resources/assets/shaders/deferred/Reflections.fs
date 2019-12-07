@@ -131,7 +131,7 @@ void main(void) {
 
 				float diff = newDepth - depth;
 
-				if (diff > 0.0 && diff < 2.5) {
+				if (diff > -0.001 && diff < 0.1) {
 					if (dot(newNorm, p - ro) < 0.0)
 						hit = true;
 					break;
