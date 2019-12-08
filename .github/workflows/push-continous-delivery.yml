@@ -10,9 +10,11 @@ jobs:
       with:
         java-version: 1.8
     - name: Build Tar
-      run: ./gradlew distTar -PAllNatives
+      run: ./gradlew distTar -PAllNatives -q
     - name: Untar for upload
-      run: tar -C artifact -xvf build/distributions/AnarchyEngine.tar
+      run: |
+        mkdir -p artifact
+        tar -C artifact -xvf build/distributions/AnarchyEngine.tar
     - name: Upload artifact
       uses: actions/upload-artifact@v1.0.0
       with:
