@@ -115,9 +115,11 @@ public class InternalClient extends Client {
 							
 							// Do all the queued updates.
 							blockUpdates = false;
-							while(packetBackQueue.size() > 0) {
-								packetBackQueue.get(0).clientProcess(connection);
-								packetBackQueue.remove(0);
+							synchronized(packetBackQueue) {
+								while(packetBackQueue.size() > 0) {
+									packetBackQueue.get(0).clientProcess(connection);
+									packetBackQueue.remove(0);
+								}
 							}
 							
 							worldJSON = null;
