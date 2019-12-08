@@ -14,7 +14,7 @@ jobs:
     - name: Untar for upload
       run: |
         mkdir -p artifact
-        tar -C artifact --strip-components=1 -xvf build/distributions/AnarchyEngine.tar
+        tar -C artifact --strip-components=1 -xf build/distributions/AnarchyEngine.tar
     - name: Upload artifact
       uses: actions/upload-artifact@v1.0.0
       with:
