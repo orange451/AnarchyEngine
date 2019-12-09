@@ -139,8 +139,8 @@ void main(void) {
 				float diff = newDepth - depth;
 
 				if (diff >= 0.1) {
-					float half = oldDist / 2.0;
-					dS = -half;
+					float halfD = oldDist / 2.0;
+					dS = -halfD;
 				} else if (diff > -0.001 && diff < 0.1) {
 					if (dot(newNorm, normalize(p - ro)) < 0.0)
 						hit = true;
