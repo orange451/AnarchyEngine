@@ -84,10 +84,7 @@ void main(void) {
 		vec3 light = auxData.rgb;
 		float ao = auxData.a;
 
-		// Reverse AO operation
-		light *= ao;
-		image -= light;
-		light /= ao;
+		image -= light * ao;
 		light -= specular;
 
 		if (useReflections == 1) {
@@ -110,6 +107,8 @@ void main(void) {
 
 			bool hit = false;
 			vec3 newNorm;
+
+			float oldDist = 0.0;
 
 			for (i = 0; i < MAX_STEPS; i++) {
 				// Move point
@@ -139,13 +138,17 @@ void main(void) {
 
 				float diff = newDepth - depth;
 
-				if (diff > -0.001 && diff < 0.1) {
-					if (dot(newNorm, p - ro) < 0.0)
+				if (diff >= 0.1) {
+					float half = oldDist / 2.0;
+					dS = -half;
+				} else if (diff > -0.001 && diff < 0.1) {
+					if (dot(newNorm, normalize(p - ro)) < 0.0)
 						hit = true;
 					break;
 				}
 
 				dO += dS; // Add distance to distance from origin
+				oldDist = dS;
 
 				if (dO > MAX_DIST)
 					break;
