@@ -83,6 +83,7 @@ import engine.glv2.v2.lights.SpotLightHandler;
 import engine.lua.type.object.insts.Camera;
 import engine.lua.type.object.insts.DynamicSkybox;
 import engine.lua.type.object.insts.Skybox;
+import engine.lua.type.object.services.Lighting;
 import engine.observer.RenderableWorld;
 
 public class GLRenderer implements IPipeline {
@@ -350,10 +351,13 @@ public class GLRenderer implements IPipeline {
 		// currentCamera.getViewMatrix().getInternal().set(spotLightHandler.getLights().get(0).getLightCamera().getViewMatrix());
 
 		// Update lighting data
-		rnd.ambient = Game.lighting().getAmbient().toJOML();
-		rnd.exposure = Game.lighting().getExposure();
-		rnd.gamma = Game.lighting().getGamma();
-		rnd.saturation = Game.lighting().getSaturation();
+		Lighting lighting = Game.lighting();
+		if ( lighting != null && !lighting.isDestroyed() ) {
+			rnd.ambient = lighting.getAmbient().toJOML();
+			rnd.exposure = lighting.getExposure();
+			rnd.gamma = lighting.getGamma();
+			rnd.saturation = lighting.getSaturation();
+		}
 
 		rd.camera = currentCamera;
 		rd.projectionMatrix = projMatrix;
