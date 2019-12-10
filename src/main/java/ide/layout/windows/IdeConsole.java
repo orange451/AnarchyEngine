@@ -135,7 +135,7 @@ public class IdeConsole extends IdePane {
 						history_index = history.size() > 1 ? history.size() - 2 : index;
 					}
 
-					String lua = history.get(Math.max((history.size() - 1) - index, 0));
+					String lua = history.get(Math.min(Math.max((history.size() - 1) - index, 0), history.size()-1));
 					luaInput.setText(lua);
 					
 					luaInput.setCaretPosition(lua.length());
