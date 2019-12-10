@@ -81,7 +81,6 @@ public class AnimInstanceForwardRenderer {
 		shader.loadSettings(true);
 		shader.loadExposure(rnd.exposure);
 		shader.loadGamma(rnd.gamma);
-		shader.loadAmbient(rnd.ambient);
 		shader.loadDirectionalLights(rnd.dlh.getLights());
 		glActiveTexture(GL_TEXTURE4);
 		glBindTexture(GL_TEXTURE_CUBE_MAP, rnd.irradianceCapture.getTexture());

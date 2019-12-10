@@ -31,13 +31,15 @@ import static org.lwjgl.opengl.GL11C.GL_TEXTURE_WRAP_T;
 import static org.lwjgl.opengl.GL12C.GL_CLAMP_TO_EDGE;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE0;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE1;
+import static org.lwjgl.opengl.GL13C.GL_TEXTURE10;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE2;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE3;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE4;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE5;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE6;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE7;
-import static org.lwjgl.opengl.GL13C.*;
+import static org.lwjgl.opengl.GL13C.GL_TEXTURE8;
+import static org.lwjgl.opengl.GL13C.GL_TEXTURE9;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE_CUBE_MAP;
 import static org.lwjgl.opengl.GL30C.GL_COLOR_ATTACHMENT0;
 import static org.lwjgl.opengl.GL30C.GL_COLOR_ATTACHMENT1;
@@ -67,7 +69,6 @@ public class Lighting extends DeferredPass<LightingShader> {
 
 	@Override
 	protected void setupShaderData(RendererData rnd, IRenderingData rd, LightingShader shader) {
-		shader.loadAmbient(rnd.ambient);
 		shader.loadCameraData(rd.camera, rd.projectionMatrix);
 	}
 

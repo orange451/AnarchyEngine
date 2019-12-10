@@ -21,7 +21,6 @@
 package engine.glv2.pipeline.shaders;
 
 import org.joml.Matrix4f;
-import org.joml.Vector3f;
 
 import engine.glv2.shaders.data.UniformMatrix4;
 import engine.glv2.shaders.data.UniformSampler;
@@ -36,7 +35,6 @@ public class LightingShader extends BasePipelineShader {
 	private UniformMatrix4 inverseViewMatrix = new UniformMatrix4("inverseViewMatrix");
 
 	private UniformVec3 cameraPosition = new UniformVec3("cameraPosition");
-	private UniformVec3 uAmbient = new UniformVec3("uAmbient");
 
 	private UniformSampler gDiffuse = new UniformSampler("gDiffuse");
 	private UniformSampler gNormal = new UniformSampler("gNormal");
@@ -56,7 +54,7 @@ public class LightingShader extends BasePipelineShader {
 
 	public LightingShader(String name) {
 		super("deferred/" + name);
-		super.storeUniforms(projectionMatrix, viewMatrix, cameraPosition, uAmbient, gDiffuse, gNormal, gDepth, gPBR,
+		super.storeUniforms(projectionMatrix, viewMatrix, cameraPosition, gDiffuse, gNormal, gDepth, gPBR,
 				gMask, irradianceCube, environmentCube, brdfLUT, biasMatrix, inverseProjectionMatrix, inverseViewMatrix,
 				directionalLightData, pointLightData, spotLightData);
 		super.validate();
@@ -86,10 +84,6 @@ public class LightingShader extends BasePipelineShader {
 		bias.m32(0.5f);
 		biasMatrix.loadMatrix(bias);
 		super.stop();
-	}
-
-	public void loadAmbient(Vector3f ambient) {
-		this.uAmbient.loadVec3(ambient);
 	}
 
 	public void loadCameraData(Camera camera, Matrix4f projection) {

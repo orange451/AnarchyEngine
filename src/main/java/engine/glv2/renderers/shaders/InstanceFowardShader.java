@@ -23,7 +23,6 @@ package engine.glv2.renderers.shaders;
 import java.util.List;
 
 import org.joml.Matrix4f;
-import org.joml.Vector3f;
 
 import engine.gl.MaterialGL;
 import engine.gl.light.DirectionalLightInternal;
@@ -54,7 +53,6 @@ public class InstanceFowardShader extends ShaderProgram {
 	private UniformSampler brdfLUT = new UniformSampler("brdfLUT");
 	private UniformBoolean colorCorrect = new UniformBoolean("colorCorrect");
 
-	private UniformVec3 uAmbient = new UniformVec3("uAmbient");
 	private UniformFloat transparency = new UniformFloat("transparency");
 	private UniformFloat gamma = new UniformFloat("gamma");
 	private UniformFloat exposure = new UniformFloat("exposure");
@@ -81,9 +79,9 @@ public class InstanceFowardShader extends ShaderProgram {
 			directionalLights[x] = new UniformDirectionalLight("directionalLights[" + x + "]");
 		}
 		super.storeUniforms(directionalLights);
-		super.storeUniforms(transformationMatrix, projectionMatrix, viewMatrix, material, cameraPosition, uAmbient,
-				irradianceMap, preFilterEnv, brdfLUT, colorCorrect, biasMatrix, useShadows, transparency, gamma,
-				exposure, totalPointLights, totalDirectionalLights);
+		super.storeUniforms(transformationMatrix, projectionMatrix, viewMatrix, material, cameraPosition, irradianceMap,
+				preFilterEnv, brdfLUT, colorCorrect, biasMatrix, useShadows, transparency, gamma, exposure,
+				totalPointLights, totalDirectionalLights);
 		super.validate();
 		this.loadInitialData();
 	}
@@ -141,10 +139,6 @@ public class InstanceFowardShader extends ShaderProgram {
 				this.directionalLights[x].loadLight(lights.get(x), 8, x);
 			totalDirectionalLights.loadInteger(Math.min(8, lights.size()));
 		}
-	}
-
-	public void loadAmbient(Vector3f ambient) {
-		this.uAmbient.loadVec3(ambient);
 	}
 
 	public void loadSettings(boolean useShadows) {

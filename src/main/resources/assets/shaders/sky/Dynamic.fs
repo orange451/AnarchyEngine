@@ -30,6 +30,7 @@ uniform int renderSun;
 uniform vec3 lightPosition;
 uniform vec3 cameraPosition;
 uniform DynamicSky dynamicSky;
+uniform vec3 ambient;
 
 #include function noise
 
@@ -236,7 +237,7 @@ void main() {
 					clamp(length(r.x), 0.0, 1.0));
 	}
 
-	out_Color[0] = vec4(color, 0.0);
+	out_Color[0] = vec4(color * ambient, 0.0);
 	out_Color[1] = vec4(0.0);
 	out_Color[2] = vec4(0.0);
 	out_Color[3] = vec4(0.0);

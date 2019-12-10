@@ -34,7 +34,6 @@ uniform int colorCorrect;
 uniform Material material;
 uniform vec3 cameraPosition;
 uniform vec3 lightPosition;
-uniform vec3 uAmbient;
 uniform samplerCube irradianceMap;
 uniform samplerCube preFilterEnv;
 uniform sampler2D brdfLUT;
@@ -118,7 +117,6 @@ void main() {
 	kD *= 1.0 - metallic;
 
 	vec3 irradiance = texture(irradianceMap, N).rgb;
-	irradiance *= uAmbient;
 	vec3 diffuse = irradiance * diffuseF.rgb;
 
 	vec3 prefilteredColor = textureLod(preFilterEnv, R, roughness * MAX_REFLECTION_LOD).rgb;

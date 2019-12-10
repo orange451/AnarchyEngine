@@ -18,25 +18,16 @@
 //
 //
 
-in vec3 pass_textureCoords;
 in vec3 pass_position;
 
 out vec4[5] out_Color;
 
-uniform samplerCube environmentMap;
-uniform float power;
-uniform float brightness;
+uniform vec3 ambient;
 
 #include variable MASK
 
 void main() {
-	vec3 color = texture(environmentMap, pass_textureCoords).rgb;
-
-	color = max(color, 0.0);
-	color = pow(color, vec3(power));
-	color *= brightness;
-
-	out_Color[0] = vec4(color, 0.0);
+	out_Color[0] = vec4(ambient, 0.0);
 	out_Color[1] = vec4(0.0);
 	out_Color[2] = vec4(0.0);
 	out_Color[3] = vec4(0.0);

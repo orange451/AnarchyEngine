@@ -26,7 +26,6 @@ out vec4[2] out_Color;
 
 uniform vec2 resolution;
 uniform vec3 cameraPosition;
-uniform vec3 uAmbient;
 uniform sampler2D gDiffuse;
 uniform sampler2D gNormal;
 uniform sampler2D gPBR; // R = roughness, G = metallic
@@ -45,7 +44,7 @@ uniform sampler2D directionalLightData;
 uniform sampler2D pointLightData;
 uniform sampler2D spotLightData;
 
-uniform int useAmbientOcclusion;
+uniform bool useAmbientOcclusion;
 
 #include variable GLOBAL
 
@@ -185,7 +184,6 @@ void main() {
 		kD *= 1.0 - metallic;
 
 		vec3 irradiance = texture(irradianceCube, N).rgb;
-		irradiance *= uAmbient;
 		vec3 diffuse = irradiance * image.rgb;
 
 		vec3 ambient = kD * diffuse;
@@ -201,7 +199,7 @@ void main() {
 		auxData.rgb = light; // Store light for use in SSR pass
 		auxData.a = 1.0;	 // Initial value 1.0
 
-		if (useAmbientOcclusion == 1) {
+		if (useAmbientOcclusion) {
 			float ao = computeAmbientOcclusion(textureCoords, position, N, gDepth, projectionMatrix,
 											   inverseProjectionMatrix, inverseViewMatrix);
 			auxData.a = ao; // Store AO for use in SSR pass

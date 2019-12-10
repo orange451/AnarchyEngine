@@ -66,21 +66,21 @@ public class EnvironmentRenderer {
 		camera = new CubeMapCamera(new Vector3f());
 	}
 
-	public void renderEnvironmentMap(Vector3f center, SkyRenderer sr, Vector3f lightPosition, float globalTime) {
+	public void renderEnvironmentMap(Vector3f center, SkyRenderer sr, Vector3f lightPosition, RendererData rnd) {
 		camera.setPosition(center);
 		framebuffer.bind();
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
 				cubeTex.getTexture(), 0);
 		camera.switchToFace(i);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		sr.render(camera, lightPosition, true, false);
+		sr.render(rnd, camera, lightPosition, true, false, true);
 		framebuffer.unbind();
 		i += 1;
 		i %= 6;
 	}
 
 	public void renderEnvironmentMap(Vector3f center, SkyRenderer sr, Vector3f lightPosition,
-			RenderingManager renderingManager, IRenderingData rd, RendererData rnd, float globalTime) {
+			RenderingManager renderingManager, IRenderingData rd, RendererData rnd) {
 		camera.setPosition(center);
 		framebuffer.bind();
 		for (int i = 0; i < 6; i++) {
@@ -89,7 +89,7 @@ public class EnvironmentRenderer {
 			camera.switchToFace(i);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			renderingManager.renderReflections(rd, rnd, camera); // TODO: Issue here with shadow sampler
-			sr.render(camera, lightPosition, false, false);
+			sr.render(rnd, camera, lightPosition, false, false, false);
 		}
 		framebuffer.unbind();
 	}

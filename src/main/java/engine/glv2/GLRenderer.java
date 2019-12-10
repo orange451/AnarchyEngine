@@ -49,7 +49,6 @@ import org.lwjgl.opengl.ARBClipControl;
 import org.lwjgl.opengl.GL;
 
 import engine.Game;
-import engine.InternalRenderThread;
 import engine.application.RenderableApplication;
 import engine.gl.IPipeline;
 import engine.gl.LegacyPipeline;
@@ -121,8 +120,6 @@ public class GLRenderer implements IPipeline {
 
 	private int width, height;
 	private Vector2f size = new Vector2f();
-
-	private float globalTime = 0;
 
 	private boolean useARBClipControl = false;
 
@@ -228,7 +225,7 @@ public class GLRenderer implements IPipeline {
 		GPUProfiler.start("Irradiance");
 		GPUProfiler.start("CubeMap Render");
 		envRenderer.renderEnvironmentMap(currentCamera.getPosition().getInternal(), skyRenderer,
-				sun.getLight().direction, globalTime);
+				sun.getLight().direction, rnd);
 		GPUProfiler.end();
 		GPUProfiler.start("Irradiance Capture");
 		irradianceCapture.render(envRenderer.getCubeTexture());
@@ -237,7 +234,7 @@ public class GLRenderer implements IPipeline {
 		GPUProfiler.start("Reflections");
 		GPUProfiler.start("CubeMap Render");
 		envRendererEntities.renderEnvironmentMap(currentCamera.getPosition().getInternal(), skyRenderer,
-				sun.getLight().direction, renderingManager, rd, rnd, globalTime);
+				sun.getLight().direction, renderingManager, rd, rnd);
 		GPUProfiler.end();
 		GPUProfiler.start("PreFilteredEnvironment");
 		preFilteredEnvironment.render(envRendererEntities.getCubeTexture().getTexture());
@@ -263,7 +260,7 @@ public class GLRenderer implements IPipeline {
 		renderingManager.render(rd, rnd, size);
 		GPUProfiler.end();
 		GPUProfiler.start("Skybox");
-		skyRenderer.render(currentCamera, projMatrix, sun.getLight().direction, true, true);
+		skyRenderer.render(rnd, rd, sun.getLight().direction, true, true);
 		GPUProfiler.end();
 		dp.unbind();
 		if (useARBClipControl) {
@@ -345,7 +342,6 @@ public class GLRenderer implements IPipeline {
 				Float.POSITIVE_INFINITY, useARBClipControl);
 
 		// Set global time for clouds
-		this.globalTime += InternalRenderThread.delta * 100;
 		sun.update(dynamicSkybox);
 
 		// currentCamera.getViewMatrix().getInternal().set(spotLightHandler.getLights().get(0).getLightCamera().getViewMatrix());

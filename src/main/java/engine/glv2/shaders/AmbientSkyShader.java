@@ -25,35 +25,23 @@ import org.joml.Vector3f;
 
 import engine.glv2.entities.CubeMapCamera;
 import engine.glv2.shaders.data.Attribute;
-import engine.glv2.shaders.data.UniformBoolean;
-import engine.glv2.shaders.data.UniformDynamicSky;
-import engine.glv2.shaders.data.UniformFloat;
 import engine.glv2.shaders.data.UniformMatrix4;
 import engine.glv2.shaders.data.UniformVec3;
 import engine.lua.type.object.insts.Camera;
-import engine.lua.type.object.insts.DynamicSkybox;
 
-public class DynamicSkyShader extends ShaderProgram {
+public class AmbientSkyShader extends ShaderProgram {
 
 	private UniformMatrix4 projectionMatrix = new UniformMatrix4("projectionMatrix");
 	private UniformMatrix4 transformationMatrix = new UniformMatrix4("transformationMatrix");
 	private UniformMatrix4 viewMatrix = new UniformMatrix4("viewMatrix");
-	private UniformFloat time = new UniformFloat("time");
-	private UniformVec3 lightPosition = new UniformVec3("lightPosition");
-	private UniformBoolean renderSun = new UniformBoolean("renderSun");
-	private UniformVec3 cameraPosition = new UniformVec3("cameraPosition");
 
 	private UniformVec3 ambient = new UniformVec3("ambient");
 
-	private UniformDynamicSky dynamicSky = new UniformDynamicSky("dynamicSky");
-
 	private Matrix4f temp = new Matrix4f();
 
-	public DynamicSkyShader() {
-		super("assets/shaders/sky/Dynamic.vs", "assets/shaders/sky/Dynamic.fs", new Attribute(0, "position"),
-				new Attribute(1, "textureCoords"), new Attribute(2, "normal"));
-		super.storeUniforms(projectionMatrix, transformationMatrix, viewMatrix, time, lightPosition, renderSun,
-				cameraPosition, dynamicSky, ambient);
+	public AmbientSkyShader() {
+		super("assets/shaders/sky/Ambient.vs", "assets/shaders/sky/Ambient.fs", new Attribute(0, "position"));
+		super.storeUniforms(projectionMatrix, transformationMatrix, viewMatrix, ambient);
 		super.validate();
 	}
 
@@ -64,7 +52,6 @@ public class DynamicSkyShader extends ShaderProgram {
 		temp._m31(0);
 		temp._m32(0);
 		viewMatrix.loadMatrix(temp);
-		cameraPosition.loadVec3(camera.getPosition().getInternal());
 	}
 
 	public void loadCamera(CubeMapCamera camera) {
@@ -74,23 +61,10 @@ public class DynamicSkyShader extends ShaderProgram {
 		temp._m31(0);
 		temp._m32(0);
 		viewMatrix.loadMatrix(temp);
-		cameraPosition.loadVec3(camera.getPosition());
 	}
 
 	public void loadTransformationMatrix(Matrix4f mat) {
 		transformationMatrix.loadMatrix(mat);
-	}
-
-	public void loadLightPosition(Vector3f pos) {
-		lightPosition.loadVec3(pos);
-	}
-
-	public void renderSun(boolean val) {
-		renderSun.loadBoolean(val);
-	}
-
-	public void loadDynamicSky(DynamicSkybox sky) {
-		dynamicSky.loadLight(sky);
 	}
 
 	public void loadAmbient(Vector3f ambient) {
