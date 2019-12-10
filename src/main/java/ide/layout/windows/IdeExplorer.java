@@ -312,7 +312,10 @@ public class IdeExplorer extends IdePane {
 				parentTreeItem = tree;
 			
 			// Add to parent
-			parentTreeItem.getItems().add(newTreeItem);
+			synchronized(parentTreeItem.getItems()) {
+				if ( !parentTreeItem.getItems().contains(newTreeItem) )
+					parentTreeItem.getItems().add(newTreeItem);
+			}
 			
 			// Sort?
 			if ( parentTreeItem instanceof SortedTreeItem ) {

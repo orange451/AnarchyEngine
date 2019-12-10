@@ -218,7 +218,6 @@ public class PhysicsWorld {
 	private List<PhysicsObjectInternal> tempExclusionList = new ArrayList<>();
 	public ClosestRayResultCallback rayTestExcluding( org.joml.Vector3f origin, org.joml.Vector3f direction, PhysicsObjectInternal... excluding ) {
 		ClosestRayResultCallback ret = new ClosestRayResultCallback(new Vector3(origin.x, origin.y, origin.z), new Vector3(origin.x, origin.y, origin.z));
-		
 		synchronized(tempExclusionList) {
 			
 			// Add to exclusion list
