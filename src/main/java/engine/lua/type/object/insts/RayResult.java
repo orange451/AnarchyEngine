@@ -27,9 +27,14 @@ public class RayResult extends Instance implements TreeViewable {
 	public RayResult(PhysicsBase object, Vector3 position, Vector3 normal) {
 		this();
 		
-		this.rawset(C_OBJECT,  object);
-		((Vector3)this.rawget(C_POSITION)).setInternal(position.getInternal());
-		((Vector3)this.rawget(C_NORMAL)).setInternal(normal.getInternal());
+		if ( object != null)
+			this.rawset(C_OBJECT,  object);
+		
+		if ( position != null )
+			((Vector3)this.rawget(C_POSITION)).setInternal(position.getInternal());
+		
+		if ( normal != null )
+			((Vector3)this.rawget(C_NORMAL)).setInternal(normal.getInternal());
 	}
 	
 	public PhysicsBase getHitObject() {

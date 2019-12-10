@@ -50,8 +50,9 @@ public class LuaUtil {
 	@SuppressWarnings("unchecked")
 	public static <T> List<T> tableToList(LuaTable table, Class<?>... filter) {
 		List<LuaValue> array = new ArrayList<>();
-		for (int i = 0; i < table.length(); i++) {
-			LuaValue t = table.get(LuaValue.valueOf(i));
+		LuaValue[] keys = table.keys();
+		for (int i = 0; i < keys.length; i++) {
+			LuaValue t = table.get(keys[i]);
 			boolean contains = filter.length==0?true:false;
 			for (int j = 0; j < filter.length; j++) {
 				Class<?> c = filter[j];

@@ -55,21 +55,18 @@ public class Workspace extends Service implements RenderableWorld,TreeViewable,T
 					if ( exclusionList.isnil() )
 						exclusionList = new LuaTable();
 					
-					if ( rayTypeEnum.isnil() )
-						rayTypeEnum = C_BLACKLIST;
-					
 					if ( !(exclusionList instanceof LuaTable) )
 						return LuaValue.NIL;
 					
 					LuaValue e = Enums.matchEnum(C_RAYIGNORETYPE, rayTypeEnum);
-					if ( e == null )
+					if ( e == null && !rayTypeEnum.isnil() )
 						return LuaValue.NIL;
 					
-					if ( !exclusionList.isnil() ) {
+					if ( !exclusionList.isnil() && !rayTypeEnum.isnil() ) {
 						// Get all root instances in the selection
 						LuaTable table = (LuaTable)exclusionList;
-						List<Instance> rootObjects = Game.getRootInstances(LuaUtil.tableToList(table, Instance.class));
-						System.out.println("ROOT OBJECTS: " + rootObjects.size());
+						List<Instance> instances = LuaUtil.tableToList(table);
+						List<Instance> rootObjects = Game.getRootInstances(instances);
 						
 						// Get all PHYSICS BASE descendents of the root instances (inclusive)
 						List<Instance> descendents = new ArrayList<Instance>();
