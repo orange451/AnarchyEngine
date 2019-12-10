@@ -91,8 +91,8 @@ public class SkyRenderer {
 	public SkyRenderer(GLResourceLoader loader) {
 		dome = loader.loadObj("SkyDome");
 		pos = new Vector3f();
-		infMat = Maths.createTransformationMatrix(pos, 0, 0, 0, Integer.MAX_VALUE);
-		regMat = Maths.createTransformationMatrix(pos, 0, 0, 0, 1500);
+		infMat = Maths.createTransformationMatrix(pos, -90, 0, 0, Integer.MAX_VALUE);
+		regMat = Maths.createTransformationMatrix(pos, -90, 0, 0, 990);
 		dynamicSkyShader = new DynamicSkyShader();
 		staticSkyShader = new StaticSkyShader();
 		ambientSkyShader = new AmbientSkyShader();
