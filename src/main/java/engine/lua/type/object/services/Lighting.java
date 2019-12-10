@@ -29,7 +29,7 @@ public class Lighting extends Service implements TreeViewable {
 	public Lighting() {
 		super("Lighting");
 		
-		this.defineField(C_AMBIENT.toString(), Color3.newInstance(128, 128, 128), false);
+		this.defineField(C_AMBIENT.toString(), Color3.newInstance(32, 32, 32), false);
 		
 		this.defineField(C_SKYBOX.toString(), LuaValue.NIL, false);
 		
