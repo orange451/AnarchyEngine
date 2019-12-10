@@ -140,7 +140,13 @@ public class Mesh extends AssetLoadable implements TreeViewable {
 			if ( realPath.contains(".mesh") ) {
 				mesh = BufferedMesh.Import(realPath);
 			} else {
-				AIScene scene = Assimp.aiImportFile(realPath, 0);
+				AIScene scene = Assimp.aiImportFileExWithProperties(realPath,
+						Assimp.aiProcess_FindInvalidData | Assimp.aiProcess_ValidateDataStructure
+								| Assimp.aiProcess_Triangulate | Assimp.aiProcess_FlipUVs
+								| Assimp.aiProcess_SplitLargeMeshes | Assimp.aiProcess_OptimizeMeshes
+								| Assimp.aiProcess_JoinIdenticalVertices | Assimp.aiProcess_GenSmoothNormals
+								| Assimp.aiProcess_CalcTangentSpace | Assimp.aiProcess_ImproveCacheLocality,
+						null, Resources.propertyStore);
 				if ( scene == null || scene.mNumMeshes() <= 0 )
 					return null;
 				
