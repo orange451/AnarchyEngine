@@ -285,7 +285,7 @@ public final class BinaryOutputStream {
 	 * @param x the {@code float} to write
 	 */
 	public void write(float x) {
-		write(Float.floatToRawIntBits(x));
+		write(Float.floatToIntBits(x));
 	}
 	
 	/**

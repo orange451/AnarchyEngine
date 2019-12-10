@@ -160,11 +160,11 @@ public class Enums extends TwoArgFunction {
 
 	/**
 	 * Matches an enum. Returns nil if enum is not found.
-	 * @param enumType
+	 * @param cRayignoretype
 	 * @param enumName
 	 * @return
 	 */
-	public static LuaValue matchEnum(LuaString enumType, LuaValue enumName) {
+	public static LuaValue matchEnum(LuaValue enumType, LuaValue enumName) {
 		LuaValue p = Enums.get().get(enumType);
 		if ( p == null || p.isnil() )
 			return LuaValue.NIL;
