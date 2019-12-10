@@ -50,14 +50,17 @@ public class LuaUtil {
 	@SuppressWarnings("unchecked")
 	public static <T> List<T> tableToList(LuaTable table, Class<?>... filter) {
 		List<LuaValue> array = new ArrayList<>();
-		item: for (int i = 0; i < table.length(); i++) {
+		for (int i = 0; i < table.length(); i++) {
 			LuaValue t = table.get(LuaValue.valueOf(i));
+			boolean contains = filter.length==0?true:false;
 			for (int j = 0; j < filter.length; j++) {
 				Class<?> c = filter[j];
-				if ( !t.getClass().equals(c) && !c.isAssignableFrom(t.getClass()) )
-					continue item;
+				if ( t.getClass().equals(c) || c.isAssignableFrom(t.getClass()) )
+					contains = true;
 			}
-			array.add(t);
+			
+			if ( contains )
+				array.add(t);
 		}
 		
 		return (List<T>) array;
