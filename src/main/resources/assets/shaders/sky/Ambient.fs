@@ -19,6 +19,8 @@
 //
 
 in vec3 pass_position;
+in vec4 clipSpace;
+in vec4 clipSpacePrev;
 
 out vec4[5] out_Color;
 
@@ -27,8 +29,12 @@ uniform vec3 ambient;
 #include variable MASK
 
 void main() {
+
+	vec3 ndcPos = (clipSpace / clipSpace.w).xyz;
+	vec3 ndcPosPrev = (clipSpacePrev / clipSpacePrev.w).xyz;
+
 	out_Color[0] = vec4(ambient, 0.0);
-	out_Color[1] = vec4(0.0);
+	out_Color[1] = vec4((ndcPosPrev - ndcPos).xy, 0.0, 0.0);
 	out_Color[2] = vec4(0.0);
 	out_Color[3] = vec4(0.0);
 	out_Color[4] = vec4(0.0, 0.0, 0.0, PBR_BACKGROUND);

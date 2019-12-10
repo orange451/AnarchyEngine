@@ -47,13 +47,16 @@ public class DynamicSkyShader extends ShaderProgram {
 
 	private UniformDynamicSky dynamicSky = new UniformDynamicSky("dynamicSky");
 
+	private UniformMatrix4 viewMatrixPrev = new UniformMatrix4("viewMatrixPrev");
+	private UniformMatrix4 projectionMatrixPrev = new UniformMatrix4("projectionMatrixPrev");
+
 	private Matrix4f temp = new Matrix4f();
 
 	public DynamicSkyShader() {
 		super("assets/shaders/sky/Dynamic.vs", "assets/shaders/sky/Dynamic.fs", new Attribute(0, "position"),
 				new Attribute(1, "textureCoords"), new Attribute(2, "normal"));
 		super.storeUniforms(projectionMatrix, transformationMatrix, viewMatrix, time, lightPosition, renderSun,
-				cameraPosition, dynamicSky, ambient);
+				cameraPosition, dynamicSky, ambient, viewMatrixPrev, projectionMatrixPrev);
 		super.validate();
 	}
 
@@ -75,6 +78,15 @@ public class DynamicSkyShader extends ShaderProgram {
 		temp._m32(0);
 		viewMatrix.loadMatrix(temp);
 		cameraPosition.loadVec3(camera.getPosition());
+	}
+
+	public void loadCameraPrev(Matrix4f viewMatrixPrev, Matrix4f projectionMatrixPrev) {
+		temp.set(viewMatrixPrev);
+		temp._m30(0);
+		temp._m31(0);
+		temp._m32(0);
+		this.viewMatrixPrev.loadMatrix(temp);
+		this.projectionMatrixPrev.loadMatrix(projectionMatrixPrev);
 	}
 
 	public void loadTransformationMatrix(Matrix4f mat) {

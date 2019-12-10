@@ -37,11 +37,15 @@ public class AmbientSkyShader extends ShaderProgram {
 
 	private UniformVec3 ambient = new UniformVec3("ambient");
 
+	private UniformMatrix4 viewMatrixPrev = new UniformMatrix4("viewMatrixPrev");
+	private UniformMatrix4 projectionMatrixPrev = new UniformMatrix4("projectionMatrixPrev");
+
 	private Matrix4f temp = new Matrix4f();
 
 	public AmbientSkyShader() {
 		super("assets/shaders/sky/Ambient.vs", "assets/shaders/sky/Ambient.fs", new Attribute(0, "position"));
-		super.storeUniforms(projectionMatrix, transformationMatrix, viewMatrix, ambient);
+		super.storeUniforms(projectionMatrix, transformationMatrix, viewMatrix, ambient, viewMatrixPrev,
+				projectionMatrixPrev);
 		super.validate();
 	}
 
@@ -61,6 +65,15 @@ public class AmbientSkyShader extends ShaderProgram {
 		temp._m31(0);
 		temp._m32(0);
 		viewMatrix.loadMatrix(temp);
+	}
+
+	public void loadCameraPrev(Matrix4f viewMatrixPrev, Matrix4f projectionMatrixPrev) {
+		temp.set(viewMatrixPrev);
+		temp._m30(0);
+		temp._m31(0);
+		temp._m32(0);
+		this.viewMatrixPrev.loadMatrix(temp);
+		this.projectionMatrixPrev.loadMatrix(projectionMatrixPrev);
 	}
 
 	public void loadTransformationMatrix(Matrix4f mat) {

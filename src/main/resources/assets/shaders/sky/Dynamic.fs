@@ -23,6 +23,8 @@
 in vec2 pass_textureCoords;
 in vec3 pass_position;
 in vec3 pass_normal;
+in vec4 clipSpace;
+in vec4 clipSpacePrev;
 
 out vec4[5] out_Color;
 
@@ -237,8 +239,11 @@ void main() {
 					clamp(length(r.x), 0.0, 1.0));
 	}
 
+	vec3 ndcPos = (clipSpace / clipSpace.w).xyz;
+    vec3 ndcPosPrev = (clipSpacePrev / clipSpacePrev.w).xyz;
+
 	out_Color[0] = vec4(color * ambient, 0.0);
-	out_Color[1] = vec4(0.0);
+	out_Color[1] = vec4((ndcPosPrev - ndcPos).xy, 0.0, 0.0);
 	out_Color[2] = vec4(0.0);
 	out_Color[3] = vec4(0.0);
 	out_Color[4] = vec4(0.0, 0.0, 0.0, PBR_BACKGROUND_DYNAMIC);

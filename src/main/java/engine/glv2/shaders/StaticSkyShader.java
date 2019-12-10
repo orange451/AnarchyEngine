@@ -45,12 +45,15 @@ public class StaticSkyShader extends ShaderProgram {
 	private UniformFloat power = new UniformFloat("power");
 	private UniformFloat brightness = new UniformFloat("brightness");
 
+	private UniformMatrix4 viewMatrixPrev = new UniformMatrix4("viewMatrixPrev");
+	private UniformMatrix4 projectionMatrixPrev = new UniformMatrix4("projectionMatrixPrev");
+
 	private Matrix4f temp = new Matrix4f();
 
 	public StaticSkyShader() {
 		super("assets/shaders/sky/Static.vs", "assets/shaders/sky/Static.fs", new Attribute(0, "position"));
 		super.storeUniforms(projectionMatrix, transformationMatrix, viewMatrix, environmentMap, power, brightness,
-				ambient);
+				ambient, viewMatrixPrev, projectionMatrixPrev);
 		super.validate();
 		this.loadInitialData();
 	}
@@ -78,6 +81,15 @@ public class StaticSkyShader extends ShaderProgram {
 		temp._m31(0);
 		temp._m32(0);
 		viewMatrix.loadMatrix(temp);
+	}
+
+	public void loadCameraPrev(Matrix4f viewMatrixPrev, Matrix4f projectionMatrixPrev) {
+		temp.set(viewMatrixPrev);
+		temp._m30(0);
+		temp._m31(0);
+		temp._m32(0);
+		this.viewMatrixPrev.loadMatrix(temp);
+		this.projectionMatrixPrev.loadMatrix(projectionMatrixPrev);
 	}
 
 	public void loadSky(Skybox skybox) {

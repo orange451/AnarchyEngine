@@ -113,6 +113,7 @@ public class SkyRenderer {
 			dynamicSkyShader.loadLightPosition(lightDirection);
 			dynamicSkyShader.renderSun(renderSun);
 			dynamicSkyShader.loadAmbient(AMBIENT);
+			dynamicSkyShader.loadCameraPrev(rnd.previousViewMatrix, rnd.previousProjectionMatrix);
 			if (infScale)
 				dynamicSkyShader.loadTransformationMatrix(infMat);
 			else
@@ -130,6 +131,7 @@ public class SkyRenderer {
 					staticSkyShader.loadCamera(rd.camera, rd.projectionMatrix);
 					staticSkyShader.loadSky(staticSky);
 					staticSkyShader.loadAmbient(AMBIENT);
+					staticSkyShader.loadCameraPrev(rnd.previousViewMatrix, rnd.previousProjectionMatrix);
 					if (infScale)
 						staticSkyShader.loadTransformationMatrix(infMat);
 					else
@@ -146,6 +148,7 @@ public class SkyRenderer {
 			ambientSkyShader.start();
 			ambientSkyShader.loadCamera(rd.camera, rd.projectionMatrix);
 			ambientSkyShader.loadAmbient(rnd.ambient);
+			ambientSkyShader.loadCameraPrev(rnd.previousViewMatrix, rnd.previousProjectionMatrix);
 			if (infScale)
 				ambientSkyShader.loadTransformationMatrix(infMat);
 			else
