@@ -9,6 +9,7 @@ import engine.InternalRenderThread;
 import engine.gl.IPipeline;
 import engine.gl.LegacyPipeline;
 import engine.gl.light.Light;
+import engine.lua.lib.EnumType;
 import engine.lua.type.NumberClamp;
 import engine.lua.type.NumberClampPreferred;
 import engine.lua.type.data.Color3;
@@ -29,6 +30,7 @@ public class SpotLight extends LightBase implements TreeViewable {
 	private static final LuaValue C_OUTERFOV = LuaValue.valueOf("OuterFOV");
 	private static final LuaValue C_RADIUS = LuaValue.valueOf("Radius");
 	private static final LuaValue C_DIRECTION = LuaValue.valueOf("Direction");
+	private static final LuaValue C_SHADOWMAPSIZE = LuaValue.valueOf("ShadowMapSize");
 
 	public SpotLight() {
 		super("SpotLight");
@@ -43,6 +45,9 @@ public class SpotLight extends LightBase implements TreeViewable {
 		
 		this.defineField(C_INNERFOVSCALE.toString(), LuaValue.valueOf(0.1), false);
 		this.getField(C_INNERFOVSCALE).setClamp(new NumberClamp(0, 1));
+
+		this.defineField(C_SHADOWMAPSIZE.toString(), LuaValue.valueOf(1024), false);
+		this.getField(C_SHADOWMAPSIZE).setEnum(new EnumType("TextureSize"));
 
 		this.changedEvent().connect((args)->{
 			LuaValue key = args[0];
@@ -66,27 +71,14 @@ public class SpotLight extends LightBase implements TreeViewable {
 					light.direction = ((Vector3) value).toJoml();
 				} else if (key.eq_b(C_SHADOWS)) {
 					light.shadows = value.toboolean();
+				} else if(key.eq_b(C_SHADOWMAPSIZE)) {
+					light.setSize(value.toint());
 				}
 			}
-			
+
 			if ( key.eq_b(C_PARENT) ) {
 				onParentChange();
 			}
-		});
-
-		InternalGameThread.runLater(() -> {
-
-			Game.lighting().changedEvent().connect((args) -> {
-				if (light == null)
-					return;
-
-				LuaValue key = args[0];
-				LuaValue value = args[1];
-
-				if (key.eq_b(LuaValue.valueOf("ShadowMapSize"))) {
-					light.setSize(value.toint());
-				}
-			});
 		});
 	}
 	
@@ -150,7 +142,7 @@ public class SpotLight extends LightBase implements TreeViewable {
 		InternalRenderThread.runLater(()->{
 			if ( light == null || pipeline == null )
 				return;
-			
+
 			pipeline.getSpotLightHandler().removeLight(light);
 			light = null;
 			pipeline = null;
@@ -164,10 +156,10 @@ public class SpotLight extends LightBase implements TreeViewable {
 		InternalRenderThread.runLater(()->{
 			if ( pipeline == null )
 				return;
-			
+
 			if ( light != null )
 				return;
-			
+
 			// Create light
 			Vector3f pos = ((Vector3)this.get("Position")).toJoml();
 			float radius = this.get(C_RADIUS).tofloat();
@@ -176,13 +168,15 @@ public class SpotLight extends LightBase implements TreeViewable {
 			float intensity = this.get(C_INTENSITY).tofloat();
 			Vector3f direction = ((Vector3) this.get(C_DIRECTION)).toJoml();
 			light = new engine.gl.light.SpotLightInternal(direction, pos, outerFOV, innerFOV, radius, intensity);
-			
+
 			// Color it
 			Color color = ((Color3)this.get("Color")).toColor();
 			light.color = new Vector3f( Math.max( color.getRed(),1 )/255f, Math.max( color.getGreen(),1 )/255f, Math.max( color.getBlue(),1 )/255f );
-			
+
 			light.visible = this.get(C_VISIBLE).toboolean();
-			
+
+			light.shadowResolution = this.get(C_SHADOWMAPSIZE).toint();
+
 			pipeline.getSpotLightHandler().addLight(light);
 		});
 	}

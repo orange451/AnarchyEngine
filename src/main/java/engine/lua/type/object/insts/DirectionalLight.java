@@ -3,13 +3,12 @@ package engine.lua.type.object.insts;
 import org.joml.Vector3f;
 import org.luaj.vm2.LuaValue;
 
-import engine.Game;
-import engine.InternalGameThread;
 import engine.InternalRenderThread;
 import engine.gl.IPipeline;
 import engine.gl.LegacyPipeline;
 import engine.gl.light.DirectionalLightInternal;
 import engine.gl.light.Light;
+import engine.lua.lib.EnumType;
 import engine.lua.type.data.Color3;
 import engine.lua.type.data.Vector3;
 import engine.lua.type.object.Instance;
@@ -26,6 +25,7 @@ public class DirectionalLight extends LightBase implements TreeViewable {
 
 	private static final LuaValue C_SHADOWDISTANCE = LuaValue.valueOf("ShadowDistance");
 	private static final LuaValue C_DIRECTION = LuaValue.valueOf("Direction");
+	private static final LuaValue C_SHADOWMAPSIZE = LuaValue.valueOf("ShadowMapSize");
 
 	public DirectionalLight() {
 		super("DirectionalLight");
@@ -38,6 +38,9 @@ public class DirectionalLight extends LightBase implements TreeViewable {
 
 		// Shadow distance
 		this.defineField(C_SHADOWDISTANCE.toString(), LuaValue.valueOf(50), false);
+
+		this.defineField(C_SHADOWMAPSIZE.toString(), LuaValue.valueOf(1024), false);
+		this.getField(C_SHADOWMAPSIZE).setEnum(new EnumType("TextureSize"));
 
 		this.changedEvent().connect((args) -> {
 			LuaValue key = args[0];
@@ -56,27 +59,14 @@ public class DirectionalLight extends LightBase implements TreeViewable {
 					light.direction = ((Vector3) value).toJoml();
 				} else if (key.eq_b(C_SHADOWS)) {
 					light.shadows = value.toboolean();
+				} else if(key.eq_b(C_SHADOWMAPSIZE)) {
+					light.setSize(value.toint());
 				}
 			}
 
 			if (key.eq_b(C_PARENT)) {
 				onParentChange();
 			}
-		});
-
-		InternalGameThread.runLater(() -> {
-
-			Game.lighting().changedEvent().connect((args) -> {
-				if (light == null)
-					return;
-
-				LuaValue key = args[0];
-				LuaValue value = args[1];
-
-				if (key.eq_b(LuaValue.valueOf("ShadowMapSize"))) {
-					light.setSize(value.toint());
-				}
-			});
 		});
 	}
 
@@ -163,6 +153,8 @@ public class DirectionalLight extends LightBase implements TreeViewable {
 					Math.max(color.getBlue(), 1) / 255f);
 			
 			light.visible = this.get(C_VISIBLE).toboolean();
+
+			light.shadowResolution = this.get(C_SHADOWMAPSIZE).toint();
 
 			pipeline.getDirectionalLightHandler().addLight(light);
 		});

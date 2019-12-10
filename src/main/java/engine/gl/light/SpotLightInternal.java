@@ -2,16 +2,14 @@ package engine.gl.light;
 
 import org.joml.Vector3f;
 
-import engine.Game;
-import engine.InternalGameThread;
 import engine.InternalRenderThread;
 import engine.glv2.v2.lights.SpotLightCamera;
 import engine.glv2.v2.lights.SpotLightShadowMap;
 
 public class SpotLightInternal extends Light {
-	public float outerFOV = 90;
-	public float innerFOV = 70;
-	public float radius = 10;
+	public float outerFOV = 80;
+	public float innerFOV = 0.1f;
+	public float radius = 8;
 	public Vector3f direction = new Vector3f(1, 1, -1);
 	public int shadowResolution = 1024;
 	public boolean shadows = true;;
@@ -26,10 +24,6 @@ public class SpotLightInternal extends Light {
 		this.innerFOV = innerFOV;
 		this.radius = radius;
 		this.intensity = intensity;
-
-		InternalGameThread.runLater(() -> {
-			this.shadowResolution = Game.core().getRenderSettings().getShadowMapSize();
-		});
 	}
 
 	public void init() {
