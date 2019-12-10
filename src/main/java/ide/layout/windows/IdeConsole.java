@@ -112,6 +112,9 @@ public class IdeConsole extends IdePane {
 		this.setOnKeyPressed(event -> {
 			if (event.getKey() == GLFW.GLFW_KEY_UP) {
 				if (cached_context.getSelected().isDescendentOf(luaInput)) {
+					if ( history.size() == 0 )
+						return;
+					
 					int index = history_index++;
 					if (index > history.size() - 1) {
 						index = 0;
@@ -129,13 +132,16 @@ public class IdeConsole extends IdePane {
 
 			if (event.getKey() == GLFW.GLFW_KEY_DOWN) {
 				if (cached_context.getSelected().isDescendentOf(luaInput)) {
+					if ( history.size() == 0 )
+						return;
+					
 					int index = history_index--;
 					if (index < 0) {
 						index = history.size() - 1;
 						history_index = history.size() > 1 ? history.size() - 2 : index;
 					}
 
-					String lua = history.get(Math.min(Math.max((history.size() - 1) - index, 0), history.size()-1));
+					String lua = history.get(Math.max((history.size() - 1) - index, 0));
 					luaInput.setText(lua);
 					
 					luaInput.setCaretPosition(lua.length());
