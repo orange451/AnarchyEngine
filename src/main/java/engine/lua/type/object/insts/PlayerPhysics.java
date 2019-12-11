@@ -107,7 +107,7 @@ public class PlayerPhysics extends PhysicsBase implements TreeViewable {
 		if ( !this.isOnGround() )
 			stepHeight /= 4f;
 		
-		if ( this.getVelocity().getZ() > 0.3 && this.getVelocity().getZ() <= 0 )
+		if ( this.getVelocity().getZ() > -0.3 && this.getVelocity().getZ() <= 0 )
 			extraStepHeight = stepHeight;
 		
 		PhysicsWorld physics = Game.workspace().getPhysicsWorld();
