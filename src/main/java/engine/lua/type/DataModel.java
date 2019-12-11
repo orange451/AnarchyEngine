@@ -173,14 +173,6 @@ public abstract class DataModel extends LuaDatatype {
 
 		// Call change event only if value changes
 		if ( changed ) {
-			//if ( key.toString().equals("Height") ) {
-				/*System.out.println();
-				System.out.println("KEY CHANGE SETTING: " + key.toString() + " from [" + oldValue.toString() + "] to [" + value.toString() + "]");
-				System.out.println(oldValue.getClass() + " / " + value.getClass());
-				System.out.println(oldValue.equals(value) + " / " + oldValue.eq(value) + " / " + oldValue.eq_b(value));
-				System.out.println();*/
-			//}
-			
 			if ( key.eq_b(C_NAME)) {
 				this.internalName = value.toString();
 			}
@@ -210,6 +202,9 @@ public abstract class DataModel extends LuaDatatype {
 		checkSetName(key, oldValue, value); // value may have changed
 		
 		if ( changed ) {
+			if ( key.eq_b(C_NAME)) {
+				this.internalName = value.toString();
+			}
 			onKeyChange( key, value, oldValue );
 		}
 	}

@@ -160,7 +160,7 @@ public class Enums extends TwoArgFunction {
 
 	/**
 	 * Matches an enum. Returns nil if enum is not found.
-	 * @param cRayignoretype
+	 * @param enumType
 	 * @param enumName
 	 * @return
 	 */

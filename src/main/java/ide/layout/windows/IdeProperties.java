@@ -227,7 +227,7 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 		Game.historyService().pushChange(instance, LuaValue.valueOf(field), oldValue, newValue);
 	}
 	
-	static class PropertyModifier extends StackPane {
+	static abstract class PropertyModifier extends StackPane {
 		protected Instance instance;
 		protected String field;
 		protected LuaValue initialValue;
@@ -246,6 +246,8 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 			this.setAlignment(Pos.CENTER_LEFT);
 			this.setFillToParentWidth(true);
 		}
+		
+		public abstract void update(LuaValue value);
 	}
 	
 	static class PropertyModifierTemp extends PropertyModifier {
@@ -262,6 +264,11 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 			
 			if ( !editable )
 				label.setTextFill(Color.GRAY);
+		}
+
+		@Override
+		public void update(LuaValue value) {
+			label.setText(value.toString());
 		}
 	}
 	
@@ -281,10 +288,15 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 			if ( editable ) {
 				this.check.setOnAction(event -> {
 					setWithHistory(this.instance, field, LuaValue.valueOf(this.check.isChecked()));
-					this.check.setChecked(this.instance.get(field).toboolean());
-					this.check.setText(""+this.check.isChecked());
+					update(this.instance.get(field));
 				});
 			}
+		}
+
+		@Override
+		public void update(LuaValue value) {
+			check.setChecked(value.toboolean());
+			this.check.setText(""+this.check.isChecked());
 		}
 	}
 	
@@ -339,6 +351,11 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 				});
 			}
 		}
+		
+		public void update(LuaValue value) {
+			slider.setValue(value.todouble());
+			this.direct.label.setText(""+slider.getValue());
+		}
 	}
 	
 	static class ColorPropertyModifier extends PropertyModifier {
@@ -362,6 +379,11 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 					setWithHistory(this.instance, field, Color3.newInstance(this.picker.getColor()));
 				});
 			}
+		}
+		
+		@Override
+		public void update(LuaValue value) {
+			this.picker.setColor(((Color3)value).toColor());
 		}
 	}
 	
@@ -404,6 +426,11 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 		}
 
 		private ComboBox<String> dropdown;
+
+		@Override
+		public void update(LuaValue value) {
+			this.dropdown.setValue(value.toString());
+		}
 	}
 	
 	static abstract class PropertyModifierInput extends PropertyModifierTemp {
@@ -725,6 +752,10 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 			this.setMaxWidth(scroller.getViewportWidth());
 			internal.forceWidth(this.getPrefWidth());
 			super.resize();
+			
+			if ( this.inst.isDestroyed() ) {
+				this.clear();
+			}
 		}
 		
 		private void fill() {
@@ -799,14 +830,7 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 				return;
 			}
 			
-			PropertyModifierTemp p2 = null;
-			if ( p instanceof PropertyModifierTemp )
-				p2 = (PropertyModifierTemp)p;
-			
-			if ( p2 == null )
-				return;
-			
-			p2.label.setText(value.toString());
+			p.update(value);
 		}
 
 		public void clear() {

@@ -9,6 +9,7 @@ import com.badlogic.gdx.physics.bullet.dynamics.btRigidBody;
 
 import engine.Game;
 import engine.InternalGameThread;
+import engine.lua.lib.Enums;
 import engine.lua.type.NumberClamp;
 import engine.lua.type.object.PhysicsBase;
 import engine.lua.type.object.TreeViewable;
@@ -46,7 +47,7 @@ public class PlayerPhysics extends PhysicsBase implements TreeViewable {
 		this.rawset(C_BOUNCINESS, LuaValue.valueOf(0));
 		
 		// Force to capsule
-		this.set(C_SHAPE.toString(), "Capsule");
+		this.set(C_SHAPE.toString(), Enums.matchEnum(C_SHAPE, LuaValue.valueOf("Capsule")));
 		this.getField(C_SHAPE).setLocked(true);
 		
 		// Use shape
