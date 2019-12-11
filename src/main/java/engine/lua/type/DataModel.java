@@ -504,7 +504,8 @@ public abstract class DataModel extends LuaDatatype {
 	}
 
 	/**
-	 * Returns the parent of the DataModel. Normally this returns an Instance, but nil works too.
+	 * Returns the parent of the DataModel. Normally this returns an Instance, but nil works too.<br>
+	 * WILL NEVER BE NULL
 	 * @return
 	 */
 	public LuaValue getParent() {

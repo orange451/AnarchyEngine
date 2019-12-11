@@ -24,6 +24,10 @@ public class HistoryChange {
 		this.instanceChanged.update();
 	}
 	
+	public HistoryChange(HistoryStack stack, Instance instance, LuaValue fieldChanged, LuaValue changedFrom, LuaValue changedTo) {
+		this(stack.getObjectReference(instance), fieldChanged, changedFrom, changedTo);
+	}
+	
 	public HistoryObjectReference getHistoryInstance() {
 		return this.instanceChanged;
 	}

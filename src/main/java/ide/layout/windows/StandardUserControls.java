@@ -2,11 +2,15 @@ package ide.layout.windows;
 
 import java.util.List;
 
+import org.luaj.vm2.LuaValue;
 import org.lwjgl.glfw.GLFW;
 
 import engine.Game;
 import engine.io.Save;
+import engine.lua.history.HistoryChange;
+import engine.lua.history.HistorySnapshot;
 import engine.lua.type.object.Instance;
+import engine.lua.type.object.insts.Folder;
 import lwjgui.LWJGUI;
 import lwjgui.scene.Node;
 
@@ -21,6 +25,41 @@ public class StandardUserControls {
 			// Delete Selection
 			if ( event.getKey() == GLFW.GLFW_KEY_DELETE ) {
 				Game.deleteSelection();
+			}
+			
+			// Group objects
+			if ( event.isCtrlDown && event.getKey() == GLFW.GLFW_KEY_G ) {
+				List<Instance> selected = Game.selected();
+				List<Instance> root = Game.getRootInstances(selected);
+				if ( root.size() == 0 )
+					return;
+				
+				Instance group = new Folder();
+				group.setParent(root.get(0).getParent());
+				
+				if ( group.getParent().isnil() ) {
+					group.destroy();
+					return;
+				}
+				
+				HistorySnapshot snapshot = new HistorySnapshot();
+				{
+					HistoryChange groupCreation = new HistoryChange(Game.historyService().getHistoryStack(), group, LuaValue.valueOf("Parent"), LuaValue.NIL, group.getParent());
+					snapshot.addChange(groupCreation);
+					
+					for (int i = 0; i < root.size(); i++) {
+						Instance obj = root.get(i);
+						LuaValue oldParent = obj.getParent();
+						obj.setParent(group);
+						
+						// If we reparented it successfully, add to history
+						if ( obj.getParent().eq_b(group) ) {
+							HistoryChange c = new HistoryChange(Game.historyService().getHistoryStack(), obj, LuaValue.valueOf("Parent"), oldParent, group );
+							snapshot.addChange(c);
+						}
+					}
+				}
+				Game.historyService().pushChange(snapshot);
 			}
 			
 			// Duplicate object
