@@ -11,8 +11,6 @@ import org.luaj.vm2.LuaValue;
 
 import engine.Game;
 import engine.InternalGameThread;
-import engine.lua.history.HistoryChange;
-import engine.lua.history.HistorySnapshot;
 import engine.lua.type.LuaConnection;
 import engine.lua.type.object.Instance;
 import engine.lua.type.object.PhysicsBase;

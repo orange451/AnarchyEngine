@@ -2,6 +2,7 @@ package engine.lua.type.object;
 
 import org.luaj.vm2.LuaValue;
 
+import engine.Game;
 import engine.lua.LuaEngine;
 
 public abstract class Asset extends Instance {
@@ -18,8 +19,9 @@ public abstract class Asset extends Instance {
 		if ( key.eq_b(C_PARENT) && preferred != null ) {
 			if ( !value.isnil() ) {
 				Instance newParent = (Instance)value;
-				if ( !newParent.getName().equals(preferred.toString())) {
-					LuaEngine.error("Asset type: " + this.typename() + " must exist within: " + preferred.toString());
+				Instance preferredParent = Game.assets().findFirstChild(getPreferredParent());
+				if ( preferredParent != null && !newParent.equals(preferredParent) && !newParent.isDescendantOf(preferredParent) ) {
+					LuaEngine.error("Asset type: " + this.typename() + " must exist within: " + preferredParent.getFullName());
 					return;
 				}
 			}

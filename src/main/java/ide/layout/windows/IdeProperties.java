@@ -224,7 +224,13 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 	public static void setWithHistory(Instance instance, String field, LuaValue newValue) {
 		LuaValue oldValue = instance.get(field);
 		instance.set(field, newValue);
-		Game.historyService().pushChange(instance, LuaValue.valueOf(field), oldValue, newValue);
+		LuaValue newNewValue = instance.get(field);
+		
+		// Value must have actually changed in order to write to history
+		if ( newNewValue.equals(oldValue) )
+			return;
+		
+		Game.historyService().pushChange(instance, LuaValue.valueOf(field), oldValue, newNewValue);
 	}
 	
 	static abstract class PropertyModifier extends StackPane {
