@@ -753,7 +753,7 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 			internal.forceWidth(this.getPrefWidth());
 			super.resize();
 			
-			if ( this.inst.isDestroyed() ) {
+			if ( this.inst != null && this.inst.isDestroyed() ) {
 				this.clear();
 			}
 		}
