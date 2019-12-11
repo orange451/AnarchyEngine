@@ -93,18 +93,23 @@ public class PlayerPhysics extends PhysicsBase implements TreeViewable {
 			ret.dispose();*/
 			doFloorCollisionNew();
 			
-			/*if ( this.isOnGround() ) {
+			if ( this.isOnGround() ) {
 				float scale = (float)Math.pow(1f - this.getFriction(), InternalGameThread.delta);
 				Vector3f newVel = this.physics.getVelocity().mul(scale, scale, 1);
 				this.setVelocity(newVel);
-			}*/
+			}
 		}
 	}
 	
 	private void doFloorCollisionNew() {
+		float extraStepHeight = 0;
 		float stepHeight = this.getStepHeight();
 		if ( !this.isOnGround() )
 			stepHeight /= 4f;
+		
+		if ( this.getVelocity().getZ() > 0.3 && this.getVelocity().getZ() <= 0 )
+			extraStepHeight = stepHeight;
+		
 		PhysicsWorld physics = Game.workspace().getPhysicsWorld();
 	
 		// 64 rays cast
@@ -124,7 +129,7 @@ public class PlayerPhysics extends PhysicsBase implements TreeViewable {
 	
 		// Cast all rays
 		ClosestRayResultCallback[] callbacks = new ClosestRayResultCallback[steps * rings +1];
-		callbacks[callbacks.length - 1] = physics.rayTestClosest( new Vector3f( x, y, z ), new Vector3f( 0, 0, -stepHeight ));
+		callbacks[callbacks.length - 1] = physics.rayTestClosest( new Vector3f( x, y, z ), new Vector3f( 0, 0, -(stepHeight+extraStepHeight) ));
 		for (int ii = 0; ii < rings; ii++) {
 			for (int i = 0; i < steps; i++) {
 				float frac = (float) ((i/(float)steps) * Math.PI * 2);
@@ -132,15 +137,17 @@ public class PlayerPhysics extends PhysicsBase implements TreeViewable {
 				float xx = (float) (x + (Math.cos(frac + ii) * size));
 				float yy = (float) (y + (Math.sin(frac + ii) * size));
 	
-				callbacks[(ii * steps) + i] = physics.rayTestClosest( new Vector3f( xx, yy, z ), new Vector3f( 0, 0, -stepHeight ));
+				callbacks[(ii * steps) + i] = physics.rayTestClosest( new Vector3f( xx, yy, z ), new Vector3f( 0, 0, -(stepHeight+extraStepHeight) ));
 			}
 		}
 		
 		// Loop through all rays and find one closest to the ground
-		float dist = stepHeight;
-		ClosestRayResultCallback lowest = null;
+		float dist = stepHeight+extraStepHeight;
+		ClosestRayResultCallback closest = null;
 		for (int i = 0; i < callbacks.length; i++) {
 			ClosestRayResultCallback callback = callbacks[i];
+			if ( callback.getCollisionObject() == null )
+				continue;
 			
 			Vector3 hitPoint = new Vector3();
 			callback.getHitPointWorld(hitPoint);
@@ -155,20 +162,20 @@ public class PlayerPhysics extends PhysicsBase implements TreeViewable {
 				float dz = tempHitPoint.z - hitPoint.z;
 	
 				// If there is nothing blocking the ray, then it is a potential position we can move into!
-				if ( temp.getCollisionObject() == null || dz >= getHeight()-radius ) {
-					lowest = callback;
+				//if ( temp.getCollisionObject() == null || dz >= getHeight()-radius ) {
+					closest = callback;
 					dist = d;
-				}
+				//}
 			}
 		}
 		
 		boolean onGround = false;
 		
 		// We have a new floor!
-		if ( lowest != null ) {
+		if ( closest != null && closest.getCollisionObject() != null ) {
 			// Get z position of floor
 			Vector3 hitLowest = new Vector3();
-			lowest.getHitPointWorld(hitLowest);
+			closest.getHitPointWorld(hitLowest);
 			float toz = hitLowest.z;
 			
 			// Teleport z to floor
