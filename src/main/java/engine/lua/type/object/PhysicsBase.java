@@ -110,7 +110,7 @@ public abstract class PhysicsBase extends Instance implements GameSubscriber {
 				GameObject tempLink = this.linked;
 				
 				if ( tempPhys != null ) {
-					Matrix4f worldMat = lastWorldMatrix;//tempPhys.getWorldMatrix();
+					Matrix4f worldMat = tempPhys.getWorldMatrix();
 					
 					if ( tempLink != null ) {
 						((Matrix4)linked.rawget(C_WORLDMATRIX)).setInternal(worldMat);
