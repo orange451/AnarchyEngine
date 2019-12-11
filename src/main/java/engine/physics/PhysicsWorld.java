@@ -16,6 +16,7 @@ import com.badlogic.gdx.physics.bullet.collision.RayResultCallback;
 import com.badlogic.gdx.physics.bullet.collision.btAxisSweep3;
 import com.badlogic.gdx.physics.bullet.collision.btCollisionConfiguration;
 import com.badlogic.gdx.physics.bullet.collision.btCollisionDispatcher;
+import com.badlogic.gdx.physics.bullet.collision.btCollisionObject;
 import com.badlogic.gdx.physics.bullet.collision.btCollisionWorld;
 import com.badlogic.gdx.physics.bullet.collision.btDefaultCollisionConfiguration;
 import com.badlogic.gdx.physics.bullet.collision.btGhostPairCallback;
@@ -27,6 +28,7 @@ import com.badlogic.gdx.physics.bullet.dynamics.btSequentialImpulseConstraintSol
 
 import engine.Game;
 import engine.InternalGameThread;
+import engine.lua.type.object.insts.PhysicsObject;
 
 public class PhysicsWorld {
 	public btDynamicsWorld dynamicsWorld;

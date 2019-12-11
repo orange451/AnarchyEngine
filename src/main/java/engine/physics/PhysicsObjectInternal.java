@@ -163,9 +163,13 @@ public class PhysicsObjectInternal {
 		if (this.destroyed)
 			return;
 
-		Matrix4 transform = body.getWorldTransform();
+		btRigidBody b = this.body;
+		if ( b == null )
+			return;
+
+		Matrix4 transform = b.getWorldTransform();
 		transform.setTranslation(pos.x, pos.y, pos.z);
-		body.setWorldTransform(transform);
+		b.setWorldTransform(transform);
 	}
 
 	private static final LuaValue C_LINKED = LuaValue.valueOf("Linked");
