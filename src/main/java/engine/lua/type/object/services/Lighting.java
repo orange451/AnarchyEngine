@@ -6,7 +6,6 @@ import engine.InternalGameThread;
 import engine.application.RenderableApplication;
 import engine.gl.IPipeline;
 import engine.gl.LegacyPipeline;
-import engine.lua.lib.EnumType;
 import engine.lua.type.LuaConnection;
 import engine.lua.type.NumberClampPreferred;
 import engine.lua.type.data.Color3;

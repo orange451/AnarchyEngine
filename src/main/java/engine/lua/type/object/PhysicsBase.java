@@ -22,6 +22,7 @@ import engine.lua.type.object.insts.GameObject;
 import engine.lua.type.object.insts.Mesh;
 import engine.lua.type.object.insts.Player;
 import engine.lua.type.object.insts.Prefab;
+import engine.lua.type.object.services.Players;
 import engine.physics.PhysicsObjectInternal;
 import engine.util.Pair;
 
@@ -510,9 +511,14 @@ public abstract class PhysicsBase extends Instance implements GameSubscriber {
 	
 	private void checkNetworkOwnership() {
 		if ( playerOwns == null ) {
+			Players playerService = Game.players();
+			if ( playerService == null )
+				return;
+			
 			if ( Game.isServer() ) {
+				
 				// This needs to be optimized some way... It's called every step BIG NO NO.
-				List<Player> players = Game.players().getPlayers();
+				List<Player> players = playerService.getPlayers();
 				for (int i = 0; i < players.size(); i++) {
 					Player player = players.get(i);
 					Instance character = player.getCharacter();
@@ -524,7 +530,7 @@ public abstract class PhysicsBase extends Instance implements GameSubscriber {
 					}
 				}
 			} else {
-				LuaValue localPlayer = Game.players().getLocalPlayer();
+				LuaValue localPlayer = playerService.getLocalPlayer();
 				if ( localPlayer != null && localPlayer instanceof Player ) {
 					Player player = (Player) localPlayer;
 					Instance character = player.getCharacter();
