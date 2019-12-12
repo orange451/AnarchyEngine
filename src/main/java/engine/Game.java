@@ -16,6 +16,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.luaj.vm2.LuaValue;
+import org.lwjgl.glfw.GLFW;
 
 import engine.io.AsynchronousResourceLoader;
 import engine.io.Load;
@@ -49,6 +50,8 @@ import engine.lua.type.object.services.Storage;
 import engine.lua.type.object.services.UserInputService;
 import engine.lua.type.object.services.Workspace;
 import engine.observer.Tickable;
+import engine.util.FileUtils;
+import ide.IDE;
 
 public class Game implements Tickable {
 	private static Game game;
@@ -326,6 +329,10 @@ public class Game implements Tickable {
 	public static void newProject() {
 		Runnable r = new Runnable() {
 			public void run() {
+				saveDirectory = "";
+				saveFile = "";
+				GLFW.glfwSetWindowTitle(IDE.window, IDE.TITLE);
+				
 				// Delete anything old
 				unload();
 				load();
