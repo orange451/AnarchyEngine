@@ -266,7 +266,7 @@ public class Assets extends Service implements TreeViewable {
 			if ( extraFlags > 0 )
 				flags = flags | extraFlags;
 			AIScene scene = Assimp.aiImportFile(file.getAbsolutePath(), flags);
-			if ( scene == null || scene.mNumMeshes() <= 0 )
+			if ( scene == null )
 				return null;
 			
 			// Get data
@@ -529,10 +529,10 @@ public class Assets extends Service implements TreeViewable {
 		return array;
 	}
 
-	private static ArrayList<AIMaterial> assimpGetMaterials(PointerBuffer mMeshes) {
+	private static ArrayList<AIMaterial> assimpGetMaterials(PointerBuffer mMaterials) {
 		ArrayList<AIMaterial> meshes = new ArrayList<AIMaterial>();
-		for ( int i = 0; i < mMeshes.remaining(); i++ ) {
-			meshes.add( AIMaterial.create(mMeshes.get(i)) );
+		for ( int i = 0; i < mMaterials.remaining(); i++ ) {
+			meshes.add( AIMaterial.create(mMaterials.get(i)) );
 		}
 		return meshes;
 	}

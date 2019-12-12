@@ -122,7 +122,7 @@ public abstract class ContextMenuType {
 		public void onClick(Instance instance) {
 			String path = "";
 			PointerBuffer outPath = MemoryUtil.memAllocPointer(1);
-			int result = NativeFileDialog.NFD_OpenDialog(Mesh.getFileTypes(), new File("").getAbsolutePath(), outPath);
+			int result = NativeFileDialog.NFD_OpenDialog(Mesh.getFileTypes() + ",md5anim", new File("").getAbsolutePath(), outPath);
 			if ( result == NativeFileDialog.NFD_OKAY ) {
 				path = outPath.getStringUTF8(0);
 				Prefab prefab = Game.assets().importPrefab(path, instance);
