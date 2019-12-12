@@ -50,7 +50,7 @@ import engine.tasks.TaskManager;
 import ide.layout.windows.ErrorWindow;
 
 public abstract class RenderableApplication extends Application implements Renderable,InternalRenderable {
-	public static long window;
+	public static long window = -1;
 	private boolean initialized;
 
 	public static int windowWidth = 0;
