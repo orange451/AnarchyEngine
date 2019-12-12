@@ -751,7 +751,11 @@ public class Game implements Tickable {
 				Instance t = root.clone();
 				if ( t == null || t.isnil() )
 					continue;
-				t.forceSetParent(root.getParent());
+				
+				// Try to put it in the same parent
+				t.setParent(root.getParent());
+				if ( !t.getParent().eq_b(root.getParent()) )
+					continue;
 				
 				// Add snapshot change for root clone & all descendents
 				List<Instance> desc = t.getDescendants();

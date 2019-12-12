@@ -307,7 +307,8 @@ public abstract class Instance extends DataModel {
 	}
 	
 	/**
-	 * Clones the instance. A cloned instance will be it's own unique Instance, but all its fields will be a copy of the source Instance.
+	 * Clones the instance. A cloned instance will be it's own unique Instance, but all its fields will be a copy of the source Instance.<br>
+	 * It will also clone all descendants of the instance.
 	 */
 	@Override
 	public Instance clone() {
@@ -348,7 +349,13 @@ public abstract class Instance extends DataModel {
 			// Clone all children
 			//synchronized(children) {
 				for (int i = 0; i < this.children.size(); i++) {
+					if ( i >= this.children.size() )
+						continue;
+					
 					Instance child = children.get(i);
+					if ( child == null )
+						continue;
+					
 					Instance t = child.clone();
 					if ( t != null ) {
 						t.forceSetParent(inst);

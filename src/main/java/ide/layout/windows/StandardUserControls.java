@@ -78,13 +78,17 @@ public class StandardUserControls {
 			}
 			
 			// Paste object
-			if ( event.isCtrlDown && event.getKey() == GLFW.GLFW_KEY_C ) {
-				Instance sel = Game.workspace();
+			if ( event.isCtrlDown && event.getKey() == GLFW.GLFW_KEY_V ) {
+				Instance pasteInto = Game.workspace();
 				List<Instance> t = Game.selected();
-				if ( t.size() == 1 )
-					sel = t.get(0);
+				if ( t.size() == 1 ) {
+					pasteInto = t.get(0);
+					if ( event.isShiftDown && !pasteInto.getParent().isnil() ) {
+						pasteInto = (Instance) pasteInto.getParent();
+					}
+				}
 				
-				Game.paste(sel);
+				Game.paste(pasteInto);
 			}
 			
 			
