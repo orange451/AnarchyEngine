@@ -34,8 +34,6 @@ public class InternalClient extends Client {
 	
 	private static engine.lua.type.object.insts.Connection connectionInstance;
 	
-	
-	
 	public InternalClient( String ip, int port, String username, LuaTable data) {
 		this.start();
 		try {
@@ -84,27 +82,23 @@ public class InternalClient extends Client {
 											if ( Load.parseJSON(true, obj) == null )
 												return;
 											
-											//Game.load();
+											Game.load();
 											Game.setLoaded(true);
+											
+											// Create connection object
+											connectionInstance = new engine.lua.type.object.insts.ServerConnection(connection);
+											connectionInstance.forceSetName("ConnectionServer");
+											connectionInstance.forceSetParent(Game.getService("Connections"));
+											Game.connections().rawset("LocalConnection", connectionInstance);
+											
+											// Tell server we're finished loading
+											connection.sendTCP(new ClientConnectFinishTCP());
+											
+											// Start game
+											Game.setRunning(true);
 										} catch(Exception e) {
 											e.printStackTrace();
 										}
-										
-										// Tell server we're all loaded
-										InternalRenderThread.runLater(()->{
-											InternalGameThread.runLater(()->{
-												
-												// Create connection object
-												connectionInstance = new engine.lua.type.object.insts.ServerConnection(connection);
-												connectionInstance.forceSetName("ConnectionServer");
-												connectionInstance.forceSetParent(Game.getService("Connections"));
-												Game.connections().rawset("LocalConnection", connectionInstance);
-												
-												connection.sendTCP(new ClientConnectFinishTCP());
-												
-												Game.setRunning(true);
-											});
-										});
 									});
 								});
 								

@@ -98,6 +98,10 @@ public class AnimInstanceRenderer implements IObjectRenderer {
 
 	private void processEntity(Instance instance) {
 		AnimationController anim = (AnimationController) instance.findFirstChildOfClass(C_ANIMATIONCONTROLLER);
+		AnimatedModel animatedModel = anim.getAnimatedModel();
+		if ( animatedModel == null )
+			return;
+		
 		anim.getAnimatedModel().renderV2();
 		instances.add(instance);
 	}
