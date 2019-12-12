@@ -38,8 +38,6 @@ public class Connections extends Service implements TreeViewable,GameSubscriber 
 		this.defineField(C_DEFAULTPORT.toString(), LuaValue.valueOf(36545), false);
 		this.defineField(C_LOCALCONNECTION.toString(), LuaValue.NIL, true);
 		
-		this.setArchivable(true);
-		
 		this.rawset(C_ONCONNECT, new LuaEvent());
 		this.rawset(C_ONDISCONNECT, new LuaEvent());
 		
