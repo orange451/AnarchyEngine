@@ -137,66 +137,10 @@ public class Mesh extends AssetLoadable implements TreeViewable {
 		if ( changed && !filePath.isnil() && filePath.toString().length()>3 && !filePath.toString().equals("nil") ) {
 			String path = filePath.toString();
 			String realPath = FilePath.convertToSystem(path);
-			if ( realPath.contains(".mesh") ) {
+			if ( realPath.endsWith(".mesh") ) {
 				mesh = BufferedMesh.Import(realPath);
 			} else {
-				AIScene scene = Assimp.aiImportFileExWithProperties(realPath,
-						Assimp.aiProcess_FindInvalidData | Assimp.aiProcess_ValidateDataStructure
-								| Assimp.aiProcess_Triangulate | Assimp.aiProcess_FlipUVs
-								| Assimp.aiProcess_SplitLargeMeshes | Assimp.aiProcess_OptimizeMeshes
-								| Assimp.aiProcess_JoinIdenticalVertices | Assimp.aiProcess_GenSmoothNormals
-								| Assimp.aiProcess_CalcTangentSpace | Assimp.aiProcess_ImproveCacheLocality,
-						null, Resources.propertyStore);
-				if ( scene == null || scene.mNumMeshes() <= 0 )
-					return null;
-				
-				// Get data
-				ArrayList<AIMesh> meshes = new ArrayList<AIMesh>();
-				int faceCount = 0;
-				for ( int i = 0; i < scene.mMeshes().remaining(); i++ ) {
-					AIMesh mm = AIMesh.create(scene.mMeshes().get(i));
-					meshes.add( mm );
-					faceCount += mm.mNumFaces();
-				}
-
-				BufferedMesh bm = new BufferedMesh( faceCount * 3 );
-				int vertCounter = 0;
-				for ( int i = 0; i < meshes.size(); i++ ) {
-					AIMesh mesh = meshes.get(i);
-					
-					// Get every face in mesh
-					org.lwjgl.assimp.AIVector3D.Buffer vertices = mesh.mVertices();
-					org.lwjgl.assimp.AIVector3D.Buffer normals = mesh.mNormals();
-					org.lwjgl.assimp.AIFace.Buffer faces = mesh.mFaces();
-					for (int j = 0; j < mesh.mNumFaces(); j++) {
-						AIFace face = faces.get(j);
-						IntBuffer indices = face.mIndices();
-		
-						// Loop through each index
-						for (int k = 0; k < indices.capacity(); k++) {
-							int index = indices.get(k);
-							// Vert Data
-							Vector2f textureCoords = new Vector2f();
-							Vector3f normalVector = new Vector3f();
-		
-							// Get the vertex info for this index.
-							AIVector3D vertex = vertices.get(index);
-							if ( normals != null ) {
-								AIVector3D normal = normals.get(index);
-								normalVector.set(normal.x(),normal.y(),normal.z());
-							}
-							if ( mesh.mTextureCoords(0)!=null ) {
-								AIVector3D tex = mesh.mTextureCoords(0).get(index);
-								textureCoords.set(tex.x(), tex.y());
-							}
-		
-							// Send vertex to output mesh
-							Vertex output = new Vertex( vertex.x(), vertex.y(), vertex.z(), normalVector.x, normalVector.y, normalVector.z, textureCoords.x, textureCoords.y, 1, 1, 1, 1 );
-							bm.setVertex(vertCounter++, output);
-						}
-					}
-				}
-				mesh = bm;
+				mesh = MeshUtils.Import(realPath);
 			}
 			changed = false;
 			this.meshLoaded().fire();

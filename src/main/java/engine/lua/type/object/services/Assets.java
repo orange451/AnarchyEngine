@@ -43,6 +43,7 @@ import engine.lua.type.object.insts.AudioSource;
 import engine.lua.type.object.insts.Texture;
 import engine.util.FileUtils;
 import engine.util.IOUtil;
+import engine.util.MeshUtils;
 import ide.layout.windows.icons.Icons;
 
 public class Assets extends Service implements TreeViewable {
@@ -245,8 +246,9 @@ public class Assets extends Service implements TreeViewable {
 		Prefab prefab = (Prefab) Instance.instanceLua(Prefab.class.getSimpleName());
 		
 		try {
-			// Get File
 			System.out.println("Loading assimp mesh: " + filePath);
+			
+			// Get File
 			File file = new File(filePath);
 			String fileDir = file.toURI().toURL().getFile().replace(specificFile, "");
 			if ( !file.exists() ) {
@@ -255,17 +257,11 @@ public class Assets extends Service implements TreeViewable {
 				file = new File( fileDir + specificFile );
 			}
 	
-			String fileWithoutExtension = specificFile;
-			int pos1 = fileWithoutExtension.lastIndexOf(".");
-			if (pos1 != -1) {
-				fileWithoutExtension = fileWithoutExtension.substring(0, pos1);
-			}
+			// Full patch without extension
+			String fileWithoutExtension = FileUtils.getFileNameWithoutExtension(specificFile);
 	
 			// Get scene
-			int flags = Assimp.aiProcess_JoinIdenticalVertices | Assimp.aiProcess_Triangulate;// | Assimp.aiProcess_GenSmoothNormals;
-			if ( extraFlags > 0 )
-				flags = flags | extraFlags;
-			AIScene scene = Assimp.aiImportFile(file.getAbsolutePath(), flags);
+			AIScene scene = MeshUtils.ImportAssimp(file.getAbsolutePath(), extraFlags);
 			System.out.println(scene);
 			if ( scene == null ) {
 				System.out.println(Assimp.aiGetErrorString());
