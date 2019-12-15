@@ -218,7 +218,7 @@ public class GameObject extends Instance implements RenderableInstance,TreeViewa
 	 */
 	public Prefab getPrefab() {
 		LuaValue p = this.get(C_PREFAB);
-		return p.equals(LuaValue.NIL)?null:(Prefab)p;
+		return (p.equals(LuaValue.NIL) || !(p instanceof Prefab))?null:(Prefab)p;
 	}
 
 	/**
