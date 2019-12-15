@@ -9,7 +9,8 @@ import engine.lua.type.object.Instance;
 public class AnimationTrack extends Instance {
 
 	private AnimationController controller;
-
+	private AnimationKeyframeSequence nextFrame;
+	
 	private static LuaValue C_ANIMATION = LuaValue.valueOf("Animation");
 	private static LuaValue C_TIMEPOSITION = LuaValue.valueOf("TimePosition");
 	private static LuaValue C_CURRENTKEYFRAME = LuaValue.valueOf("CurrentKeyframe");
@@ -20,7 +21,7 @@ public class AnimationTrack extends Instance {
 		super("AnimationTrack");
 		
 		double t = 0;
-		AnimationKeyframeSequence current = animation.getNearestSequence(t);
+		AnimationKeyframeSequence current = animation.getNearestSequenceBefore(t);
 		
 		this.defineField(C_ANIMATION.toString(), animation, true);
 		this.defineField(C_SPEED.toString(), LuaValue.valueOf(animation.getSpeed()), false);
@@ -51,12 +52,16 @@ public class AnimationTrack extends Instance {
 		this.forceset(C_TIMEPOSITION, this.rawget(C_TIMEPOSITION).add(delta*this.getSpeed()));
 		
 		// Get the current frame
-		AnimationKeyframeSequence frame = this.getAnimation().getNearestSequence(this.getTimePosition());
-		
+		AnimationKeyframeSequence frame = this.getAnimation().getNearestSequenceBefore(this.getTimePosition());
+		AnimationKeyframeSequence nextFrame = this.getAnimation().getNearestSequenceAfter(this.getTimePosition());
+
 		// Handle updating the current frame
-		if ( frame == null || !frame.equals(this.getCurrentKeyframe()) ) {
+		if ( frame == null || !frame.equals(this.getCurrentKeyframe()) )
 			this.forceset(C_CURRENTKEYFRAME, frame==null?LuaValue.NIL:frame);
-		}
+		
+		// Handle updating the next frame
+		if ( nextFrame == null || !nextFrame.equals(this.getCurrentKeyframe()) )
+			this.nextFrame = nextFrame;
 		
 		// Handle animation looping
 		if ( this.getTimePosition() > this.getLength() ) {
@@ -102,6 +107,21 @@ public class AnimationTrack extends Instance {
 		return ret.equals(LuaValue.NIL)?null:(AnimationKeyframeSequence)ret;
 	}
 
+	/**
+	 * Sets the current keyframe sequence that this animation track will display.
+	 * @param frame
+	 */
+	public void setCurrentKeyframe(AnimationKeyframeSequence frame) {
+		if ( frame == null )
+			this.rawset(C_CURRENTKEYFRAME, LuaValue.NIL);
+		else
+			this.rawset(C_CURRENTKEYFRAME, frame);
+	}
+	
+	public AnimationKeyframeSequence getNextKeyframe() {
+		return this.nextFrame;
+	}
+	
 	@Override
 	public void onDestroy() {
 		//

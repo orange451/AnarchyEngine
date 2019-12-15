@@ -55,6 +55,7 @@ import engine.glv2.renderers.shaders.AnimInstanceFowardShader;
 import engine.glv2.v2.IRenderingData;
 import engine.glv2.v2.RendererData;
 import engine.lua.type.object.Instance;
+import engine.lua.type.object.PrefabRenderer;
 import engine.lua.type.object.insts.AnimationController;
 import engine.lua.type.object.insts.GameObject;
 import engine.lua.type.object.insts.Material;
@@ -112,8 +113,10 @@ public class AnimInstanceForwardRenderer {
 		if (go.getPrefab() == null)
 			return;
 		AnimatedModel model = anim.getAnimatedModel();
+		PrefabRenderer pfr = go.getPrefab().getPrefab();
 
 		Matrix4f mat = go.getWorldMatrix().toJoml();
+		mat.translate(pfr.getAABBOffset());
 		mat.scale(go.getPrefab().getScale());
 		shader.loadTransformationMatrix(mat);
 		shader.loadBoneMat(model.getBoneBuffer());

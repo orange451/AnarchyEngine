@@ -70,7 +70,7 @@ public class Animation extends Instance implements TreeViewable {
 	 * @param time
 	 * @return
 	 */
-	public AnimationKeyframeSequence getNearestSequence(double time) {
+	public AnimationKeyframeSequence getNearestSequenceBefore(double time) {
 		double minTime = 0;
 		AnimationKeyframeSequence ret = null;
 		
@@ -82,15 +82,44 @@ public class Animation extends Instance implements TreeViewable {
 			if ( child instanceof AnimationKeyframeSequence ) {
 				AnimationKeyframeSequence seq = (AnimationKeyframeSequence)child;
 				double seqTime = seq.getTime();
-				if ( seqTime < time ) {
-					if ( seqTime > minTime ) {
+				if ( seqTime <= time ) {
+					if ( seqTime >= minTime ) {
 						minTime = seqTime;
 						ret = seq;
 					}
 				}
 			}
 		}
+	
+		return ret;
+	}
 		
+	/**
+	 * Returns the AnimationKeyframeSequence with the time closest to the specified time, but not less than the specified time.
+	 * @param time
+	 * @return
+	 */
+	public AnimationKeyframeSequence getNearestSequenceAfter(double time) {
+		double maxTime = Double.MAX_VALUE;
+		AnimationKeyframeSequence ret = null;
+		
+		if ( children == null || children.size() == 0 )
+			return null;
+		
+		for (int i = 0; i < children.size(); i++) {
+			Instance child = children.get(i);
+			if ( child instanceof AnimationKeyframeSequence ) {
+				AnimationKeyframeSequence seq = (AnimationKeyframeSequence)child;
+				double seqTime = seq.getTime();
+				if ( seqTime >= time ) {
+					if ( seqTime <= maxTime ) {
+						maxTime = seqTime;
+						ret = seq;
+					}
+				}
+			}
+		}
+	
 		return ret;
 	}
 }

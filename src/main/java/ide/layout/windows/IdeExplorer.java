@@ -425,7 +425,18 @@ public class IdeExplorer extends IdePane {
 			super(root, node);
 		}
 		
+		@Override
+		public void setExpanded(boolean expanded) {
+			if ( this.isExpanded() == expanded )
+				return;
+			
+			super.setExpanded(expanded);
+			sort();
+		}
+		
 		protected void sort() {
+			if ( !this.isExpanded() )
+				return;
 			
 			ArrayList<TreeNode<E>> nodules = new ArrayList<TreeNode<E>>();
 			for (int i = 0; i < nodes.size(); i++) {

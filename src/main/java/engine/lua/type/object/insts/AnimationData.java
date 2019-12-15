@@ -63,10 +63,13 @@ public class AnimationData extends Instance implements TreeViewable {
 	}
 
 	public void processBones(Mesh mesh, HashMap<Integer, List<Integer>> indexToVertexIndex, Instance boneData, PointerBuffer mBones) {
-		if ( mBones == null )
+		if ( mBones == null ) {
+			System.out.println("No bones");
 			return;
-
+		}
+		
 		for (int a = 0; a < mBones.remaining(); a++) {
+			System.out.println("Attempting to create bone...");
 			AIBone bone = AIBone.create(mBones.get(a));
 			Matrix4f offsetMat = fromAssimpMatrix(bone.mOffsetMatrix());
 
@@ -141,7 +144,7 @@ public class AnimationData extends Instance implements TreeViewable {
 				name = "Animation";
 			animObject.forceSetName(name);
 			
-			TreeMap<Double,HashMap<Bone,TempKeyframe>> temp = new TreeMap<Double,HashMap<Bone,TempKeyframe>>();
+			TreeMap<Double,HashMap<Bone,TempKeyframe>> boneKeyframes = new TreeMap<>();
 			
 			int nodes = aiAnimation.mNumChannels();
 			for (int j = 0; j < nodes; j++) {
@@ -150,8 +153,14 @@ public class AnimationData extends Instance implements TreeViewable {
 				Instance bones = this.findFirstChildOfClass("Bones");
 				if ( bones == null )
 					continue;
-
-				List<Instance> boneList = bones.getChildrenWithName(nodeData.mNodeName().dataString());
+				
+				// Try to find the bones that are supposed to be modified by this keyframe
+				String boneName = nodeData.mNodeName().dataString();
+				List<Instance> boneList = bones.getChildrenWithName(boneName);
+				if ( boneList.size() == 0 )
+					boneList = bones.getChildrenWithName(boneName.replace("nodes_", "bone_")); // Needed for GLTF??? WHY???? WHY ARE BONES NOT NAMED THE SAME AS NODES?????????????????????????
+					// Every other animation format does this why not GLTF? THiS makes me mad >:(
+				
 				for (int a = 0; a < boneList.size(); a++) {
 					Instance bone = boneList.get(a);
 					if ( bone == null || !(bone instanceof Bone))
@@ -162,11 +171,11 @@ public class AnimationData extends Instance implements TreeViewable {
 						AIVectorKey key = nodeData.mPositionKeys().get(k);
 						Double time = key.mTime();
 	
-						if ( !temp.containsKey(time) ) {
-							temp.put(time, new HashMap<Bone,TempKeyframe>());
+						if ( !boneKeyframes.containsKey(time) ) {
+							boneKeyframes.put(time, new HashMap<Bone,TempKeyframe>());
 						}
 	
-						HashMap<Bone, TempKeyframe> keyframes = temp.get(time);
+						HashMap<Bone, TempKeyframe> keyframes = boneKeyframes.get(time);
 						if ( !keyframes.containsKey(bone) ) {
 							keyframes.put((Bone) bone, new TempKeyframe((Bone) bone));
 						}
@@ -180,11 +189,11 @@ public class AnimationData extends Instance implements TreeViewable {
 						AIQuatKey key = nodeData.mRotationKeys().get(k);
 						Double time = key.mTime();
 	
-						if ( !temp.containsKey(time) ) {
-							temp.put(time, new HashMap<Bone,TempKeyframe>());
+						if ( !boneKeyframes.containsKey(time) ) {
+							boneKeyframes.put(time, new HashMap<Bone,TempKeyframe>());
 						}
 	
-						HashMap<Bone, TempKeyframe> keyframes = temp.get(time);
+						HashMap<Bone, TempKeyframe> keyframes = boneKeyframes.get(time);
 						if ( !keyframes.containsKey(bone) ) {
 							keyframes.put((Bone) bone, new TempKeyframe((Bone) bone));
 						}
@@ -196,7 +205,7 @@ public class AnimationData extends Instance implements TreeViewable {
 			}
 			
 			// Translate list of keyframes into proper objects
-			for (Map.Entry<Double,HashMap<Bone,TempKeyframe>> entry : temp.entrySet()) {
+			for (Map.Entry<Double,HashMap<Bone,TempKeyframe>> entry : boneKeyframes.entrySet()) {
 				Double time = entry.getKey();
 				AnimationKeyframeSequence seq = new AnimationKeyframeSequence();
 				

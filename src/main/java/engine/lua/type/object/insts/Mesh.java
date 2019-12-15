@@ -241,6 +241,6 @@ public class Mesh extends AssetLoadable implements TreeViewable {
 	}
 
 	public static String getFileTypes() {
-		return "obj,fbx,3ds,smd,gltf,dae,ms3d,md5mesh";
+		return "x,obj,fbx,3ds,smd,xml,gltf,dae,ms3d,md5mesh";
 	}
 }

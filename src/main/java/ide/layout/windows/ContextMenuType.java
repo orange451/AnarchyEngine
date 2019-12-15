@@ -126,6 +126,9 @@ public abstract class ContextMenuType {
 			if ( result == NativeFileDialog.NFD_OKAY ) {
 				path = outPath.getStringUTF8(0);
 				Prefab prefab = Game.assets().importPrefab(path, instance);
+				if ( prefab == null )
+					return;
+				
 				Game.historyService().pushChange(prefab, LuaValue.valueOf("Parent"), LuaValue.NIL, prefab.getParent());
 			} else {
 				return;

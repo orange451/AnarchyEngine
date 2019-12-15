@@ -184,6 +184,11 @@ public class AnimationController extends Instance {
 			playingAnimations.remove(track);
 		
 		playingAnimations.add(track);
+		
+		AnimationKeyframeSequence frame = track.getAnimation().getNearestSequenceBefore(track.getTimePosition());
+		if ( frame != null ) {
+			track.setCurrentKeyframe(frame);
+		}
 	}
 	
 	/**

@@ -262,12 +262,15 @@ public class Assets extends Service implements TreeViewable {
 			}
 	
 			// Get scene
-			int flags = Assimp.aiProcess_JoinIdenticalVertices | Assimp.aiProcess_Triangulate | Assimp.aiProcess_GenSmoothNormals;
+			int flags = Assimp.aiProcess_JoinIdenticalVertices | Assimp.aiProcess_Triangulate;// | Assimp.aiProcess_GenSmoothNormals;
 			if ( extraFlags > 0 )
 				flags = flags | extraFlags;
 			AIScene scene = Assimp.aiImportFile(file.getAbsolutePath(), flags);
-			if ( scene == null )
+			System.out.println(scene);
+			if ( scene == null ) {
+				System.out.println(Assimp.aiGetErrorString());
 				return null;
+			}
 			
 			// Get data
 			ArrayList<AIMesh> meshes = assimpGetMeshes(scene.mMeshes());
@@ -531,9 +534,13 @@ public class Assets extends Service implements TreeViewable {
 
 	private static ArrayList<AIMaterial> assimpGetMaterials(PointerBuffer mMaterials) {
 		ArrayList<AIMaterial> meshes = new ArrayList<AIMaterial>();
-		for ( int i = 0; i < mMaterials.remaining(); i++ ) {
-			meshes.add( AIMaterial.create(mMaterials.get(i)) );
+		
+		if ( mMaterials != null ) {
+			for ( int i = 0; i < mMaterials.remaining(); i++ ) {
+				meshes.add( AIMaterial.create(mMaterials.get(i)) );
+			}
 		}
+		
 		return meshes;
 	}
 
