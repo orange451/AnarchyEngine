@@ -104,7 +104,9 @@ public class AnimInstanceForwardRenderer {
 
 	private void renderInstance(Instance inst, RendererData rnd, boolean transparentOnly) {
 		AnimationController anim = (AnimationController) inst.findFirstChildOfClass(C_ANIMATIONCONTROLLER);
-
+		if ( anim == null )
+			return;
+		
 		GameObject go = anim.getLinkedInstance();
 		if (go.isDestroyed())
 			return;

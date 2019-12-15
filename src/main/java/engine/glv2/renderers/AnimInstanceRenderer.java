@@ -109,7 +109,9 @@ public class AnimInstanceRenderer implements IObjectRenderer {
 
 	private void renderInstance(Instance inst) {
 		AnimationController anim = (AnimationController) inst.findFirstChildOfClass(C_ANIMATIONCONTROLLER);
-
+		if ( anim == null )
+			return;
+		
 		GameObject go = anim.getLinkedInstance();
 		if (go.isDestroyed())
 			return;

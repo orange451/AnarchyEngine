@@ -76,7 +76,9 @@ public class AnimInstanceShadowRenderer {
 
 	private void renderInstance(Instance inst, AnimInstanceBaseShadowShader shader) {
 		AnimationController anim = (AnimationController) inst.findFirstChildOfClass(C_ANIMATIONCONTROLLER);
-
+		if ( anim == null )
+			return;
+		
 		GameObject go = anim.getLinkedInstance();
 		if (go.isDestroyed())
 			return;
