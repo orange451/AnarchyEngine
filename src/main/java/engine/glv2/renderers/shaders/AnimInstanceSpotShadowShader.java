@@ -33,7 +33,6 @@ public class AnimInstanceSpotShadowShader extends AnimInstanceBaseShadowShader {
 				new Attribute(0, "position"), new Attribute(1, "normals"), new Attribute(2, "textureCoords"),
 				new Attribute(3, "inColor"), new Attribute(4, "boneIndices"), new Attribute(5, "boneWeights"));
 		super.storeUniforms(projectionMatrix);
-		super.validate();
 	}
 
 	public void loadSpotLight(SpotLightCamera camera) {

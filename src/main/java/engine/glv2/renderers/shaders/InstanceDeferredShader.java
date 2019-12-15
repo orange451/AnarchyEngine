@@ -63,7 +63,6 @@ public class InstanceDeferredShader extends ShaderProgram {
 				new Attribute(3, "inColor"));
 		super.storeUniforms(transformationMatrix, material, projectionMatrix, viewMatrix, jitterMatrix, useTAA,
 				transformationMatrixPrev, viewMatrixPrev, projectionMatrixPrev);
-		super.validate();
 	}
 
 	public void loadTransformationMatrix(Matrix4f matrix) {

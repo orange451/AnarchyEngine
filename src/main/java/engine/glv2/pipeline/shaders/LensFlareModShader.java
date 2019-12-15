@@ -32,7 +32,6 @@ public class LensFlareModShader extends BasePipelineShader {
 	public LensFlareModShader(String name) {
 		super("deferred/" + name);
 		super.storeUniforms(lensFlare, lensDirt, lensStar, image);
-		super.validate();
 		this.loadInitialData();
 	}
 

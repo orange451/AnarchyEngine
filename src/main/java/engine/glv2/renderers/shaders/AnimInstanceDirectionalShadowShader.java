@@ -36,7 +36,6 @@ public class AnimInstanceDirectionalShadowShader extends AnimInstanceBaseShadowS
 		for (int i = 0; i < 4; i++)
 			projectionMatrix[i] = new UniformMatrix4("projectionMatrix[" + i + "]");
 		super.storeUniforms(projectionMatrix);
-		super.validate();
 	}
 
 	public void loadDirectionalLight(DirectionalLightCamera camera) {

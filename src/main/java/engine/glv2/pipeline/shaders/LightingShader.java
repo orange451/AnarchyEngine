@@ -57,7 +57,6 @@ public class LightingShader extends BasePipelineShader {
 		super.storeUniforms(projectionMatrix, viewMatrix, cameraPosition, gDiffuse, gNormal, gDepth, gPBR,
 				gMask, irradianceCube, environmentCube, brdfLUT, biasMatrix, inverseProjectionMatrix, inverseViewMatrix,
 				directionalLightData, pointLightData, spotLightData);
-		super.validate();
 		this.loadInitialData();
 	}
 

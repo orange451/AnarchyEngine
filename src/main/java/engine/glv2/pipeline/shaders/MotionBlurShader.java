@@ -30,7 +30,6 @@ public class MotionBlurShader extends BasePipelineShader {
 	public MotionBlurShader(String name) {
 		super("deferred/" + name);
 		this.storeUniforms(image, gMotion);
-		this.validate();
 		this.loadInitialData();
 	}
 

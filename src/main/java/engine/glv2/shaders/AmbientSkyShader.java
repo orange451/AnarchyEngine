@@ -46,7 +46,6 @@ public class AmbientSkyShader extends ShaderProgram {
 		super("assets/shaders/sky/Ambient.vs", "assets/shaders/sky/Ambient.fs", new Attribute(0, "position"));
 		super.storeUniforms(projectionMatrix, transformationMatrix, viewMatrix, ambient, viewMatrixPrev,
 				projectionMatrixPrev);
-		super.validate();
 	}
 
 	public void loadCamera(Camera camera, Matrix4f projection) {

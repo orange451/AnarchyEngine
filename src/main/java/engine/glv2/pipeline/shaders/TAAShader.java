@@ -32,7 +32,6 @@ public class TAAShader extends BasePipelineShader {
 	public TAAShader(String name) {
 		super("deferred/" + name);
 		this.storeUniforms(image, previous, gMotion);
-		this.validate();
 		this.loadInitialData();
 	}
 

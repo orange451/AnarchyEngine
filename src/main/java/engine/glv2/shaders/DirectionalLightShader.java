@@ -58,7 +58,6 @@ public class DirectionalLightShader extends ShaderProgram {
 		super("assets/shaders/DirectionalLight.vs", "assets/shaders/DirectionalLight.fs", new Attribute(0, "position"));
 		super.storeUniforms(projectionMatrix, viewMatrix, cameraPosition, gDiffuse, gNormal, gDepth, gPBR, gMask, light,
 				inverseProjectionMatrix, inverseViewMatrix, biasMatrix, useShadows);
-		super.validate();
 		this.loadInitialData();
 	}
 

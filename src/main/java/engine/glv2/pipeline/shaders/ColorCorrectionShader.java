@@ -32,7 +32,6 @@ public class ColorCorrectionShader extends BasePipelineShader {
 	public ColorCorrectionShader(String name) {
 		super("deferred/" + name);
 		this.storeUniforms(image, exposure, gamma);
-		this.validate();
 		this.loadInitialData();
 	}
 

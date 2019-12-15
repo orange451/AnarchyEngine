@@ -30,7 +30,6 @@ public class BloomShader extends BasePipelineShader {
 	public BloomShader(String name) {
 		super("deferred/" + name);
 		super.storeUniforms(base, bloom);
-		super.validate();
 		this.loadInitialData();
 	}
 

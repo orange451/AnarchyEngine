@@ -27,7 +27,6 @@ public class BRDFIntegrationMapShader extends ShaderProgram {
 	public BRDFIntegrationMapShader() {
 		super("assets/shaders/BRDFIntegrationMap.vs", "assets/shaders/BRDFIntegrationMap.fs",
 				new Attribute(0, "position"));
-		super.validate();
 	}
 
 }

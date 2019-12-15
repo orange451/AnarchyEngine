@@ -32,7 +32,6 @@ public class InstanceSpotShadowShader extends InstanceBaseShadowShader {
 		super("assets/shaders/renderers/InstanceSpotShadow.vs", "assets/shaders/renderers/InstanceShadow.fs",
 				new Attribute(0, "position"));
 		super.storeUniforms(projectionMatrix);
-		super.validate();
 	}
 
 	public void loadSpotLight(SpotLightCamera camera) {

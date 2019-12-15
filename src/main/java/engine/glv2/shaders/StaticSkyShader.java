@@ -54,7 +54,6 @@ public class StaticSkyShader extends ShaderProgram {
 		super("assets/shaders/sky/Static.vs", "assets/shaders/sky/Static.fs", new Attribute(0, "position"));
 		super.storeUniforms(projectionMatrix, transformationMatrix, viewMatrix, environmentMap, power, brightness,
 				ambient, viewMatrixPrev, projectionMatrixPrev);
-		super.validate();
 		this.loadInitialData();
 	}
 

@@ -53,7 +53,6 @@ public class ReflectionsShader extends BasePipelineShader {
 		super("deferred/" + name);
 		super.storeUniforms(projectionMatrix, viewMatrix, cameraPosition, gDiffuse, gNormal, gDepth, gPBR, gMask,
 				environmentCube, brdfLUT, inverseProjectionMatrix, inverseViewMatrix, pass, aux);
-		super.validate();
 		this.loadInitialData();
 	}
 

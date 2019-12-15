@@ -64,7 +64,6 @@ public class SpotLightShader extends ShaderProgram {
 		super("assets/shaders/SpotLight.vs", "assets/shaders/SpotLight.fs", new Attribute(0, "position"));
 		super.storeUniforms(projectionMatrix, viewMatrix, cameraPosition, gDiffuse, gNormal, gDepth, gPBR, gMask, light,
 				inverseProjectionMatrix, inverseViewMatrix, biasMatrix, useShadows, transformationMatrix, texel);
-		super.validate();
 		this.loadInitialData();
 	}
 

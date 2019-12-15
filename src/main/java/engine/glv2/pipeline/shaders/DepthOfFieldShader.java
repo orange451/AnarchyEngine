@@ -30,7 +30,6 @@ public class DepthOfFieldShader extends BasePipelineShader {
 	public DepthOfFieldShader(String name) {
 		super("postprocess/" + name);
 		super.storeUniforms(image, depth);
-		super.validate();
 		this.loadInitialData();
 	}
 

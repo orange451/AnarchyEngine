@@ -29,7 +29,6 @@ public class BasicPostProcessShader extends BasePipelineShader {
 	public BasicPostProcessShader(String name) {
 		super("postprocess/" + name);
 		super.storeUniforms(image);
-		super.validate();
 		this.loadInitialData();
 	}
 

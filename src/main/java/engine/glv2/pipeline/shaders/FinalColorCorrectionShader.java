@@ -31,7 +31,6 @@ public class FinalColorCorrectionShader extends BasePipelineShader {
 	public FinalColorCorrectionShader(String name) {
 		super("postprocess/" + name);
 		this.storeUniforms(image, saturation);
-		this.validate();
 		this.loadInitialData();
 	}
 

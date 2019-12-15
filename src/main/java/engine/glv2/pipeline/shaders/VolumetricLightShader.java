@@ -55,7 +55,6 @@ public class VolumetricLightShader extends BasePipelineShader {
 		super.storeUniforms(projectionLightMatrix);
 		super.storeUniforms(projectionMatrix, viewMatrix, cameraPosition, lightPosition, gPosition, gNormal, biasMatrix,
 				viewLightMatrix, time, shadowMap);
-		super.validate();
 		this.loadInitialData();
 	}
 

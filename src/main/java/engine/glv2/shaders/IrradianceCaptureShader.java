@@ -37,7 +37,6 @@ public class IrradianceCaptureShader extends ShaderProgram {
 		super("assets/shaders/IrradianceCapture.vs", "assets/shaders/IrradianceCapture.fs",
 				new Attribute(0, "position"));
 		super.storeUniforms(projectionMatrix, viewMatrix, envMap);
-		super.validate();
 		this.loadInitialData();
 	}
 

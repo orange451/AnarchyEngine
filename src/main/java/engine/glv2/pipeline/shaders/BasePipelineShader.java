@@ -51,7 +51,6 @@ public class BasePipelineShader extends ShaderProgram {
 		super.storeUniforms(resolution, useFXAA, useDOF, useMotionBlur, useReflections,
 				useVolumetricLight, useAmbientOcclusion, useChromaticAberration, useLensFlares, useShadows, frame,
 				useTAA);
-		super.validate();
 	}
 
 	public void loadSettings(RenderingSettings rs) {

@@ -68,7 +68,6 @@ public class AnimInstanceDeferredShader extends ShaderProgram {
 				new Attribute(3, "inColor"), new Attribute(4, "boneIndices"), new Attribute(5, "boneWeights"));
 		super.storeUniforms(transformationMatrix, material, projectionMatrix, viewMatrix, jitterMatrix, useTAA, boneMat,
 				transformationMatrixPrev, viewMatrixPrev, projectionMatrixPrev, boneMatPrev);
-		super.validate();
 	}
 
 	public void loadTransformationMatrix(Matrix4f matrix) {

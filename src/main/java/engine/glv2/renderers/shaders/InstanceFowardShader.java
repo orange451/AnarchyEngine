@@ -82,7 +82,6 @@ public class InstanceFowardShader extends ShaderProgram {
 		super.storeUniforms(transformationMatrix, projectionMatrix, viewMatrix, material, cameraPosition, irradianceMap,
 				preFilterEnv, brdfLUT, colorCorrect, biasMatrix, useShadows, transparency, gamma, exposure,
 				totalPointLights, totalDirectionalLights);
-		super.validate();
 		this.loadInitialData();
 	}
 

@@ -30,7 +30,6 @@ public class FinalShader extends ShaderProgram {
 	public FinalShader(String name) {
 		super("assets/shaders/" + name + ".vs", "assets/shaders/" + name + ".fs", new Attribute(0, "position"));
 		super.storeUniforms(image);
-		super.validate();
 		this.loadInitialData();
 	}
 

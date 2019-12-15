@@ -67,7 +67,6 @@ public abstract class ShaderProgram {
 		shaders.add(new Shader(vertexFile, GL_VERTEX_SHADER));
 		shaders.add(new Shader(fragmentFile, GL_FRAGMENT_SHADER));
 		this.loadShaderProgram();
-		loaded = true;
 	}
 
 	public ShaderProgram(String vertexFile, String geometryFile, String fragmentFile, Attribute... attributes) {
@@ -76,7 +75,17 @@ public abstract class ShaderProgram {
 		shaders.add(new Shader(geometryFile, GL_GEOMETRY_SHADER));
 		shaders.add(new Shader(fragmentFile, GL_FRAGMENT_SHADER));
 		this.loadShaderProgram();
-		loaded = true;
+	}
+
+	public ShaderProgram() {
+	}
+
+	protected void addShader(Shader shader) {
+		this.shaders.add(shader);
+	}
+
+	protected void setAttributes(Attribute... attributes) {
+		this.attributes = attributes;
 	}
 
 	protected void storeUniforms(IUniform... uniforms) {
@@ -86,10 +95,6 @@ public abstract class ShaderProgram {
 	}
 
 	protected void loadInitialData() {
-	}
-
-	protected void validate() {
-		glValidateProgram(program);
 	}
 
 	public void start() {
@@ -105,7 +110,6 @@ public abstract class ShaderProgram {
 		this.loadShaderProgram();
 		for (IUniform uniform : uniforms)
 			uniform.storeUniformLocation(program);
-		this.validate();
 		this.loadInitialData();
 	}
 
@@ -125,7 +129,7 @@ public abstract class ShaderProgram {
 			glBindAttribLocation(program, attribute.getId(), attribute.getName());
 	}
 
-	private void loadShaderProgram() {
+	protected void loadShaderProgram() {
 		program = glCreateProgram();
 		for (Shader shader : shaders)
 			glAttachShader(program, loadShader(shader));
@@ -137,6 +141,8 @@ public abstract class ShaderProgram {
 			glDetachShader(program, shader.id);
 			glDeleteShader(shader.id);
 		}
+		glValidateProgram(program); // TODO: Check validation
+		loaded = true;
 	}
 
 	private int loadShader(Shader shader) {

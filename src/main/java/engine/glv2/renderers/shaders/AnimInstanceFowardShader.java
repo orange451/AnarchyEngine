@@ -85,7 +85,6 @@ public class AnimInstanceFowardShader extends ShaderProgram {
 		super.storeUniforms(transformationMatrix, projectionMatrix, viewMatrix, material, cameraPosition,
 				irradianceMap, preFilterEnv, brdfLUT, colorCorrect, biasMatrix, useShadows, transparency, gamma,
 				exposure, totalPointLights, totalDirectionalLights, boneMat);
-		super.validate();
 		this.loadInitialData();
 	}
 

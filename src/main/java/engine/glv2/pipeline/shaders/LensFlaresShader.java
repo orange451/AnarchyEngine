@@ -30,7 +30,6 @@ public class LensFlaresShader extends BasePipelineShader {
 	public LensFlaresShader(String name) {
 		super("deferred/" + name);
 		super.storeUniforms(bloom, lensColor);
-		super.validate();
 		this.loadInitialData();
 	}
 

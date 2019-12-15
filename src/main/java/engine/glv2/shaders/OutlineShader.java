@@ -38,7 +38,6 @@ public class OutlineShader extends ShaderProgram {
 	public OutlineShader() {
 		super("assets/shaders/Outline.vs", "assets/shaders/Outline.fs", new Attribute(0, "position"));
 		super.storeUniforms(transformationMatrix, projectionMatrix, viewMatrix, color);
-		super.validate();
 	}
 
 	public void loadTransformationMatrix(Matrix4f matrix) {

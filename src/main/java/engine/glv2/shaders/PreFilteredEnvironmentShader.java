@@ -39,7 +39,6 @@ public class PreFilteredEnvironmentShader extends ShaderProgram {
 		super("assets/shaders/PreFilteredEnvironment.vs", "assets/shaders/PreFilteredEnvironment.fs",
 				new Attribute(0, "position"));
 		super.storeUniforms(projectionMatrix, viewMatrix, envMap, roughness);
-		super.validate();
 		this.loadInitialData();
 	}
 

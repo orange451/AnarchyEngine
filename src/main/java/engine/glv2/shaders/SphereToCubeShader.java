@@ -35,7 +35,6 @@ public class SphereToCubeShader extends ShaderProgram {
 	public SphereToCubeShader() {
 		super("assets/shaders/SphereToCube.vs", "assets/shaders/SphereToCube.fs", new Attribute(0, "position"));
 		super.storeUniforms(projectionMatrix, viewMatrix, environmentMap);
-		super.validate();
 		this.loadInitialData();
 	}
 

@@ -57,7 +57,6 @@ public class DynamicSkyShader extends ShaderProgram {
 				new Attribute(1, "textureCoords"), new Attribute(2, "normal"));
 		super.storeUniforms(projectionMatrix, transformationMatrix, viewMatrix, time, lightPosition, renderSun,
 				cameraPosition, dynamicSky, ambient, viewMatrixPrev, projectionMatrixPrev);
-		super.validate();
 	}
 
 	public void loadCamera(Camera camera, Matrix4f projection) {
