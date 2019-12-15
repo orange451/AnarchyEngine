@@ -437,7 +437,7 @@ public class Assets extends Service implements TreeViewable {
 				t3.forceSetName(specular.replace(baseDir, ""));
 				t3.setFilePath(specular);
 				t3.forceSetParent(textureAssetFolder);
-				tm.setMetalMap(t3);
+				tm.setRoughMap(t3);
 			}
 			
 			if ( glossy != null ) {
@@ -445,7 +445,7 @@ public class Assets extends Service implements TreeViewable {
 				t4.forceSetName(glossy.replace(baseDir, ""));
 				t4.setFilePath(glossy);
 				t4.forceSetParent(textureAssetFolder);
-				tm.setRoughMap(t4);
+				tm.setMetalMap(t4);
 			}
 		}
 		
