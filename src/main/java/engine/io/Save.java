@@ -69,7 +69,7 @@ public class Save {
 		bottom.setPrefHeight(32);
 		bottom.setAlignment(Pos.CENTER);
 		bottom.setFillToParentWidth(true);
-		bottom.setBackground(Theme.current().getControlAlt());
+		bottom.setBackgroundLegacy(Theme.current().getControlAlt());
 		root.setBottom(bottom);
 		
 		HBox t = new HBox();

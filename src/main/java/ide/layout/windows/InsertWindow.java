@@ -32,7 +32,7 @@ public class InsertWindow {
 		Window window = LWJGUI.initialize(handle);
 		
 		StackPane root = new StackPane();
-		root.setBackground(Theme.current().getControl());
+		root.setBackgroundLegacy(Theme.current().getControl());
 		root.setPadding(new Insets(8));
 		
 		VBox tempV = new VBox();

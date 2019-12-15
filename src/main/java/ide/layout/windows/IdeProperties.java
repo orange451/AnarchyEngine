@@ -614,7 +614,7 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 						SELECTING_OBJECT = true;
 						t = new StackPane();
 						t.setPrefSize(this.getWidth(),this.getHeight());
-						t.setBackground(new Color(0, 32, 255, 128));
+						t.setBackgroundLegacy(new Color(0, 32, 255, 128));
 						this.getChildren().add(t);
 					} else {
 						cancel();
@@ -708,7 +708,7 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 			StackPane top = new StackPane();
 			top.setFillToParentWidth(true);
 			top.setPadding(new Insets(2,2,2,2));
-			top.setBackground(Theme.current().getControlOutline());
+			top.setBackgroundLegacy(Theme.current().getControlOutline());
 			top.setAlignment(Pos.CENTER_LEFT);
 			top.setPrefSize(1, 1);
 			this.getChildren().add(top);
@@ -743,7 +743,7 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 			
 			// Create grid
 			internal = new GridPane();
-			internal.setBackground(Theme.current().getBackgroundAlt());
+			internal.setBackgroundLegacy(Theme.current().getBackgroundAlt());
 			internal.setFillToParentWidth(true);
 			internal.setHgap(1);
 			internal.setVgap(1);
@@ -779,7 +779,7 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 				// Cell 1
 				StackPane t1 = new StackPane();
 				if ( i % 2 == 1 )
-					t1.setBackground(Theme.current().getControlAlt());
+					t1.setBackgroundLegacy(Theme.current().getControlAlt());
 				t1.setPadding(new Insets(2,0,2,12));
 				t1.setPrefSize(1, 1);
 				t1.getChildren().add(fieldLabel);
