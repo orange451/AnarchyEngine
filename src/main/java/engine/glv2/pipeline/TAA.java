@@ -39,7 +39,7 @@ public class TAA extends DeferredPass<TAAShader> {
 
 	@Override
 	protected TAAShader setupShader() {
-		return new TAAShader(name);
+		return new TAAShader();
 	}
 
 	@Override

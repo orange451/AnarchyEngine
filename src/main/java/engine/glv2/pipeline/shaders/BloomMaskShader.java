@@ -20,16 +20,19 @@
 
 package engine.glv2.pipeline.shaders;
 
+import static org.lwjgl.opengl.GL20C.GL_FRAGMENT_SHADER;
+
 import engine.glv2.shaders.data.UniformSampler;
 
 public class BloomMaskShader extends BasePipelineShader {
 
 	private UniformSampler image = new UniformSampler("image");
 
-	public BloomMaskShader(String name) {
-		super("deferred/" + name);
+	@Override
+	protected void setupShader() {
+		super.setupShader();
+		super.addShader(new Shader("assets/shaders/deferred/BloomMask.fs", GL_FRAGMENT_SHADER));
 		super.storeUniforms(image);
-		this.loadInitialData();
 	}
 
 	@Override

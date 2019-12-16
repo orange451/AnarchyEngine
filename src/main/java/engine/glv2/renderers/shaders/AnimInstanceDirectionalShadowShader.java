@@ -20,7 +20,9 @@
 
 package engine.glv2.renderers.shaders;
 
-import engine.glv2.shaders.data.Attribute;
+import static org.lwjgl.opengl.GL20C.GL_VERTEX_SHADER;
+import static org.lwjgl.opengl.GL32C.GL_GEOMETRY_SHADER;
+
 import engine.glv2.shaders.data.UniformMatrix4;
 import engine.glv2.v2.lights.DirectionalLightCamera;
 
@@ -28,11 +30,11 @@ public class AnimInstanceDirectionalShadowShader extends AnimInstanceBaseShadowS
 
 	private UniformMatrix4 projectionMatrix[] = new UniformMatrix4[4];
 
-	public AnimInstanceDirectionalShadowShader() {
-		super("assets/shaders/renderers/AnimInstanceDirectionalShadow.vs",
-				"assets/shaders/renderers/InstanceDirectionalShadow.gs", "assets/shaders/renderers/InstanceShadow.fs",
-				new Attribute(0, "position"), new Attribute(1, "normals"), new Attribute(2, "textureCoords"),
-				new Attribute(3, "inColor"), new Attribute(4, "boneIndices"), new Attribute(5, "boneWeights"));
+	@Override
+	protected void setupShader() {
+		super.setupShader();
+		super.addShader(new Shader("assets/shaders/renderers/AnimInstanceDirectionalShadow.vs", GL_VERTEX_SHADER));
+		super.addShader(new Shader("assets/shaders/renderers/InstanceDirectionalShadow.gs", GL_GEOMETRY_SHADER));
 		for (int i = 0; i < 4; i++)
 			projectionMatrix[i] = new UniformMatrix4("projectionMatrix[" + i + "]");
 		super.storeUniforms(projectionMatrix);

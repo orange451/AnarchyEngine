@@ -20,13 +20,18 @@
 
 package engine.glv2.shaders;
 
+import static org.lwjgl.opengl.GL20C.GL_FRAGMENT_SHADER;
+import static org.lwjgl.opengl.GL20C.GL_VERTEX_SHADER;
+
 import engine.glv2.shaders.data.Attribute;
 
 public class BRDFIntegrationMapShader extends ShaderProgram {
 
-	public BRDFIntegrationMapShader() {
-		super("assets/shaders/BRDFIntegrationMap.vs", "assets/shaders/BRDFIntegrationMap.fs",
-				new Attribute(0, "position"));
+	@Override
+	protected void setupShader() {
+		super.addShader(new Shader("assets/shaders/BRDFIntegrationMap.vs", GL_VERTEX_SHADER));
+		super.addShader(new Shader("assets/shaders/BRDFIntegrationMap.fs", GL_FRAGMENT_SHADER));
+		super.setAttributes(new Attribute(0, "position"));
 	}
 
 }

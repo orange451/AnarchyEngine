@@ -20,7 +20,8 @@
 
 package engine.glv2.renderers.shaders;
 
-import engine.glv2.shaders.data.Attribute;
+import static org.lwjgl.opengl.GL20C.GL_VERTEX_SHADER;
+
 import engine.glv2.shaders.data.UniformMatrix4;
 import engine.glv2.v2.lights.SpotLightCamera;
 
@@ -28,9 +29,10 @@ public class InstanceSpotShadowShader extends InstanceBaseShadowShader {
 
 	private UniformMatrix4 projectionMatrix = new UniformMatrix4("projectionMatrix");
 
-	public InstanceSpotShadowShader() {
-		super("assets/shaders/renderers/InstanceSpotShadow.vs", "assets/shaders/renderers/InstanceShadow.fs",
-				new Attribute(0, "position"));
+	@Override
+	protected void setupShader() {
+		super.setupShader();
+		super.addShader(new Shader("assets/shaders/renderers/InstanceSpotShadow.vs", GL_VERTEX_SHADER));
 		super.storeUniforms(projectionMatrix);
 	}
 

@@ -20,6 +20,9 @@
 
 package engine.glv2.shaders;
 
+import static org.lwjgl.opengl.GL20C.GL_FRAGMENT_SHADER;
+import static org.lwjgl.opengl.GL20C.GL_VERTEX_SHADER;
+
 import org.joml.Matrix4f;
 
 import engine.gl.light.DirectionalLightInternal;
@@ -40,25 +43,27 @@ public class DirectionalLightShader extends ShaderProgram {
 
 	private UniformVec3 cameraPosition = new UniformVec3("cameraPosition");
 
-	private UniformSampler gDiffuse = new UniformSampler("gDiffuse");
-	private UniformSampler gNormal = new UniformSampler("gNormal");
-	private UniformSampler gDepth = new UniformSampler("gDepth");
-	private UniformSampler gPBR = new UniformSampler("gPBR");
-	private UniformSampler gMask = new UniformSampler("gMask");
+	private UniformSampler gDiffuse = new UniformSampler("gDiffuse");;
+	private UniformSampler gNormal = new UniformSampler("gNormal");;
+	private UniformSampler gDepth = new UniformSampler("gDepth");;
+	private UniformSampler gPBR = new UniformSampler("gPBR");;
+	private UniformSampler gMask = new UniformSampler("gMask");;
 
-	private UniformMatrix4 biasMatrix = new UniformMatrix4("biasMatrix");
+	private UniformMatrix4 biasMatrix = new UniformMatrix4("biasMatrix");;
 
-	private UniformDirectionalLight light = new UniformDirectionalLight("light");
+	private UniformDirectionalLight light = new UniformDirectionalLight("light");;
 
-	private UniformBoolean useShadows = new UniformBoolean("useShadows");
+	private UniformBoolean useShadows = new UniformBoolean("useShadows");;
 
 	private Matrix4f projInv = new Matrix4f(), viewInv = new Matrix4f();
 
-	public DirectionalLightShader() {
-		super("assets/shaders/DirectionalLight.vs", "assets/shaders/DirectionalLight.fs", new Attribute(0, "position"));
+	@Override
+	protected void setupShader() {
+		super.addShader(new Shader("assets/shaders/DirectionalLight.vs", GL_VERTEX_SHADER));
+		super.addShader(new Shader("assets/shaders/DirectionalLight.fs", GL_FRAGMENT_SHADER));
+		super.setAttributes(new Attribute(0, "position"));
 		super.storeUniforms(projectionMatrix, viewMatrix, cameraPosition, gDiffuse, gNormal, gDepth, gPBR, gMask, light,
 				inverseProjectionMatrix, inverseViewMatrix, biasMatrix, useShadows);
-		this.loadInitialData();
 	}
 
 	@Override

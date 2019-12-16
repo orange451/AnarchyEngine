@@ -20,6 +20,9 @@
 
 package engine.glv2.shaders;
 
+import static org.lwjgl.opengl.GL20C.GL_FRAGMENT_SHADER;
+import static org.lwjgl.opengl.GL20C.GL_VERTEX_SHADER;
+
 import engine.glv2.shaders.data.Attribute;
 import engine.glv2.shaders.data.UniformSampler;
 
@@ -27,10 +30,18 @@ public class FinalShader extends ShaderProgram {
 
 	private UniformSampler image = new UniformSampler("image");
 
+	private String name;
+
 	public FinalShader(String name) {
-		super("assets/shaders/" + name + ".vs", "assets/shaders/" + name + ".fs", new Attribute(0, "position"));
+		this.name = name;
+	}
+
+	@Override
+	protected void setupShader() {
+		super.addShader(new Shader("assets/shaders/" + name + ".vs", GL_VERTEX_SHADER));
+		super.addShader(new Shader("assets/shaders/" + name + ".fs", GL_FRAGMENT_SHADER));
+		super.setAttributes(new Attribute(0, "position"));
 		super.storeUniforms(image);
-		this.loadInitialData();
 	}
 
 	@Override

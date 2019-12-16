@@ -63,6 +63,7 @@ public class InstanceRenderer implements IObjectRenderer {
 
 	public InstanceRenderer() {
 		shader = new InstanceDeferredShader();
+		shader.init();
 		shadowRenderer = new InstanceShadowRenderer();
 		forwardRenderer = new InstanceForwardRenderer();
 	}

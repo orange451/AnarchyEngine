@@ -94,8 +94,11 @@ public class SkyRenderer {
 		infMat = Maths.createTransformationMatrix(pos, -90, 0, 0, Integer.MAX_VALUE);
 		regMat = Maths.createTransformationMatrix(pos, -90, 0, 0, 990);
 		dynamicSkyShader = new DynamicSkyShader();
+		dynamicSkyShader.init();
 		staticSkyShader = new StaticSkyShader();
+		staticSkyShader.init();
 		ambientSkyShader = new AmbientSkyShader();
+		ambientSkyShader.init();
 		cube = VAO.create();
 		cube.bind();
 		cube.createAttribute(0, CUBE, 3, GL_STATIC_DRAW);
@@ -273,6 +276,7 @@ public class SkyRenderer {
 		generateFramebuffer(512);
 		CubeMapCamera camera = new CubeMapCamera(new Vector3f());
 		SphereToCubeShader stc = new SphereToCubeShader();
+		stc.init();
 
 		glDisable(GL_BLEND);
 

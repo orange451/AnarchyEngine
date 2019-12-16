@@ -30,7 +30,6 @@ import engine.glv2.v2.DeferredPass;
 import engine.glv2.v2.DeferredPipeline;
 import engine.glv2.v2.RendererData;
 
-
 public class Bloom extends DeferredPass<BloomShader> {
 
 	public Bloom() {
@@ -39,7 +38,7 @@ public class Bloom extends DeferredPass<BloomShader> {
 
 	@Override
 	protected BloomShader setupShader() {
-		return new BloomShader(name);
+		return new BloomShader();
 	}
 
 	@Override

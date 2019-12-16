@@ -62,6 +62,7 @@ public abstract class PipelinePass<T extends BasePipelineShader, P> {
 		height = (int) (iHeight * scaling);
 		generateFramebuffer(width, height);
 		shader = setupShader();
+		shader.init();
 		shader.start();
 		shader.loadResolution(new Vector2f(width, height));
 		shader.stop();

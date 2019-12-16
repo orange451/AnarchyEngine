@@ -20,6 +20,9 @@
 
 package engine.glv2.shaders;
 
+import static org.lwjgl.opengl.GL20C.GL_FRAGMENT_SHADER;
+import static org.lwjgl.opengl.GL20C.GL_VERTEX_SHADER;
+
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
@@ -50,11 +53,13 @@ public class StaticSkyShader extends ShaderProgram {
 
 	private Matrix4f temp = new Matrix4f();
 
-	public StaticSkyShader() {
-		super("assets/shaders/sky/Static.vs", "assets/shaders/sky/Static.fs", new Attribute(0, "position"));
+	@Override
+	protected void setupShader() {
+		super.addShader(new Shader("assets/shaders/sky/Static.vs", GL_VERTEX_SHADER));
+		super.addShader(new Shader("assets/shaders/sky/Static.fs", GL_FRAGMENT_SHADER));
+		super.setAttributes(new Attribute(0, "position"));
 		super.storeUniforms(projectionMatrix, transformationMatrix, viewMatrix, environmentMap, power, brightness,
 				ambient, viewMatrixPrev, projectionMatrixPrev);
-		this.loadInitialData();
 	}
 
 	@Override

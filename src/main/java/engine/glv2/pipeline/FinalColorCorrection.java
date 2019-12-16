@@ -38,7 +38,7 @@ public class FinalColorCorrection extends PostProcesPass<FinalColorCorrectionSha
 
 	@Override
 	protected FinalColorCorrectionShader setupShader() {
-		return new FinalColorCorrectionShader(name);
+		return new FinalColorCorrectionShader();
 	}
 
 	@Override

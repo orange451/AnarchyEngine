@@ -38,7 +38,7 @@ public class ColorCorrection extends DeferredPass<ColorCorrectionShader> {
 
 	@Override
 	protected ColorCorrectionShader setupShader() {
-		return new ColorCorrectionShader(name);
+		return new ColorCorrectionShader();
 	}
 
 	@Override

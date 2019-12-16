@@ -45,7 +45,9 @@ public class InstanceShadowRenderer {
 
 	public InstanceShadowRenderer() {
 		directionalShader = new InstanceDirectionalShadowShader();
+		directionalShader.init();
 		spotShader = new InstanceSpotShadowShader();
+		spotShader.init();
 	}
 
 	protected void renderShadow(List<Instance> instances, DirectionalLightCamera camera) {

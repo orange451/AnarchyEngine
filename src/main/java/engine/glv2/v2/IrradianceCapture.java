@@ -82,6 +82,7 @@ public class IrradianceCapture {
 	public IrradianceCapture() {
 		camera = new CubeMapCamera(new Vector3f());
 		shader = new IrradianceCaptureShader();
+		shader.init();
 		shader.start();
 		shader.loadProjectionMatrix(camera.getProjectionMatrix());
 		shader.stop();

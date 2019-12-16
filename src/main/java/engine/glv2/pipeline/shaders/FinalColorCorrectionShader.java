@@ -20,6 +20,8 @@
 
 package engine.glv2.pipeline.shaders;
 
+import static org.lwjgl.opengl.GL20C.GL_FRAGMENT_SHADER;
+
 import engine.glv2.shaders.data.UniformFloat;
 import engine.glv2.shaders.data.UniformSampler;
 
@@ -28,10 +30,11 @@ public class FinalColorCorrectionShader extends BasePipelineShader {
 	private UniformSampler image = new UniformSampler("image");
 	private UniformFloat saturation = new UniformFloat("saturation");
 
-	public FinalColorCorrectionShader(String name) {
-		super("postprocess/" + name);
+	@Override
+	protected void setupShader() {
+		super.setupShader();
+		super.addShader(new Shader("assets/shaders/postprocess/FinalColorCorrection.fs", GL_FRAGMENT_SHADER));
 		this.storeUniforms(image, saturation);
-		this.loadInitialData();
 	}
 
 	@Override

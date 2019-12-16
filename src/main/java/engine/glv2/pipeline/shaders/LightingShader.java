@@ -20,6 +20,8 @@
 
 package engine.glv2.pipeline.shaders;
 
+import static org.lwjgl.opengl.GL20C.GL_FRAGMENT_SHADER;
+
 import org.joml.Matrix4f;
 
 import engine.glv2.shaders.data.UniformMatrix4;
@@ -52,12 +54,13 @@ public class LightingShader extends BasePipelineShader {
 
 	private Matrix4f projInv = new Matrix4f(), viewInv = new Matrix4f();
 
-	public LightingShader(String name) {
-		super("deferred/" + name);
+	@Override
+	protected void setupShader() {
+		super.setupShader();
+		super.addShader(new Shader("assets/shaders/deferred/Lighting.fs", GL_FRAGMENT_SHADER));
 		super.storeUniforms(projectionMatrix, viewMatrix, cameraPosition, gDiffuse, gNormal, gDepth, gPBR,
 				gMask, irradianceCube, environmentCube, brdfLUT, biasMatrix, inverseProjectionMatrix, inverseViewMatrix,
 				directionalLightData, pointLightData, spotLightData);
-		this.loadInitialData();
 	}
 
 	@Override

@@ -50,6 +50,7 @@ public class AnimInstanceRenderer implements IObjectRenderer {
 
 	public AnimInstanceRenderer() {
 		shader = new AnimInstanceDeferredShader();
+		shader.init();
 		shadowRenderer = new AnimInstanceShadowRenderer();
 		forwardRenderer = new AnimInstanceForwardRenderer();
 	}

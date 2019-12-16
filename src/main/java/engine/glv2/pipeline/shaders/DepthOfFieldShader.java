@@ -20,6 +20,8 @@
 
 package engine.glv2.pipeline.shaders;
 
+import static org.lwjgl.opengl.GL20C.GL_FRAGMENT_SHADER;
+
 import engine.glv2.shaders.data.UniformSampler;
 
 public class DepthOfFieldShader extends BasePipelineShader {
@@ -27,10 +29,11 @@ public class DepthOfFieldShader extends BasePipelineShader {
 	private UniformSampler image = new UniformSampler("image");
 	private UniformSampler depth = new UniformSampler("depth");
 
-	public DepthOfFieldShader(String name) {
-		super("postprocess/" + name);
+	@Override
+	protected void setupShader() {
+		super.setupShader();
+		super.addShader(new Shader("assets/shaders/postprocess/DoF.fs", GL_FRAGMENT_SHADER));
 		super.storeUniforms(image, depth);
-		this.loadInitialData();
 	}
 
 	@Override

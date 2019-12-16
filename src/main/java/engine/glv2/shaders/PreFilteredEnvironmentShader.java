@@ -20,6 +20,9 @@
 
 package engine.glv2.shaders;
 
+import static org.lwjgl.opengl.GL20C.GL_FRAGMENT_SHADER;
+import static org.lwjgl.opengl.GL20C.GL_VERTEX_SHADER;
+
 import org.joml.Matrix4f;
 
 import engine.glv2.entities.CubeMapCamera;
@@ -35,11 +38,12 @@ public class PreFilteredEnvironmentShader extends ShaderProgram {
 	private UniformSampler envMap = new UniformSampler("envMap");
 	private UniformFloat roughness = new UniformFloat("roughness");
 
-	public PreFilteredEnvironmentShader() {
-		super("assets/shaders/PreFilteredEnvironment.vs", "assets/shaders/PreFilteredEnvironment.fs",
-				new Attribute(0, "position"));
+	@Override
+	protected void setupShader() {
+		super.addShader(new Shader("assets/shaders/PreFilteredEnvironment.vs", GL_VERTEX_SHADER));
+		super.addShader(new Shader("assets/shaders/PreFilteredEnvironment.fs", GL_FRAGMENT_SHADER));
+		super.setAttributes(new Attribute(0, "position"));
 		super.storeUniforms(projectionMatrix, viewMatrix, envMap, roughness);
-		this.loadInitialData();
 	}
 
 	@Override

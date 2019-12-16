@@ -20,66 +20,26 @@
 
 package engine.glv2.renderers.shaders;
 
+import static org.lwjgl.opengl.GL20C.GL_VERTEX_SHADER;
+
 import java.nio.FloatBuffer;
 
-import org.joml.Matrix4f;
-import org.joml.Vector2f;
-
-import engine.gl.MaterialGL;
-import engine.glv2.shaders.ShaderProgram;
 import engine.glv2.shaders.data.Attribute;
-import engine.glv2.shaders.data.UniformBoolean;
-import engine.glv2.shaders.data.UniformMaterial;
 import engine.glv2.shaders.data.UniformMatrix4;
-import engine.lua.type.object.insts.Camera;
 
-public class AnimInstanceDeferredShader extends ShaderProgram {
-
-	private UniformMatrix4 transformationMatrix = new UniformMatrix4("transformationMatrix");
-	private UniformMatrix4 projectionMatrix = new UniformMatrix4("projectionMatrix");
-	private UniformMatrix4 viewMatrix = new UniformMatrix4("viewMatrix");
-	private UniformMatrix4 jitterMatrix = new UniformMatrix4("jitterMatrix");
-	private UniformMaterial material = new UniformMaterial("material");
-	private UniformBoolean useTAA = new UniformBoolean("useTAA");
-
-	private UniformMatrix4 transformationMatrixPrev = new UniformMatrix4("transformationMatrixPrev");
-	private UniformMatrix4 viewMatrixPrev = new UniformMatrix4("viewMatrixPrev");
-	private UniformMatrix4 projectionMatrixPrev = new UniformMatrix4("projectionMatrixPrev");
+public class AnimInstanceDeferredShader extends InstanceDeferredShader {
 
 	private UniformMatrix4 boneMat = new UniformMatrix4("boneMat");
 	private UniformMatrix4 boneMatPrev = new UniformMatrix4("boneMatPrev");
 
-	private Matrix4f jitter = new Matrix4f();
-
-	private int frameCont;
-
-	// TODO: Move this
-	private Vector2f sampleLocs[] = { new Vector2f(-7.0f, 1.0f).mul(1.0f / 8.0f),
-			new Vector2f(-5.0f, -5.0f).mul(1.0f / 8.0f), new Vector2f(-1.0f, -3.0f).mul(1.0f / 8.0f),
-			new Vector2f(3.0f, -7.0f).mul(1.0f / 8.0f), new Vector2f(5.0f, -1.0f).mul(1.0f / 8.0f),
-			new Vector2f(7.0f, 7.0f).mul(1.0f / 8.0f), new Vector2f(1.0f, 3.0f).mul(1.0f / 8.0f),
-			new Vector2f(-3.0f, 5.0f).mul(1.0f / 8.0f) };
-
-	private Vector2f tmp = new Vector2f();
-
-	public AnimInstanceDeferredShader() {
-		super("assets/shaders/renderers/AnimInstanceDeferred.vs", "assets/shaders/renderers/InstanceDeferred.fs",
-				new Attribute(0, "position"), new Attribute(1, "normals"), new Attribute(2, "textureCoords"),
-				new Attribute(3, "inColor"), new Attribute(4, "boneIndices"), new Attribute(5, "boneWeights"));
-		super.storeUniforms(transformationMatrix, material, projectionMatrix, viewMatrix, jitterMatrix, useTAA, boneMat,
-				transformationMatrixPrev, viewMatrixPrev, projectionMatrixPrev, boneMatPrev);
-	}
-
-	public void loadTransformationMatrix(Matrix4f matrix) {
-		transformationMatrix.loadMatrix(matrix);
-	}
-
-	public void loadTransformationMatrixPrev(Matrix4f matrix) {
-		transformationMatrixPrev.loadMatrix(matrix);
-	}
-
-	public void loadMaterial(MaterialGL mat) {
-		material.loadMaterial(mat);
+	@Override
+	protected void setupShader() {
+		super.setupShader();
+		super.addShader(new Shader("assets/shaders/renderers/AnimInstanceDeferred.vs", GL_VERTEX_SHADER));
+		super.setAttributes(new Attribute(0, "position"), new Attribute(1, "normals"),
+				new Attribute(2, "textureCoords"), new Attribute(3, "inColor"), new Attribute(4, "boneIndices"),
+				new Attribute(5, "boneWeights"));
+		super.storeUniforms(boneMat, boneMatPrev);
 	}
 
 	public void loadBoneMat(FloatBuffer mat) {
@@ -90,28 +50,4 @@ public class AnimInstanceDeferredShader extends ShaderProgram {
 		boneMatPrev.loadMatrix(mat);
 	}
 
-	public void loadCameraPrev(Matrix4f viewMatrixPrev, Matrix4f projectionMatrixPrev) {
-		this.viewMatrixPrev.loadMatrix(viewMatrixPrev);
-		this.projectionMatrixPrev.loadMatrix(projectionMatrixPrev);
-	}
-
-	public void loadCamera(Camera camera, Matrix4f projection, Vector2f resolution, boolean taa) {
-		projectionMatrix.loadMatrix(projection);
-		viewMatrix.loadMatrix(camera.getViewMatrix().getInternal());
-		useTAA.loadBoolean(taa);
-		if (taa) {
-			Vector2f texSize = new Vector2f(1.0f / resolution.x, 1.0f / resolution.y);
-
-			Vector2f subsampleSize = texSize.mul(2.0f, new Vector2f());
-
-			Vector2f S = sampleLocs[frameCont];
-
-			Vector2f subsample = S.mul(subsampleSize, tmp);
-			subsample.mul(0.5f);
-			jitter.translation(subsample.x, subsample.y, 0);
-			jitterMatrix.loadMatrix(jitter);
-			frameCont++;
-			frameCont %= 4;
-		}
-	}
 }

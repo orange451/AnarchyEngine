@@ -66,6 +66,7 @@ public class HandlesRenderer {
 
 	public HandlesRenderer() {
 		shader = new OutlineShader();
+		shader.init();
 		
 		Game.loadEvent().connect((loadargs)->{
 			Game.userInputService().inputBeganEvent().connect((args)->{

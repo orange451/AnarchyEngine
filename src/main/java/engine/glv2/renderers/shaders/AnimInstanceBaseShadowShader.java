@@ -29,13 +29,12 @@ public class AnimInstanceBaseShadowShader extends InstanceBaseShadowShader {
 
 	private UniformMatrix4 boneMat = new UniformMatrix4("boneMat");
 
-	public AnimInstanceBaseShadowShader(String vs, String gs, String fs, Attribute... attributes) {
-		super(vs, gs, fs, attributes);
-		super.storeUniforms(boneMat);
-	}
-
-	public AnimInstanceBaseShadowShader(String vs, String fs, Attribute... attributes) {
-		super(vs, fs, attributes);
+	@Override
+	protected void setupShader() {
+		super.setupShader();
+		super.setAttributes(new Attribute(0, "position"), new Attribute(1, "normals"),
+				new Attribute(2, "textureCoords"), new Attribute(3, "inColor"), new Attribute(4, "boneIndices"),
+				new Attribute(5, "boneWeights"));
 		super.storeUniforms(boneMat);
 	}
 

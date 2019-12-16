@@ -20,6 +20,9 @@
 
 package engine.glv2.shaders;
 
+import static org.lwjgl.opengl.GL20C.GL_FRAGMENT_SHADER;
+import static org.lwjgl.opengl.GL20C.GL_VERTEX_SHADER;
+
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
@@ -52,9 +55,12 @@ public class DynamicSkyShader extends ShaderProgram {
 
 	private Matrix4f temp = new Matrix4f();
 
-	public DynamicSkyShader() {
-		super("assets/shaders/sky/Dynamic.vs", "assets/shaders/sky/Dynamic.fs", new Attribute(0, "position"),
-				new Attribute(1, "textureCoords"), new Attribute(2, "normal"));
+	@Override
+	protected void setupShader() {
+		super.addShader(new Shader("assets/shaders/sky/Dynamic.vs", GL_VERTEX_SHADER));
+		super.addShader(new Shader("assets/shaders/sky/Dynamic.fs", GL_FRAGMENT_SHADER));
+		super.setAttributes(new Attribute(0, "position"), new Attribute(1, "textureCoords"),
+				new Attribute(2, "normal"));
 		super.storeUniforms(projectionMatrix, transformationMatrix, viewMatrix, time, lightPosition, renderSun,
 				cameraPosition, dynamicSky, ambient, viewMatrixPrev, projectionMatrixPrev);
 	}

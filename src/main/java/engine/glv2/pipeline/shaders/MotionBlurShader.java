@@ -20,6 +20,8 @@
 
 package engine.glv2.pipeline.shaders;
 
+import static org.lwjgl.opengl.GL20C.GL_FRAGMENT_SHADER;
+
 import engine.glv2.shaders.data.UniformSampler;
 
 public class MotionBlurShader extends BasePipelineShader {
@@ -27,10 +29,11 @@ public class MotionBlurShader extends BasePipelineShader {
 	private UniformSampler image = new UniformSampler("image");
 	private UniformSampler gMotion = new UniformSampler("gMotion");
 
-	public MotionBlurShader(String name) {
-		super("deferred/" + name);
+	@Override
+	protected void setupShader() {
+		super.setupShader();
+		super.addShader(new Shader("assets/shaders/deferred/MotionBlur.fs", GL_FRAGMENT_SHADER));
 		this.storeUniforms(image, gMotion);
-		this.loadInitialData();
 	}
 
 	@Override

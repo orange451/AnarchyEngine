@@ -37,7 +37,7 @@ public class BloomMask extends DeferredPass<BloomMaskShader> {
 
 	@Override
 	protected BloomMaskShader setupShader() {
-		return new BloomMaskShader(name);
+		return new BloomMaskShader();
 	}
 
 	@Override

@@ -92,6 +92,7 @@ public abstract class PostProcessPipeline {
 		for (PostProcesPass<?> pass : passes)
 			pass.init(width, height);
 		finalShader = new FinalShader("postprocess/Final");
+		finalShader.init();
 		finalSurface = new Surface(width, height);
 	}
 

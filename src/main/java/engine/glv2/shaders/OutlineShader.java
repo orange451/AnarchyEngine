@@ -20,6 +20,9 @@
 
 package engine.glv2.shaders;
 
+import static org.lwjgl.opengl.GL20C.GL_FRAGMENT_SHADER;
+import static org.lwjgl.opengl.GL20C.GL_VERTEX_SHADER;
+
 import org.joml.Matrix4f;
 
 import engine.gl.MaterialGL;
@@ -35,8 +38,11 @@ public class OutlineShader extends ShaderProgram {
 	private UniformMatrix4 viewMatrix = new UniformMatrix4("viewMatrix");
 	private UniformVec3 color = new UniformVec3("color");
 
-	public OutlineShader() {
-		super("assets/shaders/Outline.vs", "assets/shaders/Outline.fs", new Attribute(0, "position"));
+	@Override
+	protected void setupShader() {
+		super.addShader(new Shader("assets/shaders/Outline.vs", GL_VERTEX_SHADER));
+		super.addShader(new Shader("assets/shaders/Outline.fs", GL_FRAGMENT_SHADER));
+		super.setAttributes(new Attribute(0, "position"));
 		super.storeUniforms(transformationMatrix, projectionMatrix, viewMatrix, color);
 	}
 

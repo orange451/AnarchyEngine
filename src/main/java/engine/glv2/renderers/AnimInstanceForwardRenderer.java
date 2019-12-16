@@ -69,6 +69,7 @@ public class AnimInstanceForwardRenderer {
 
 	public AnimInstanceForwardRenderer() {
 		shader = new AnimInstanceFowardShader();
+		shader.init();
 	}
 
 	public void render(List<Instance> instances, IRenderingData rd, RendererData rnd, CubeMapCamera cubeCamera,

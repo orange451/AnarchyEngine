@@ -20,6 +20,9 @@
 
 package engine.glv2.renderers.shaders;
 
+import static org.lwjgl.opengl.GL20C.GL_FRAGMENT_SHADER;
+import static org.lwjgl.opengl.GL20C.GL_VERTEX_SHADER;
+
 import java.util.List;
 
 import org.joml.Matrix4f;
@@ -67,10 +70,12 @@ public class InstanceFowardShader extends ShaderProgram {
 	private UniformDirectionalLight directionalLights[] = new UniformDirectionalLight[8];
 	private UniformInteger totalDirectionalLights = new UniformInteger("totalDirectionalLights");
 
-	public InstanceFowardShader() {
-		super("assets/shaders/renderers/InstanceForward.vs", "assets/shaders/renderers/InstanceForward.fs",
-				new Attribute(0, "position"), new Attribute(1, "normals"), new Attribute(2, "textureCoords"),
-				new Attribute(3, "inColor"));
+	@Override
+	protected void setupShader() {
+		super.addShader(new Shader("assets/shaders/renderers/InstanceForward.vs", GL_VERTEX_SHADER));
+		super.addShader(new Shader("assets/shaders/renderers/InstanceForward.fs", GL_FRAGMENT_SHADER));
+		super.setAttributes(new Attribute(0, "position"), new Attribute(1, "normals"),
+				new Attribute(2, "textureCoords"), new Attribute(3, "inColor"));
 		for (int x = 0; x < 8; x++) {
 			pointLights[x] = new UniformPointLight("pointLights[" + x + "]");
 		}
@@ -82,7 +87,6 @@ public class InstanceFowardShader extends ShaderProgram {
 		super.storeUniforms(transformationMatrix, projectionMatrix, viewMatrix, material, cameraPosition, irradianceMap,
 				preFilterEnv, brdfLUT, colorCorrect, biasMatrix, useShadows, transparency, gamma, exposure,
 				totalPointLights, totalDirectionalLights);
-		this.loadInitialData();
 	}
 
 	@Override

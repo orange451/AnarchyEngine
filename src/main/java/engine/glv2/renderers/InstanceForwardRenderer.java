@@ -62,6 +62,7 @@ public class InstanceForwardRenderer {
 
 	public InstanceForwardRenderer() {
 		shader = new InstanceFowardShader();
+		shader.init();
 	}
 
 	public void render(List<Instance> instances, IRenderingData rd, RendererData rnd, CubeMapCamera cubeCamera,

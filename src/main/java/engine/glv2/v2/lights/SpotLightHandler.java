@@ -23,7 +23,6 @@ import static org.lwjgl.opengl.GL11C.glDisable;
 import static org.lwjgl.opengl.GL11C.glEnable;
 import static org.lwjgl.opengl.GL12C.GL_CLAMP_TO_EDGE;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE0;
-import static org.lwjgl.opengl.GL13C.GL_TEXTURE1;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE2;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE3;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE4;
@@ -55,7 +54,6 @@ import engine.util.MeshUtils;
 public class SpotLightHandler implements ISpotLightHandler {
 
 	private List<SpotLightInternal> lights = Collections.synchronizedList(new ArrayList<>());
-
 	private BufferedMesh mesh = MeshUtils.sphere(1, 16);
 
 	private Framebuffer main;
@@ -77,6 +75,7 @@ public class SpotLightHandler implements ISpotLightHandler {
 
 	public void init() {
 		shader = new SpotLightShader();
+		shader.init();
 		generateFramebuffer();
 	}
 

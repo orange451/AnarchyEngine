@@ -20,6 +20,9 @@
 
 package engine.glv2.renderers.shaders;
 
+import static org.lwjgl.opengl.GL20C.GL_FRAGMENT_SHADER;
+import static org.lwjgl.opengl.GL20C.GL_VERTEX_SHADER;
+
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
 
@@ -57,10 +60,12 @@ public class InstanceDeferredShader extends ShaderProgram {
 
 	private Vector2f tmp = new Vector2f();
 
-	public InstanceDeferredShader() {
-		super("assets/shaders/renderers/InstanceDeferred.vs", "assets/shaders/renderers/InstanceDeferred.fs",
-				new Attribute(0, "position"), new Attribute(1, "normals"), new Attribute(2, "textureCoords"),
-				new Attribute(3, "inColor"));
+	@Override
+	protected void setupShader() {
+		super.addShader(new Shader("assets/shaders/renderers/InstanceDeferred.vs", GL_VERTEX_SHADER));
+		super.addShader(new Shader("assets/shaders/renderers/InstanceDeferred.fs", GL_FRAGMENT_SHADER));
+		super.setAttributes(new Attribute(0, "position"), new Attribute(1, "normals"),
+				new Attribute(2, "textureCoords"), new Attribute(3, "inColor"));
 		super.storeUniforms(transformationMatrix, material, projectionMatrix, viewMatrix, jitterMatrix, useTAA,
 				transformationMatrixPrev, viewMatrixPrev, projectionMatrixPrev);
 	}

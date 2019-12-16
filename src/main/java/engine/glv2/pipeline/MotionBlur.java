@@ -38,7 +38,7 @@ public class MotionBlur extends DeferredPass<MotionBlurShader> {
 
 	@Override
 	protected MotionBlurShader setupShader() {
-		return new MotionBlurShader(name);
+		return new MotionBlurShader();
 	}
 
 	@Override

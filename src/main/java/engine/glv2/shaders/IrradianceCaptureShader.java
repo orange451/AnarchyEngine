@@ -20,6 +20,9 @@
 
 package engine.glv2.shaders;
 
+import static org.lwjgl.opengl.GL20C.GL_FRAGMENT_SHADER;
+import static org.lwjgl.opengl.GL20C.GL_VERTEX_SHADER;
+
 import org.joml.Matrix4f;
 
 import engine.glv2.entities.CubeMapCamera;
@@ -33,11 +36,12 @@ public class IrradianceCaptureShader extends ShaderProgram {
 	private UniformMatrix4 viewMatrix = new UniformMatrix4("viewMatrix");
 	private UniformSampler envMap = new UniformSampler("envMap");
 
-	public IrradianceCaptureShader() {
-		super("assets/shaders/IrradianceCapture.vs", "assets/shaders/IrradianceCapture.fs",
-				new Attribute(0, "position"));
+	@Override
+	protected void setupShader() {
+		super.addShader(new Shader("assets/shaders/IrradianceCapture.vs", GL_VERTEX_SHADER));
+		super.addShader(new Shader("assets/shaders/IrradianceCapture.fs", GL_FRAGMENT_SHADER));
+		super.setAttributes(new Attribute(0, "position"));
 		super.storeUniforms(projectionMatrix, viewMatrix, envMap);
-		this.loadInitialData();
 	}
 
 	@Override

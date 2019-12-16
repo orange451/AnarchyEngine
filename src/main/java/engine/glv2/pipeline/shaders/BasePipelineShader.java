@@ -22,6 +22,8 @@ package engine.glv2.pipeline.shaders;
 
 import org.joml.Vector2f;
 
+import static org.lwjgl.opengl.GL33C.*;
+
 import engine.glv2.shaders.ShaderProgram;
 import engine.glv2.shaders.data.Attribute;
 import engine.glv2.shaders.data.UniformBoolean;
@@ -46,11 +48,12 @@ public class BasePipelineShader extends ShaderProgram {
 
 	private UniformInteger frame = new UniformInteger("frame");
 
-	public BasePipelineShader(String path) {
-		super("assets/shaders/" + path + ".vs", "assets/shaders/" + path + ".fs", new Attribute(0, "position"));
-		super.storeUniforms(resolution, useFXAA, useDOF, useMotionBlur, useReflections,
-				useVolumetricLight, useAmbientOcclusion, useChromaticAberration, useLensFlares, useShadows, frame,
-				useTAA);
+	@Override
+	protected void setupShader() {
+		super.addShader(new Shader("assets/shaders/pipeline/DefaultPipeline.vs", GL_VERTEX_SHADER));
+		super.setAttributes(new Attribute(0, "position"));
+		super.storeUniforms(resolution, useFXAA, useDOF, useMotionBlur, useReflections, useVolumetricLight,
+				useAmbientOcclusion, useChromaticAberration, useLensFlares, useShadows, frame, useTAA);
 	}
 
 	public void loadSettings(RenderingSettings rs) {

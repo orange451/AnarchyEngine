@@ -41,7 +41,7 @@ public class GaussianBlur extends DeferredPass<GaussianShader> {
 
 	@Override
 	protected GaussianShader setupShader() {
-		return new GaussianShader(name);
+		return new GaussianShader();
 	}
 
 	@Override

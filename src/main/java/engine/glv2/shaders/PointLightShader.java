@@ -20,6 +20,9 @@
 
 package engine.glv2.shaders;
 
+import static org.lwjgl.opengl.GL20C.GL_FRAGMENT_SHADER;
+import static org.lwjgl.opengl.GL20C.GL_VERTEX_SHADER;
+
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
 
@@ -60,11 +63,13 @@ public class PointLightShader extends ShaderProgram {
 
 	private Matrix4f projInv = new Matrix4f(), viewInv = new Matrix4f();
 
-	public PointLightShader() {
-		super("assets/shaders/PointLight.vs", "assets/shaders/PointLight.fs", new Attribute(0, "position"));
+	@Override
+	protected void setupShader() {
+		super.addShader(new Shader("assets/shaders/PointLight.vs", GL_VERTEX_SHADER));
+		super.addShader(new Shader("assets/shaders/PointLight.fs", GL_FRAGMENT_SHADER));
+		super.setAttributes(new Attribute(0, "position"));
 		super.storeUniforms(projectionMatrix, viewMatrix, cameraPosition, gDiffuse, gNormal, gDepth, gPBR, gMask, light,
 				inverseProjectionMatrix, inverseViewMatrix, biasMatrix, useShadows, transformationMatrix, texel);
-		this.loadInitialData();
 	}
 
 	@Override

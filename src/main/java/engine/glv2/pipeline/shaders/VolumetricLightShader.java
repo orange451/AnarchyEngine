@@ -48,7 +48,7 @@ public class VolumetricLightShader extends BasePipelineShader {
 	private UniformSampler shadowMap = new UniformSampler("shadowMap");
 
 	public VolumetricLightShader(String name) {
-		super("deferred/" + name);
+		//super("deferred/" + name);
 		projectionLightMatrix = new UniformMatrix4[4];
 		for (int x = 0; x < 4; x++)
 			projectionLightMatrix[x] = new UniformMatrix4("projectionLightMatrix[" + x + "]");

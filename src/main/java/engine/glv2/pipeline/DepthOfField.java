@@ -38,7 +38,7 @@ public class DepthOfField extends PostProcesPass<DepthOfFieldShader> {
 
 	@Override
 	protected DepthOfFieldShader setupShader() {
-		return new DepthOfFieldShader(name);
+		return new DepthOfFieldShader();
 	}
 
 	@Override

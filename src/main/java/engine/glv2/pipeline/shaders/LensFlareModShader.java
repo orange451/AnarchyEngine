@@ -20,6 +20,8 @@
 
 package engine.glv2.pipeline.shaders;
 
+import static org.lwjgl.opengl.GL20C.GL_FRAGMENT_SHADER;
+
 import engine.glv2.shaders.data.UniformSampler;
 
 public class LensFlareModShader extends BasePipelineShader {
@@ -29,10 +31,11 @@ public class LensFlareModShader extends BasePipelineShader {
 	private UniformSampler lensFlare = new UniformSampler("lensFlare");
 	private UniformSampler image = new UniformSampler("image");
 
-	public LensFlareModShader(String name) {
-		super("deferred/" + name);
+	@Override
+	protected void setupShader() {
+		super.setupShader();
+		super.addShader(new Shader("assets/shaders/deferred/LensFlaresMod.fs", GL_FRAGMENT_SHADER));
 		super.storeUniforms(lensFlare, lensDirt, lensStar, image);
-		this.loadInitialData();
 	}
 
 	@Override

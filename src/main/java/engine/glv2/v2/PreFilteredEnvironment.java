@@ -94,6 +94,7 @@ public class PreFilteredEnvironment {
 	public PreFilteredEnvironment() {
 
 		shader = new PreFilteredEnvironmentShader();
+		shader.init();
 		camera = new CubeMapCamera(new Vector3f());
 
 		quad = VAO.create();
@@ -126,6 +127,7 @@ public class PreFilteredEnvironment {
 		Framebuffer lutFB = fb.endFramebuffer();
 
 		brdfIntegrationMapShader = new BRDFIntegrationMapShader();
+		brdfIntegrationMapShader.init();
 
 		lutFB.bind();
 		brdfIntegrationMapShader.start();

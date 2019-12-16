@@ -22,8 +22,6 @@ package engine.glv2.shaders;
 
 import static org.lwjgl.opengl.GL11C.GL_FALSE;
 import static org.lwjgl.opengl.GL20C.GL_COMPILE_STATUS;
-import static org.lwjgl.opengl.GL20C.GL_FRAGMENT_SHADER;
-import static org.lwjgl.opengl.GL20C.GL_VERTEX_SHADER;
 import static org.lwjgl.opengl.GL20C.glAttachShader;
 import static org.lwjgl.opengl.GL20C.glBindAttribLocation;
 import static org.lwjgl.opengl.GL20C.glCompileShader;
@@ -38,7 +36,6 @@ import static org.lwjgl.opengl.GL20C.glLinkProgram;
 import static org.lwjgl.opengl.GL20C.glShaderSource;
 import static org.lwjgl.opengl.GL20C.glUseProgram;
 import static org.lwjgl.opengl.GL20C.glValidateProgram;
-import static org.lwjgl.opengl.GL32C.GL_GEOMETRY_SHADER;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -50,6 +47,8 @@ import java.util.List;
 
 import org.lwjgl.opengl.GL;
 
+import com.esotericsoftware.kryo.util.IntMap;
+
 import engine.glv2.exceptions.CompileShaderException;
 import engine.glv2.exceptions.LoadShaderException;
 import engine.glv2.shaders.data.Attribute;
@@ -59,29 +58,18 @@ public abstract class ShaderProgram {
 	private int program;
 	private boolean loaded;
 	private List<IUniform> uniforms = new ArrayList<>();
-	private List<Shader> shaders = new ArrayList<>();
 	private Attribute[] attributes;
+	private IntMap<Shader> shaders = new IntMap<>();
 
-	public ShaderProgram(String vertexFile, String fragmentFile, Attribute... attributes) {
-		this.attributes = attributes;
-		shaders.add(new Shader(vertexFile, GL_VERTEX_SHADER));
-		shaders.add(new Shader(fragmentFile, GL_FRAGMENT_SHADER));
-		this.loadShaderProgram();
-	}
-
-	public ShaderProgram(String vertexFile, String geometryFile, String fragmentFile, Attribute... attributes) {
-		this.attributes = attributes;
-		shaders.add(new Shader(vertexFile, GL_VERTEX_SHADER));
-		shaders.add(new Shader(geometryFile, GL_GEOMETRY_SHADER));
-		shaders.add(new Shader(fragmentFile, GL_FRAGMENT_SHADER));
-		this.loadShaderProgram();
-	}
-
-	public ShaderProgram() {
-	}
-
+	/**
+	 * Sets a shader or replaces one with the same type
+	 * 
+	 * @param shader
+	 */
 	protected void addShader(Shader shader) {
-		this.shaders.add(shader);
+		Shader s = this.shaders.put(shader.type, shader);
+		if (s != null)
+			System.out.println("Replaced " + s.file + " with " + shader.file);
 	}
 
 	protected void setAttributes(Attribute... attributes) {
@@ -89,10 +77,15 @@ public abstract class ShaderProgram {
 	}
 
 	protected void storeUniforms(IUniform... uniforms) {
-		for (IUniform uniform : uniforms)
-			uniform.storeUniformLocation(program);
 		this.uniforms.addAll(Arrays.asList(uniforms));
 	}
+
+	public void init() {
+		this.setupShader();
+		this.loadShaderProgram();
+	}
+
+	protected abstract void setupShader();
 
 	protected void loadInitialData() {
 	}
@@ -108,9 +101,6 @@ public abstract class ShaderProgram {
 	public void reload() {
 		glDeleteProgram(program);
 		this.loadShaderProgram();
-		for (IUniform uniform : uniforms)
-			uniform.storeUniformLocation(program);
-		this.loadInitialData();
 	}
 
 	public void dispose() {
@@ -129,28 +119,28 @@ public abstract class ShaderProgram {
 			glBindAttribLocation(program, attribute.getId(), attribute.getName());
 	}
 
-	protected void loadShaderProgram() {
+	private void loadShaderProgram() {
 		program = glCreateProgram();
-		for (Shader shader : shaders)
+		for (Shader shader : shaders.values())
 			glAttachShader(program, loadShader(shader));
-
 		bindAttributes(attributes);
 		glLinkProgram(program);
-
-		for (Shader shader : shaders) {
+		for (Shader shader : shaders.values()) {
 			glDetachShader(program, shader.id);
 			glDeleteShader(shader.id);
 		}
 		glValidateProgram(program); // TODO: Check validation
+		for (IUniform uniform : uniforms)
+			uniform.storeUniformLocation(program);
+		this.loadInitialData();
 		loaded = true;
 	}
 
 	private int loadShader(Shader shader) {
 		StringBuilder shaderSource = new StringBuilder();
 		InputStream filet = getClass().getClassLoader().getResourceAsStream(shader.file);
+		System.out.println("Loading Shader: " + shader.file);
 		try (BufferedReader reader = new BufferedReader(new InputStreamReader(filet))) {
-
-			System.out.println("Loading Shader: " + shader.file);
 
 			shaderSource.append("#version 330 core").append("//\n");
 			if (!GL.getCapabilities().GL_ARB_clip_control)

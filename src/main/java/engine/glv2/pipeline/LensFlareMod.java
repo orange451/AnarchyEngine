@@ -51,7 +51,7 @@ public class LensFlareMod extends DeferredPass<LensFlareModShader> {
 
 	@Override
 	protected LensFlareModShader setupShader() {
-		return new LensFlareModShader(name);
+		return new LensFlareModShader();
 	}
 
 	@Override

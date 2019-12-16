@@ -106,6 +106,7 @@ public abstract class DeferredPipeline {
 		for (DeferredPass<?> pass : passes)
 			pass.init(width, height);
 		finalShader = new FinalShader("deferred/Final");
+		finalShader.init();
 	}
 
 	public abstract void setupPasses();

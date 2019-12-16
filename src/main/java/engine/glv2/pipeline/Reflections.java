@@ -47,7 +47,7 @@ public class Reflections extends DeferredPass<ReflectionsShader> {
 
 	@Override
 	protected ReflectionsShader setupShader() {
-		return new ReflectionsShader(name);
+		return new ReflectionsShader();
 	}
 
 	@Override

@@ -20,6 +20,8 @@
 
 package engine.glv2.renderers.shaders;
 
+import static org.lwjgl.opengl.GL20C.GL_FRAGMENT_SHADER;
+
 import org.joml.Matrix4f;
 
 import engine.glv2.shaders.ShaderProgram;
@@ -33,13 +35,10 @@ public abstract class InstanceBaseShadowShader extends ShaderProgram {
 	protected UniformMatrix4 viewMatrix = new UniformMatrix4("viewMatrix");
 	private UniformFloat transparency = new UniformFloat("transparency");
 
-	public InstanceBaseShadowShader(String vs, String gs, String fs, Attribute... attributes) {
-		super(vs, gs, fs, attributes);
-		super.storeUniforms(transformationMatrix, viewMatrix, transparency);
-	}
-
-	public InstanceBaseShadowShader(String vs, String fs, Attribute... attributes) {
-		super(vs, fs, attributes);
+	@Override
+	protected void setupShader() {
+		super.addShader(new Shader("assets/shaders/renderers/InstanceShadow.fs", GL_FRAGMENT_SHADER));
+		super.setAttributes(new Attribute(0, "position"));
 		super.storeUniforms(transformationMatrix, viewMatrix, transparency);
 	}
 

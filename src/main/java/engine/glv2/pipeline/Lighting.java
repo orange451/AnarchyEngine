@@ -64,7 +64,7 @@ public class Lighting extends DeferredPass<LightingShader> {
 
 	@Override
 	protected LightingShader setupShader() {
-		return new LightingShader(name);
+		return new LightingShader();
 	}
 
 	@Override

@@ -22,7 +22,6 @@ import static org.lwjgl.opengl.GL11C.glDrawArrays;
 import static org.lwjgl.opengl.GL11C.glEnable;
 import static org.lwjgl.opengl.GL12C.GL_CLAMP_TO_EDGE;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE0;
-import static org.lwjgl.opengl.GL13C.GL_TEXTURE1;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE2;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE3;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE4;
@@ -78,6 +77,7 @@ public class DirectionalLightHandler implements IDirectionalLightHandler {
 		quad.unbind();
 		quad.setVertexCount(4);
 		shader = new DirectionalLightShader();
+		shader.init();
 		generateFramebuffer();
 	}
 

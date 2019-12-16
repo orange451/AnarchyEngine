@@ -20,6 +20,9 @@
 
 package engine.glv2.shaders;
 
+import static org.lwjgl.opengl.GL20C.GL_FRAGMENT_SHADER;
+import static org.lwjgl.opengl.GL20C.GL_VERTEX_SHADER;
+
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
@@ -32,18 +35,21 @@ import engine.lua.type.object.insts.Camera;
 public class AmbientSkyShader extends ShaderProgram {
 
 	private UniformMatrix4 projectionMatrix = new UniformMatrix4("projectionMatrix");
-	private UniformMatrix4 transformationMatrix = new UniformMatrix4("transformationMatrix");
-	private UniformMatrix4 viewMatrix = new UniformMatrix4("viewMatrix");
+	private UniformMatrix4 transformationMatrix = new UniformMatrix4("transformationMatrix");;
+	private UniformMatrix4 viewMatrix = new UniformMatrix4("viewMatrix");;
 
-	private UniformVec3 ambient = new UniformVec3("ambient");
+	private UniformVec3 ambient = new UniformVec3("ambient");;
 
-	private UniformMatrix4 viewMatrixPrev = new UniformMatrix4("viewMatrixPrev");
-	private UniformMatrix4 projectionMatrixPrev = new UniformMatrix4("projectionMatrixPrev");
+	private UniformMatrix4 viewMatrixPrev = new UniformMatrix4("viewMatrixPrev");;
+	private UniformMatrix4 projectionMatrixPrev = new UniformMatrix4("projectionMatrixPrev");;
 
 	private Matrix4f temp = new Matrix4f();
 
-	public AmbientSkyShader() {
-		super("assets/shaders/sky/Ambient.vs", "assets/shaders/sky/Ambient.fs", new Attribute(0, "position"));
+	@Override
+	protected void setupShader() {
+		super.addShader(new Shader("assets/shaders/sky/Ambient.vs", GL_VERTEX_SHADER));
+		super.addShader(new Shader("assets/shaders/sky/Ambient.fs", GL_FRAGMENT_SHADER));
+		super.setAttributes(new Attribute(0, "position"));
 		super.storeUniforms(projectionMatrix, transformationMatrix, viewMatrix, ambient, viewMatrixPrev,
 				projectionMatrixPrev);
 	}
