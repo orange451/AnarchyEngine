@@ -38,6 +38,7 @@ import engine.gl.MaterialGL;
 import engine.gl.Resources;
 import engine.gl.mesh.BufferedMesh;
 import engine.glv2.entities.CubeMapCamera;
+import engine.glv2.entities.LayeredCubeCamera;
 import engine.glv2.renderers.shaders.InstanceDeferredShader;
 import engine.glv2.v2.IObjectRenderer;
 import engine.glv2.v2.IRenderingData;
@@ -87,6 +88,11 @@ public class InstanceRenderer implements IObjectRenderer {
 	}
 
 	@Override
+	public void renderReflections(IRenderingData rd, RendererData rnd, LayeredCubeCamera cubeCamera) {
+		// TODO Auto-generated method stub
+		
+	}
+	
 	public void renderReflections(IRenderingData rd, RendererData rnd, CubeMapCamera cubeCamera) {
 		forwardRenderer.render(instances, rd, rnd, cubeCamera, false, false);
 	}

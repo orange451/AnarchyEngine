@@ -44,6 +44,7 @@ import org.joml.Vector3f;
 import engine.glv2.GLResourceLoader;
 import engine.glv2.Maths;
 import engine.glv2.entities.CubeMapCamera;
+import engine.glv2.entities.LayeredCubeCamera;
 import engine.glv2.objects.Framebuffer;
 import engine.glv2.objects.FramebufferBuilder;
 import engine.glv2.objects.Renderbuffer;
@@ -51,10 +52,13 @@ import engine.glv2.objects.RenderbufferBuilder;
 import engine.glv2.objects.Texture;
 import engine.glv2.objects.TextureBuilder;
 import engine.glv2.objects.VAO;
-import engine.glv2.shaders.AmbientSkyShader;
-import engine.glv2.shaders.DynamicSkyShader;
 import engine.glv2.shaders.SphereToCubeShader;
-import engine.glv2.shaders.StaticSkyShader;
+import engine.glv2.shaders.sky.AmbientSkyCubeShader;
+import engine.glv2.shaders.sky.AmbientSkyShader;
+import engine.glv2.shaders.sky.DynamicSkyCubeShader;
+import engine.glv2.shaders.sky.DynamicSkyShader;
+import engine.glv2.shaders.sky.StaticSkyCubeShader;
+import engine.glv2.shaders.sky.StaticSkyShader;
 import engine.lua.type.object.insts.DynamicSkybox;
 import engine.lua.type.object.insts.Skybox;
 import engine.tasks.TaskManager;
@@ -75,6 +79,10 @@ public class SkyRenderer {
 	private DynamicSkyShader dynamicSkyShader;
 	private StaticSkyShader staticSkyShader;
 	private AmbientSkyShader ambientSkyShader;
+
+	private AmbientSkyCubeShader ambientSkyCubeShader;
+	private StaticSkyCubeShader staticSkyCubeShader;
+	private DynamicSkyCubeShader dynamicSkyCubeShader;
 	private Vector3f pos;
 
 	private Matrix4f infMat, regMat;
@@ -99,6 +107,14 @@ public class SkyRenderer {
 		staticSkyShader.init();
 		ambientSkyShader = new AmbientSkyShader();
 		ambientSkyShader.init();
+
+		ambientSkyCubeShader = new AmbientSkyCubeShader();
+		ambientSkyCubeShader.init();
+		staticSkyCubeShader = new StaticSkyCubeShader();
+		staticSkyCubeShader.init();
+		dynamicSkyCubeShader = new DynamicSkyCubeShader();
+		dynamicSkyCubeShader.init();
+
 		cube = VAO.create();
 		cube.bind();
 		cube.createAttribute(0, CUBE, 3, GL_STATIC_DRAW);
@@ -163,62 +179,63 @@ public class SkyRenderer {
 		}
 	}
 
-	public void render(RendererData rnd, CubeMapCamera camera, Vector3f lightDirection, boolean renderSun,
+	public void renderReflections(RendererData rnd, LayeredCubeCamera camera, Sun sun, boolean renderSun,
 			boolean infScale, boolean applyAmbient) {
 		if (dynamicSky != null) {
 			glCullFace(GL_FRONT);
-			dynamicSkyShader.start();
-			dynamicSkyShader.loadCamera(camera);
-			dynamicSkyShader.loadDynamicSky(dynamicSky);
-			dynamicSkyShader.loadLightPosition(lightDirection);
-			dynamicSkyShader.renderSun(renderSun);
+			dynamicSkyCubeShader.start();
+			dynamicSkyCubeShader.loadCamera(camera);
+			dynamicSkyCubeShader.loadDynamicSky(dynamicSky);
+			dynamicSkyCubeShader.loadLightPosition(sun.getLight().direction);
+			dynamicSkyCubeShader.renderSun(renderSun);
 			if (applyAmbient)
-				dynamicSkyShader.loadAmbient(rnd.ambient);
+				dynamicSkyCubeShader.loadAmbient(rnd.ambient);
 			else
-				dynamicSkyShader.loadAmbient(AMBIENT);
+				dynamicSkyCubeShader.loadAmbient(AMBIENT);
 			if (infScale)
-				dynamicSkyShader.loadTransformationMatrix(infMat);
+				dynamicSkyCubeShader.loadTransformationMatrix(infMat);
 			else
-				dynamicSkyShader.loadTransformationMatrix(regMat);
+				dynamicSkyCubeShader.loadTransformationMatrix(regMat);
 			dome.bind(0, 1, 2);
 			glDrawElements(GL_TRIANGLES, dome.getIndexCount(), GL_UNSIGNED_INT, 0);
 			dome.unbind(0, 1, 2);
-			dynamicSkyShader.stop();
+			dynamicSkyCubeShader.stop();
 			glCullFace(GL_BACK);
+
 		} else if (staticSky != null) {
 			if (staticSky.getImage() != null) {
 				if (staticSky.getImage().hasLoaded()) {
-					staticSkyShader.start();
-					staticSkyShader.loadCamera(camera);
-					staticSkyShader.loadSky(staticSky);
+					staticSkyCubeShader.start();
+					staticSkyCubeShader.loadCamera(camera);
+					staticSkyCubeShader.loadSky(staticSky);
 					if (applyAmbient)
-						staticSkyShader.loadAmbient(rnd.ambient);
+						staticSkyCubeShader.loadAmbient(rnd.ambient);
 					else
-						staticSkyShader.loadAmbient(AMBIENT);
+						staticSkyCubeShader.loadAmbient(AMBIENT);
 					if (infScale)
-						staticSkyShader.loadTransformationMatrix(infMat);
+						staticSkyCubeShader.loadTransformationMatrix(infMat);
 					else
-						staticSkyShader.loadTransformationMatrix(regMat);
+						staticSkyCubeShader.loadTransformationMatrix(regMat);
 					cube.bind(0);
 					glActiveTexture(GL_TEXTURE0);
 					glBindTexture(GL_TEXTURE_CUBE_MAP, cubeTex.getTexture());
 					glDrawArrays(GL_TRIANGLES, 0, cube.getVertexCount());
 					cube.unbind(0);
-					staticSkyShader.stop();
+					staticSkyCubeShader.stop();
 				}
 			}
 		} else {
-			ambientSkyShader.start();
-			ambientSkyShader.loadCamera(camera);
-			ambientSkyShader.loadAmbient(rnd.ambient);
+			ambientSkyCubeShader.start();
+			ambientSkyCubeShader.loadCamera(camera);
+			ambientSkyCubeShader.loadAmbient(rnd.ambient);
 			if (infScale)
-				ambientSkyShader.loadTransformationMatrix(infMat);
+				ambientSkyCubeShader.loadTransformationMatrix(infMat);
 			else
-				ambientSkyShader.loadTransformationMatrix(regMat);
+				ambientSkyCubeShader.loadTransformationMatrix(regMat);
 			cube.bind(0);
 			glDrawArrays(GL_TRIANGLES, 0, cube.getVertexCount());
 			cube.unbind(0);
-			ambientSkyShader.stop();
+			ambientSkyCubeShader.stop();
 		}
 	}
 
@@ -227,6 +244,10 @@ public class SkyRenderer {
 		dynamicSkyShader.dispose();
 		staticSkyShader.dispose();
 		ambientSkyShader.dispose();
+
+		ambientSkyCubeShader.dispose();
+		staticSkyCubeShader.dispose();
+		dynamicSkyCubeShader.dispose();
 	}
 
 	public void setDynamicSky(DynamicSkybox dynamicSky) {

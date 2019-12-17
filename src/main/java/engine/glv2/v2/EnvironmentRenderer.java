@@ -30,6 +30,7 @@ import static org.lwjgl.opengl.GL11C.GL_TEXTURE_MAG_FILTER;
 import static org.lwjgl.opengl.GL11C.GL_TEXTURE_MIN_FILTER;
 import static org.lwjgl.opengl.GL11C.GL_TEXTURE_WRAP_S;
 import static org.lwjgl.opengl.GL11C.GL_TEXTURE_WRAP_T;
+import static org.lwjgl.opengl.GL11C.GL_UNSIGNED_BYTE;
 import static org.lwjgl.opengl.GL11C.glClear;
 import static org.lwjgl.opengl.GL12C.GL_CLAMP_TO_EDGE;
 import static org.lwjgl.opengl.GL12C.GL_TEXTURE_WRAP_R;
@@ -37,60 +38,41 @@ import static org.lwjgl.opengl.GL13C.GL_TEXTURE_CUBE_MAP;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE_CUBE_MAP_POSITIVE_X;
 import static org.lwjgl.opengl.GL30C.GL_COLOR_ATTACHMENT0;
 import static org.lwjgl.opengl.GL30C.GL_DEPTH_ATTACHMENT;
-import static org.lwjgl.opengl.GL30C.GL_FRAMEBUFFER;
 import static org.lwjgl.opengl.GL30C.GL_RGB16F;
-import static org.lwjgl.opengl.GL30C.glFramebufferTexture2D;
 
-import org.joml.Vector3f;
-
-import engine.glv2.entities.CubeMapCamera;
+import engine.glv2.entities.LayeredCubeCamera;
 import engine.glv2.objects.Framebuffer;
 import engine.glv2.objects.FramebufferBuilder;
-import engine.glv2.objects.Renderbuffer;
-import engine.glv2.objects.RenderbufferBuilder;
 import engine.glv2.objects.Texture;
 import engine.glv2.objects.TextureBuilder;
 
 public class EnvironmentRenderer {
 
 	private Framebuffer framebuffer;
-	private Renderbuffer depthBuffer;
-	private Texture cubeTex;
+	private Texture cubeTex, depthTex;
 
-	private CubeMapCamera camera;
-
-	private int i;
+	private LayeredCubeCamera layeredCubeCamera;
 
 	public EnvironmentRenderer(int size) {
 		generateFramebuffer(size);
-		camera = new CubeMapCamera(new Vector3f());
+		layeredCubeCamera = new LayeredCubeCamera();
 	}
 
-	public void renderEnvironmentMap(Vector3f center, SkyRenderer sr, Vector3f lightPosition, RendererData rnd) {
-		camera.setPosition(center);
+	public void renderIrradiance(SkyRenderer sr, Sun sun, IRenderingData rd, RendererData rnd) {
+		layeredCubeCamera.setPosition(rd.camera.getPosition().getInternal());
 		framebuffer.bind();
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
-				cubeTex.getTexture(), 0);
-		camera.switchToFace(i);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		sr.render(rnd, camera, lightPosition, true, false, true);
+		sr.renderReflections(rnd, layeredCubeCamera, sun,  true, false, true);
 		framebuffer.unbind();
-		i += 1;
-		i %= 6;
 	}
 
-	public void renderEnvironmentMap(Vector3f center, SkyRenderer sr, Vector3f lightPosition,
-			RenderingManager renderingManager, IRenderingData rd, RendererData rnd) {
-		camera.setPosition(center);
+	public void renderReflections(SkyRenderer sr, Sun sun, IRenderingData rd, RendererData rnd,
+			RenderingManager renderingManager) {
+		layeredCubeCamera.setPosition(rd.camera.getPosition().getInternal());
 		framebuffer.bind();
-		for (int i = 0; i < 6; i++) {
-			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
-					cubeTex.getTexture(), 0);
-			camera.switchToFace(i);
-			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-			renderingManager.renderReflections(rd, rnd, camera); // TODO: Issue here with shadow sampler
-			sr.render(rnd, camera, lightPosition, false, false, false);
-		}
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		renderingManager.renderReflections(rd, rnd, layeredCubeCamera); // TODO: Issue here with shadow sampler
+		sr.renderReflections(rnd, layeredCubeCamera, sun, false, false, false);
 		framebuffer.unbind();
 	}
 
@@ -103,12 +85,6 @@ public class EnvironmentRenderer {
 	}
 
 	private void generateFramebuffer(int size) {
-		RenderbufferBuilder rb = new RenderbufferBuilder();
-
-		rb.genRenderbuffer().bindRenderbuffer().sizeRenderbuffer(size, size);
-		rb.renderbufferStorage(GL_DEPTH_COMPONENT);
-		depthBuffer = rb.endRenderbuffer();
-
 		TextureBuilder tb = new TextureBuilder();
 
 		tb.genTexture(GL_TEXTURE_CUBE_MAP).bindTexture();
@@ -122,17 +98,29 @@ public class EnvironmentRenderer {
 		tb.texParameteri(GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 		cubeTex = tb.endTexture();
 
+		tb.genTexture(GL_TEXTURE_CUBE_MAP).bindTexture();
+		tb.sizeTexture(size, size);
+		for (int i = 0; i < 6; i++)
+			tb.texImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_DEPTH_COMPONENT, 0, GL_DEPTH_COMPONENT,
+					GL_UNSIGNED_BYTE, 0);
+		tb.texParameteri(GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		tb.texParameteri(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		tb.texParameteri(GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		tb.texParameteri(GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		tb.texParameteri(GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+		depthTex = tb.endTexture();
+
 		FramebufferBuilder fb = new FramebufferBuilder();
 		fb.genFramebuffer().bindFramebuffer().sizeFramebuffer(size, size);
-		fb.framebufferTexture2D(GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X, cubeTex, 0);
-		fb.framebufferRenderbuffer(GL_DEPTH_ATTACHMENT, depthBuffer);
+		fb.framebufferTexture(GL_COLOR_ATTACHMENT0, cubeTex, 0);
+		fb.framebufferTexture(GL_DEPTH_ATTACHMENT, depthTex, 0);
 		framebuffer = fb.endFramebuffer();
 	}
 
 	private void disposeFramebuffer() {
 		framebuffer.dispose();
-		depthBuffer.dispose();
 		cubeTex.dispose();
+		depthTex.dispose();
 	}
 
 }

@@ -34,7 +34,7 @@ import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.IntMap.Entry;
 import com.esotericsoftware.kryonet.util.ObjectIntMap;
 
-import engine.glv2.entities.CubeMapCamera;
+import engine.glv2.entities.LayeredCubeCamera;
 import engine.glv2.v2.lights.DirectionalLightCamera;
 import engine.glv2.v2.lights.SpotLightCamera;
 import engine.lua.type.object.Instance;
@@ -76,7 +76,7 @@ public class RenderingManager {
 			rendererEntry.value.render(rd, rnd, resolution);
 	}
 
-	public void renderReflections(IRenderingData rd, RendererData rnd, CubeMapCamera cubeCamera) {
+	public void renderReflections(IRenderingData rd, RendererData rnd, LayeredCubeCamera cubeCamera) {
 		for (Entry<IObjectRenderer> rendererEntry : objectRenderers)
 			rendererEntry.value.renderReflections(rd, rnd, cubeCamera);
 	}

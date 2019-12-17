@@ -18,7 +18,7 @@
  * 
  */
 
-package engine.glv2.shaders;
+package engine.glv2.shaders.sky;
 
 import static org.lwjgl.opengl.GL20C.GL_FRAGMENT_SHADER;
 import static org.lwjgl.opengl.GL20C.GL_VERTEX_SHADER;
@@ -27,31 +27,47 @@ import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
 import engine.glv2.entities.CubeMapCamera;
+import engine.glv2.shaders.ShaderProgram;
 import engine.glv2.shaders.data.Attribute;
+import engine.glv2.shaders.data.UniformFloat;
 import engine.glv2.shaders.data.UniformMatrix4;
+import engine.glv2.shaders.data.UniformSampler;
 import engine.glv2.shaders.data.UniformVec3;
 import engine.lua.type.object.insts.Camera;
+import engine.lua.type.object.insts.Skybox;
 
-public class AmbientSkyShader extends ShaderProgram {
+public class StaticSkyShader extends ShaderProgram {
 
 	private UniformMatrix4 projectionMatrix = new UniformMatrix4("projectionMatrix");
-	private UniformMatrix4 transformationMatrix = new UniformMatrix4("transformationMatrix");;
-	private UniformMatrix4 viewMatrix = new UniformMatrix4("viewMatrix");;
+	private UniformMatrix4 transformationMatrix = new UniformMatrix4("transformationMatrix");
+	private UniformMatrix4 viewMatrix = new UniformMatrix4("viewMatrix");
 
-	private UniformVec3 ambient = new UniformVec3("ambient");;
+	private UniformSampler environmentMap = new UniformSampler("environmentMap");
 
-	private UniformMatrix4 viewMatrixPrev = new UniformMatrix4("viewMatrixPrev");;
-	private UniformMatrix4 projectionMatrixPrev = new UniformMatrix4("projectionMatrixPrev");;
+	private UniformVec3 ambient = new UniformVec3("ambient");
+
+	private UniformFloat power = new UniformFloat("power");
+	private UniformFloat brightness = new UniformFloat("brightness");
+
+	private UniformMatrix4 viewMatrixPrev = new UniformMatrix4("viewMatrixPrev");
+	private UniformMatrix4 projectionMatrixPrev = new UniformMatrix4("projectionMatrixPrev");
 
 	private Matrix4f temp = new Matrix4f();
 
 	@Override
 	protected void setupShader() {
-		super.addShader(new Shader("assets/shaders/sky/Ambient.vs", GL_VERTEX_SHADER));
-		super.addShader(new Shader("assets/shaders/sky/Ambient.fs", GL_FRAGMENT_SHADER));
+		super.addShader(new Shader("assets/shaders/sky/Static.vs", GL_VERTEX_SHADER));
+		super.addShader(new Shader("assets/shaders/sky/Static.fs", GL_FRAGMENT_SHADER));
 		super.setAttributes(new Attribute(0, "position"));
-		super.storeUniforms(projectionMatrix, transformationMatrix, viewMatrix, ambient, viewMatrixPrev,
-				projectionMatrixPrev);
+		super.storeUniforms(projectionMatrix, transformationMatrix, viewMatrix, environmentMap, power, brightness,
+				ambient, viewMatrixPrev, projectionMatrixPrev);
+	}
+
+	@Override
+	protected void loadInitialData() {
+		super.start();
+		environmentMap.loadTexUnit(0);
+		super.stop();
 	}
 
 	public void loadCamera(Camera camera, Matrix4f projection) {
@@ -79,6 +95,11 @@ public class AmbientSkyShader extends ShaderProgram {
 		temp._m32(0);
 		this.viewMatrixPrev.loadMatrix(temp);
 		this.projectionMatrixPrev.loadMatrix(projectionMatrixPrev);
+	}
+
+	public void loadSky(Skybox skybox) {
+		power.loadFloat(skybox.getPower());
+		brightness.loadFloat(skybox.getBrightness());
 	}
 
 	public void loadTransformationMatrix(Matrix4f mat) {

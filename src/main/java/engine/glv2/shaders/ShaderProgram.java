@@ -173,7 +173,7 @@ public abstract class ShaderProgram {
 		return shaderID;
 	}
 
-	protected class Shader {
+	public class Shader {
 		protected final String file;
 		protected final int type;
 		protected int id;

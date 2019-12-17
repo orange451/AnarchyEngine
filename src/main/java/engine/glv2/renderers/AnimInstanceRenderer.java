@@ -22,6 +22,7 @@ import engine.gl.Resources;
 import engine.gl.mesh.animation.AnimatedModel;
 import engine.gl.mesh.animation.AnimatedModelSubMesh;
 import engine.glv2.entities.CubeMapCamera;
+import engine.glv2.entities.LayeredCubeCamera;
 import engine.glv2.renderers.shaders.AnimInstanceDeferredShader;
 import engine.glv2.v2.IObjectRenderer;
 import engine.glv2.v2.IRenderingData;
@@ -72,8 +73,13 @@ public class AnimInstanceRenderer implements IObjectRenderer {
 		}
 		shader.stop();
 	}
-
+	
 	@Override
+	public void renderReflections(IRenderingData rd, RendererData rnd, LayeredCubeCamera cubeCamera) {
+		// TODO Auto-generated method stub
+		
+	}
+
 	public void renderReflections(IRenderingData rd, RendererData rnd, CubeMapCamera cubeCamera) {
 		forwardRenderer.render(instances, rd, rnd, cubeCamera, false, false);
 	}

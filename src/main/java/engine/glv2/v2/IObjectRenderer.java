@@ -24,7 +24,7 @@ import java.util.List;
 
 import org.joml.Vector2f;
 
-import engine.glv2.entities.CubeMapCamera;
+import engine.glv2.entities.LayeredCubeCamera;
 import engine.glv2.v2.lights.DirectionalLightCamera;
 import engine.glv2.v2.lights.SpotLightCamera;
 import engine.lua.type.object.Instance;
@@ -35,7 +35,7 @@ public interface IObjectRenderer {
 
 	public void render(IRenderingData rd, RendererData rnd, Vector2f resolution);
 
-	public void renderReflections(IRenderingData rd, RendererData rnd, CubeMapCamera cubeCamera);
+	public void renderReflections(IRenderingData rd, RendererData rnd, LayeredCubeCamera cubeCamera);
 
 	public void renderForward(IRenderingData rd, RendererData rnd);
 

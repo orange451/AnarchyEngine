@@ -224,8 +224,7 @@ public class GLRenderer implements IPipeline {
 		GPUProfiler.start("Environment Pass");
 		GPUProfiler.start("Irradiance");
 		GPUProfiler.start("CubeMap Render");
-		envRenderer.renderEnvironmentMap(currentCamera.getPosition().getInternal(), skyRenderer,
-				sun.getLight().direction, rnd);
+		envRenderer.renderIrradiance(skyRenderer, sun, rd, rnd);
 		GPUProfiler.end();
 		GPUProfiler.start("Irradiance Capture");
 		irradianceCapture.render(envRenderer.getCubeTexture());
@@ -233,8 +232,7 @@ public class GLRenderer implements IPipeline {
 		GPUProfiler.end();
 		GPUProfiler.start("Reflections");
 		GPUProfiler.start("CubeMap Render");
-		envRendererEntities.renderEnvironmentMap(currentCamera.getPosition().getInternal(), skyRenderer,
-				sun.getLight().direction, renderingManager, rd, rnd);
+		envRendererEntities.renderReflections(skyRenderer, sun, rd, rnd, renderingManager);
 		GPUProfiler.end();
 		GPUProfiler.start("PreFilteredEnvironment");
 		preFilteredEnvironment.render(envRendererEntities.getCubeTexture().getTexture());
