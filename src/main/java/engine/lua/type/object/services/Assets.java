@@ -467,6 +467,16 @@ public class Assets extends Service implements TreeViewable {
 				tm.setColor( Color3.newInstance((int)(mDiffuseColor.r()*255f), (int)(mDiffuseColor.g()*255f), (int)(mDiffuseColor.b()*255f)));
 			}
 			
+			if ( propertyKey.equals(Assimp.AI_MATKEY_COLOR_SPECULAR) ) {
+				float shine = prop.mData().getFloat();
+				tm.setRoughness(shine);
+			}
+			
+			if ( propertyKey.equals(Assimp.AI_MATKEY_REFLECTIVITY) ) {
+				float shine = prop.mData().getFloat();
+				tm.setMetalness(shine);
+			}
+			
 			if ( propertyKey.equals(Assimp.AI_MATKEY_SHININESS) ) {
 				float shine = prop.mData().getFloat();
 				tm.setReflective(shine / 256f);
