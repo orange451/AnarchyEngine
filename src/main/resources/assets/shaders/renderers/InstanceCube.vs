@@ -23,35 +23,16 @@ layout(location = 1) in vec3 normal;
 layout(location = 2) in vec2 textureCoords;
 layout(location = 3) in vec4 inColor;
 
-out vec2 pass_textureCoords;
-out vec3 pass_position;
-out mat3 TBN;
-out vec4 clipSpace;
-out vec4 clipSpacePrev;
-out vec3 pass_normal;;
+out vec2 passTextureCoords;
+out vec4 passPosition;
+out mat3 passTBN;
 
 uniform mat4 transformationMatrix;
-uniform mat4 transformationMatrixPrev;
-uniform mat4 projectionMatrix;
-uniform mat4 viewMatrix;
-uniform mat4 projectionMatrixPrev;
-uniform mat4 viewMatrixPrev;
-uniform mat4 jitterMatrix;
-uniform int frame;
-
-uniform bool useTAA;
 
 void main() {
 	vec4 worldPosition = transformationMatrix * vec4(position, 1.0);
-	vec4 positionRelativeToCam = viewMatrix * worldPosition;
-	clipSpace = projectionMatrix * positionRelativeToCam;
-	if (useTAA) {
-		gl_Position = jitterMatrix * clipSpace;
-	} else {
-		gl_Position = clipSpace;
-	}
-
-	pass_textureCoords = textureCoords;
+	gl_Position = worldPosition;
+	passTextureCoords = textureCoords;
 
 	vec3 t;
 	vec3 c1 = cross(normal, vec3(0.0, 0.0, 1.0));
@@ -64,12 +45,7 @@ void main() {
 	vec3 N = normalize(vec3(transformationMatrix * vec4(normal, 0.0)));
 	T = normalize(T - dot(T, N) * N);
 	vec3 B = cross(N, T);
-	TBN = mat3(T, B, N);
+	passTBN = mat3(T, B, N);
 
-	pass_position = worldPosition.xyz;
-
-	worldPosition = transformationMatrixPrev * vec4(position, 1.0);
-	positionRelativeToCam = viewMatrixPrev * worldPosition;
-	clipSpacePrev = projectionMatrixPrev * positionRelativeToCam;
-	pass_normal = vec3(transformationMatrix * vec4(normal, 0.0));
+	passPosition = worldPosition;
 }

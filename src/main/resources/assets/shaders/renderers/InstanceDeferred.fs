@@ -25,6 +25,7 @@ in vec3 pass_position;
 in mat3 TBN;
 in vec4 clipSpace;
 in vec4 clipSpacePrev;
+in vec3 pass_normal;
 
 out vec4[5] out_Color;
 
@@ -57,7 +58,7 @@ void main() {
 
 	out_Color[0] = vec4(diffuseF.rgb, 0.0);
 	out_Color[1] = vec4((ndcPosPrev - ndcPos).xy, 0.0, 0.0);
-	out_Color[2] = vec4(normal, 0.0);
-	out_Color[3] = vec4(roughnessF, metallicF, 0.0, 0.0);
+	out_Color[2] = vec4(pass_normal, 0.0);
+	out_Color[3] = vec4(0.0, metallicF, 0.0, 0.0);
 	out_Color[4] = vec4(material.emissive.rgb * diffuseF.rgb, PBR_OBJECT);
 }

@@ -46,7 +46,6 @@ import engine.gl.MaterialGL;
 import engine.gl.Resources;
 import engine.gl.light.PointLightInternal;
 import engine.gl.mesh.BufferedMesh;
-import engine.glv2.entities.CubeMapCamera;
 import engine.glv2.renderers.shaders.InstanceFowardShader;
 import engine.glv2.v2.IRenderingData;
 import engine.glv2.v2.RendererData;
@@ -65,14 +64,10 @@ public class InstanceForwardRenderer {
 		shader.init();
 	}
 
-	public void render(List<Instance> instances, IRenderingData rd, RendererData rnd, CubeMapCamera cubeCamera,
-			boolean colorCorrect, boolean transparentOnly) {
+	public void render(List<Instance> instances, IRenderingData rd, RendererData rnd) {
 		shader.start();
-		if (cubeCamera == null) // TODO: Improve
-			shader.loadCamera(rd.camera, rd.projectionMatrix);
-		else
-			shader.loadCamera(cubeCamera);
-		shader.colorCorrect(colorCorrect);
+		shader.loadCamera(rd.camera, rd.projectionMatrix);
+		shader.colorCorrect(true);
 		shader.loadSettings(true);
 		shader.loadExposure(rnd.exposure);
 		shader.loadGamma(rnd.gamma);
@@ -91,12 +86,12 @@ public class InstanceForwardRenderer {
 			}
 		}
 		for (Instance instance : instances) {
-			renderInstance(instance, rnd, transparentOnly);
+			renderInstance(instance, rnd);
 		}
 		shader.stop();
 	}
 
-	private void renderInstance(Instance inst, RendererData rnd, boolean transparentOnly) {
+	private void renderInstance(Instance inst, RendererData rnd) {
 		GameObject go = (GameObject) inst;
 		if (go.isDestroyed())
 			return;
@@ -149,7 +144,7 @@ public class InstanceForwardRenderer {
 			float iMatTrans = 1.0f - material.getTransparency();
 			float iObjTrans = 1.0f - go.getTransparency();
 			float trans = iMatTrans * iObjTrans;
-			if (trans == 1.0 && transparentOnly)
+			if (trans == 1.0)
 				continue;
 
 			prepareMaterial(material);

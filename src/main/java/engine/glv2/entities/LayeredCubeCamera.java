@@ -108,6 +108,7 @@ public class LayeredCubeCamera {
 
 	public void setPosition(Vector3f position) {
 		this.position = position;
+		generateViewMatrix();
 	}
 
 	private Matrix4f createViewMatrix(Matrix4f matrix) {
@@ -115,7 +116,17 @@ public class LayeredCubeCamera {
 			matrix = new Matrix4f();
 		matrix.identity();
 		createViewMatrixRot(rotation.x, rotation.y, rotation.z, matrix);
+		createViewMatrixPos(position, matrix);
 		return matrix;
+	}
+
+	private Matrix4f createViewMatrixPos(Vector3f pos, Matrix4f viewMatrix) {
+		if (viewMatrix == null) {
+			viewMatrix = new Matrix4f();
+			viewMatrix.identity();
+		}
+		viewMatrix.translate(pos.negate(new Vector3f()));
+		return viewMatrix;
 	}
 
 	private Matrix4f createViewMatrixRot(float pitch, float yaw, float roll, Matrix4f viewMatrix) {

@@ -30,14 +30,13 @@ in mat3 TBN;
 
 out vec4 out_Color;
 
-uniform int colorCorrect;
+uniform bool colorCorrect;
 uniform Material material;
 uniform vec3 cameraPosition;
-uniform vec3 lightPosition;
 uniform samplerCube irradianceMap;
 uniform samplerCube preFilterEnv;
 uniform sampler2D brdfLUT;
-uniform int useShadows;
+uniform bool useShadows;
 uniform mat4 biasMatrix;
 uniform float transparency;
 uniform float exposure;
@@ -127,7 +126,7 @@ void main() {
 
 	vec3 ambient = kD * diffuse + specular;
 	vec3 color = ambient + emissive + Lo;
-	if (colorCorrect == 1) {
+	if (colorCorrect) {
 		vec3 final = vec3(1.0) - exp(-color * exposure);
 
 		// Apply tone-mapping

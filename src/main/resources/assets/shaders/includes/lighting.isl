@@ -416,7 +416,7 @@ float lookupV2(vec2 offsetIn, vec2 multTex, vec4 shadowCoord[4], sampler2DArrayS
 }
 
 float computeShadowV2(vec3 position, DirectionalLight light) {
-	if (useShadows == 1) {
+	if (useShadows) {
 		float shadow = 0.0;
 		vec4 posLight = light.viewMatrix * vec4(position, 1.0);
 		vec2 multTex = 1.0 / textureSize(light.shadowMap, 0).xy;

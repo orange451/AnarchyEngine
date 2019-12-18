@@ -59,7 +59,7 @@ public class AnimInstanceRenderer implements IObjectRenderer {
 	@Override
 	public void preProcess(List<Instance> instances) {
 		for (Instance entity : instances) {
-			processEntity(entity);
+			processInstance(entity);
 		}
 	}
 
@@ -104,14 +104,21 @@ public class AnimInstanceRenderer implements IObjectRenderer {
 		instances.clear();
 	}
 
-	private void processEntity(Instance instance) {
-		AnimationController anim = (AnimationController) instance.findFirstChildOfClass(C_ANIMATIONCONTROLLER);
-		AnimatedModel animatedModel = anim.getAnimatedModel();
-		if ( animatedModel == null )
+	private void processInstance(Instance inst) {
+		AnimationController anim = (AnimationController) inst.findFirstChildOfClass(C_ANIMATIONCONTROLLER);
+		if ( anim == null )
+			return;
+		
+		GameObject go = anim.getLinkedInstance();
+		if (go.isDestroyed())
+			return;
+		if (go.getParent().isnil())
+			return;
+		if (go.getPrefab() == null)
 			return;
 		
 		anim.getAnimatedModel().renderV2();
-		instances.add(instance);
+		instances.add(inst);
 	}
 
 	private void renderInstance(Instance inst) {

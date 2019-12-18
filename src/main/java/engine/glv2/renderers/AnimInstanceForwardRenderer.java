@@ -77,8 +77,8 @@ public class AnimInstanceForwardRenderer {
 		shader.start();
 		if (cubeCamera == null) // TODO: Improve
 			shader.loadCamera(rd.camera, rd.projectionMatrix);
-		else
-			shader.loadCamera(cubeCamera);
+		//else
+		//	shader.loadCamera(cubeCamera);
 		shader.colorCorrect(colorCorrect);
 		shader.loadSettings(true);
 		shader.loadExposure(rnd.exposure);

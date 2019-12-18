@@ -30,7 +30,6 @@ import org.joml.Matrix4f;
 import engine.gl.MaterialGL;
 import engine.gl.light.DirectionalLightInternal;
 import engine.gl.light.PointLightInternal;
-import engine.glv2.entities.CubeMapCamera;
 import engine.glv2.shaders.ShaderProgram;
 import engine.glv2.shaders.data.Attribute;
 import engine.glv2.shaders.data.UniformBoolean;
@@ -47,10 +46,10 @@ import engine.lua.type.object.insts.Camera;
 public class InstanceFowardShader extends ShaderProgram {
 
 	private UniformMatrix4 transformationMatrix = new UniformMatrix4("transformationMatrix");
-	private UniformMatrix4 projectionMatrix = new UniformMatrix4("projectionMatrix");
+	protected UniformMatrix4 projectionMatrix = new UniformMatrix4("projectionMatrix");
 	private UniformMatrix4 viewMatrix = new UniformMatrix4("viewMatrix");
 	private UniformMaterial material = new UniformMaterial("material");
-	private UniformVec3 cameraPosition = new UniformVec3("cameraPosition");
+	protected UniformVec3 cameraPosition = new UniformVec3("cameraPosition");
 	private UniformSampler irradianceMap = new UniformSampler("irradianceMap");
 	private UniformSampler preFilterEnv = new UniformSampler("preFilterEnv");
 	private UniformSampler brdfLUT = new UniformSampler("brdfLUT");
@@ -122,12 +121,6 @@ public class InstanceFowardShader extends ShaderProgram {
 		projectionMatrix.loadMatrix(projection);
 		viewMatrix.loadMatrix(camera.getViewMatrix().getInternal());
 		cameraPosition.loadVec3(camera.getPosition().getInternal());
-	}
-
-	public void loadCamera(CubeMapCamera camera) {
-		projectionMatrix.loadMatrix(camera.getProjectionMatrix());
-		viewMatrix.loadMatrix(camera.getViewMatrix());
-		cameraPosition.loadVec3(camera.getPosition());
 	}
 
 	public void loadPointLights(List<PointLightInternal> lights) {

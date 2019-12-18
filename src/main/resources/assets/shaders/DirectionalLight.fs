@@ -30,7 +30,7 @@ uniform sampler2D gNormal;
 uniform sampler2D gPBR; // R = roughness, G = metallic
 uniform sampler2D gMask;
 uniform sampler2D gDepth;
-uniform int useShadows;
+uniform bool useShadows;
 uniform mat4 biasMatrix;
 uniform mat4 projectionMatrix;
 uniform mat4 viewMatrix;
