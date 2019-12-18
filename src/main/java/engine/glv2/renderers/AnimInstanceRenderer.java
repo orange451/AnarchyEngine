@@ -21,7 +21,6 @@ import engine.gl.MaterialGL;
 import engine.gl.Resources;
 import engine.gl.mesh.animation.AnimatedModel;
 import engine.gl.mesh.animation.AnimatedModelSubMesh;
-import engine.glv2.entities.CubeMapCamera;
 import engine.glv2.entities.LayeredCubeCamera;
 import engine.glv2.renderers.shaders.AnimInstanceDeferredShader;
 import engine.glv2.v2.IObjectRenderer;
@@ -43,6 +42,7 @@ public class AnimInstanceRenderer implements IObjectRenderer {
 	private List<Instance> instances = new ArrayList<>();
 	private AnimInstanceShadowRenderer shadowRenderer;
 	private AnimInstanceForwardRenderer forwardRenderer;
+	private AnimInstanceCubeRenderer cubeRenderer;
 
 	// TODO: this should NOT be here
 	private static final LuaValue C_ANIMATIONCONTROLLER = LuaValue.valueOf("AnimationController");
@@ -54,6 +54,7 @@ public class AnimInstanceRenderer implements IObjectRenderer {
 		shader.init();
 		shadowRenderer = new AnimInstanceShadowRenderer();
 		forwardRenderer = new AnimInstanceForwardRenderer();
+		cubeRenderer = new AnimInstanceCubeRenderer();
 	}
 
 	@Override
@@ -73,20 +74,15 @@ public class AnimInstanceRenderer implements IObjectRenderer {
 		}
 		shader.stop();
 	}
-	
+
 	@Override
 	public void renderReflections(IRenderingData rd, RendererData rnd, LayeredCubeCamera cubeCamera) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public void renderReflections(IRenderingData rd, RendererData rnd, CubeMapCamera cubeCamera) {
-		forwardRenderer.render(instances, rd, rnd, cubeCamera, false, false);
+		cubeRenderer.render(instances, rnd, cubeCamera);
 	}
 
 	@Override
 	public void renderForward(IRenderingData rd, RendererData rnd) {
-		forwardRenderer.render(instances, rd, rnd, null, true, true);
+		forwardRenderer.render(instances, rd, rnd);
 	}
 
 	@Override
@@ -106,9 +102,9 @@ public class AnimInstanceRenderer implements IObjectRenderer {
 
 	private void processInstance(Instance inst) {
 		AnimationController anim = (AnimationController) inst.findFirstChildOfClass(C_ANIMATIONCONTROLLER);
-		if ( anim == null )
+		if (anim == null)
 			return;
-		
+
 		GameObject go = anim.getLinkedInstance();
 		if (go.isDestroyed())
 			return;
@@ -116,16 +112,16 @@ public class AnimInstanceRenderer implements IObjectRenderer {
 			return;
 		if (go.getPrefab() == null)
 			return;
-		
+
 		anim.getAnimatedModel().renderV2();
 		instances.add(inst);
 	}
 
 	private void renderInstance(Instance inst) {
 		AnimationController anim = (AnimationController) inst.findFirstChildOfClass(C_ANIMATIONCONTROLLER);
-		if ( anim == null )
+		if (anim == null)
 			return;
-		
+
 		GameObject go = anim.getLinkedInstance();
 		if (go.isDestroyed())
 			return;
@@ -195,6 +191,7 @@ public class AnimInstanceRenderer implements IObjectRenderer {
 		shader.dispose();
 		shadowRenderer.dispose();
 		forwardRenderer.dispose();
+		cubeRenderer.dispose();
 	}
 
 	@Override

@@ -4,15 +4,18 @@ import static org.lwjgl.stb.STBImage.stbi_failure_reason;
 import static org.lwjgl.stb.STBImage.stbi_info_from_memory;
 import static org.lwjgl.stb.STBImage.stbi_load_from_memory;
 
+import static org.lwjgl.system.MemoryStack.*;
+import static org.lwjgl.system.MemoryUtil.*;
+
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 
-import org.lwjgl.BufferUtils;
 import org.lwjgl.stb.STBImage;
 import org.lwjgl.stb.STBImageResize;
+import org.lwjgl.system.MemoryStack;
 
-import engine.util.IOUtil;
+import engine.resources.ResourcesManager;
 import lwjgui.paint.Color;
 
 public class Image {
@@ -33,7 +36,7 @@ public class Image {
 		//STBImage.nstbi_set_flip_vertically_on_load(1);
 		ByteBuffer imageBuffer;
 		try {
-			imageBuffer = IOUtil.ioResourceToByteBuffer(imagePath, 4 * 1024);
+			imageBuffer = ResourcesManager.ioResourceToByteBuffer(imagePath, 4 * 1024);
 		} catch (IOException e) {
 			System.err.println("Image " + imagePath + " not found!");
 			image = null;
@@ -43,51 +46,56 @@ public class Image {
 		if ( imageBuffer == null )
 			return;
 
-		IntBuffer w = BufferUtils.createIntBuffer(1);
-		IntBuffer h = BufferUtils.createIntBuffer(1);
-		IntBuffer comp = BufferUtils.createIntBuffer(1);
-		
-		this.flipped = flipY;
+		try (MemoryStack stack = stackPush()) {
+			IntBuffer w = stack.mallocInt(1);
+			IntBuffer h = stack.mallocInt(1);
+			IntBuffer comp = stack.mallocInt(1);
 
-		// Use info to read image metadata without decoding the entire image.
-		// We don't need this for this demo, just testing the API.
-		if ( !stbi_info_from_memory(imageBuffer, w, h, comp) )
-			throw new RuntimeException("Image " + imagePath + " Failed to read image information: " + stbi_failure_reason());
+			this.flipped = flipY;
 
-		/*System.out.println("Image width: " + w.get(0));
-		System.out.println("Image height: " + h.get(0));
-		System.out.println("Image components: " + comp.get(0));
-		System.out.println("Image HDR: " + stbi_is_hdr_from_memory(imageBuffer));*/
-		
-		this.w = w.get(0);
-		this.h = h.get(0);
-		this.comp = comp.get(0);
-		this.hdr = STBImage.stbi_is_hdr_from_memory(imageBuffer);
+			// Use info to read image metadata without decoding the entire image.
+			// We don't need this for this demo, just testing the API.
+			if (!stbi_info_from_memory(imageBuffer, w, h, comp))
+				throw new RuntimeException(
+						"Image " + imagePath + " Failed to read image information: " + stbi_failure_reason());
 
-		// Decode the image
-		ByteBuffer data = stbi_load_from_memory(imageBuffer, w, h, comp, 0);
-		
-		ByteBuffer ff = data;
-		if ( flipped ) {
-			ByteBuffer temp = BufferUtils.createByteBuffer( data.capacity() );
-		
-			for (int row = this.h-1; row >= 0; row--) {
-				int offset = row*this.w*this.comp;
-				for (int x = 0; x < this.w; x++) {
-					for (int i = 0; i < this.comp; i++) {
-						byte t = data.get(offset+(x*this.comp+i));
-						temp.put(t);
+			/*
+			 * System.out.println("Image width: " + w.get(0));
+			 * System.out.println("Image height: " + h.get(0));
+			 * System.out.println("Image components: " + comp.get(0));
+			 * System.out.println("Image HDR: " + stbi_is_hdr_from_memory(imageBuffer));
+			 */
+
+			this.w = w.get(0);
+			this.h = h.get(0);
+			this.comp = comp.get(0);
+			this.hdr = STBImage.stbi_is_hdr_from_memory(imageBuffer);
+
+			// Decode the image
+			ByteBuffer data = stbi_load_from_memory(imageBuffer, w, h, comp, 0);
+			memFree(imageBuffer);
+
+			ByteBuffer ff = data;
+			if (flipped) {
+				ByteBuffer temp = memAlloc(data.capacity());
+
+				for (int row = this.h - 1; row >= 0; row--) {
+					int offset = row * this.w * this.comp;
+					for (int x = 0; x < this.w; x++) {
+						for (int i = 0; i < this.comp; i++) {
+							byte t = data.get(offset + (x * this.comp + i));
+							temp.put(t);
+						}
 					}
 				}
+				temp.flip();
+				ff = temp;
+
+				memFree(data);
 			}
-			temp.flip();
-			ff = temp;
-			
-			data.clear();
-			BufferUtils.zeroBuffer(data);
+
+			setData(ff);
 		}
-		
-		setData( ff );
 
 		if ( image == null ) {
 			System.err.println("Failed to load image: " + stbi_failure_reason());
@@ -111,7 +119,7 @@ public class Image {
 		this.h = height;
 		
 
-		ByteBuffer data = BufferUtils.createByteBuffer( w*h*comp );
+		ByteBuffer data = memAlloc( w*h*comp );
 
 		byte rr = (byte) (color.getRed() & 0xff);
 		byte gg = (byte) (color.getGreen() & 0xff);
@@ -135,7 +143,7 @@ public class Image {
 		this.loaded = false;
 
 		long start = System.currentTimeMillis();
-		ByteBuffer newImage = BufferUtils.createByteBuffer( width * height * this.comp );
+		ByteBuffer newImage = memAlloc( width * height * this.comp );
 		int alpha = (comp == 4)?3:STBImageResize.STBIR_ALPHA_CHANNEL_NONE;
 		
 		STBImageResize.stbir_resize(
@@ -157,6 +165,7 @@ public class Image {
 		        STBImageResize.STBIR_FILTER_CUBICBSPLINE,
 		        STBImageResize.STBIR_COLORSPACE_LINEAR
 		);
+		memFree(image);
 
 
 		this.w = width;
@@ -175,7 +184,7 @@ public class Image {
 		if ( image == null )
 			return;
 		
-		IOUtil.freeBuffer(image);
+		memFree(image);
 		image = null;
 	}
 

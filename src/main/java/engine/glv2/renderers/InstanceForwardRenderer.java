@@ -68,7 +68,7 @@ public class InstanceForwardRenderer {
 		shader.start();
 		shader.loadCamera(rd.camera, rd.projectionMatrix);
 		shader.colorCorrect(true);
-		shader.loadSettings(true);
+		shader.loadSettings(rnd.rs.shadowsEnabled);
 		shader.loadExposure(rnd.exposure);
 		shader.loadGamma(rnd.gamma);
 		shader.loadDirectionalLights(rnd.dlh.getLights());

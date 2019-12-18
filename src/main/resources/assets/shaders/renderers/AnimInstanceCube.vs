@@ -22,52 +22,44 @@ layout(location = 0) in vec3 position;
 layout(location = 1) in vec3 normal;
 layout(location = 2) in vec2 textureCoords;
 layout(location = 3) in vec4 inColor;
+layout(location = 4) in vec4 boneIndices;
+layout(location = 5) in vec4 boneWeights;
 
-out vec2 pass_textureCoords;
-out vec3 pass_position;
-out mat3 TBN;
-out vec4 clipSpace;
-out vec4 clipSpacePrev;
+#define MAX_BONES 128
+
+out vec2 passTextureCoords;
+out vec4 passPosition;
+out mat3 passTBN;
 
 uniform mat4 transformationMatrix;
-uniform mat4 transformationMatrixPrev;
-uniform mat4 projectionMatrix;
-uniform mat4 viewMatrix;
-uniform mat4 projectionMatrixPrev;
-uniform mat4 viewMatrixPrev;
-uniform mat4 jitterMatrix;
-uniform int frame;
 
-uniform bool useTAA;
+uniform mat4 boneMat[MAX_BONES];
 
 void main() {
-	vec4 worldPosition = transformationMatrix * vec4(position, 1.0);
-	vec4 positionRelativeToCam = viewMatrix * worldPosition;
-	clipSpace = projectionMatrix * positionRelativeToCam;
-	if (useTAA) {
-		gl_Position = jitterMatrix * clipSpace;
-	} else {
-		gl_Position = clipSpace;
-	}
+	mat4 boneTransform = boneMat[int(boneIndices[0])] * boneWeights[0];
+	boneTransform += boneMat[int(boneIndices[1])] * boneWeights[1];
+	boneTransform += boneMat[int(boneIndices[2])] * boneWeights[2];
+	boneTransform += boneMat[int(boneIndices[3])] * boneWeights[3];
 
-	pass_textureCoords = textureCoords;
+	vec4 BToP = boneTransform * vec4(position, 1.0);
+	vec4 BToN = boneTransform * vec4(normal, 0.0);
+
+	vec4 worldPosition = transformationMatrix * BToP;
+	gl_Position = worldPosition;
+	passTextureCoords = textureCoords;
 
 	vec3 t;
-	vec3 c1 = cross(normal, vec3(0.0, 0.0, 1.0));
-	vec3 c2 = cross(normal, vec3(0.0, 1.0, 0.0));
+	vec3 c1 = cross(BToN.xyz, vec3(0.0, 0.0, 1.0));
+	vec3 c2 = cross(BToN.xyz, vec3(0.0, 1.0, 0.0));
 	if (length(c1) > length(c2))
 		t = c1;
 	else
 		t = c2;
 	vec3 T = normalize(vec3(transformationMatrix * vec4(t, 0.0)));
-	vec3 N = normalize(vec3(transformationMatrix * vec4(normal, 0.0)));
+	vec3 N = normalize(vec3(transformationMatrix * vec4(BToN.xyz, 0.0)));
 	T = normalize(T - dot(T, N) * N);
 	vec3 B = cross(N, T);
-	TBN = mat3(T, B, N);
+	passTBN = mat3(T, B, N);
 
-	pass_position = worldPosition.xyz;
-
-	worldPosition = transformationMatrixPrev * vec4(position, 1.0);
-	positionRelativeToCam = viewMatrixPrev * worldPosition;
-	clipSpacePrev = projectionMatrixPrev * positionRelativeToCam;
+	passPosition = worldPosition;
 }

@@ -29,6 +29,8 @@ public class StaticSkyCubeShader extends ShaderProgram {
 	private UniformFloat power = new UniformFloat("power");
 	private UniformFloat brightness = new UniformFloat("brightness");
 
+	private Matrix4f temp = new Matrix4f();
+
 	@Override
 	protected void setupShader() {
 		super.addShader(new Shader("assets/shaders/sky/StaticCube.vs", GL_VERTEX_SHADER));
@@ -49,8 +51,13 @@ public class StaticSkyCubeShader extends ShaderProgram {
 	}
 
 	public void loadCamera(LayeredCubeCamera camera) {
-		for (int i = 0; i < 6; i++)
-			this.viewMatrixCube[i].loadMatrix(camera.getViewMatrix()[i]);
+		for (int i = 0; i < 6; i++) {
+			temp.set(camera.getViewMatrix()[i]);
+			temp._m30(0);
+			temp._m31(0);
+			temp._m32(0);
+			this.viewMatrixCube[i].loadMatrix(temp);
+		}
 		this.projectionMatrix.loadMatrix(camera.getProjectionMatrix());
 	}
 

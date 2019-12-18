@@ -38,6 +38,8 @@ import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
 import java.util.Iterator;
 
+import org.lwjgl.system.MemoryUtil;
+
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.ObjectMap.Entry;
 
@@ -53,7 +55,7 @@ public final class ResourcesManager {
 	private static ObjectMap<Task<Texture>, Texture> textureTasks = new ObjectMap<>();
 
 	public static void processShaderIncludes(String file) {
-		//TaskManager.submitBackgroundThread(new ShaderIncludeTask(file));
+		// TaskManager.submitBackgroundThread(new ShaderIncludeTask(file));
 	}
 
 	public static Task<Texture> loadTextureMisc(String fileName, OnFinished<Texture> dst) {
@@ -64,8 +66,7 @@ public final class ResourcesManager {
 			OnFinished<Texture> dst) {
 		System.out.println("Texture scheduled to load: " + fileName);
 		return TaskManager.submitRenderBackgroundThread(
-				new LoadTextureTask(fileName, filter, GL_REPEAT, GL_RGBA, textureMipMapAF)
-						.setOnFinished(dst));
+				new LoadTextureTask(fileName, filter, GL_REPEAT, GL_RGBA, textureMipMapAF).setOnFinished(dst));
 	}
 
 	public static Task<Texture> loadTexture(String fileName, OnFinished<Texture> dst) {
@@ -76,8 +77,7 @@ public final class ResourcesManager {
 			OnFinished<Texture> dst) {
 		System.out.println("Texture scheduled to load: " + fileName);
 		return TaskManager.submitRenderBackgroundThread(
-				new LoadTextureTask(fileName, filter, GL_REPEAT, GL_SRGB_ALPHA, textureMipMapAF)
-						.setOnFinished(dst));
+				new LoadTextureTask(fileName, filter, GL_REPEAT, GL_SRGB_ALPHA, textureMipMapAF).setOnFinished(dst));
 	}
 
 	public static void disposeTexture(Texture texture) {
@@ -101,6 +101,16 @@ public final class ResourcesManager {
 		}
 	}
 
+	/**
+	 * Loads a file into a {@link MemoryUtil#memAlloc(int)} allocated
+	 * {@link ByteBuffer}, this buffer needs to be freed using
+	 * {@link MemoryUtil#memFree(java.nio.Buffer)}
+	 * 
+	 * @param resource
+	 * @param bufferSize
+	 * @return
+	 * @throws IOException
+	 */
 	public static ByteBuffer ioResourceToByteBuffer(String resource, int bufferSize) throws IOException {
 		ByteBuffer buffer;
 
@@ -136,6 +146,5 @@ public final class ResourcesManager {
 		buffer.flip();
 		return buffer;
 	}
-
 
 }

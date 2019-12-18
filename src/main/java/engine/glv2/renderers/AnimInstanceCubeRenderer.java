@@ -50,8 +50,8 @@ import engine.gl.Resources;
 import engine.gl.light.PointLightInternal;
 import engine.gl.mesh.animation.AnimatedModel;
 import engine.gl.mesh.animation.AnimatedModelSubMesh;
-import engine.glv2.renderers.shaders.AnimInstanceFowardShader;
-import engine.glv2.v2.IRenderingData;
+import engine.glv2.entities.LayeredCubeCamera;
+import engine.glv2.renderers.shaders.AnimInstanceCubeShader;
 import engine.glv2.v2.RendererData;
 import engine.lua.type.object.Instance;
 import engine.lua.type.object.PrefabRenderer;
@@ -59,22 +59,22 @@ import engine.lua.type.object.insts.AnimationController;
 import engine.lua.type.object.insts.GameObject;
 import engine.lua.type.object.insts.Material;
 
-public class AnimInstanceForwardRenderer {
+public class AnimInstanceCubeRenderer {
 
-	private AnimInstanceFowardShader shader;
+	private AnimInstanceCubeShader shader;
 
 	// TODO: this should NOT be here
 	private static final LuaValue C_ANIMATIONCONTROLLER = LuaValue.valueOf("AnimationController");
 
-	public AnimInstanceForwardRenderer() {
-		shader = new AnimInstanceFowardShader();
+	public AnimInstanceCubeRenderer() {
+		shader = new AnimInstanceCubeShader();
 		shader.init();
 	}
 
-	public void render(List<Instance> instances, IRenderingData rd, RendererData rnd) {
+	public void render(List<Instance> instances, RendererData rnd, LayeredCubeCamera cubeCamera) {
 		shader.start();
-		shader.loadCamera(rd.camera, rd.projectionMatrix);
-		shader.colorCorrect(true);
+		shader.loadCamera(cubeCamera);
+		shader.colorCorrect(false);
 		shader.loadSettings(rnd.rs.shadowsEnabled);
 		shader.loadExposure(rnd.exposure);
 		shader.loadGamma(rnd.gamma);
@@ -153,8 +153,6 @@ public class AnimInstanceForwardRenderer {
 			float iMatTrans = 1.0f - material.getTransparency();
 			float iObjTrans = 1.0f - go.getTransparency();
 			float trans = iMatTrans * iObjTrans;
-			if (trans == 1.0)
-				continue;
 
 			prepareMaterial(material);
 			shader.loadMaterial(material);

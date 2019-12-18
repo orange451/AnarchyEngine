@@ -21,6 +21,8 @@ public class AmbientSkyCubeShader extends ShaderProgram {
 
 	private UniformVec3 ambient = new UniformVec3("ambient");
 
+	private Matrix4f temp = new Matrix4f();
+
 	@Override
 	protected void setupShader() {
 		super.addShader(new Shader("assets/shaders/sky/AmbientCube.vs", GL_VERTEX_SHADER));
@@ -34,8 +36,13 @@ public class AmbientSkyCubeShader extends ShaderProgram {
 	}
 
 	public void loadCamera(LayeredCubeCamera camera) {
-		for (int i = 0; i < 6; i++)
-			this.viewMatrixCube[i].loadMatrix(camera.getViewMatrix()[i]);
+		for (int i = 0; i < 6; i++) {
+			temp.set(camera.getViewMatrix()[i]);
+			temp._m30(0);
+			temp._m31(0);
+			temp._m32(0);
+			this.viewMatrixCube[i].loadMatrix(temp);
+		}
 		this.projectionMatrix.loadMatrix(camera.getProjectionMatrix());
 	}
 

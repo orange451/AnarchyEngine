@@ -2,6 +2,7 @@ package engine.util;
 
 import org.lwjgl.BufferUtils;
 
+import engine.resources.ResourcesManager;
 import engine.util.DeallocationHelper.Deallocator;
 
 import java.io.*;
@@ -50,6 +51,7 @@ public final class IOUtil {
 	 * @return the resource data
 	 *
 	 * @throws IOException if an IO error occurs
+	 * @deprecated Use {@link ResourcesManager#ioResourceToByteBuffer(String, int)}
 	 */
 	public static ByteBuffer ioResourceToByteBuffer(String resource, int bufferSize) throws IOException {
 		if ( resource == null )
@@ -84,7 +86,11 @@ public final class IOUtil {
 		buffer.flip();
 		return buffer;
 	}
-
+	/**
+	 * 
+	 * @param buffer
+	 * @deprecated Use {@link ResourcesManager#ioResourceToByteBuffer(String, int)}
+	 */
 	public static void freeBuffer(ByteBuffer buffer) {
 		try {
 			if ( deallocate == null ) {
