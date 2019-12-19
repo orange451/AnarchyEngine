@@ -41,6 +41,8 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.lwjgl.opengl.GL;
 
+import engine.util.GLCompat;
+
 public class TaskManager {
 
 	private static Queue<Task<?>> tasksMainThread = new ConcurrentLinkedQueue<>(),
@@ -201,8 +203,8 @@ public class TaskManager {
 		glfwWindowHint(GLFW_VISIBLE, GL_FALSE);
 		glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 		glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, GLCompat.GL_MAJOR);
+		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, GLCompat.GL_MINOR);
 		asyncWindow = glfwCreateWindow(1, 1, "Background Window", NULL, parent);
 		if (asyncWindow == NULL)
 			throw new RuntimeException("Failed to create background window");
@@ -220,8 +222,8 @@ public class TaskManager {
 				}
 				glfwSwapBuffers(asyncWindow);
 			}
-			glfwMakeContextCurrent(NULL);
 			GL.setCapabilities(null);
+			glfwMakeContextCurrent(NULL);
 		});
 		renderBackgroundThread.setName("Render Background");
 		renderBackgroundThread.start();

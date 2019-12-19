@@ -47,6 +47,7 @@ import engine.gl.Resources;
 import engine.observer.InternalRenderable;
 import engine.observer.Renderable;
 import engine.tasks.TaskManager;
+import engine.util.GLCompat;
 import ide.layout.windows.ErrorWindow;
 
 public abstract class RenderableApplication extends Application implements Renderable,InternalRenderable {
@@ -153,17 +154,18 @@ public abstract class RenderableApplication extends Application implements Rende
 			return;
 		}
 		
+		GLCompat.init(3, 3);
 
 		// Configure GLFW
 		glfwDefaultWindowHints(); // optional, the current window hints are already the default
 		glfwWindowHint(GLFW_VISIBLE, GL_FALSE); // the window will stay hidden after creation
 		glfwWindowHint(GLFW_RESIZABLE, GL_TRUE); // the window will be resizable
 
-		// Core OpenGL version 3.3
+		// Core OpenGL with version 3.3 as the lower limit
 		glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 		glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, GLCompat.GL_MAJOR);
+		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, GLCompat.GL_MINOR);
 
 		// Create the window
 		window = glfwCreateWindow(1024, 640, "Window", NULL, NULL);
@@ -234,6 +236,9 @@ public abstract class RenderableApplication extends Application implements Rende
 			return;
 		}
 		renderThread.run();
+
+		GL.setCapabilities(null);
+		glfwMakeContextCurrent(NULL);
 
 		Callbacks.glfwFreeCallbacks(window);
 		glfwDestroyWindow(window);

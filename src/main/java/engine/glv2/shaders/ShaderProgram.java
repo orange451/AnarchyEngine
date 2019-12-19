@@ -53,6 +53,7 @@ import engine.glv2.exceptions.CompileShaderException;
 import engine.glv2.exceptions.LoadShaderException;
 import engine.glv2.shaders.data.Attribute;
 import engine.glv2.shaders.data.IUniform;
+import engine.util.GLCompat;
 
 public abstract class ShaderProgram {
 	private int program;
@@ -142,7 +143,7 @@ public abstract class ShaderProgram {
 		System.out.println("Loading Shader: " + shader.file);
 		try (BufferedReader reader = new BufferedReader(new InputStreamReader(filet))) {
 
-			shaderSource.append("#version 330 core").append("//\n");
+			shaderSource.append(GLCompat.GLSL_VERSION).append("//\n");
 			if (!GL.getCapabilities().GL_ARB_clip_control)
 				shaderSource.append("#define OneToOneDepth").append("//\n");
 			String line;

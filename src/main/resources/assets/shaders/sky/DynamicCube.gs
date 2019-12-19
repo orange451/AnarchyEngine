@@ -19,6 +19,9 @@
 //
 
 layout(triangles) in;
+#if __VERSION__ >= 400
+layout(invocations = 6) in;
+#endif
 layout(triangle_strip, max_vertices = 18) out;
 
 in vec2 passTextureCoords[];
@@ -32,28 +35,35 @@ uniform mat4 viewMatrixCube[6];
 
 vec4 positionRelativeToCam;
 
+void compute(int i) {
+	gl_Layer = i;
+
+	positionRelativeToCam = viewMatrixCube[i] * gl_in[0].gl_Position;
+	pass_textureCoords = passTextureCoords[0];
+	pass_normal = passNormal[0];
+	gl_Position = projectionMatrix * positionRelativeToCam;
+	EmitVertex();
+
+	positionRelativeToCam = viewMatrixCube[i] * gl_in[1].gl_Position;
+	pass_textureCoords = passTextureCoords[1];
+	pass_normal = passNormal[1];
+	gl_Position = projectionMatrix * positionRelativeToCam;
+	EmitVertex();
+
+	positionRelativeToCam = viewMatrixCube[i] * gl_in[2].gl_Position;
+	pass_textureCoords = passTextureCoords[2];
+	pass_normal = passNormal[2];
+	gl_Position = projectionMatrix * positionRelativeToCam;
+	EmitVertex();
+
+	EndPrimitive();
+}
+
 void main() {
-	for (int i = 0; i < 6; i++) {
-		gl_Layer = i;
-
-		positionRelativeToCam = viewMatrixCube[i] * gl_in[0].gl_Position;
-		pass_textureCoords = passTextureCoords[0];
-		pass_normal = passNormal[0];
-		gl_Position = projectionMatrix * positionRelativeToCam;
-		EmitVertex();
-
-		positionRelativeToCam = viewMatrixCube[i] * gl_in[1].gl_Position;
-		pass_textureCoords = passTextureCoords[1];
-		pass_normal = passNormal[1];
-		gl_Position = projectionMatrix * positionRelativeToCam;
-		EmitVertex();
-
-		positionRelativeToCam = viewMatrixCube[i] * gl_in[2].gl_Position;
-		pass_textureCoords = passTextureCoords[2];
-		pass_normal = passNormal[2];
-		gl_Position = projectionMatrix * positionRelativeToCam;
-		EmitVertex();
-
-		EndPrimitive();
-	}
+#if __VERSION__ >= 400
+	compute(gl_InvocationID);
+#else
+	for (int i = 0; i < 6; i++)
+		compute(i);
+#endif
 }
