@@ -113,11 +113,14 @@ public abstract class PhysicsBase extends Instance implements GameSubscriber {
 					Matrix4f worldMat = lastWorldMatrix;//tempPhys.getWorldMatrix();
 					
 					if ( tempLink != null ) {
-						((Matrix4)linked.rawget(C_WORLDMATRIX)).setInternal(worldMat);
+						linked.rawset(C_WORLDMATRIX, new Matrix4(worldMat) );
+						//((Matrix4)linked.rawget(C_WORLDMATRIX)).setInternal(worldMat);
 					}
-					((Matrix4)this.rawget(C_WORLDMATRIX)).setInternal(worldMat);
+					//((Matrix4)this.rawget(C_WORLDMATRIX)).setInternal(worldMat);
+					this.rawset(C_WORLDMATRIX, new Matrix4(worldMat) );
 				} else if ( tempLink != null ) {
-					this.rawset(C_WORLDMATRIX, linked.get(C_WORLDMATRIX));
+					this.rawset(C_WORLDMATRIX, new Matrix4((Matrix4)linked.get(C_WORLDMATRIX)) );
+					//this.rawset(C_WORLDMATRIX, linked.get(C_WORLDMATRIX));
 				}
 			});
 		});

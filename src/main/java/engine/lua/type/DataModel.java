@@ -270,8 +270,8 @@ public abstract class DataModel extends LuaDatatype {
 	}
 	
 	private void onKeyChange(LuaValue key, LuaValue value, LuaValue oldValue) {
-		if ( value == oldValue )
-			return;
+		//if ( value == oldValue )
+			//return;
 		
 		this.onValueUpdated(key, value);
 		Game.changes = true;
