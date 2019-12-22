@@ -1,4 +1,4 @@
-﻿/*
+/*
  *
  * Copyright (C) 2015-2020 Anarchy Engine Open Source Contributors (see CONTRIBUTORS.md)
  *
