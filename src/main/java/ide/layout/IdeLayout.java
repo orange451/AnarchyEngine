@@ -30,6 +30,7 @@ import lwjgui.LWJGUI;
 import lwjgui.collections.ObservableList;
 import lwjgui.geometry.Orientation;
 import lwjgui.geometry.Pos;
+import lwjgui.scene.Group;
 import lwjgui.scene.control.Menu;
 import lwjgui.scene.control.MenuBar;
 import lwjgui.scene.control.MenuItem;
@@ -46,7 +47,7 @@ public class IdeLayout {
 	private IdeDockPane center;
 	private IdePane gameView;
 	
-	public IdeLayout(Pane root) {
+	public IdeLayout(Group root) {
 		root.setAlignment(Pos.TOP_LEFT);
 	
 		BorderPane pane = new BorderPane();

@@ -134,7 +134,9 @@ public class DirectionalLight extends LightBase implements TreeViewable {
 			if (light == null || pipeline == null)
 				return;
 
-			pipeline.getDirectionalLightHandler().removeLight(light);
+			if ( pipeline.getDirectionalLightHandler() != null )
+				pipeline.getDirectionalLightHandler().removeLight(light);
+			
 			light = null;
 			pipeline = null;
 
@@ -166,7 +168,8 @@ public class DirectionalLight extends LightBase implements TreeViewable {
 
 			light.shadowResolution = this.get(C_SHADOWMAPSIZE).toint();
 
-			pipeline.getDirectionalLightHandler().addLight(light);
+			if ( pipeline.getDirectionalLightHandler() != null )
+				pipeline.getDirectionalLightHandler().addLight(light);
 		});
 	}
 

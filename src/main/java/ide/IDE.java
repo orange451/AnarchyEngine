@@ -18,12 +18,14 @@ import engine.Game;
 import engine.InternalGameThread;
 import engine.InternalRenderThread;
 import engine.application.RenderableApplication;
+import engine.gl.LegacyPipeline;
 import engine.glv2.GLRenderer;
 import engine.io.Load;
 import engine.lua.type.object.ScriptBase;
 import ide.layout.IdeLayout;
 import ide.layout.windows.IdeLuaEditor;
 import lwjgui.LWJGUI;
+import lwjgui.scene.Group;
 import lwjgui.scene.Window;
 import lwjgui.scene.layout.Pane;
 
@@ -47,8 +49,7 @@ public class IDE extends RenderableApplication {
 		InternalGameThread.desiredTPS = 60;
 		
 		// Setup background pane
-		Pane background = new Pane();
-		background.setBackground(null);
+		Group background = new Group();
 		win.getScene().setRoot(background);
 		
 		//Theme.setTheme(new ThemeDark());
@@ -62,8 +63,8 @@ public class IDE extends RenderableApplication {
 		});
 		
 		// Create rendering pipeline
-		//this.attachRenderable(pipeline = new LegacyPipeline());
-		this.attachRenderable(pipeline = new GLRenderer());
+		this.attachRenderable(pipeline = new LegacyPipeline());
+		//this.attachRenderable(pipeline = new GLRenderer());
 		
 		// Setup mane IDE layout
 		layout = new IdeLayout(background);

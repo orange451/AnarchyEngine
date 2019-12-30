@@ -187,7 +187,8 @@ public class SpotLight extends LightBase implements TreeViewable {
 
 			light.shadowResolution = this.get(C_SHADOWMAPSIZE).toint();
 
-			pipeline.getSpotLightHandler().addLight(light);
+			if ( pipeline.getSpotLightHandler() != null )
+				pipeline.getSpotLightHandler().addLight(light);
 		});
 	}
 	
