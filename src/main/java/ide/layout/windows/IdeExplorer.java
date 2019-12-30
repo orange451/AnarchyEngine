@@ -224,7 +224,13 @@ public class IdeExplorer extends IdePane {
 			selectedCache.clear();
 		this.selectedCache = new ArrayList<Instance>();
 
-		this.tree = new SortedTreeView<Instance>();
+		this.tree = new SortedTreeView<Instance>() {
+			@Override
+			public void resize() {
+				super.resize();
+				this.setPrefWidth(scroller.getViewportWidth());
+			}
+		};
 		this.scroller.setContent(tree);
 		
 		tree.setOnSelectItem(event -> {
@@ -288,9 +294,28 @@ public class IdeExplorer extends IdePane {
 			return;
 		
 		synchronized(instanceToTreeItemMap) {
+			// Get Parent node
+			TreeBase<Instance> parentTreeItem = instanceToTreeItemMap.get(instance.getParent());
+			if ( parentTreeItem == null )
+				parentTreeItem = tree;
+			
+			// Get grandparent node
+			LuaValue parInst = Game.game();
+			if ( parentTreeItem instanceof TreeItem )
+				parInst = ((TreeItem<Instance>)parentTreeItem).getRoot().getParent();
+			TreeBase<Instance> grandparentTreeItem = instanceToTreeItemMap.get(parInst);
+			if ( grandparentTreeItem == null )
+				grandparentTreeItem = tree;
+			
 			// Get Tree Node
 			TreeItem<Instance> treeItem = instanceToTreeItemMap.get(instance);
 			if ( treeItem == null ) {
+				// Parent (or grandparent) MUST be open for children to be created!
+				if ( !parentTreeItem.isExpanded() && !grandparentTreeItem.isExpanded() ) {
+					//System.out.println("Cant create UI element! " + parInst);
+					return;
+				}
+				
 				// What graphic does it need?
 				Node graphic = Icons.icon_wat.getView();
 				if ( instance instanceof TreeViewable )
@@ -314,42 +339,37 @@ public class IdeExplorer extends IdePane {
 			// The tree node to be added (Or it may already be there)
 			final TreeItem<Instance> newTreeItem = treeItem;
 			
-			// Get Parent node
-			TreeBase<Instance> parentTreeItem = instanceToTreeItemMap.get(instance.getParent());
-			if ( parentTreeItem == null )
-				parentTreeItem = tree;
-			
 			// Add to parent
 			synchronized(parentTreeItem.getItems()) {
-				if ( !parentTreeItem.getItems().contains(newTreeItem) )
+				if ( !parentTreeItem.getItems().contains(newTreeItem) ) {
 					parentTreeItem.getItems().add(newTreeItem);
-			}
-			
-			// Sort?
-			if ( parentTreeItem instanceof SortedTreeItem ) {
-				((SortedTreeItem<Instance>)parentTreeItem).sort();
-			}
-			
-			
-			// Add connections
-			instanceToTreeItemMap.put(instance, newTreeItem);
-			treeItemToParentTreeItemMap.put(newTreeItem, parentTreeItem);
-			
-			LuaConnection changedConnection = instance.changedEvent().connect((args)->{
-				LuaValue key = args[0];
-				LuaValue val = args[1];
-				
-				if ( key.eq_b(C_NAME) ) {
-					newTreeItem.setText(val.toString());
+
+					// Sort?
+					if ( parentTreeItem instanceof SortedTreeItem ) {
+						((SortedTreeItem<Instance>)parentTreeItem).sort();
+					}
+					
+					// Add connections
+					instanceToTreeItemMap.put(instance, newTreeItem);
+					treeItemToParentTreeItemMap.put(newTreeItem, parentTreeItem);
+					
+					LuaConnection changedConnection = instance.changedEvent().connect((args)->{
+						LuaValue key = args[0];
+						LuaValue val = args[1];
+						
+						if ( key.eq_b(C_NAME) ) {
+							newTreeItem.setText(val.toString());
+						}
+						
+						if ( key.eq_b(C_PARENT) ) {
+							destroyNode(instance);
+							buildNode(instance);
+							buildDescendents(instance);
+						}
+					});
+					treeItemToChangedConnectionMap.put(newTreeItem, changedConnection);
 				}
-				
-				if ( key.eq_b(C_PARENT) ) {
-					destroyNode(instance);
-					buildNode(instance);
-					buildDescendents(instance);
-				}
-			});
-			treeItemToChangedConnectionMap.put(newTreeItem, changedConnection);
+			}
 		}
 	}
 	
@@ -422,7 +442,10 @@ public class IdeExplorer extends IdePane {
 	}
 
 	class SortedTreeView<E> extends TreeView<E> {
-		//
+		@Override
+		public boolean isExpanded() {
+			return true;
+		}
 	}
 	
 	class SortedTreeItem<E> extends TreeItem<E> {
@@ -441,7 +464,12 @@ public class IdeExplorer extends IdePane {
 				return;
 			
 			super.setExpanded(expanded);
-			sort();
+			
+			if ( expanded ) {
+				 if ( this.getRoot() instanceof Instance )
+					buildDescendents((Instance)this.getRoot());
+				sort();
+			}
 		}
 		
 		protected void sort() {
