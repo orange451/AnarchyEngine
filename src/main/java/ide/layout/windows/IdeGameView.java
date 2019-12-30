@@ -51,6 +51,9 @@ public class IdeGameView extends IdePane {
 			
 			@Override
 			public void render(Context context) {
+				if ( !IdeGameView.this.pipeline.isInitialized() )
+					return;
+				
 				Surface surface = IdeGameView.this.pipeline.getPipelineBuffer();
 				surface.render(shader);
 			}
@@ -113,6 +116,9 @@ public class IdeGameView extends IdePane {
 	
 	@Override
 	public void render(Context context) {
+		if ( !IdeGameView.this.pipeline.isInitialized() )
+			return;
+		
 		fps.setText(InternalRenderThread.fps + " fps");
 		
 		super.render(context);

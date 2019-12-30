@@ -74,6 +74,7 @@ import engine.lua.type.object.insts.DynamicSkybox;
 import engine.lua.type.object.insts.Skybox;
 import engine.lua.type.object.services.Lighting;
 import engine.observer.RenderableWorld;
+import ide.layout.windows.ErrorWindow;
 
 public class GLRenderer implements IPipeline {
 
@@ -112,6 +113,8 @@ public class GLRenderer implements IPipeline {
 	private Vector2f size = new Vector2f();
 
 	private boolean useARBClipControl = false;
+	
+	private boolean initialized;
 
 	public GLRenderer() {
 		useARBClipControl = GL.getCapabilities().GL_ARB_clip_control;
@@ -141,7 +144,13 @@ public class GLRenderer implements IPipeline {
 			}
 		});
 
-		init();
+		try {
+			init();
+			initialized = true;
+		} catch (Exception e) {
+			e.printStackTrace();
+			new ErrorWindow("Error initializing renderer", true);
+		}
 	}
 
 	public void init() {
@@ -319,6 +328,8 @@ public class GLRenderer implements IPipeline {
 			return;
 		if (!Game.isLoaded())
 			return;
+		if ( !initialized ) 
+			return;
 
 		currentCamera = renderableWorld.getCurrentCamera();
 		if (currentCamera == null)
@@ -459,6 +470,11 @@ public class GLRenderer implements IPipeline {
 		glDisable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		glClearColor(0.0f, 0, 0, 0.0f);
+	}
+
+	@Override
+	public boolean isInitialized() {
+		return this.initialized;
 	}
 
 }

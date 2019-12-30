@@ -63,8 +63,8 @@ public class IDE extends RenderableApplication {
 		});
 		
 		// Create rendering pipeline
-		this.attachRenderable(pipeline = new LegacyPipeline());
-		//this.attachRenderable(pipeline = new GLRenderer());
+		//this.attachRenderable(pipeline = new LegacyPipeline());
+		this.attachRenderable(pipeline = new GLRenderer());
 		
 		// Setup mane IDE layout
 		layout = new IdeLayout(background);

@@ -76,6 +76,7 @@ public class LegacyPipeline implements IPipeline {
 	private static HashMap<RenderableWorld, IPipeline> pipelineMap = new HashMap<>();
 	
 	private boolean debug;
+	private boolean initialized;
 	
 	private static final Matrix4f IDENTITY = new Matrix4f().identity();
 
@@ -94,6 +95,7 @@ public class LegacyPipeline implements IPipeline {
 		viewMatrix = new Matrix4f();
 		projMatrix = new Matrix4f();
 		renderables = Collections.synchronizedList(new ArrayList<Renderable>());
+		initialized = true;
 	}
 	
 	public void setDebug(boolean debug) {
@@ -530,5 +532,10 @@ public class LegacyPipeline implements IPipeline {
 	public RenderingSettings getRenderSettings() {
 		// TODO Auto-generated method stub
 		return null;
+	}
+	
+	@Override
+	public boolean isInitialized() {
+		return this.initialized;
 	}
 }

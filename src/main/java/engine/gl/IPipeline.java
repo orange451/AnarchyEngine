@@ -44,4 +44,6 @@ public interface IPipeline extends Renderable {
 	public void reloadStaticSkybox();
 	
 	public RenderingSettings getRenderSettings();
+
+	public boolean isInitialized();
 }
