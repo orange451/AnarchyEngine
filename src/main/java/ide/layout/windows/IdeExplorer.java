@@ -142,7 +142,7 @@ public class IdeExplorer extends IdePane {
 		Game.game().descendantAddedEvent().connect((args)->{
 			if ( !Game.isLoaded() )
 				return;
-			buildNode((Instance) args[0]);
+			buildNode((Instance) args[0], true);
 		});
 		
 		// Object removed
@@ -248,10 +248,10 @@ public class IdeExplorer extends IdePane {
 	private void rebuild() {
 		clear();
 		
-		buildDescendents(Game.game());
+		buildDescendents(Game.game(), true);
 	}
 	
-	private void buildDescendents(Instance parent) {
+	private void buildDescendents(Instance parent, boolean sort) {
 		List<Instance> gameDescendents = parent.getDescendantsUnsafe();
 		for (int i = 0; i < gameDescendents.size(); i++) {
 			if ( i >= gameDescendents.size() )
@@ -261,7 +261,7 @@ public class IdeExplorer extends IdePane {
 			if ( desc == null )
 				continue;
 			
-			buildNode(desc);
+			buildNode(desc, sort);
 		}
 	}
 	
@@ -286,7 +286,7 @@ public class IdeExplorer extends IdePane {
 		}
 	}
 	
-	private synchronized void buildNode(Instance instance) {
+	private synchronized void buildNode(Instance instance, boolean sort) {
 		if ( instance.getParent().isnil() )
 			return;
 		
@@ -363,8 +363,8 @@ public class IdeExplorer extends IdePane {
 						
 						if ( key.eq_b(C_PARENT) ) {
 							destroyNode(instance);
-							buildNode(instance);
-							buildDescendents(instance);
+							buildNode(instance, true);
+							buildDescendents(instance, true);
 						}
 					});
 					treeItemToChangedConnectionMap.put(newTreeItem, changedConnection);
@@ -467,7 +467,7 @@ public class IdeExplorer extends IdePane {
 			
 			if ( expanded ) {
 				 if ( this.getRoot() instanceof Instance )
-					buildDescendents((Instance)this.getRoot());
+					buildDescendents((Instance)this.getRoot(), false);
 				sort();
 			}
 		}
