@@ -295,15 +295,20 @@ public class IdeExplorer extends IdePane {
 		
 		synchronized(instanceToTreeItemMap) {
 			// Get Parent node
-			TreeBase<Instance> parentTreeItem = instanceToTreeItemMap.get(instance.getParent());
-			if ( parentTreeItem == null )
+			LuaValue parInst = instance.getParent();
+			if ( parInst.isnil() )
+				parInst = Game.game();
+			TreeBase<Instance> parentTreeItem = instanceToTreeItemMap.get(parInst);
+			if ( parInst.isnil() || parInst.eq_b(Game.game()) )
 				parentTreeItem = tree;
+			if ( parentTreeItem == null )
+				return;
 			
 			// Get grandparent node
-			LuaValue parInst = Game.game();
+			LuaValue grandparInst = Game.game();
 			if ( parentTreeItem instanceof TreeItem )
-				parInst = ((TreeItem<Instance>)parentTreeItem).getRoot().getParent();
-			TreeBase<Instance> grandparentTreeItem = instanceToTreeItemMap.get(parInst);
+				grandparInst = ((TreeItem<Instance>)parentTreeItem).getRoot().getParent();
+			TreeBase<Instance> grandparentTreeItem = instanceToTreeItemMap.get(grandparInst);
 			if ( grandparentTreeItem == null )
 				grandparentTreeItem = tree;
 			
