@@ -34,7 +34,6 @@ import lwjgui.paint.Color;
 public class SpotLight extends LightBase implements TreeViewable {
 
 	private engine.gl.light.SpotLightInternal light;
-	private IPipeline pipeline;
 
 	private static final LuaValue C_INNERFOVSCALE = LuaValue.valueOf("InnerFOVScale");
 	private static final LuaValue C_OUTERFOV = LuaValue.valueOf("OuterFOV");
@@ -85,49 +84,7 @@ public class SpotLight extends LightBase implements TreeViewable {
 					light.setSize(value.toint());
 				}
 			}
-
-			if ( key.eq_b(C_PARENT) ) {
-				onParentChange();
-			}
 		});
-	}
-	
-	private void onParentChange() {
-		LuaValue t = this.getParent();
-		if ( t.isnil() ) {
-			destroyLight();
-			return;
-		}
-		
-		// Search for renderable world
-		while ( t != null && !t.isnil() ) {
-			if ( t instanceof RenderableWorld ) {
-				IPipeline tempPipeline = LegacyPipeline.get((RenderableWorld)t);
-				if ( tempPipeline == null )
-					break;
-				// Light exists inside old pipeline. No need to recreate.
-				if ( pipeline != null && pipeline.equals(tempPipeline) )
-					break;
-				
-				// Destroy old light
-				if ( pipeline != null )
-					destroyLight();
-				
-				// Make new light. Return means we can live for another day!
-				pipeline = tempPipeline;
-				makeLight();
-				return;
-			}
-			
-			// Navigate up tree
-			LuaValue temp = t;
-			t = ((Instance)t).getParent();
-			if ( t == temp )
-				t = null;
-		}
-		
-		// Cant make light, can't destroy light. SO NO LIGHT!
-		destroyLight();
 	}
 
 	public void setOuterFOV(float fov) {
@@ -144,26 +101,25 @@ public class SpotLight extends LightBase implements TreeViewable {
 	}
 
 	@Override
-	public void onDestroy() {
-		destroyLight();
-	}
-	
-	private void destroyLight() {
+	protected void destroyLight(IPipeline pipeline) {
 		InternalRenderThread.runLater(()->{
 			if ( light == null || pipeline == null )
 				return;
 
 			pipeline.getSpotLightHandler().removeLight(light);
 			light = null;
-			pipeline = null;
+			this.pipeline = null;
 
 			System.out.println("Destroyed light");
 		});
 	}
-	
-	private void makeLight() {		
+
+	@Override
+	protected void makeLight(IPipeline pipeline) {		
 		// Add it to pipeline
 		InternalRenderThread.runLater(()->{
+			this.pipeline = pipeline;
+			
 			if ( pipeline == null )
 				return;
 

@@ -38,33 +38,17 @@ import lwjgui.theme.Theme;
 public class InsertWindow {
 	
 	public InsertWindow() {
-		long handle = LWJGUIUtil.createOpenGLCoreWindow("Insert Object", 2, 2, false, true);
+		long handle = LWJGUIUtil.createOpenGLCoreWindow("Insert Object: " + InsertWindow.this.getParent().getFullName(), 2, 2, false, true);
 		Window window = LWJGUI.initialize(handle);
 		
 		StackPane root = new StackPane();
 		root.setBackgroundLegacy(Theme.current().getControl());
 		root.setPadding(new Insets(8));
 		
-		VBox tempV = new VBox();
-		tempV.setBackground(null);
-		tempV.setFillToParentHeight(true);
-		tempV.setFillToParentWidth(true);
-		tempV.setSpacing(4);
-		root.getChildren().add(tempV);
-		
-		Label l = new Label() {
-			@Override
-			public void position(Node parent) {
-				super.position(parent);
-				this.setText("Insert object into: " + InsertWindow.this.getParent().getFullName());
-			}
-		};
-		tempV.getChildren().add(l);
-		
 		ScrollPane scroll = new ScrollPane();
 		scroll.setFillToParentHeight(true);
 		scroll.setFillToParentWidth(true);
-		tempV.getChildren().add(scroll);
+		root.getChildren().add(scroll);
 		
 		VBox items = new VBox();
 		scroll.setContent(items);

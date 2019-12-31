@@ -126,6 +126,9 @@ public class Save {
 	}
 
 	public static boolean save(boolean saveAs) {
+		if ( !Game.isLoaded() )
+			return false;
+		
 		String path = Game.saveFile;
 
 		// Make projects folder
@@ -436,6 +439,8 @@ public class Save {
 
 	protected static void writeResources(File resourcesFolder) {
 		String resourcesPath = resourcesFolder.getAbsolutePath();
+		if ( !Game.isLoaded() )
+			return;
 		copyAssets( resourcesPath + File.separator + "Textures", Game.assets().getTextures());
 		copyAssets( resourcesPath + File.separator + "Meshes", Game.assets().getMeshes());
 		copyAssets( resourcesPath + File.separator + "Audio", Game.assets().getAudio());

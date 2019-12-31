@@ -58,6 +58,7 @@ import ide.IDE;
 import ide.layout.IdePane;
 import ide.layout.windows.icons.Icons;
 import lwjgui.collections.ObservableList;
+import lwjgui.geometry.Insets;
 import lwjgui.scene.Node;
 import lwjgui.scene.control.ContextMenu;
 import lwjgui.scene.control.MenuItem;
@@ -134,6 +135,7 @@ public class IdeExplorer extends IdePane {
 		super("Explorer New", true);
 
 		this.scroller = new ScrollPane();
+		this.scroller.setBorder(Insets.EMPTY);
 		this.scroller.setFillToParentHeight(true);
 		this.scroller.setFillToParentWidth(true);
 		this.getChildren().add(scroller);
@@ -184,6 +186,9 @@ public class IdeExplorer extends IdePane {
 			for (int i = 0; i < toUnselect.size(); i++) {
 				Instance t = toUnselect.get(i);
 				TreeItem<Instance> t2 = instanceToTreeItemMap.get(t);
+				if ( t2 == null )
+					continue;
+				
 				tree.deselectItem(t2);
 			}
 			
@@ -191,6 +196,9 @@ public class IdeExplorer extends IdePane {
 			for (int i = 0; i < toSelect.size(); i++) {
 				Instance t = toSelect.get(i);
 				TreeItem<Instance> t2 = instanceToTreeItemMap.get(t);
+				if ( t2 == null )
+					continue;
+				
 				tree.selectItem(t2);
 			}
 			
@@ -316,10 +324,12 @@ public class IdeExplorer extends IdePane {
 			TreeItem<Instance> treeItem = instanceToTreeItemMap.get(instance);
 			if ( treeItem == null ) {
 				// Parent (or grandparent) MUST be open for children to be created!
-				if ( !parentTreeItem.isExpanded() && !grandparentTreeItem.isExpanded() ) {
-					//System.out.println("Cant create UI element! " + parInst);
+				if ( !parentTreeItem.isExpanded() && !grandparentTreeItem.isExpanded() )
 					return;
-				}
+				
+				// If the grandparent has at least 1 item in it
+				if ( !parentTreeItem.isExpanded() && parentTreeItem.getItems().size() > 0 )
+					return;
 				
 				// What graphic does it need?
 				Node graphic = Icons.icon_wat.getView();
