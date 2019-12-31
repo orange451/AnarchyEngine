@@ -56,49 +56,7 @@ public class PointLight extends LightBase implements TreeViewable {
 					light.color = new Vector3f( Math.max( color.getRed(),1 )/255f, Math.max( color.getGreen(),1 )/255f, Math.max( color.getBlue(),1 )/255f );
 				}
 			}
-			
-			if ( key.eq_b(C_PARENT) ) {
-				onParentChange();
-			}
 		});
-	}
-	
-	private void onParentChange() {
-		LuaValue t = this.getParent();
-		if ( t.isnil() ) {
-			destroyLight();
-			return;
-		}
-		
-		// Search for renderable world
-		while ( t != null && !t.isnil() ) {
-			if ( t instanceof RenderableWorld ) {
-				IPipeline tempPipeline = LegacyPipeline.get((RenderableWorld)t);
-				if ( tempPipeline == null )
-					break;
-				// Light exists inside old pipeline. No need to recreate.
-				if ( pipeline != null && pipeline.equals(tempPipeline) )
-					break;
-				
-				// Destroy old light
-				if ( pipeline != null )
-					destroyLight();
-				
-				// Make new light. Return means we can live for another day!
-				pipeline = tempPipeline;
-				makeLight();
-				return;
-			}
-			
-			// Navigate up tree
-			LuaValue temp = t;
-			t = ((Instance)t).getParent();
-			if ( t == temp )
-				t = null;
-		}
-		
-		// Cant make light, can't destroy light. SO NO LIGHT!
-		destroyLight();
 	}
 
 	public void setRadius(float radius) {
@@ -109,13 +67,9 @@ public class PointLight extends LightBase implements TreeViewable {
 	public Light getLightInternal() {
 		return light;
 	}
-
-	@Override
-	public void onDestroy() {
-		destroyLight();
-	}
 	
-	private void destroyLight() {
+	@Override
+	protected void destroyLight() {
 		InternalRenderThread.runLater(()->{
 			if ( light == null || pipeline == null )
 				return;
@@ -127,8 +81,9 @@ public class PointLight extends LightBase implements TreeViewable {
 			System.out.println("Destroyed light");
 		});
 	}
-	
-	private void makeLight() {		
+
+	@Override
+	protected void makeLight() {		
 		// Add it to pipeline
 		InternalRenderThread.runLater(()->{
 			if ( pipeline == null )

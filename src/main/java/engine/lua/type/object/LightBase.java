@@ -13,12 +13,15 @@ package engine.lua.type.object;
 import org.joml.Vector3f;
 import org.luaj.vm2.LuaValue;
 
+import engine.gl.IPipeline;
+import engine.gl.LegacyPipeline;
 import engine.gl.light.Light;
 import engine.lua.type.NumberClampPreferred;
 import engine.lua.type.data.Color3;
 import engine.lua.type.data.Matrix4;
 import engine.lua.type.data.Vector3;
 import engine.lua.type.object.Instance;
+import engine.observer.RenderableWorld;
 import engine.util.AABBUtil;
 import engine.util.Pair;
 
@@ -29,6 +32,7 @@ public abstract class LightBase extends Instance implements Positionable {
 	protected static final LuaValue C_COLOR = LuaValue.valueOf("Color");
 	protected static final LuaValue C_SHADOWS = LuaValue.valueOf("Shadows");
 	protected static final LuaValue C_VISIBLE = LuaValue.valueOf("Visible");
+	protected IPipeline pipeline;
 	
 	public LightBase(String typename) {
 		super(typename);
@@ -50,7 +54,58 @@ public abstract class LightBase extends Instance implements Positionable {
 				
 				l.visible = args[1].toboolean();
 			}
+
+			if ( args[0].eq_b(C_PARENT) ) {
+				onParentChange();
+			}
 		});
+	}
+	
+	protected abstract void destroyLight();
+	protected abstract void makeLight();
+	
+	@Override
+	public void onDestroy() {
+		destroyLight();
+	}
+	
+	private void onParentChange() {
+		LuaValue t = this.getParent();
+		if (t.isnil()) {
+			destroyLight();
+			return;
+		}
+
+		// Search for renderable world
+		while (t != null && !t.isnil()) {
+			if (t instanceof RenderableWorld) {
+				IPipeline tempPipeline = LegacyPipeline.get((RenderableWorld) t);
+				if (tempPipeline == null)
+					break;
+
+				// Light exists inside old pipeline. No need to recreate.
+				if (pipeline != null && pipeline.equals(tempPipeline))
+					break;
+
+				// Destroy old light
+				if (pipeline != null)
+					destroyLight();
+
+				// Make new light. Return means we can live for another day!
+				pipeline = tempPipeline;
+				makeLight();
+				return;
+			}
+
+			// Navigate up tree
+			LuaValue temp = t;
+			t = ((Instance) t).getParent();
+			if (t == temp)
+				t = null;
+		}
+
+		// Cant make light, can't destroy light. SO NO LIGHT!
+		destroyLight();
 	}
 
 	@Override
