@@ -489,7 +489,7 @@ public class Assets extends Service implements TreeViewable {
 			
 			if ( propertyKey.equals(Assimp.AI_MATKEY_SHININESS) ) {
 				float shine = prop.mData().getFloat();
-				tm.setReflective(shine / 256f);
+				tm.setReflective(shine);
 			}
 			
 			if ( propertyKey.equals(Assimp.AI_MATKEY_OPACITY)) {
