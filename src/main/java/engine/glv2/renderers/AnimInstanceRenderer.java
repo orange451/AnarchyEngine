@@ -123,7 +123,11 @@ public class AnimInstanceRenderer implements IObjectRenderer {
 		if (go.getPrefab() == null)
 			return;
 
-		anim.getAnimatedModel().renderV2();
+		AnimatedModel animatedModel = anim.getAnimatedModel();
+		if ( animatedModel == null )
+			return;
+		
+		animatedModel.renderV2();
 		instances.add(inst);
 	}
 

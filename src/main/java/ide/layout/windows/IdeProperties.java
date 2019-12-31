@@ -790,8 +790,9 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 				
 				// Cell 1
 				StackPane t1 = new StackPane();
+				t1.setBackgroundLegacy(Theme.current().getPane());
 				if ( i % 2 == 1 )
-					t1.setBackgroundLegacy(Theme.current().getControlAlt());
+					t1.setBackgroundLegacy(Theme.current().getPaneAlt());
 				t1.setPadding(new Insets(2,0,2,12));
 				t1.setPrefSize(1, 1);
 				t1.getChildren().add(fieldLabel);
