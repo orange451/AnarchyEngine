@@ -13,6 +13,7 @@ package engine.lua.type.object;
 import org.joml.Vector3f;
 import org.luaj.vm2.LuaValue;
 
+import engine.Game;
 import engine.gl.IPipeline;
 import engine.gl.LegacyPipeline;
 import engine.gl.light.Light;
@@ -21,6 +22,7 @@ import engine.lua.type.data.Color3;
 import engine.lua.type.data.Matrix4;
 import engine.lua.type.data.Vector3;
 import engine.lua.type.object.Instance;
+import engine.lua.type.object.services.Lighting;
 import engine.observer.RenderableWorld;
 import engine.util.AABBUtil;
 import engine.util.Pair;
@@ -61,39 +63,41 @@ public abstract class LightBase extends Instance implements Positionable {
 		});
 	}
 	
-	protected abstract void destroyLight();
-	protected abstract void makeLight();
+	protected abstract void destroyLight(IPipeline pipeline);
+	protected abstract void makeLight(IPipeline pipeline);
 	
 	@Override
 	public void onDestroy() {
-		destroyLight();
+		destroyLight(pipeline);
 	}
 	
 	private void onParentChange() {
 		LuaValue t = this.getParent();
 		if (t.isnil()) {
-			destroyLight();
+			destroyLight(pipeline);
 			return;
 		}
 
 		// Search for renderable world
 		while (t != null && !t.isnil()) {
-			if (t instanceof RenderableWorld) {
-				IPipeline tempPipeline = LegacyPipeline.get((RenderableWorld) t);
-				if (tempPipeline == null)
-					break;
+			if (t instanceof RenderableWorld || t instanceof Lighting) {
+				IPipeline tempPipeline = null;
 
-				// Light exists inside old pipeline. No need to recreate.
-				if (pipeline != null && pipeline.equals(tempPipeline))
+				if ( t instanceof Lighting )
+					t = Game.workspace();
+				
+				if ( t instanceof RenderableWorld )
+					tempPipeline = LegacyPipeline.get((RenderableWorld) t);
+
+				if (tempPipeline == null)
 					break;
 
 				// Destroy old light
 				if (pipeline != null)
-					destroyLight();
+					destroyLight(pipeline);
 
 				// Make new light. Return means we can live for another day!
-				pipeline = tempPipeline;
-				makeLight();
+				makeLight(tempPipeline);
 				return;
 			}
 
@@ -105,7 +109,7 @@ public abstract class LightBase extends Instance implements Positionable {
 		}
 
 		// Cant make light, can't destroy light. SO NO LIGHT!
-		destroyLight();
+		destroyLight(pipeline);
 	}
 
 	@Override

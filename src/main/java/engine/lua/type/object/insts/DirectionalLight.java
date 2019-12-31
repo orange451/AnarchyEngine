@@ -31,7 +31,6 @@ import lwjgui.paint.Color;
 public class DirectionalLight extends LightBase implements TreeViewable {
 
 	private DirectionalLightInternal light;
-	private IPipeline pipeline;
 
 	private static final LuaValue C_SHADOWDISTANCE = LuaValue.valueOf("ShadowDistance");
 	private static final LuaValue C_DIRECTION = LuaValue.valueOf("Direction");
@@ -82,7 +81,7 @@ public class DirectionalLight extends LightBase implements TreeViewable {
 	}
 
 	@Override
-	protected void destroyLight() {
+	protected void destroyLight(IPipeline pipeline) {
 		InternalRenderThread.runLater(() -> {
 			if (light == null || pipeline == null)
 				return;
@@ -91,16 +90,18 @@ public class DirectionalLight extends LightBase implements TreeViewable {
 				pipeline.getDirectionalLightHandler().removeLight(light);
 			
 			light = null;
-			pipeline = null;
+			this.pipeline = null;
 
 			System.out.println("Destroyed light");
 		});
 	}
 
 	@Override
-	protected void makeLight() {
+	protected void makeLight(IPipeline pipeline) {
 		// Add it to pipeline
 		InternalRenderThread.runLater(() -> {
+			this.pipeline = pipeline;
+			
 			if (pipeline == null)
 				return;
 

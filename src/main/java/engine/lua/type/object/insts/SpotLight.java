@@ -101,23 +101,25 @@ public class SpotLight extends LightBase implements TreeViewable {
 	}
 
 	@Override
-	protected void destroyLight() {
+	protected void destroyLight(IPipeline pipeline) {
 		InternalRenderThread.runLater(()->{
 			if ( light == null || pipeline == null )
 				return;
 
 			pipeline.getSpotLightHandler().removeLight(light);
 			light = null;
-			pipeline = null;
+			this.pipeline = null;
 
 			System.out.println("Destroyed light");
 		});
 	}
 
 	@Override
-	protected void makeLight() {		
+	protected void makeLight(IPipeline pipeline) {		
 		// Add it to pipeline
 		InternalRenderThread.runLater(()->{
+			this.pipeline = pipeline;
+			
 			if ( pipeline == null )
 				return;
 

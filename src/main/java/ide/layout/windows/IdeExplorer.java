@@ -186,6 +186,9 @@ public class IdeExplorer extends IdePane {
 			for (int i = 0; i < toUnselect.size(); i++) {
 				Instance t = toUnselect.get(i);
 				TreeItem<Instance> t2 = instanceToTreeItemMap.get(t);
+				if ( t2 == null )
+					continue;
+				
 				tree.deselectItem(t2);
 			}
 			
@@ -193,6 +196,9 @@ public class IdeExplorer extends IdePane {
 			for (int i = 0; i < toSelect.size(); i++) {
 				Instance t = toSelect.get(i);
 				TreeItem<Instance> t2 = instanceToTreeItemMap.get(t);
+				if ( t2 == null )
+					continue;
+				
 				tree.selectItem(t2);
 			}
 			

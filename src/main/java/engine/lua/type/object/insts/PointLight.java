@@ -30,7 +30,6 @@ import lwjgui.paint.Color;
 public class PointLight extends LightBase implements TreeViewable {
 
 	private engine.gl.light.PointLightInternal light;
-	private IPipeline pipeline;
 
 	private static final LuaValue C_RADIUS = LuaValue.valueOf("Radius");
 
@@ -69,28 +68,32 @@ public class PointLight extends LightBase implements TreeViewable {
 	}
 	
 	@Override
-	protected void destroyLight() {
+	protected void destroyLight(IPipeline pipeline) {
 		InternalRenderThread.runLater(()->{
 			if ( light == null || pipeline == null )
 				return;
 			
 			pipeline.getPointLightHandler().removeLight(light);
-			light = null;
-			pipeline = null;
+			this.light = null;
+			this.pipeline = null;
 
 			System.out.println("Destroyed light");
 		});
 	}
 
 	@Override
-	protected void makeLight() {		
+	protected void makeLight(IPipeline pipeline) {		
 		// Add it to pipeline
 		InternalRenderThread.runLater(()->{
+			
+			System.out.println("Creating pointlight! " + pipeline + " / " + light);
 			if ( pipeline == null )
 				return;
 			
 			if ( light != null )
 				return;
+			
+			this.pipeline = pipeline;
 			
 			// Create light
 			Vector3f pos = ((Vector3)this.get("Position")).toJoml();
