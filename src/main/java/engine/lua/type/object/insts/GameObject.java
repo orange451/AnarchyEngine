@@ -275,6 +275,9 @@ public class GameObject extends Instance implements RenderableInstance,TreeViewa
 	 * Returns the vector3 position of this object.
 	 */
 	public Vector3 getPosition() {
+		if ( this.isDestroyed() )
+			return new Vector3();
+		
 		return (Vector3) this.get(C_POSITION);
 	}
 
