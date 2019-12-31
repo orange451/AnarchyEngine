@@ -28,7 +28,7 @@ import engine.lua.type.object.InstancePropertySubscriber;
 public abstract class DataModel extends LuaDatatype {
 	protected List<Instance> children = Collections.synchronizedList(new ArrayList<Instance>());
 	protected HashSet<Instance> descendents = new HashSet<Instance>();
-	protected ArrayList<Instance> descendentsList = new ArrayList<Instance>();
+	protected List<Instance> descendentsList = Collections.synchronizedList(new ArrayList<Instance>());
 	protected List<InstancePropertySubscriber> propertySubscribers = Collections.synchronizedList(new ArrayList<InstancePropertySubscriber>());
 	protected HashMap<LuaValue, DataModel> cachedChildrenOfClass = new HashMap<LuaValue, DataModel>();
 	

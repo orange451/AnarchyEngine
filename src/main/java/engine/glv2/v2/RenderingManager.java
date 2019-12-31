@@ -29,7 +29,6 @@ import engine.glv2.v2.lights.DirectionalLightCamera;
 import engine.glv2.v2.lights.SpotLightCamera;
 import engine.lua.type.object.Instance;
 import engine.lua.type.object.insts.AnimationController;
-import engine.lua.type.object.insts.Camera;
 import engine.observer.RenderableInstance;
 
 public class RenderingManager {
@@ -48,9 +47,9 @@ public class RenderingManager {
 	}
 
 	public void preProcess(Instance world) {
-		List<Instance> entities = world.getChildren();
-		synchronized (entities) {
-			for (Instance entity : entities)
+		List<Instance> instances = world.getDescendantsUnsafe();
+		synchronized (instances) {
+			for (Instance entity : instances)
 				process(entity);
 		}
 		for (Entry<IObjectRenderer> rendererEntry : objectRenderers) {
@@ -99,15 +98,7 @@ public class RenderingManager {
 	}
 
 	private void process(Instance root) {
-		synchronized (root.getChildren()) {
-			for (Instance inst : root.getChildren()) {
-				if (inst instanceof Camera)
-					continue;
-				process(inst);
-			}
-		}
 		if (root instanceof RenderableInstance) {
-
 			Instance animationController = root.findFirstChildOfClass(C_ANIMATIONCONTROLLER);
 			boolean hasAnimationController = animationController != null
 					&& ((AnimationController) animationController).getPlayingAnimations() > 0;
