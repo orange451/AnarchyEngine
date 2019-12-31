@@ -231,8 +231,13 @@ public class GameObject extends Instance implements RenderableInstance,TreeViewa
 	
 	@Override
 	protected boolean onValueGet(LuaValue key) {
+		if ( this.isDestroyed() )
+			return false;
+		
 		if ( key.eq_b(C_POSITION) ) {
-			this.rawset(C_POSITION, ((Matrix4)this.rawget(C_WORLDMATRIX)).getPosition());
+			LuaValue mat = this.rawget(C_WORLDMATRIX);
+			if ( mat != null )
+				this.rawset(C_POSITION, ((Matrix4)mat).getPosition());
 		}
 		return true;
 	}

@@ -39,6 +39,7 @@ import engine.lua.type.object.PrefabRenderer;
 import engine.lua.type.object.insts.GameObject;
 import engine.lua.type.object.insts.Material;
 import engine.lua.type.object.insts.Model;
+import engine.lua.type.object.insts.Prefab;
 
 public class InstanceRenderer implements IObjectRenderer {
 
@@ -120,9 +121,14 @@ public class InstanceRenderer implements IObjectRenderer {
 			return;
 		if (go.getParent().isnil())
 			return;
-		if (go.getPrefab() == null)
+		
+		Prefab goPrefab = go.getPrefab();
+		if (goPrefab == null)
 			return;
-		PrefabRenderer pfr = go.getPrefab().getPrefab();
+		
+		PrefabRenderer pfr = goPrefab.getPrefab();
+		if ( pfr == null )
+			return;
 
 		Matrix4f mat = go.getWorldMatrix().toJoml();
 		mat.translate(pfr.getAABBOffset());
