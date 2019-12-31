@@ -1,0 +1,3 @@
+[submodule "lwjgui"]
+	path = lwjgui
+	url = https://github.com/orange451/LWJGUI.git
