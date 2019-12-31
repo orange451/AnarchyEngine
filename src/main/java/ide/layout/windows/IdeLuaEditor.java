@@ -23,6 +23,7 @@ import lwjgui.font.FontStyle;
 import lwjgui.paint.Color;
 import lwjgui.scene.Node;
 import lwjgui.scene.control.CodeArea;
+import lwjgui.theme.Theme;
 
 public class IdeLuaEditor extends IdePane {
 	private ScriptBase inst;
@@ -135,6 +136,8 @@ public class IdeLuaEditor extends IdePane {
 		// Do syntax highlighting
 		code.setOnTextChange((event)->{
 			code.resetHighlighting();
+			if ( Theme.current() instanceof lwjgui.theme.ThemeWhite )
+				code.setFontFill(Color.BLACK);
 
 			String text = code.getText();
 			Matcher matcher = PATTERN.matcher(text);
@@ -152,7 +155,7 @@ public class IdeLuaEditor extends IdePane {
 				
 				if ( matcher.group("COMMENT") != null ) {
 					code.setHighlighting(start, end,
-							new FontMetaData().color(new Color("#5f9ea0")));
+							new FontMetaData().color(new Color("#007F00")));
 				}
 				
 				if ( matcher.group("STRING") != null ) {

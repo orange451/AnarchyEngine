@@ -76,6 +76,7 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 		super("Properties", true);
 		
 		this.scroller = new ScrollPane();
+		this.scroller.setBorder(Insets.EMPTY);
 		this.scroller.setFillToParentHeight(true);
 		this.scroller.setFillToParentWidth(true);
 		this.scroller.setHbarPolicy(ScrollBarPolicy.AS_NEEDED);
@@ -765,7 +766,7 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 		
 		@Override
 		public void resize() {
-			this.setMaxWidth(scroller.getViewportWidth());
+			//this.setMaxWidth(scroller.getViewportWidth());
 			this.setPrefWidth(scroller.getViewportWidth());
 			internal.forceWidth(this.getPrefWidth());
 			super.resize();
