@@ -36,8 +36,11 @@ public class GameObject extends Instance implements RenderableInstance,TreeViewa
 	private final static LuaValue C_WORLDMATRIX = LuaValue.valueOf("WorldMatrix");
 	private final static LuaValue C_POSITION = LuaValue.valueOf("Position");
 	private final static LuaValue C_TRANSPARENCY = LuaValue.valueOf("Transparency");
+	private final static LuaValue C_STATIC = LuaValue.valueOf("Static");
 	
 	private final static String PHYSICSOBJECT = "PhysicsObject";
+
+	private Matrix4 staticMatrix;
 	private final Matrix4f lastWorldMatrix;
 	
 	public GameObject() {
@@ -50,6 +53,7 @@ public class GameObject extends Instance implements RenderableInstance,TreeViewa
 		this.defineField(C_POSITION.toString(), new Vector3(), false );
 		this.defineField(C_TRANSPARENCY.toString(), LuaValue.valueOf(0), false);
 		this.getField(C_TRANSPARENCY).setClamp(new NumberClamp(0, 1));
+		this.defineField(C_STATIC.toString(), LuaValue.FALSE, false);
 		
 		// Update the last world matrix BEFORE running physics simulation.
 		InternalRenderThread.runLater(()->{
@@ -64,6 +68,14 @@ public class GameObject extends Instance implements RenderableInstance,TreeViewa
 		// Another update for when game state reloads
 		Game.loadEvent().connect((args)->{
 			lastWorldMatrix.set(this.getWorldMatrix().getInternal());
+		});
+		
+		this.changedEvent().connect((args)->{
+			if ( args[0].eq_b(C_STATIC) ) {
+				if ( args[1].toboolean() ) {
+					staticMatrix = new Matrix4(this.getWorldMatrix().getInternal());
+				}
+			}
 		});
 	}
 	
@@ -81,6 +93,26 @@ public class GameObject extends Instance implements RenderableInstance,TreeViewa
 		// Render
 		PrefabRenderer prefab = luaPrefab.getPrefab();
 		prefab.render(shader, matrix.getInternal());
+	}
+	
+	/**
+	 * Returns the static flag for this Game Object.
+	 * A Static Game Object will not reflect world matrix changes.
+	 * They will be considered when calculating Irradiance mapping and other static-based lighting effects.
+	 * @param bool
+	 */
+	public boolean isStatic() {
+		return this.get(C_STATIC).toboolean();
+	}
+	
+	/**
+	 * Sets the static flag for this Game Object.
+	 * A Static Game Object will not reflect world matrix changes.
+	 * They will be considered when calculating Irradiance mapping and other static-based lighting effects.
+	 * @param bool
+	 */
+	public void setStatic(boolean bool) {
+		this.set(C_STATIC, LuaValue.valueOf(bool));
 	}
 	
 	/**
@@ -107,6 +139,9 @@ public class GameObject extends Instance implements RenderableInstance,TreeViewa
 	 * @return
 	 */
 	public Matrix4 getWorldMatrix() {
+		if ( isStatic() && staticMatrix != null )
+			return new Matrix4(staticMatrix);
+		
 		LuaValue worldMatrix = this.get(C_WORLDMATRIX);
 		if ( worldMatrix.isnil() )
 			return new Matrix4();
