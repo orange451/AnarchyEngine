@@ -30,7 +30,7 @@ public abstract class Asset extends Instance {
 			if ( !value.isnil() ) {
 				Instance newParent = (Instance)value;
 				Instance preferredParent = Game.assets().findFirstChild(getPreferredParent());
-				if ( preferredParent != null && !newParent.equals(preferredParent) && !newParent.isDescendantOf(preferredParent) ) {
+				if ( preferredParent != null && !newParent.equals(preferredParent) && !newParent.isDescendantOf(preferredParent) && !newParent.equalsLoosely(preferredParent) ) {
 					LuaEngine.error("Asset type: " + this.typename() + " must exist within: " + preferredParent.getFullName());
 					return;
 				}

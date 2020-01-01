@@ -634,4 +634,13 @@ public abstract class Instance extends DataModel {
 		
 		return Integer.toString(resultBuilder.toString().hashCode());
 	}
+
+	/**
+	 * Two parents are equals loosely if they have the same class name, and the same name.
+	 * @param preferredParent
+	 * @return
+	 */
+	public boolean equalsLoosely(Instance compareTo) {
+		return compareTo.getClassName().eq_b(this.getClassName()) && this.getName().equals(compareTo.getName());
+	}
 }
