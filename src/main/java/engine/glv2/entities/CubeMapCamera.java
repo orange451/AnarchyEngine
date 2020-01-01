@@ -24,6 +24,8 @@ public class CubeMapCamera {
 
 	private Vector3f position = new Vector3f(), rotation = new Vector3f();
 
+	private Vector3f negate = new Vector3f();
+
 	private static final Vector3f X = new Vector3f(1, 0, 0);
 	private static final Vector3f Y = new Vector3f(0, 1, 0);
 	private static final Vector3f Z = new Vector3f(0, 0, 1);
@@ -118,7 +120,7 @@ public class CubeMapCamera {
 			viewMatrix = new Matrix4f();
 			viewMatrix.identity();
 		}
-		viewMatrix.translate(pos.negate(new Vector3f()));
+		viewMatrix.translate(pos.negate(negate));
 		return viewMatrix;
 	}
 
