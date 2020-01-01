@@ -121,6 +121,9 @@ public class PhysicsObjectInternal {
 	}
 
 	public Vector3f getLocation() {
+		if ( body == null ) 
+			return new Vector3f();
+		
 		if (this.destroyed)
 			return new Vector3f(0,0,0);
 		com.badlogic.gdx.math.Matrix4 transform = body.getWorldTransform();
