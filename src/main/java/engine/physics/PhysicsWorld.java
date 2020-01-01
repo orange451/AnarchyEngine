@@ -29,6 +29,7 @@ import com.badlogic.gdx.physics.bullet.collision.btCollisionDispatcher;
 import com.badlogic.gdx.physics.bullet.collision.btCollisionObject;
 import com.badlogic.gdx.physics.bullet.collision.btCollisionWorld;
 import com.badlogic.gdx.physics.bullet.collision.btDefaultCollisionConfiguration;
+import com.badlogic.gdx.physics.bullet.collision.btGImpactCollisionAlgorithm;
 import com.badlogic.gdx.physics.bullet.collision.btGhostPairCallback;
 import com.badlogic.gdx.physics.bullet.dynamics.btConstraintSolver;
 import com.badlogic.gdx.physics.bullet.dynamics.btDiscreteDynamicsWorld;
@@ -331,7 +332,8 @@ public class PhysicsWorld {
 		btAxisSweep3 sweepBP = new btAxisSweep3(worldMin, worldMax);
 		dynamicsWorld = new btDiscreteDynamicsWorld(dispatcher, sweepBP, solver, collisionConfiguration);
 		
-		//btGImpactCollisionAlgorithm.registerAlgorithm( dispatcher );
+		// Register GIMPACT collision algo
+		btGImpactCollisionAlgorithm.registerAlgorithm( dispatcher );
 		
 		// Allow ghost objects
 		dynamicsWorld.getBroadphase().getOverlappingPairCache().setInternalGhostPairCallback(new btGhostPairCallback());
