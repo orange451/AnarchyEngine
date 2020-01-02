@@ -27,6 +27,7 @@ public class AudioPlayer3D extends AudioPlayerBase implements Positionable {
 	protected static final LuaValue C_POSITION = LuaValue.valueOf("Position");
 	protected static final LuaValue C_POSITIONTYPE = LuaValue.valueOf("PositionType");
 	protected static final LuaValue C_RANGE = LuaValue.valueOf("Range");
+	protected static final LuaValue C_EMITTERSIZE = LuaValue.valueOf("EmitterSize");
 	
 	public AudioPlayer3D() {
 		super("AudioPlayer3D");
@@ -38,14 +39,25 @@ public class AudioPlayer3D extends AudioPlayerBase implements Positionable {
 
 		this.defineField(C_RANGE.toString(), LuaValue.valueOf(8.0f), false);
 		this.getField(C_RANGE).setClamp(new NumberClampPreferred(0, 32, 0, 1024 ));
+
+		this.defineField(C_EMITTERSIZE.toString(), LuaValue.valueOf(1.0f), false);
+		this.getField(C_EMITTERSIZE).setClamp(new NumberClampPreferred(0, 32, 0, 1024 ));
 	}
 	
 	public void setRange(float range) {
 		this.set(C_RANGE, LuaValue.valueOf(range));
 	}
 	
+	public void setEmitterSize(float range) {
+		this.set(C_EMITTERSIZE, LuaValue.valueOf(range));
+	}
+	
 	public float getRange() {
 		return this.get(C_RANGE).tofloat();
+	}
+	
+	public float getEmitterSize() {
+		return this.get(C_EMITTERSIZE).tofloat();
 	}
 	
 	@Override
@@ -73,6 +85,6 @@ public class AudioPlayer3D extends AudioPlayerBase implements Positionable {
 		if ( source == null )
 			return;
 		
-		Game.soundService().playSound3D(source, getPosition(), getVolume(), getPitch(), getRange());
+		Game.soundService().playSound3D(source, getPosition(), getVolume(), getPitch(), getRange(), getEmitterSize());
 	}
 }
