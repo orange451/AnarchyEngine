@@ -129,6 +129,9 @@ public class Save {
 		if ( !Game.isLoaded() )
 			return false;
 		
+		if ( Game.isRunning() )
+			return false;
+		
 		String path = Game.saveFile;
 
 		// Make projects folder
