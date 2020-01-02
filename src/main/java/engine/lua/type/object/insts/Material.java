@@ -249,7 +249,7 @@ public class Material extends Asset implements TreeViewable {
 			material.setRoughness(this.getRoughness());
 			material.setReflective(this.getReflectivness());
 			material.setColor(this.getColor().toColor());
-			material.setEmissive(this.getEmissive().toJoml());
+			material.setEmissive(this.getEmissive().getInternal());
 			material.setTransparency(this.getTransparency());
 		}
 		return material;

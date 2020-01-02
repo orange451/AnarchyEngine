@@ -22,6 +22,10 @@
 *.xml           text
 *.glsl          text
 *.groovy        text
+*.isl           text
+*.vs            text
+*.fs            text
+*.gs            text
 gradlew         text
 
 # These files are binary and should be left untouched

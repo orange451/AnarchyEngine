@@ -28,8 +28,8 @@ public class MaterialGL {
 	private float reflective = 0.1f;
 	private float transparency = 0;
 	
-	private Vector3f emissive;
-	private Vector3f color;
+	private Vector3f emissive = new Vector3f();
+	private Vector3f color = new Vector3f();
 	
 	public MaterialGL() {
 		setDiffuseTexture(null);
@@ -41,7 +41,7 @@ public class MaterialGL {
 	}
 	
 	public MaterialGL setColor(Color color) {
-		this.color = new Vector3f(color.getRed()/255f, color.getGreen()/255f, color.getBlue()/255f);
+		this.color.set(color.getRed()/255f, color.getGreen()/255f, color.getBlue()/255f);
 		return this;
 	}
 	
@@ -51,7 +51,7 @@ public class MaterialGL {
 	}	
 	
 	public MaterialGL setEmissive(Color color) {
-		this.emissive = new Vector3f(color.getRed()/255f, color.getGreen()/255f, color.getBlue()/255f);
+		this.emissive.set(color.getRed()/255f, color.getGreen()/255f, color.getBlue()/255f);
 		return this;
 	}
 	

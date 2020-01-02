@@ -52,7 +52,7 @@ public class EnvironmentRenderer {
 		layeredCubeCamera.setPosition(rd.camera.getPosition().getInternal());
 		framebuffer.bind();
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		sr.renderReflections(rnd, layeredCubeCamera, sun,  true, false, true);
+		sr.renderReflections(rnd, layeredCubeCamera, sun,  false, false, true);
 		framebuffer.unbind();
 	}
 
