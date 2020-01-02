@@ -97,7 +97,7 @@ public class SoundService extends Service implements TreeViewable {
 	public String playSound2D(AudioSource audioSource, float volumeMultiplier, float pitchMultiplier) {
 		Vector3D position = this.internalSound.getSoundSystem().getListenerData().position;
 		Vector3 p = new Vector3(position.x, position.y, position.z);
-		return this.playSound3D(audioSource, p, volumeMultiplier, pitchMultiplier, 1024.0f);
+		return this.playSound3D(audioSource, p, volumeMultiplier, pitchMultiplier, 1024.0f, 1.0f);
 	}
 	
 	/**
@@ -109,7 +109,7 @@ public class SoundService extends Service implements TreeViewable {
 	 * @param range
 	 * @return
 	 */
-	public String playSound3D(AudioSource audioSource, Vector3 position, float volumeMultiplier, float pitchMultiplier, float range) {
+	public String playSound3D(AudioSource audioSource, Vector3 position, float volumeMultiplier, float pitchMultiplier, float range, float emitterSize) {
 		if ( audioSource.getAbsoluteFilePath().length() == 0 )
 			return null;
 		
