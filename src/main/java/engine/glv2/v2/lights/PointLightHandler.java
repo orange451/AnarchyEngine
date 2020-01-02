@@ -42,7 +42,6 @@ import static org.lwjgl.opengl.GL30C.GL_COLOR_ATTACHMENT0;
 import static org.lwjgl.opengl.GL30C.GL_RGB16F;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.joml.Matrix4f;
@@ -58,11 +57,12 @@ import engine.glv2.shaders.PointLightShader;
 import engine.glv2.v2.DeferredPipeline;
 import engine.glv2.v2.RenderingSettings;
 import engine.lua.type.object.insts.Camera;
+import engine.tasks.TaskManager;
 import engine.util.MeshUtils;
 
 public class PointLightHandler implements IPointLightHandler {
 
-	private List<PointLightInternal> lights = Collections.synchronizedList(new ArrayList<>());
+	private List<PointLightInternal> lights = new ArrayList<>();
 
 	private BufferedMesh mesh = MeshUtils.sphere(1, 16);
 
@@ -100,25 +100,24 @@ public class PointLightHandler implements IPointLightHandler {
 		shader.loadUseShadows(rs.shadowsEnabled);
 		shader.loadTexel(texel);
 		activateTexture(GL_TEXTURE0, GL_TEXTURE_2D, dp.getDiffuseTex().getTexture());
-		//activateTexture(GL_TEXTURE1, GL_TEXTURE_2D, dp.getPositionTex().getTexture());
+		// activateTexture(GL_TEXTURE1, GL_TEXTURE_2D,
+		// dp.getPositionTex().getTexture());
 		activateTexture(GL_TEXTURE2, GL_TEXTURE_2D, dp.getNormalTex().getTexture());
 		activateTexture(GL_TEXTURE3, GL_TEXTURE_2D, dp.getDepthTex().getTexture());
 		activateTexture(GL_TEXTURE4, GL_TEXTURE_2D, dp.getPbrTex().getTexture());
 		activateTexture(GL_TEXTURE5, GL_TEXTURE_2D, dp.getMaskTex().getTexture());
-		synchronized (lights) {
-			for (PointLightInternal l : lights) {
-				if (!l.visible)
-					continue;
-				temp.identity();
-				temp.translate(l.position);
-				temp.scale(l.radius);
-				shader.loadTransformationMatrix(temp);
-				shader.loadPointLight(l);
-				// activateTexture(GL_TEXTURE6, GL_TEXTURE_2D_ARRAY,
-				// l.getShadowMap().getShadowMaps().getTexture());
-				// glDrawArrays(GL_TRIANGLE_STRIP, 0, quad.getVertexCount());
-				mesh.render(null, null, null);
-			}
+		for (PointLightInternal l : lights) {
+			if (!l.visible)
+				continue;
+			temp.identity();
+			temp.translate(l.position);
+			temp.scale(l.radius);
+			shader.loadTransformationMatrix(temp);
+			shader.loadPointLight(l);
+			// activateTexture(GL_TEXTURE6, GL_TEXTURE_2D_ARRAY,
+			// l.getShadowMap().getShadowMaps().getTexture());
+			// glDrawArrays(GL_TRIANGLE_STRIP, 0, quad.getVertexCount());
+			mesh.render(null, null, null);
 		}
 		shader.stop();
 		glCullFace(GL_BACK);
@@ -174,16 +173,14 @@ public class PointLightHandler implements IPointLightHandler {
 	public void addLight(PointLightInternal l) {
 		if (l == null)
 			return;
-		lights.add(l);
+		TaskManager.addTaskRenderThread(() -> lights.add(l));
 	}
 
 	@Override
 	public void removeLight(PointLightInternal l) {
 		if (l == null)
 			return;
-		synchronized (lights) {
-			lights.remove(l);
-		}
+		TaskManager.addTaskRenderThread(() -> lights.remove(l));
 	}
 
 	public List<PointLightInternal> getLights() {

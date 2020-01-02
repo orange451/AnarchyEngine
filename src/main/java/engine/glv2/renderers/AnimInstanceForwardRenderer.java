@@ -75,12 +75,9 @@ public class AnimInstanceForwardRenderer {
 		glBindTexture(GL_TEXTURE_CUBE_MAP, rnd.environmentMap.getTexture());
 		glActiveTexture(GL_TEXTURE6);
 		glBindTexture(GL_TEXTURE_2D, rnd.brdfLUT.getTexture());
-		synchronized (rnd.dlh.getLights()) {
-			for (int x = 0; x < Math.min(8, rnd.dlh.getLights().size()); x++) {
-				glActiveTexture(GL_TEXTURE8 + x);
-				glBindTexture(GL_TEXTURE_2D_ARRAY,
-						rnd.dlh.getLights().get(x).getShadowMap().getShadowMaps().getTexture());
-			}
+		for (int x = 0; x < Math.min(8, rnd.dlh.getLights().size()); x++) {
+			glActiveTexture(GL_TEXTURE8 + x);
+			glBindTexture(GL_TEXTURE_2D_ARRAY, rnd.dlh.getLights().get(x).getShadowMap().getShadowMaps().getTexture());
 		}
 		for (Instance instance : instances) {
 			renderInstance(instance, rnd);

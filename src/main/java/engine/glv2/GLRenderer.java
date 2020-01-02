@@ -113,7 +113,7 @@ public class GLRenderer implements IPipeline {
 	private Vector2f size = new Vector2f();
 
 	private boolean useARBClipControl = false;
-	
+
 	private boolean initialized;
 
 	public GLRenderer() {
@@ -190,29 +190,25 @@ public class GLRenderer implements IPipeline {
 		// TODO: Render transparent shadows using an extra texture
 		if (renderingSettings.shadowsEnabled) {
 			GPUProfiler.start("Shadow Pass");
-			synchronized (directionalLightHandler.getLights()) {
-				for (DirectionalLightInternal l : directionalLightHandler.getLights()) {
-					if (!l.shadows || !l.visible)
-						continue;
-					l.setPosition(currentCamera.getPosition().getInternal());
-					l.update();
-					l.getShadowMap().bind();
-					glClear(GL_DEPTH_BUFFER_BIT);
-					renderingManager.renderShadow(l.getLightCamera());
-					l.getShadowMap().unbind();
-				}
+			for (DirectionalLightInternal l : directionalLightHandler.getLights()) {
+				if (!l.shadows || !l.visible)
+					continue;
+				l.setPosition(currentCamera.getPosition().getInternal());
+				l.update();
+				l.getShadowMap().bind();
+				glClear(GL_DEPTH_BUFFER_BIT);
+				renderingManager.renderShadow(l.getLightCamera());
+				l.getShadowMap().unbind();
 			}
 			glCullFace(GL_FRONT);
-			synchronized (spotLightHandler.getLights()) {
-				for (SpotLightInternal l : spotLightHandler.getLights()) {
-					if (!l.shadows || !l.visible)
-						continue;
-					l.update();
-					l.getShadowMap().bind();
-					glClear(GL_DEPTH_BUFFER_BIT);
-					renderingManager.renderShadow(l.getLightCamera());
-					l.getShadowMap().unbind();
-				}
+			for (SpotLightInternal l : spotLightHandler.getLights()) {
+				if (!l.shadows || !l.visible)
+					continue;
+				l.update();
+				l.getShadowMap().bind();
+				glClear(GL_DEPTH_BUFFER_BIT);
+				renderingManager.renderShadow(l.getLightCamera());
+				l.getShadowMap().unbind();
 			}
 			glCullFace(GL_BACK);
 			GPUProfiler.end();
@@ -315,7 +311,7 @@ public class GLRenderer implements IPipeline {
 		pp.process(rnd, rd);
 		GPUProfiler.end();
 	}
-	
+
 	public RenderingSettings getRenderSettings() {
 		return this.renderingSettings;
 	}
@@ -328,7 +324,7 @@ public class GLRenderer implements IPipeline {
 			return;
 		if (!Game.isLoaded())
 			return;
-		if ( !initialized ) 
+		if (!initialized)
 			return;
 
 		currentCamera = renderableWorld.getCurrentCamera();
@@ -347,7 +343,7 @@ public class GLRenderer implements IPipeline {
 
 		// Update lighting data
 		Lighting lighting = Game.lighting();
-		if ( lighting != null && !lighting.isDestroyed() ) {
+		if (lighting != null && !lighting.isDestroyed()) {
 			rnd.ambient = lighting.getAmbient().toJOML();
 			rnd.exposure = lighting.getExposure();
 			rnd.gamma = lighting.getGamma();

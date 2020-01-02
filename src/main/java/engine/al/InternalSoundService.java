@@ -11,6 +11,8 @@
 package engine.al;
 
 import org.joml.Vector3f;
+import org.lwjgl.openal.ALC;
+import org.lwjgl.system.Configuration;
 
 import paulscode.sound.SoundSystem;
 import paulscode.sound.SoundSystemConfig;
@@ -23,6 +25,8 @@ public class InternalSoundService {
 	private SoundSystem soundSystem;
 
 	static {
+		Configuration.OPENAL_EXPLICIT_INIT.set(true); // Move this to another place
+		ALC.create();
 		try {
 			SoundSystemConfig.addLibrary(LibraryLWJGLOpenAL.class);
 			SoundSystemConfig.setCodec("ogg", CodecJOgg.class);
@@ -38,19 +42,20 @@ public class InternalSoundService {
 
 	public void stopSoundSystem() {
 		System.out.println("Stopping sound system...");
-		if ( soundSystem != null )
+		if (soundSystem != null)
 			soundSystem.cleanup();
 		soundSystem = null;
 		System.out.println("Sound system stopped");
 	}
-	
+
 	public String quickPlay(String filepath, Vector3f position) {
-		if ( soundSystem == null )
+		if (soundSystem == null)
 			return null;
-		
-		return soundSystem.quickPlay(false, filepath, false, position.x, position.y, position.z, SoundSystemConfig.ATTENUATION_ROLLOFF, SoundSystemConfig.getDefaultRolloff());
+
+		return soundSystem.quickPlay(false, filepath, false, position.x, position.y, position.z,
+				SoundSystemConfig.ATTENUATION_ROLLOFF, SoundSystemConfig.getDefaultRolloff());
 	}
-	
+
 	public SoundSystem getSoundSystem() {
 		return this.soundSystem;
 	}

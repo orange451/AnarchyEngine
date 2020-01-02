@@ -23,6 +23,8 @@ public class SpotLightCamera {
 
 	private Vector3f temp = new Vector3f();
 
+	private static final Vector3f UP = new Vector3f(0, 1, 0);
+
 	public SpotLightCamera(float fov, int resolution) {
 		projectionMatrix = Maths.createProjectionMatrix(resolution, resolution, fov, 0.1f, 100f);
 		viewMatrix = new Matrix4f();
@@ -30,7 +32,7 @@ public class SpotLightCamera {
 
 	public void update(Vector3f direction, Vector3f position) {
 		temp.set(direction);
-		viewMatrix.setLookAt(position, temp.add(position), new Vector3f(0, 1, 0));
+		viewMatrix.setLookAt(position, temp.add(position), UP);
 	}
 
 	public void setFov(float fov, int resolution) {
