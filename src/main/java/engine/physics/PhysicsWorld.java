@@ -23,11 +23,11 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.bullet.Bullet;
 import com.badlogic.gdx.physics.bullet.collision.ClosestRayResultCallback;
 import com.badlogic.gdx.physics.bullet.collision.RayResultCallback;
-import com.badlogic.gdx.physics.bullet.collision.btAxisSweep3;
+import com.badlogic.gdx.physics.bullet.collision.btBroadphaseInterface;
 import com.badlogic.gdx.physics.bullet.collision.btCollisionConfiguration;
 import com.badlogic.gdx.physics.bullet.collision.btCollisionDispatcher;
-import com.badlogic.gdx.physics.bullet.collision.btCollisionObject;
 import com.badlogic.gdx.physics.bullet.collision.btCollisionWorld;
+import com.badlogic.gdx.physics.bullet.collision.btDbvtBroadphase;
 import com.badlogic.gdx.physics.bullet.collision.btDefaultCollisionConfiguration;
 import com.badlogic.gdx.physics.bullet.collision.btGImpactCollisionAlgorithm;
 import com.badlogic.gdx.physics.bullet.collision.btGhostPairCallback;
@@ -39,7 +39,6 @@ import com.badlogic.gdx.physics.bullet.dynamics.btSequentialImpulseConstraintSol
 
 import engine.Game;
 import engine.InternalGameThread;
-import engine.lua.type.object.insts.PhysicsObject;
 
 public class PhysicsWorld {
 	public btDynamicsWorld dynamicsWorld;
@@ -51,14 +50,15 @@ public class PhysicsWorld {
 	}
 
 	public void tick() {
-		double dt = 1f/(float)InternalGameThread.desiredTPS;
+		float fixedDelta = 1f/InternalGameThread.desiredTPS;
+		float delta = InternalGameThread.delta;
 
 		if ( Game.isRunning() ) {
 			synchronized(dynamicsWorld) {
 				dynamicsWorld.setGravity(new Vector3(0, 0, -Game.workspace().getGravity()));
 				try{
-					Game.runService().physicsSteppedEvent().fire(LuaValue.valueOf(dt));
-					dynamicsWorld.stepSimulation((float)dt,2,(float)dt);
+					Game.runService().physicsSteppedEvent().fire(LuaValue.valueOf(delta));
+					dynamicsWorld.stepSimulation(Math.min(1f / 30f, delta), 5, fixedDelta);
 				}catch(Exception e) {
 					System.err.println("Error Stepping Physics");
 					e.printStackTrace();
@@ -327,10 +327,8 @@ public class PhysicsWorld {
 		btCollisionConfiguration collisionConfiguration = new btDefaultCollisionConfiguration();
 		btCollisionDispatcher dispatcher = new btCollisionDispatcher(collisionConfiguration);
 		btConstraintSolver solver = new btSequentialImpulseConstraintSolver();
-		Vector3 worldMin = new Vector3(-1000f,-1000f,-1000f);
-		Vector3 worldMax = new Vector3(1000f,1000f,1000f);
-		btAxisSweep3 sweepBP = new btAxisSweep3(worldMin, worldMax);
-		dynamicsWorld = new btDiscreteDynamicsWorld(dispatcher, sweepBP, solver, collisionConfiguration);
+		btBroadphaseInterface overlappingPairCache = new btDbvtBroadphase();
+		dynamicsWorld = new btDiscreteDynamicsWorld(dispatcher, overlappingPairCache, solver, collisionConfiguration);
 		
 		// Register GIMPACT collision algo
 		btGImpactCollisionAlgorithm.registerAlgorithm( dispatcher );
