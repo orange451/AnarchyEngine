@@ -43,8 +43,8 @@ public class EnvironmentRenderer {
 
 	private LayeredCubeCamera layeredCubeCamera;
 
-	public EnvironmentRenderer(int size) {
-		generateFramebuffer(size);
+	public EnvironmentRenderer(int size, boolean mipmap) {
+		generateFramebuffer(size, mipmap);
 		layeredCubeCamera = new LayeredCubeCamera();
 	}
 
@@ -77,14 +77,14 @@ public class EnvironmentRenderer {
 		return cubeTex;
 	}
 
-	private void generateFramebuffer(int size) {
+	private void generateFramebuffer(int size, boolean mipmap) {
 		TextureBuilder tb = new TextureBuilder();
 
 		tb.genTexture(GL_TEXTURE_CUBE_MAP).bindTexture();
 		tb.sizeTexture(size, size);
 		for (int i = 0; i < 6; i++)
 			tb.texImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB16F, 0, GL_RGB, GL_FLOAT, 0);
-		tb.texParameteri(GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+		tb.texParameteri(GL_TEXTURE_MIN_FILTER, mipmap ? GL_LINEAR_MIPMAP_LINEAR : GL_LINEAR);
 		tb.texParameteri(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		tb.texParameteri(GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 		tb.texParameteri(GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
