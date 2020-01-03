@@ -230,7 +230,7 @@ public class GLRenderer implements IPipeline {
 		envRendererEntities.renderReflections(skyRenderer, sun, rd, rnd, renderingManager);
 		GPUProfiler.end();
 		GPUProfiler.start("PreFilteredEnvironment");
-		preFilteredEnvironment.render(envRendererEntities.getCubeTexture().getTexture());
+		preFilteredEnvironment.render(envRendererEntities.getCubeTexture());
 		GPUProfiler.end();
 		GPUProfiler.end();
 		GPUProfiler.end();

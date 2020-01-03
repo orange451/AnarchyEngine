@@ -24,7 +24,6 @@ import static org.lwjgl.opengl.GL11C.GL_TEXTURE_WRAP_S;
 import static org.lwjgl.opengl.GL11C.GL_TEXTURE_WRAP_T;
 import static org.lwjgl.opengl.GL11C.GL_TRIANGLES;
 import static org.lwjgl.opengl.GL11C.GL_TRIANGLE_STRIP;
-import static org.lwjgl.opengl.GL11C.glBindTexture;
 import static org.lwjgl.opengl.GL11C.glClear;
 import static org.lwjgl.opengl.GL11C.glDrawArrays;
 import static org.lwjgl.opengl.GL11C.glViewport;
@@ -33,8 +32,6 @@ import static org.lwjgl.opengl.GL12C.GL_TEXTURE_WRAP_R;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE0;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE_CUBE_MAP;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE_CUBE_MAP_POSITIVE_X;
-import static org.lwjgl.opengl.GL13C.glActiveTexture;
-import static org.lwjgl.opengl.GL14C.GL_TEXTURE_LOD_BIAS;
 import static org.lwjgl.opengl.GL15C.GL_STATIC_DRAW;
 import static org.lwjgl.opengl.GL30C.GL_COLOR_ATTACHMENT0;
 import static org.lwjgl.opengl.GL30C.GL_DEPTH_ATTACHMENT;
@@ -132,12 +129,12 @@ public class PreFilteredEnvironment {
 		quad.dispose();
 	}
 
-	public void render(int envMap) {
+	public void render(Texture envMap) {
 		framebuffer.bind();
 		shader.start();
 		cube.bind(0);
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_CUBE_MAP, envMap);
+		envMap.active(GL_TEXTURE0);
+		shader.loadResolution(envMap.getWidth());
 		shader.loadProjectionMatrix(camera.getProjectionMatrix());
 		for (int mip = 0; mip < maxMipLevels; mip++) {
 			int mipWidth = (int) ((float) cubeTex.getWidth() * Math.pow(0.5, mip));
@@ -188,13 +185,11 @@ public class PreFilteredEnvironment {
 		tb.sizeTexture(size, size);
 		for (int i = 0; i < 6; i++)
 			tb.texImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB16F, 0, GL_RGB, GL_FLOAT, 0);
-		tb.texParameteri(GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		tb.texParameteri(GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 		tb.texParameteri(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		tb.texParameteri(GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 		tb.texParameteri(GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 		tb.texParameteri(GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-		tb.texParameteri(GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-		tb.texParameterf(GL_TEXTURE_LOD_BIAS, 0);
 		tb.generateMipmap();
 		cubeTex = tb.endTexture();
 

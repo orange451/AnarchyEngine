@@ -18,6 +18,7 @@ import org.joml.Matrix4f;
 import engine.glv2.entities.CubeMapCamera;
 import engine.glv2.shaders.data.Attribute;
 import engine.glv2.shaders.data.UniformFloat;
+import engine.glv2.shaders.data.UniformInteger;
 import engine.glv2.shaders.data.UniformMatrix4;
 import engine.glv2.shaders.data.UniformSampler;
 
@@ -27,13 +28,14 @@ public class PreFilteredEnvironmentShader extends ShaderProgram {
 	private UniformMatrix4 viewMatrix = new UniformMatrix4("viewMatrix");
 	private UniformSampler envMap = new UniformSampler("envMap");
 	private UniformFloat roughness = new UniformFloat("roughness");
+	private UniformInteger resolution = new UniformInteger("resolution");
 
 	@Override
 	protected void setupShader() {
 		super.addShader(new Shader("assets/shaders/PreFilteredEnvironment.vs", GL_VERTEX_SHADER));
 		super.addShader(new Shader("assets/shaders/PreFilteredEnvironment.fs", GL_FRAGMENT_SHADER));
 		super.setAttributes(new Attribute(0, "position"));
-		super.storeUniforms(projectionMatrix, viewMatrix, envMap, roughness);
+		super.storeUniforms(projectionMatrix, viewMatrix, envMap, roughness, resolution);
 	}
 
 	@Override
@@ -53,6 +55,10 @@ public class PreFilteredEnvironmentShader extends ShaderProgram {
 
 	public void loadRoughness(float r) {
 		roughness.loadFloat(r);
+	}
+
+	public void loadResolution(int resolution) {
+		this.resolution.loadInteger(resolution);
 	}
 
 }
