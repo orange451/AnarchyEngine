@@ -69,7 +69,11 @@ public class StandardUserControls {
 						}
 					}
 				}
-				Game.historyService().pushChange(snapshot);
+				
+				if ( group.getChildren().size() == 0 )
+					group.destroy();
+				else
+					Game.historyService().pushChange(snapshot);
 			}
 			
 			// Duplicate object
