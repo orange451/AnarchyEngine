@@ -62,6 +62,8 @@ public class IdeGameView extends IdePane {
 		
 		internal.setOnKeyPressed(event -> {
 			UserInputService uis = (UserInputService) Game.getService("UserInputService");
+			if ( uis == null )
+				return;
 			
 			if ( !internal.isDescendentSelected() )
 				return;
@@ -70,6 +72,8 @@ public class IdeGameView extends IdePane {
 		});
 		internal.setOnKeyReleased(event -> {
 			UserInputService uis = (UserInputService) Game.getService("UserInputService");
+			if ( uis == null )
+				return;
 			
 			if ( !internal.isDescendentSelected() )
 				return;
@@ -78,11 +82,17 @@ public class IdeGameView extends IdePane {
 		});
 		internal.setOnMousePressed(event -> {
 			UserInputService uis = (UserInputService) Game.getService("UserInputService");
+			if ( uis == null )
+				return;
+			
 			uis.onMousePress(event.button);
 			cached_context.setSelected(internal);
 		});
 		internal.setOnMouseReleased(event -> {
 			UserInputService uis = (UserInputService) Game.getService("UserInputService");
+			if ( uis == null )
+				return;
+			
 			uis.onMouseRelease(event.button);
 		});
 		internal.setOnMouseScrolled(event ->{

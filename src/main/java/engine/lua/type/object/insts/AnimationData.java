@@ -95,11 +95,13 @@ public class AnimationData extends Instance implements TreeViewable {
 				float vertexWeight = weight.mWeight();
 				List<Integer> vertices = indexToVertexIndex.get(vertexIndex);
 				
-				for (int j = 0; j < vertices.size(); j++) {
-					BoneWeight w = new BoneWeight();
-					w.forceset("VertexId", LuaValue.valueOf(vertices.get(j)));
-					w.forceset("Weight", LuaValue.valueOf(vertexWeight));
-					w.forceSetParent(b);
+				if ( vertices != null ) {
+					for (int j = 0; j < vertices.size(); j++) {
+						BoneWeight w = new BoneWeight();
+						w.forceset("VertexId", LuaValue.valueOf(vertices.get(j)));
+						w.forceset("Weight", LuaValue.valueOf(vertexWeight));
+						w.forceSetParent(b);
+					}
 				}
 			}
 			
