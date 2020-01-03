@@ -10,7 +10,6 @@
 
 package engine.glv2.pipeline;
 
-import static org.lwjgl.opengl.GL11C.GL_TEXTURE_2D;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE0;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE1;
 
@@ -33,8 +32,8 @@ public class DepthOfField extends PostProcesPass<DepthOfFieldShader> {
 
 	@Override
 	protected void setupTextures(RendererData rnd, PostProcessPipeline pp, Texture[] auxTex) {
-		super.activateTexture(GL_TEXTURE0, GL_TEXTURE_2D, auxTex[0].getTexture());
-		super.activateTexture(GL_TEXTURE1, GL_TEXTURE_2D, pp.getDepthTex().getTexture());
+		auxTex[0].active(GL_TEXTURE0);
+		pp.getDepthTex().active(GL_TEXTURE1);
 	}
 
 }

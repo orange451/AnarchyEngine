@@ -30,7 +30,6 @@ import static org.lwjgl.opengl.GL13C.GL_TEXTURE6;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE7;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE8;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE9;
-import static org.lwjgl.opengl.GL13C.GL_TEXTURE_CUBE_MAP;
 import static org.lwjgl.opengl.GL30C.GL_COLOR_ATTACHMENT0;
 import static org.lwjgl.opengl.GL30C.GL_COLOR_ATTACHMENT1;
 import static org.lwjgl.opengl.GL30C.GL_RGBA16F;
@@ -64,17 +63,17 @@ public class Lighting extends DeferredPass<LightingShader> {
 
 	@Override
 	protected void setupTextures(RendererData rnd, DeferredPipeline dp, Texture[] auxTex) {
-		super.activateTexture(GL_TEXTURE0, GL_TEXTURE_2D, dp.getDiffuseTex().getTexture());
-		super.activateTexture(GL_TEXTURE1, GL_TEXTURE_2D, dp.getNormalTex().getTexture());
-		super.activateTexture(GL_TEXTURE2, GL_TEXTURE_2D, dp.getDepthTex().getTexture());
-		super.activateTexture(GL_TEXTURE3, GL_TEXTURE_2D, dp.getPbrTex().getTexture());
-		super.activateTexture(GL_TEXTURE4, GL_TEXTURE_2D, dp.getMaskTex().getTexture());
-		super.activateTexture(GL_TEXTURE5, GL_TEXTURE_CUBE_MAP, rnd.irradianceCapture.getTexture());
-		super.activateTexture(GL_TEXTURE6, GL_TEXTURE_CUBE_MAP, rnd.environmentMap.getTexture());
-		super.activateTexture(GL_TEXTURE7, GL_TEXTURE_2D, rnd.brdfLUT.getTexture());
-		super.activateTexture(GL_TEXTURE8, GL_TEXTURE_2D, rnd.dlh.getMainTex().getTexture());
-		super.activateTexture(GL_TEXTURE9, GL_TEXTURE_2D, rnd.plh.getMainTex().getTexture());
-		super.activateTexture(GL_TEXTURE10, GL_TEXTURE_2D, rnd.slh.getMainTex().getTexture());
+		dp.getDiffuseTex().active(GL_TEXTURE0);
+		dp.getNormalTex().active(GL_TEXTURE1);
+		dp.getDepthTex().active(GL_TEXTURE2);
+		dp.getPbrTex().active(GL_TEXTURE3);
+		dp.getMaskTex().active(GL_TEXTURE4);
+		rnd.irradianceCapture.active(GL_TEXTURE5);
+		rnd.environmentMap.active(GL_TEXTURE6);
+		rnd.brdfLUT.active(GL_TEXTURE7);
+		rnd.dlh.getMainTex().active(GL_TEXTURE8);
+		rnd.plh.getMainTex().active(GL_TEXTURE9);
+		rnd.slh.getMainTex().active(GL_TEXTURE10);
 	}
 
 	@Override

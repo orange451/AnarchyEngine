@@ -26,7 +26,6 @@ import static org.lwjgl.opengl.GL11C.GL_TEXTURE_MAG_FILTER;
 import static org.lwjgl.opengl.GL11C.GL_TEXTURE_MIN_FILTER;
 import static org.lwjgl.opengl.GL11C.GL_TEXTURE_WRAP_S;
 import static org.lwjgl.opengl.GL11C.GL_TEXTURE_WRAP_T;
-import static org.lwjgl.opengl.GL11C.glBindTexture;
 import static org.lwjgl.opengl.GL11C.glBlendFunc;
 import static org.lwjgl.opengl.GL11C.glClear;
 import static org.lwjgl.opengl.GL11C.glDisable;
@@ -37,7 +36,6 @@ import static org.lwjgl.opengl.GL13C.GL_TEXTURE2;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE3;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE4;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE5;
-import static org.lwjgl.opengl.GL13C.glActiveTexture;
 import static org.lwjgl.opengl.GL30C.GL_COLOR_ATTACHMENT0;
 import static org.lwjgl.opengl.GL30C.GL_RGB16F;
 
@@ -99,13 +97,11 @@ public class PointLightHandler implements IPointLightHandler {
 		shader.loadCameraData(camera, projectionMatrix);
 		shader.loadUseShadows(rs.shadowsEnabled);
 		shader.loadTexel(texel);
-		activateTexture(GL_TEXTURE0, GL_TEXTURE_2D, dp.getDiffuseTex().getTexture());
-		// activateTexture(GL_TEXTURE1, GL_TEXTURE_2D,
-		// dp.getPositionTex().getTexture());
-		activateTexture(GL_TEXTURE2, GL_TEXTURE_2D, dp.getNormalTex().getTexture());
-		activateTexture(GL_TEXTURE3, GL_TEXTURE_2D, dp.getDepthTex().getTexture());
-		activateTexture(GL_TEXTURE4, GL_TEXTURE_2D, dp.getPbrTex().getTexture());
-		activateTexture(GL_TEXTURE5, GL_TEXTURE_2D, dp.getMaskTex().getTexture());
+		dp.getDiffuseTex().active(GL_TEXTURE0);
+		dp.getNormalTex().active(GL_TEXTURE2);
+		dp.getDepthTex().active(GL_TEXTURE3);
+		dp.getPbrTex().active(GL_TEXTURE4);
+		dp.getMaskTex().active(GL_TEXTURE5);
 		for (PointLightInternal l : lights) {
 			if (!l.visible)
 				continue;
@@ -136,11 +132,6 @@ public class PointLightHandler implements IPointLightHandler {
 
 	public void dispose() {
 		disposeFramebuffer();
-	}
-
-	private void activateTexture(int textureNum, int target, int texture) {
-		glActiveTexture(textureNum);
-		glBindTexture(target, texture);
 	}
 
 	private void generateFramebuffer() {

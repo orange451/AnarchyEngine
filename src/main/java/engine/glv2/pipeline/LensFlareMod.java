@@ -10,7 +10,6 @@
 
 package engine.glv2.pipeline;
 
-import static org.lwjgl.opengl.GL11C.GL_TEXTURE_2D;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE0;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE1;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE2;
@@ -46,10 +45,10 @@ public class LensFlareMod extends DeferredPass<LensFlareModShader> {
 
 	@Override
 	protected void setupTextures(RendererData rnd, DeferredPipeline dp, Texture[] auxTex) {
-		super.activateTexture(GL_TEXTURE0, GL_TEXTURE_2D, auxTex[0].getTexture());
-		super.activateTexture(GL_TEXTURE1, GL_TEXTURE_2D, lensDirt.getTexture());
-		super.activateTexture(GL_TEXTURE2, GL_TEXTURE_2D, lensStar.getTexture());
-		super.activateTexture(GL_TEXTURE3, GL_TEXTURE_2D, auxTex[1].getTexture());
+		auxTex[0].active(GL_TEXTURE0);
+		lensDirt.active(GL_TEXTURE1);
+		lensStar.active(GL_TEXTURE2);
+		auxTex[1].active(GL_TEXTURE3);
 	}
 
 	@Override

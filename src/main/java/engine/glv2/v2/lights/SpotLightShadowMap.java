@@ -32,7 +32,7 @@ import engine.glv2.objects.TextureBuilder;
 public class SpotLightShadowMap {
 
 	private Framebuffer framebuffer;
-	private Texture shadowMap;
+	private Texture texture;
 
 	private int size;
 
@@ -59,8 +59,13 @@ public class SpotLightShadowMap {
 		disposeFramebuffer();
 	}
 
+	@Deprecated
 	public Texture getShadowMap() {
-		return shadowMap;
+		return texture;
+	}
+
+	public Texture getTexture() {
+		return texture;
 	}
 
 	private void generateFramebuffer() {
@@ -75,18 +80,18 @@ public class SpotLightShadowMap {
 		tb.texParameteri(GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
 		float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
 		tb.texParameterfv(GL_TEXTURE_BORDER_COLOR, borderColor);
-		shadowMap = tb.endTexture();
+		texture = tb.endTexture();
 
 		FramebufferBuilder fb = new FramebufferBuilder();
 
 		fb.genFramebuffer().bindFramebuffer().sizeFramebuffer(size, size);
-		fb.framebufferTexture(GL_DEPTH_ATTACHMENT, shadowMap, 0);
+		fb.framebufferTexture(GL_DEPTH_ATTACHMENT, texture, 0);
 		framebuffer = fb.endFramebuffer();
 	}
 
 	private void disposeFramebuffer() {
 		framebuffer.dispose();
-		shadowMap.dispose();
+		texture.dispose();
 	}
 
 }

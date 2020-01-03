@@ -10,7 +10,6 @@
 
 package engine.glv2.pipeline;
 
-import static org.lwjgl.opengl.GL11C.GL_TEXTURE_2D;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE0;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE1;
 
@@ -42,8 +41,8 @@ public class LensFlares extends DeferredPass<LensFlaresShader> {
 
 	@Override
 	protected void setupTextures(RendererData rnd, DeferredPipeline dp, Texture[] auxTex) {
-		super.activateTexture(GL_TEXTURE0, GL_TEXTURE_2D, auxTex[1].getTexture());
-		super.activateTexture(GL_TEXTURE1, GL_TEXTURE_2D, lensColor.getTexture());
+		auxTex[1].active(GL_TEXTURE0);
+		lensColor.active(GL_TEXTURE1);
 		auxTex[1] = auxTex[0];
 	}
 

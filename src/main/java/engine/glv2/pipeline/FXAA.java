@@ -10,7 +10,6 @@
 
 package engine.glv2.pipeline;
 
-import static org.lwjgl.opengl.GL11C.GL_TEXTURE_2D;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE0;
 import static org.lwjgl.opengl.GL20C.GL_VERTEX_SHADER;
 
@@ -39,7 +38,7 @@ public class FXAA extends PostProcesPass<BasicPostProcessShader> {
 
 	@Override
 	protected void setupTextures(RendererData rnd, PostProcessPipeline pp, Texture[] auxTex) {
-		super.activateTexture(GL_TEXTURE0, GL_TEXTURE_2D, auxTex[0].getTexture());
+		auxTex[0].active(GL_TEXTURE0);
 	}
 
 }

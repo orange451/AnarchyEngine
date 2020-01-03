@@ -19,7 +19,7 @@ import static org.lwjgl.opengl.GL30C.glDeleteFramebuffers;
 import static org.lwjgl.opengl.GL30C.glFramebufferTextureLayer;
 import static org.lwjgl.opengl.GL32C.glFramebufferTexture;
 
-public class Framebuffer implements IObject {
+public class Framebuffer implements IVisualObject {
 
 	private final int framebuffer;
 	private final int width, height;
@@ -48,6 +48,16 @@ public class Framebuffer implements IObject {
 	@Override
 	public void dispose() {
 		glDeleteFramebuffers(framebuffer);
+	}
+
+	@Override
+	public int getWidth() {
+		return width;
+	}
+
+	@Override
+	public int getHeight() {
+		return height;
 	}
 
 	public void swapTexture(int attachment, Texture texture, int level) {

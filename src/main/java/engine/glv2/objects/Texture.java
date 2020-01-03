@@ -12,6 +12,8 @@ package engine.glv2.objects;
 
 import static org.lwjgl.opengl.GL11C.glBindTexture;
 import static org.lwjgl.opengl.GL11C.glDeleteTextures;
+import static org.lwjgl.opengl.GL13C.glActiveTexture;
+import static org.lwjgl.opengl.GL30C.glGenerateMipmap;
 
 public class Texture implements IVisualObject {
 
@@ -31,6 +33,15 @@ public class Texture implements IVisualObject {
 		this.target = target;
 		this.width = width;
 		this.height = height;
+	}
+
+	public void generateMipmaps() {
+		glGenerateMipmap(target);
+	}
+
+	public void active(int textureNum) {
+		glActiveTexture(textureNum);
+		glBindTexture(target, texture);
 	}
 
 	@Override

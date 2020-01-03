@@ -32,7 +32,7 @@ public class DirectionalLightShadowMap {
 
 	private Framebuffer framebuffer;
 
-	private Texture shadowMaps;
+	private Texture texture;
 
 	private int size = 256;
 
@@ -59,8 +59,13 @@ public class DirectionalLightShadowMap {
 		disposeFramebuffer();
 	}
 
+	@Deprecated
 	public Texture getShadowMaps() {
-		return shadowMaps;
+		return texture;
+	}
+
+	public Texture getTexture() {
+		return texture;
 	}
 
 	private void generateFramebuffer() {
@@ -73,17 +78,17 @@ public class DirectionalLightShadowMap {
 		tb.texParameteri(GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 		tb.texParameteri(GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 		tb.texParameteri(GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
-		shadowMaps = tb.endTexture();
+		texture = tb.endTexture();
 
 		FramebufferBuilder fb = new FramebufferBuilder();
 		fb.genFramebuffer().bindFramebuffer().sizeFramebuffer(size, size);
-		fb.framebufferTexture(GL_DEPTH_ATTACHMENT, shadowMaps, 0);
+		fb.framebufferTexture(GL_DEPTH_ATTACHMENT, texture, 0);
 		framebuffer = fb.endFramebuffer();
 	}
 
 	private void disposeFramebuffer() {
 		framebuffer.dispose();
-		shadowMaps.dispose();
+		texture.dispose();
 	}
 
 }

@@ -92,11 +92,13 @@ public abstract class PipelinePass<T extends BasePipelineShader, P> {
 	protected void setupShaderData(RendererData rnd, IRenderingData rd, T shader) {
 	}
 
+	@Deprecated
 	protected void activateTexture(int textureNum, int target, int texture) {
 		glActiveTexture(textureNum);
 		glBindTexture(target, texture);
 	}
 
+	@Deprecated
 	protected void activateTexture(int textureNum, Texture texture) {
 		glActiveTexture(textureNum);
 		texture.bind();

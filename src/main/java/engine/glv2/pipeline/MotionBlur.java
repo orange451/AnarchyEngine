@@ -10,7 +10,6 @@
 
 package engine.glv2.pipeline;
 
-import static org.lwjgl.opengl.GL11C.GL_TEXTURE_2D;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE0;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE1;
 
@@ -33,8 +32,8 @@ public class MotionBlur extends DeferredPass<MotionBlurShader> {
 
 	@Override
 	protected void setupTextures(RendererData rnd, DeferredPipeline dp, Texture[] auxTex) {
-		super.activateTexture(GL_TEXTURE0, GL_TEXTURE_2D, auxTex[0].getTexture());
-		super.activateTexture(GL_TEXTURE1, GL_TEXTURE_2D, dp.getMotionTex().getTexture());
+		auxTex[0].active(GL_TEXTURE0);
+		dp.getMotionTex().active(GL_TEXTURE1);
 	}
 
 }
