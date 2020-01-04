@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.joml.Matrix4f;
+import org.joml.Vector3f;
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.TwoArgFunction;
 
@@ -198,7 +199,7 @@ public class AnimationController extends Instance {
 			if ( firstBone == null )
 				continue;
 			
-			computeBones( keyframe, firstBone, linked.getWorldMatrix().toJoml());
+			computeBones( keyframe, firstBone, new Matrix4f().translate(linked.getWorldMatrix().toJoml().getTranslation(new Vector3f())));
 		}
 	}
 	
@@ -262,10 +263,7 @@ public class AnimationController extends Instance {
 					
 					boneNameToPreviousTransformationMap.put(boneName, ((AnimationKeyframe)keyframeBone).getMatrixInternal());
 					boneNameToPreviousRootInverseMap.put(boneName, ((Matrix4)bones.get(Bones.C_ROOTINVERSE)).getInternal());
-					//globalTransformation.mul(keyframeMatrix);
 				}
-			} else {
-				System.out.println(boneName);
 			}
 		}
 		
@@ -276,7 +274,7 @@ public class AnimationController extends Instance {
 			previousRootTransformation = IDENTITY;
 		
 		// Get the previously defined root inverse (normally does not change per animation)
-		// IDENTITY if it is not yet defined.
+		// IDENTITY if it is not yet defined. It's most likely to be IDENTITY anyways...
 		Matrix4f previousRootInverse = boneNameToPreviousRootInverseMap.get(boneName);
 		if ( previousRootInverse == null )
 			previousRootInverse = IDENTITY;
