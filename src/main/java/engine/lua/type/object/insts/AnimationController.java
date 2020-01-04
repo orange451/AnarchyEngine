@@ -37,6 +37,7 @@ public class AnimationController extends Instance {
 	private LuaConnection linkedConnection = null;
 	private HashMap<String, Matrix4> boneAbsolutePositions;
 	private HashMap<String, Matrix4f> boneNameToPreviousTransformationMap;
+	private HashMap<String, Matrix4f> boneNameToPreviousRootInverseMap;
 	private AnimatedModel animatedModel;
 	
 	public AnimationController() {
@@ -101,6 +102,12 @@ public class AnimationController extends Instance {
 			boneNameToPreviousTransformationMap.clear();
 		else
 			boneNameToPreviousTransformationMap = new HashMap<>();	
+		
+		// clear previous root index
+		if ( boneNameToPreviousRootInverseMap != null )
+			boneNameToPreviousRootInverseMap.clear();
+		else
+			boneNameToPreviousRootInverseMap = new HashMap<>();	
 		
 		animatedModel = new AnimatedModel(this);
 	}
@@ -253,9 +260,9 @@ public class AnimationController extends Instance {
 				if ( bone != null && bone instanceof Bone ) {
 					boneName = bone.getName();
 					
-					Matrix4f keyframeMatrix = ((AnimationKeyframe)keyframeBone).getMatrixInternal();
-					boneNameToPreviousTransformationMap.put(boneName, ((Matrix4)bones.get(Bones.C_ROOTINVERSE)).getInternal());
-					globalTransformation.mul(keyframeMatrix);
+					boneNameToPreviousTransformationMap.put(boneName, ((AnimationKeyframe)keyframeBone).getMatrixInternal());
+					boneNameToPreviousRootInverseMap.put(boneName, ((Matrix4)bones.get(Bones.C_ROOTINVERSE)).getInternal());
+					//globalTransformation.mul(keyframeMatrix);
 				}
 			} else {
 				System.out.println(boneName);
@@ -268,9 +275,16 @@ public class AnimationController extends Instance {
 		if ( previousRootTransformation == null )
 			previousRootTransformation = IDENTITY;
 		
+		// Get the previously defined root inverse (normally does not change per animation)
+		// IDENTITY if it is not yet defined.
+		Matrix4f previousRootInverse = boneNameToPreviousRootInverseMap.get(boneName);
+		if ( previousRootInverse == null )
+			previousRootInverse = IDENTITY;
+		
 		// Update this bones matrix
+		globalTransformation.mul(previousRootTransformation);
 		Matrix4f finalTransform = new Matrix4f();
-		finalTransform.mul(previousRootTransformation);
+		finalTransform.mul(previousRootInverse);
 		finalTransform.mul(globalTransformation);
 		boneAbsolutePositions.put(boneName, new Matrix4(finalTransform));
 		
