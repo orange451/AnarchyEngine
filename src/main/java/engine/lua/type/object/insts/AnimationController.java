@@ -36,6 +36,7 @@ public class AnimationController extends Instance {
 	
 	private LuaConnection linkedConnection = null;
 	private HashMap<String, Matrix4> boneAbsolutePositions;
+	private HashMap<String, Matrix4> boneNameToPreviousTransformationMap;
 	private AnimatedModel animatedModel;
 	
 	public AnimationController() {
@@ -89,10 +90,17 @@ public class AnimationController extends Instance {
 		playingAnimations.clear();
 		System.out.println("Animations cleared");
 		
+		// Clear bone absolute positions
 		if ( boneAbsolutePositions != null )
 			boneAbsolutePositions.clear();
 		else
 			boneAbsolutePositions = new HashMap<>(); 
+		
+		// clear previous transformations
+		if ( boneNameToPreviousTransformationMap != null )
+			boneNameToPreviousTransformationMap.clear();
+		else
+			boneNameToPreviousTransformationMap = new HashMap<>();	
 		
 		animatedModel = new AnimatedModel(this);
 	}
@@ -154,6 +162,9 @@ public class AnimationController extends Instance {
 		if ( bones == null )
 			return;
 		
+		if ( boneStructure.getChildrenSize() == 0 )
+			return;
+		
 		for (int i = 0; i < playingAnimations.size(); i++) {
 			if ( i >= playingAnimations.size() )
 				continue;
@@ -171,8 +182,16 @@ public class AnimationController extends Instance {
 			if ( keyframe == null )
 				continue;
 			
-			// Update bones
-			computeBones( keyframe, boneStructure, linked.getWorldMatrix().toJoml());
+			// Make sure there's children
+			List<Instance> children = boneStructure.getChildren();
+			if ( children == null || children.size() == 0 )
+				continue;
+			
+			Instance firstBone = children.get(0);
+			if ( firstBone == null )
+				continue;
+			
+			computeBones( keyframe, firstBone, linked.getWorldMatrix().toJoml());
 		}
 	}
 	
@@ -218,10 +237,13 @@ public class AnimationController extends Instance {
 			animatedModel.render(new Matrix4f());
 	}
 	
+	private static final Matrix4f IDENTITY = new Matrix4f().identity();
 	private void computeBones(AnimationKeyframeSequence keyframe, Instance root, Matrix4f parentMatrix) {
 		Matrix4f globalTransformation = new Matrix4f(parentMatrix);
+		Matrix4f inverseRoot = IDENTITY;
+		String boneName = root.getName();
 		
-		// Do rendering
+		// Check if this bone has a keyframe
 		if ( root instanceof BoneTreeNode ) {
 			Instance keyframeBone = keyframe.findFirstChild(root.getName());
 			if ( keyframeBone != null && keyframeBone instanceof AnimationKeyframe ) {
@@ -231,20 +253,23 @@ public class AnimationController extends Instance {
 				
 				if ( bone != null && bone instanceof Bone ) {
 					Matrix4f keyframeMatrix = ((AnimationKeyframe)keyframeBone).getMatrixInternal();
-					Matrix4f inverseRoot = ((Matrix4)bones.get(Bones.C_ROOTINVERSE)).getInternal();
-					
+					inverseRoot = ((Matrix4)bones.get(Bones.C_ROOTINVERSE)).getInternal();
 					globalTransformation.mul(keyframeMatrix);
 					
-					Matrix4f finalTransform = new Matrix4f();
-					finalTransform.mul(inverseRoot);
-					finalTransform.mul(globalTransformation);
-					
-					boneAbsolutePositions.put(bone.getName(), new Matrix4(finalTransform));
+					boneName = bone.getName();
 				}
+			} else {
+				System.out.println(boneName);
 			}
 		}
 		
-		// Render children
+		// Update this bones matrix
+		Matrix4f finalTransform = new Matrix4f();
+		finalTransform.mul(inverseRoot);
+		finalTransform.mul(globalTransformation);
+		boneAbsolutePositions.put(boneName, new Matrix4(finalTransform));
+		
+		// Update children
 		List<Instance> bones = root.getChildren();
 		for (int i = 0; i < bones.size(); i++) {
 			Instance newRoot = bones.get(i);

@@ -439,6 +439,14 @@ public abstract class Instance extends DataModel {
 	public List<Instance> getChildren() {
 		return children;
 	}
+	
+	/**
+	 * Returns the amount of children this instance has.
+	 * @return
+	 */
+	public int getChildrenSize() {
+		return this.children.size();
+	}
 
 	/**
 	 * Returns the first child with the matching name.
