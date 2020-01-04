@@ -583,6 +583,8 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 						String pp = FilePath.convertToSystem(initialValue.toString());
 						if ( !new File(pp).exists() )
 							pp = "";
+						
+						// Check if this object has defined file types
 						String types = null;
 						if ( instance instanceof AssetLoadable ) {
 							Class<?> clazz = ((AssetLoadable)instance).getClass();
@@ -590,6 +592,8 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 							Method m = clazz.getMethod("getFileTypes");
 							types = (String) m.invoke(null);
 						}
+						
+						// Open the dialogue to pick new path.
 						int result = NativeFileDialog.NFD_OpenDialog(types, pp, outPath);
 						if ( result == NativeFileDialog.NFD_OKAY ) {
 							String path = FilePath.convertToIDE(outPath.getStringUTF8(0));

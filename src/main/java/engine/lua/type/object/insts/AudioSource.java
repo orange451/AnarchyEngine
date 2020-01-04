@@ -12,6 +12,7 @@ package engine.lua.type.object.insts;
 
 import org.luaj.vm2.LuaValue;
 
+import engine.FileFormats;
 import engine.Game;
 import engine.lua.type.NumberClampPreferred;
 import engine.lua.type.object.AssetLoadable;
@@ -78,7 +79,7 @@ public class AudioSource extends AssetLoadable implements TreeViewable {
 	}
 
 	public static String getFileTypes() {
-		return "wav,ogg,midi";
+		return FileFormats.AUDIO;
 	}
 
 	public float getVolume() {

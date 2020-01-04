@@ -12,6 +12,7 @@ package engine.lua.type.object.insts;
 
 import org.luaj.vm2.LuaValue;
 
+import engine.FileFormats;
 import engine.FilePath;
 import engine.Game;
 import engine.gl.Resources;
@@ -148,7 +149,7 @@ public class Texture extends AssetLoadable implements TreeViewable,FileResource 
 	}
 	
 	public static String getFileTypes() {
-		return "png,bmp,tga,jpg,hdr";
+		return FileFormats.TEXTURES;
 	}
 
 	public boolean hasLoaded() {

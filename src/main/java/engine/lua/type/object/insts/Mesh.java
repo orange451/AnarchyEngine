@@ -24,6 +24,7 @@ import org.lwjgl.assimp.AIScene;
 import org.lwjgl.assimp.AIVector3D;
 import org.lwjgl.assimp.Assimp;
 
+import engine.FileFormats;
 import engine.FilePath;
 import engine.gl.Resources;
 import engine.gl.mesh.BufferedMesh;
@@ -195,6 +196,6 @@ public class Mesh extends AssetLoadable implements TreeViewable {
 	}
 
 	public static String getFileTypes() {
-		return "x,obj,fbx,3ds,smd,xml,dae,gltf,ms3d,blend,md5mesh";
+		return FileFormats.MESHES;
 	}
 }
