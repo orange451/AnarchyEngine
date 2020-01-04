@@ -159,7 +159,7 @@ public class GLRenderer implements IPipeline {
 
 		renderingManager = new RenderingManager();
 
-		envRenderer = new EnvironmentRenderer(32, false);
+		envRenderer = new EnvironmentRenderer(64, false);
 		envRendererEntities = new EnvironmentRenderer(128, true);
 		irradianceCapture = new IrradianceCapture();
 		rnd.irradianceCapture = irradianceCapture.getCubeTexture();
