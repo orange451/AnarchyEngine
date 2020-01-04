@@ -34,6 +34,7 @@ import org.lwjgl.assimp.AIScene;
 import org.lwjgl.assimp.AIString;
 import org.lwjgl.assimp.AIVector3D;
 import org.lwjgl.assimp.Assimp;
+import org.lwjgl.system.MemoryStack;
 
 import engine.Game;
 import engine.gl.mesh.BufferedMesh;
@@ -404,18 +405,10 @@ public class Assets extends Service implements TreeViewable {
 		}
 		
 		// Load textures
-		String diffuse  = assimpGetTextureFile( material, Assimp.aiTextureType_DIFFUSE );
-		String normal   = assimpGetTextureFile( material, Assimp.aiTextureType_NORMALS );
-		String specular = assimpGetTextureFile( material, Assimp.aiTextureType_SPECULAR );
-		String glossy   = assimpGetTextureFile( material, Assimp.aiTextureType_SHININESS );
-		if ( diffuse != null )
-			diffuse = baseDir+diffuse;
-		if ( normal != null )
-			normal = baseDir+normal;
-		if ( specular != null )
-			specular = baseDir+specular;
-		if ( glossy != null )
-			glossy = baseDir+glossy;
+		String diffuse  = assimpGetTextureFile( material, Assimp.aiTextureType_DIFFUSE, baseDir );
+		String normal   = assimpGetTextureFile( material, Assimp.aiTextureType_NORMALS, baseDir );
+		String specular = assimpGetTextureFile( material, Assimp.aiTextureType_SPECULAR, baseDir );
+		String glossy   = assimpGetTextureFile( material, Assimp.aiTextureType_SHININESS, baseDir );
 		
 		Texture TEMPTEXTURE = new Texture();
 		Instance textureAssetFolder = prefab.findFirstChild(TEMPTEXTURE.getPreferredParent());
@@ -463,7 +456,7 @@ public class Assets extends Service implements TreeViewable {
 		System.out.println("Found material: " + material);
 		PointerBuffer properties = material.mProperties();
 		for (int j = 0; j < material.mNumProperties(); j++) {
-			org.lwjgl.assimp.AIMaterialProperty prop = AIMaterialProperty.create(properties.get(j));
+			AIMaterialProperty prop = AIMaterialProperty.create(properties.get(j));
 			String propertyKey = prop.mKey().dataString();
 			System.out.println("  -" + prop.mKey().dataString());
 			if ( propertyKey.equals(Assimp.AI_MATKEY_NAME) ) {
@@ -472,19 +465,23 @@ public class Assets extends Service implements TreeViewable {
 			}
 			
 			if ( propertyKey.equals(Assimp.AI_MATKEY_COLOR_DIFFUSE) ) {
-				AIColor4D mDiffuseColor = AIColor4D.create();
-				Assimp.aiGetMaterialColor(material, Assimp.AI_MATKEY_COLOR_DIFFUSE, Assimp.aiTextureType_NONE, 0, mDiffuseColor);
-				tm.setColor( Color3.newInstance((int)(mDiffuseColor.r()*255f), (int)(mDiffuseColor.g()*255f), (int)(mDiffuseColor.b()*255f)));
+				try (MemoryStack stack = MemoryStack.stackPush()) {
+					AIColor4D mDiffuseColor = AIColor4D.mallocStack(stack);
+					Assimp.aiGetMaterialColor(material, Assimp.AI_MATKEY_COLOR_DIFFUSE, Assimp.aiTextureType_NONE, 0,
+							mDiffuseColor);
+					tm.setColor(Color3.newInstance((int) (mDiffuseColor.r() * 255f), (int) (mDiffuseColor.g() * 255f),
+							(int) (mDiffuseColor.b() * 255f)));
+				}
 			}
 			
 			if ( propertyKey.equals(Assimp.AI_MATKEY_COLOR_SPECULAR) ) {
-				float shine = prop.mData().getFloat();
-				tm.setRoughness(shine);
-			}
-			
-			if ( propertyKey.equals(Assimp.AI_MATKEY_REFLECTIVITY) ) {
-				float shine = prop.mData().getFloat();
-				tm.setMetalness(shine);
+				try (MemoryStack stack = MemoryStack.stackPush()) {
+					AIColor4D pbr = AIColor4D.mallocStack(stack);
+					Assimp.aiGetMaterialColor(material, Assimp.AI_MATKEY_COLOR_SPECULAR, Assimp.aiTextureType_NONE, 0,
+							pbr);
+					tm.setRoughness(pbr.r());
+					tm.setMetalness(pbr.g());
+				}
 			}
 			
 			if ( propertyKey.equals(Assimp.AI_MATKEY_SHININESS) ) {
@@ -511,16 +508,36 @@ public class Assets extends Service implements TreeViewable {
 		return ret.trim();
 	}
 
-	private static String assimpGetTextureFile( AIMaterial material, int textureType ) {
+	private static String assimpGetTextureFile( AIMaterial material, int textureType, String basePath ) {
 		if ( Assimp.aiGetMaterialTextureCount( material, textureType ) <= 0 )
 			return null;
+		String fileName;
+		try (MemoryStack stack = MemoryStack.stackPush()) {
+			AIString path = AIString.mallocStack(stack);
+			Assimp.aiGetMaterialTexture(material, textureType, 0, path, new int[] { 0 }, new int[] { 0 },
+					new float[] { 0 }, new int[] { 0 }, new int[] { 0 }, new int[] { 0 });
+			String localBasePath = new String(basePath);
 
-		AIString path = AIString.create();
-		int texInd = Assimp.aiGetMaterialTexture(material, textureType, 0, path, new int[]{0}, new int[]{0}, new float[]{0}, new int[]{0}, new int[]{0}, new int[]{0});
+			String file = path.dataString();
+			file = file.replace("\\", "/");
+			file = file.replace("//", "");
+			int count = file.split("\\.").length;
+			if (count > 2) {
+				count--;
+				count /= 2;
+				if (localBasePath.lastIndexOf("/") == localBasePath.length() - 1)
+					localBasePath = localBasePath.substring(0, localBasePath.lastIndexOf("/"));
+				for (int i = 0; i < count; i++)
+					localBasePath = localBasePath.substring(0, localBasePath.lastIndexOf("/"));
+				file = file.substring(2);
+			} else {
+				if (localBasePath.lastIndexOf("/") != localBasePath.length() - 1)
+					localBasePath += "/";
+			}
 
-		String filePath = path.dataString();
-		String fileName = filePath.substring( filePath.lastIndexOf('/')+1, filePath.length() );
-		System.out.println("Original texture File: " + filePath);
+			fileName = localBasePath + file;
+			System.out.println("Original texture File: " + file);
+		}
 		return fileName;
 	}
 
