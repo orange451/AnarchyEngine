@@ -36,7 +36,7 @@ public class AnimationController extends Instance {
 	
 	private LuaConnection linkedConnection = null;
 	private HashMap<String, Matrix4> boneAbsolutePositions;
-	private HashMap<String, Matrix4> boneNameToPreviousTransformationMap;
+	private HashMap<String, Matrix4f> boneNameToPreviousTransformationMap;
 	private AnimatedModel animatedModel;
 	
 	public AnimationController() {
@@ -240,7 +240,6 @@ public class AnimationController extends Instance {
 	private static final Matrix4f IDENTITY = new Matrix4f().identity();
 	private void computeBones(AnimationKeyframeSequence keyframe, Instance root, Matrix4f parentMatrix) {
 		Matrix4f globalTransformation = new Matrix4f(parentMatrix);
-		Matrix4f inverseRoot = IDENTITY;
 		String boneName = root.getName();
 		
 		// Check if this bone has a keyframe
@@ -252,20 +251,26 @@ public class AnimationController extends Instance {
 				Instance bone = bones.findFirstChild(keyframeBone.getName());
 				
 				if ( bone != null && bone instanceof Bone ) {
-					Matrix4f keyframeMatrix = ((AnimationKeyframe)keyframeBone).getMatrixInternal();
-					inverseRoot = ((Matrix4)bones.get(Bones.C_ROOTINVERSE)).getInternal();
-					globalTransformation.mul(keyframeMatrix);
-					
 					boneName = bone.getName();
+					
+					Matrix4f keyframeMatrix = ((AnimationKeyframe)keyframeBone).getMatrixInternal();
+					boneNameToPreviousTransformationMap.put(boneName, ((Matrix4)bones.get(Bones.C_ROOTINVERSE)).getInternal());
+					globalTransformation.mul(keyframeMatrix);
 				}
 			} else {
 				System.out.println(boneName);
 			}
 		}
 		
+		// Get the previously defined local-transformation for the bone)
+		// IDENTITY if it is not yet defined.
+		Matrix4f previousRootTransformation = boneNameToPreviousTransformationMap.get(boneName);
+		if ( previousRootTransformation == null )
+			previousRootTransformation = IDENTITY;
+		
 		// Update this bones matrix
 		Matrix4f finalTransform = new Matrix4f();
-		finalTransform.mul(inverseRoot);
+		finalTransform.mul(previousRootTransformation);
 		finalTransform.mul(globalTransformation);
 		boneAbsolutePositions.put(boneName, new Matrix4(finalTransform));
 		
