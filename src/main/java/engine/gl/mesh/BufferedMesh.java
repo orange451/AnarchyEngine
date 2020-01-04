@@ -372,6 +372,35 @@ public class BufferedMesh implements RenderableMesh {
 		return ret;
 	}
 	
+	enum MeshFormat {
+		NEW_VERTEX(255),
+		VERTEX3(0),
+		NORMAL3(1),
+		UV2(2),
+		COLOR4(3);
+		
+		private byte index;
+		
+		MeshFormat(int index) {
+			this.index = (byte) (index & 0xff);
+		}
+		
+		public byte getIndex() {
+			return this.index;
+		}
+
+		public static MeshFormat match(byte t) {
+			MeshFormat[] values = MeshFormat.values();
+			
+			for (int i = 0; i< values.length; i++) {
+				if ( values[i].getIndex() == t )
+					return values[i];
+			}
+			
+			return null;
+		}
+	}
+	
 	/**
 	 * Export a mesh to a given filepath.<br>
 	 * The format is simple:<br>
@@ -397,12 +426,28 @@ public class BufferedMesh implements RenderableMesh {
 	public static void Export(BufferedMesh mesh, String filepath) {
 		try {
 			BinaryOutputStream bin = new BinaryOutputStream(filepath);
+			bin.write("MESH100");
 			bin.write(mesh.vertices.length);
 			for (int i = 0; i < mesh.vertices.length; i++) {
 				Vertex v = mesh.vertices[i];
+				
+				// Mark new Vertex
+				bin.write(MeshFormat.NEW_VERTEX.getIndex());
+			
+				// Write vertex position
+				bin.write(MeshFormat.VERTEX3.getIndex());
 				bin.write(v.getXYZ());
+				
+				// Write vertex normal
+				bin.write(MeshFormat.NORMAL3.getIndex());
 				bin.write(v.getNormalXYZ());
+				
+				// Write vertex UVs
+				bin.write(MeshFormat.UV2.getIndex());
 				bin.write(v.getST());
+				
+				// Write vertex colors
+				bin.write(MeshFormat.COLOR4.getIndex());
 				bin.write(v.getRGBA());
 			}
 			
@@ -422,30 +467,87 @@ public class BufferedMesh implements RenderableMesh {
 		BufferedMesh ret = null;
 		try {
 			BinaryInputStream bin = new BinaryInputStream(filepath);
-			int verts = bin.readInt();
 			
-			ret = new BufferedMesh(verts);
-			for (int i = 0; i < verts; i++) {
-				Vertex v = new Vertex(
-						bin.readFloat(), // X
-						bin.readFloat(), // Y
-						bin.readFloat(), // Z
-						bin.readFloat(), // NX
-						bin.readFloat(), // NY
-						bin.readFloat(), // NZ
-						bin.readFloat(), // S
-						bin.readFloat(), // T
-						bin.readFloat(), // R
-						bin.readFloat(), // G
-						bin.readFloat(), // B
-						bin.readFloat()  // A
-				);
-				ret.setVertex(i, v);
+			// Try to read header
+			byte[] b = new byte[4];
+			for (int i = 0; i < b.length; i++)
+				b[i] = bin.readByte();
+			String ISMESH = new String(b);
+			System.out.println("Loading mesh with string: " + ISMESH);
+			
+			// Try to read version
+			if ( ISMESH.equalsIgnoreCase("MESH") ) {
+				byte[] temp = new byte[3];
+				for (int i = 0; i < temp.length; i++)
+					temp[i] = bin.readByte();
+				String VERSION = new String(temp);
+				System.out.println("Found version: " + VERSION);
+				
+				// Read vertices...
+				int verts = bin.readInt();
+				ret = new BufferedMesh(verts);
+				
+				Vertex vertex = null;
+				int index = 0;
+				
+				// Read until empty...
+				while(!bin.isEmpty()) {
+					MeshFormat currentByte = MeshFormat.match(bin.readByte());
+					
+					// Try to read new vertex
+					if ( currentByte == MeshFormat.NEW_VERTEX ) {
+						vertex = new Vertex();
+						ret.setVertex(index++, vertex);
+					}
+					
+					// Must have vertex to read vertex data
+					if ( vertex == null )
+						continue;
+					
+					// Read vector3
+					if ( currentByte == MeshFormat.VERTEX3 )
+						vertex.setXYZ(bin.readFloat(), bin.readFloat(), bin.readFloat());
+					
+					// Read normal3
+					if ( currentByte == MeshFormat.NORMAL3 )
+						vertex.setNormalXYZ(bin.readFloat(), bin.readFloat(), bin.readFloat());
+					
+					// Read uv coordinates
+					if ( currentByte == MeshFormat.UV2 )
+						vertex.setST(bin.readFloat(), bin.readFloat());
+					
+					// Read RGBA color
+					if ( currentByte == MeshFormat.COLOR4 )
+						vertex.setRGBA(bin.readFloat(), bin.readFloat(), bin.readFloat(), bin.readFloat());
+				}
+			} else {
+				// Reopen and read LEGACY format... THIS WILL BE REMOVED IN THE FUTURE
+				bin.close();
+				bin = new BinaryInputStream(filepath);
+				
+				int verts = bin.readInt();
+				ret = new BufferedMesh(verts);
+				for (int i = 0; i < verts; i++) {
+					Vertex v = new Vertex(
+							bin.readFloat(), // X
+							bin.readFloat(), // Y
+							bin.readFloat(), // Z
+							bin.readFloat(), // NX
+							bin.readFloat(), // NY
+							bin.readFloat(), // NZ
+							bin.readFloat(), // S
+							bin.readFloat(), // T
+							bin.readFloat(), // R
+							bin.readFloat(), // G
+							bin.readFloat(), // B
+							bin.readFloat()  // A
+					);
+					ret.setVertex(i, v);
+				}
 			}
 			
 			bin.close();
 		} catch(Exception e ) {
-			//e.printStackTrace();
 			System.out.println("Could not load mesh: " + filepath);
 		}
 		

@@ -47,6 +47,10 @@ public class Vertex {
 	// The size of a vertex in bytes, like in C/C++: sizeof(Vertex)
 	public static final int stride = positionByteCount + normalByteCount + textureByteCount + colorByteCount;
 
+	public Vertex() {
+		//
+	}
+	
 	public Vertex(float x, float y, float z, float nx, float ny, float nz, float s, float t, float r, float g, float b, float a) {
 		setXYZ(x, y, z);
 		setNormalXYZ(nx, ny, nz);
