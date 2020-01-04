@@ -44,7 +44,7 @@ import engine.util.IOUtil;
  *  @author Robert Sedgewick
  *  @author Kevin Wayne
  */
-public final class BinaryInputStream {
+public final class BinaryInputStream implements AutoCloseable {
 	private static final int EOF = -1;   // end of file
 
 	private BufferedInputStream in;      // the input stream
@@ -137,7 +137,8 @@ public final class BinaryInputStream {
 			System.err.println("Could not open " + name);
 		}
 	}
-	
+
+	@Override
 	public void close() throws IOException {
 		in.close();
 	}

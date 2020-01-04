@@ -424,8 +424,7 @@ public class BufferedMesh implements RenderableMesh {
 	 * @param filepath
 	 */
 	public static void Export(BufferedMesh mesh, String filepath) {
-		try {
-			BinaryOutputStream bin = new BinaryOutputStream(filepath);
+		try (BinaryOutputStream bin = new BinaryOutputStream(filepath)) {
 			bin.write("MESH100");
 			bin.write(mesh.vertices.length);
 			for (int i = 0; i < mesh.vertices.length; i++) {
@@ -450,10 +449,6 @@ public class BufferedMesh implements RenderableMesh {
 				bin.write(MeshFormat.COLOR4.getIndex());
 				bin.write(v.getRGBA());
 			}
-			
-			bin.close();
-		} catch (Exception e) {
-			//
 		}
 	}
 

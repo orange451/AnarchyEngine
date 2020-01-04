@@ -35,7 +35,7 @@ import java.net.Socket;
  *  @author Robert Sedgewick
  *  @author Kevin Wayne
  */
-public final class BinaryOutputStream {
+public final class BinaryOutputStream implements AutoCloseable {
 
 	private BufferedOutputStream out;  // the output stream
 	private int buffer;                // 8-bit buffer of bits to write out
@@ -157,6 +157,7 @@ public final class BinaryOutputStream {
 	 * Flushes and closes the binary output stream.
 	 * Once it is closed, bits can no longer be written.
 	 */
+	@Override
 	public void close() {
 		flush();
 		try {
