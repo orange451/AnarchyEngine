@@ -590,9 +590,9 @@ public class MeshUtils {
 			AIMesh mesh = meshes.get(i);
 			
 			// Get every face in mesh
-			org.lwjgl.assimp.AIVector3D.Buffer vertices = mesh.mVertices();
-			org.lwjgl.assimp.AIVector3D.Buffer normals = mesh.mNormals();
-			org.lwjgl.assimp.AIFace.Buffer faces = mesh.mFaces();
+			AIVector3D.Buffer vertices = mesh.mVertices();
+			AIVector3D.Buffer normals = mesh.mNormals();
+			AIFace.Buffer faces = mesh.mFaces();
 			for (int j = 0; j < mesh.mNumFaces(); j++) {
 				AIFace face = faces.get(j);
 				IntBuffer indices = face.mIndices();
@@ -621,7 +621,7 @@ public class MeshUtils {
 				}
 			}
 		}
-		
+		Assimp.aiReleaseImport(scene);
 		return bm;
 	}
 }
