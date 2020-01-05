@@ -530,6 +530,7 @@ public class Save {
 			boolean localFile = filePath.contains(FilePath.PROJECT_IDENTIFIER);
 			filePath = filePath.replace(FilePath.PROJECT_IDENTIFIER, new File(Game.saveDirectory).getAbsolutePath());
 			
+			// Check if the filepath is filled out
 			if ( filePath != null && filePath.length() > 3 ) {
 				String fileName = FileUtils.getFileNameFromPath(filePath);
 				String fileNameEx = FileUtils.getFileNameWithoutExtension(fileName);
@@ -566,7 +567,7 @@ public class Save {
 				if ( a instanceof Mesh ) {
 					Mesh mesh = (Mesh) a;
 					BufferedMesh bufferedMesh = mesh.getMesh();
-					if ( bufferedMesh != null ) {
+					if ( bufferedMesh != null && bufferedMesh.getSize() > 0 ) {
 						File d = getFreeFile( path, "Mesh_", ".mesh");
 						if ( d != null ) {
 							String dest = d.getAbsolutePath();

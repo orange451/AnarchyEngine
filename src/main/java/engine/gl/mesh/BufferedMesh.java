@@ -37,6 +37,7 @@ import engine.gl.shader.BaseShader;
 import engine.io.BinaryInputStream;
 import engine.io.BinaryOutputStream;
 import engine.observer.RenderableMesh;
+import engine.util.AABBUtil;
 import engine.util.Pair;
 
 public class BufferedMesh implements RenderableMesh {
@@ -68,7 +69,7 @@ public class BufferedMesh implements RenderableMesh {
 		if ( r ) {
 			recalculateAABB();
 		} else {
-			checkAABB( vertex ); // Otherwise, just mix AABB with new vertex.
+			checkAABB( AABB, vertex ); // Otherwise, just mix AABB with new vertex.
 		}
 	}
 
@@ -188,7 +189,7 @@ public class BufferedMesh implements RenderableMesh {
 		return this.AABB;
 	}
 	
-	private void checkAABB(Vertex v) {
+	private void checkAABB(Pair<Vector3f, Vector3f> tempAABB, Vertex v) {
 		if ( v == null )
 			return;
 		
@@ -197,12 +198,12 @@ public class BufferedMesh implements RenderableMesh {
 		float y = xyz[1];
 		float z = xyz[2];
 
-		float mnx = AABB.value1().x;
-		float mny = AABB.value1().y;
-		float mnz = AABB.value1().z;
-		float mxx = AABB.value2().x;
-		float mxy = AABB.value2().y;
-		float mxz = AABB.value2().z;
+		float mnx = tempAABB.value1().x;
+		float mny = tempAABB.value1().y;
+		float mnz = tempAABB.value1().z;
+		float mxx = tempAABB.value2().x;
+		float mxy = tempAABB.value2().y;
+		float mxz = tempAABB.value2().z;
 
 		mnx = Math.min(x, mnx);
 		mny = Math.min(y, mny);
@@ -211,15 +212,17 @@ public class BufferedMesh implements RenderableMesh {
 		mxy = Math.max(y, mxy);
 		mxz = Math.max(z, mxz);
 
-		AABB.value1().set(mnx,mny,mnz);
-		AABB.value2().set(mxx,mxy,mxz);
+		tempAABB.value1().set(mnx,mny,mnz);
+		tempAABB.value2().set(mxx,mxy,mxz);
 	}
 	
-	private void recalculateAABB() {
-		AABB = new Pair<Vector3f,Vector3f>(new Vector3f(Integer.MAX_VALUE), new Vector3f(Integer.MIN_VALUE));
+	public void recalculateAABB() {
+		Pair<Vector3f, Vector3f> tempAABB = new Pair<Vector3f,Vector3f>(new Vector3f(Integer.MAX_VALUE), new Vector3f(Integer.MIN_VALUE));
 		for (int i = 0; i < vertices.length; i++) {
-			checkAABB(vertices[i]);
+			checkAABB(tempAABB, vertices[i]);
 		}
+		
+		this.AABB = tempAABB;
 	}
 
 
@@ -377,7 +380,10 @@ public class BufferedMesh implements RenderableMesh {
 		VERTEX3(0),
 		NORMAL3(1),
 		UV2(2),
-		COLOR4(3);
+		COLOR4(3),
+		VERTEX2(4),
+		COLOR3(5),
+		;
 		
 		private byte index;
 		
@@ -468,7 +474,6 @@ public class BufferedMesh implements RenderableMesh {
 			for (int i = 0; i < b.length; i++)
 				b[i] = bin.readByte();
 			String ISMESH = new String(b);
-			System.out.println("Loading mesh with string: " + ISMESH);
 			
 			// Try to read version
 			if ( ISMESH.equalsIgnoreCase("MESH") ) {
@@ -483,36 +488,63 @@ public class BufferedMesh implements RenderableMesh {
 				ret = new BufferedMesh(verts);
 				
 				Vertex vertex = null;
+				boolean addedVertex = false;
 				int index = 0;
 				
 				// Read until empty...
 				while(!bin.isEmpty()) {
-					MeshFormat currentByte = MeshFormat.match(bin.readByte());
+					MeshFormat readCommand = MeshFormat.match(bin.readByte());
 					
 					// Try to read new vertex
-					if ( currentByte == MeshFormat.NEW_VERTEX ) {
+					if ( readCommand == MeshFormat.NEW_VERTEX ) {
+						
+						if ( vertex != null && !addedVertex ) {
+							addedVertex = true;
+							ret.setVertex(index++, vertex);
+						}
+						
+						addedVertex = false;
 						vertex = new Vertex();
-						ret.setVertex(index++, vertex);
 					}
 					
 					// Must have vertex to read vertex data
 					if ( vertex == null )
 						continue;
 					
+					// Read vector2
+					if ( readCommand == MeshFormat.VERTEX2 ) {
+						vertex.setXYZ(bin.readFloat(), bin.readFloat(), 0);
+						
+						if ( !addedVertex ) {
+							addedVertex = true;
+							ret.setVertex(index++, vertex);
+						}
+					}
+					
 					// Read vector3
-					if ( currentByte == MeshFormat.VERTEX3 )
+					if ( readCommand == MeshFormat.VERTEX3 ) {
 						vertex.setXYZ(bin.readFloat(), bin.readFloat(), bin.readFloat());
+						
+						if ( !addedVertex ) {
+							addedVertex = true;
+							ret.setVertex(index++, vertex);
+						}
+					}
 					
 					// Read normal3
-					if ( currentByte == MeshFormat.NORMAL3 )
+					if ( readCommand == MeshFormat.NORMAL3 )
 						vertex.setNormalXYZ(bin.readFloat(), bin.readFloat(), bin.readFloat());
 					
 					// Read uv coordinates
-					if ( currentByte == MeshFormat.UV2 )
+					if ( readCommand == MeshFormat.UV2 )
 						vertex.setST(bin.readFloat(), bin.readFloat());
 					
+					// Read RGB color
+					if ( readCommand == MeshFormat.COLOR3 )
+						vertex.setRGBA(bin.readFloat(), bin.readFloat(), bin.readFloat(), 1.0f);
+					
 					// Read RGBA color
-					if ( currentByte == MeshFormat.COLOR4 )
+					if ( readCommand == MeshFormat.COLOR4 )
 						vertex.setRGBA(bin.readFloat(), bin.readFloat(), bin.readFloat(), bin.readFloat());
 				}
 			} else {

@@ -556,6 +556,12 @@ public class MeshUtils {
 		return TeapotData.mesh( radius );
 	}
 	
+	/**
+	 * Import Assimp Scene fia Filepath.
+	 * @param realPath
+	 * @param extraFlags
+	 * @return
+	 */
 	public static AIScene ImportAssimp(String realPath, int extraFlags) {
 		int flags = Assimp.aiProcess_FindInvalidData | Assimp.aiProcess_ValidateDataStructure
 				| Assimp.aiProcess_Triangulate | Assimp.aiProcess_FlipUVs
@@ -572,6 +578,12 @@ public class MeshUtils {
 		return scene;
 	}
 
+	/**
+	 * Imports a model (via filepath) as exactly 1 BufferedMesh.
+	 * If you wish to import a multi-material model, import prefab Via {@link engine.lua.type.object.services.Assets#importPrefab(String)}
+	 * @param realPath
+	 * @return
+	 */
 	public static BufferedMesh Import(String realPath) {
 		AIScene scene = ImportAssimp(realPath, -1);
 		

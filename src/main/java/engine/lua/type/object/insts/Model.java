@@ -13,6 +13,8 @@ package engine.lua.type.object.insts;
 import org.luaj.vm2.LuaValue;
 
 import engine.gl.mesh.BufferedMesh;
+import engine.lua.type.LuaConnection;
+import engine.lua.type.LuaEvent;
 import engine.lua.type.object.Instance;
 
 public class Model extends Instance {
@@ -21,6 +23,9 @@ public class Model extends Instance {
 	protected final static LuaValue C_MATERIAL = LuaValue.valueOf("Material");
 	protected final static LuaValue C_NAME = LuaValue.valueOf("Name");
 	protected final static LuaValue C_PARENT = LuaValue.valueOf("Parent");
+	protected final static LuaValue C_MESHUPDATEEVENT = LuaValue.valueOf("MeshUpdateEvent");
+	
+	private LuaConnection meshConnection;
 	
 	public Model() {
 		super("Model");
@@ -28,9 +33,15 @@ public class Model extends Instance {
 		this.defineField(C_MESH.toString(), LuaValue.NIL, false);
 		this.defineField(C_MATERIAL.toString(), LuaValue.NIL, false);
 		
+		this.rawset(C_MESHUPDATEEVENT, new LuaEvent());
+		
 		this.setInstanceable(true);
 		this.getField(C_NAME).setLocked(false);
 		this.getField(C_PARENT).setLocked(false);
+	}
+	
+	public LuaEvent meshUpdateEvent() {
+		return (LuaEvent)this.get(C_MESHUPDATEEVENT);
 	}
 
 	@Override
@@ -43,11 +54,27 @@ public class Model extends Instance {
 				return null;
 		}
 		
+		// Mesh must be of type Mesh!
 		if ( key.eq_b(C_MESH)) {
 			if ( !value.isnil() && !(value instanceof Mesh) )
 				return null;
+			
+			// Disconnect previous mesh connection
+			if ( meshConnection != null )
+				meshConnection.disconnect();
+			
+			// Reconnect to new mesh
+			if ( !value.isnil() ) {
+				meshConnection = ((Mesh)value).meshLoaded().connect((args) -> {
+					meshUpdateEvent().fire();
+				});
+			} else {
+				// Reset mesh connection
+				meshConnection = null;
+			}
 		}
 		
+		// Material must be of type Material!
 		if ( key.eq_b(C_MATERIAL) ) {
 			if ( !value.isnil() && !(value instanceof Material) )
 				return null;

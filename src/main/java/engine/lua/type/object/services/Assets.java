@@ -143,7 +143,22 @@ public class Assets extends Service implements TreeViewable {
 		t.forceSetParent(parent);
 		return t;
 	}
+	
+	/**
+	 * Import a prefab via filepath.
+	 * @param filePath
+	 * @return
+	 */
+	public Prefab importPrefab(String filePath) {
+		return importPrefab(filePath, null);
+	}
 
+	/**
+	 * Import a prefab and parent it to the specified instance
+	 * @param filePath
+	 * @param instance
+	 * @return
+	 */
 	public Prefab importPrefab(String filePath, Instance instance) {
 		return importPrefab(filePath, 1, -1, instance);
 	}
@@ -389,7 +404,8 @@ public class Assets extends Service implements TreeViewable {
 			System.out.println("Loaded");
 			
 			prefab.setName(fileWithoutExtension);
-			prefab.forceSetParent(parent);
+			if ( parent != null )
+				prefab.forceSetParent(parent);
 		} catch(Exception e ) {
 			e.printStackTrace();
 		}

@@ -76,6 +76,10 @@ public class Prefab extends Asset implements TreeViewable {
 						}
 					});
 					
+					((Model)arg).meshUpdateEvent().connect((args) ->{
+						prefab.update();
+					});
+					
 					models.add((Model)arg);
 				}
 				return LuaValue.NIL;
