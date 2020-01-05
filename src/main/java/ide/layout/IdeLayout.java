@@ -38,7 +38,6 @@ import lwjgui.scene.control.MenuItem;
 import lwjgui.scene.control.SeparatorMenuItem;
 import lwjgui.scene.control.SplitPane;
 import lwjgui.scene.layout.BorderPane;
-import lwjgui.scene.layout.Pane;
 
 public class IdeLayout {
 	

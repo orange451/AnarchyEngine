@@ -13,21 +13,16 @@ package engine.lua.type.object.insts;
 import org.joml.Vector3f;
 import org.luaj.vm2.LuaValue;
 
-import engine.Game;
-import engine.InternalGameThread;
 import engine.InternalRenderThread;
 import engine.gl.IPipeline;
-import engine.gl.LegacyPipeline;
 import engine.gl.light.Light;
 import engine.lua.lib.EnumType;
 import engine.lua.type.NumberClamp;
 import engine.lua.type.NumberClampPreferred;
 import engine.lua.type.data.Color3;
 import engine.lua.type.data.Vector3;
-import engine.lua.type.object.Instance;
 import engine.lua.type.object.LightBase;
 import engine.lua.type.object.TreeViewable;
-import engine.observer.RenderableWorld;
 import ide.layout.windows.icons.Icons;
 import lwjgui.paint.Color;
 

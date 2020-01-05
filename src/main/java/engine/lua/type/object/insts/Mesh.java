@@ -10,25 +10,13 @@
 
 package engine.lua.type.object.insts;
 
-import java.nio.IntBuffer;
-import java.util.ArrayList;
-
-import org.joml.Vector2f;
-import org.joml.Vector3f;
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.ThreeArgFunction;
 import org.luaj.vm2.lib.TwoArgFunction;
-import org.lwjgl.assimp.AIFace;
-import org.lwjgl.assimp.AIMesh;
-import org.lwjgl.assimp.AIScene;
-import org.lwjgl.assimp.AIVector3D;
-import org.lwjgl.assimp.Assimp;
-
 import engine.FileFormats;
 import engine.FilePath;
 import engine.gl.Resources;
 import engine.gl.mesh.BufferedMesh;
-import engine.gl.mesh.Vertex;
 import engine.lua.lib.FourArgFunction;
 import engine.lua.type.LuaEvent;
 import engine.lua.type.object.AssetLoadable;

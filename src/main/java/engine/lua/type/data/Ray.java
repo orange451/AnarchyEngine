@@ -92,7 +92,6 @@ public class Ray extends LuaValuetype {
 		};
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public JSONObject toJSON() {
 		JSONObject j = new JSONObject();

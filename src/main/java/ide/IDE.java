@@ -19,7 +19,6 @@ import engine.AnarchyEngineClient;
 import engine.Game;
 import engine.InternalGameThread;
 import engine.InternalRenderThread;
-import engine.gl.LegacyPipeline;
 import engine.glv2.GLRenderer;
 import engine.io.Load;
 import engine.lua.type.object.ScriptBase;
@@ -28,7 +27,6 @@ import ide.layout.windows.IdeLuaEditor;
 import lwjgui.LWJGUI;
 import lwjgui.scene.Group;
 import lwjgui.scene.Window;
-import lwjgui.scene.layout.Pane;
 
 public class IDE extends AnarchyEngineClient {
 	public static IdeLayout layout;

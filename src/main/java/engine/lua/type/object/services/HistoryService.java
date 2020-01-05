@@ -12,10 +12,6 @@ package engine.lua.type.object.services;
 
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.ZeroArgFunction;
-import org.lwjgl.glfw.GLFW;
-
-import engine.Game;
-import engine.InternalGameThread;
 import engine.lua.history.HistoryChange;
 import engine.lua.history.HistorySnapshot;
 import engine.lua.history.HistoryStack;

@@ -60,7 +60,6 @@ import engine.lua.type.object.services.Storage;
 import engine.lua.type.object.services.UserInputService;
 import engine.lua.type.object.services.Workspace;
 import engine.observer.Tickable;
-import engine.util.FileUtils;
 import ide.IDE;
 
 public class Game implements Tickable {
@@ -80,7 +79,7 @@ public class Game implements Tickable {
 	
 	private static AtomicLong instanceCounter = new AtomicLong(0);
 	
-	public static final String VERSION = "0.6";
+	public static final String VERSION = "0.7a";
 
 	protected boolean isServer = true;
 	
