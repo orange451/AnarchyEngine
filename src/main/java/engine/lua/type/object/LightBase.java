@@ -27,7 +27,7 @@ import engine.observer.RenderableWorld;
 import engine.util.AABBUtil;
 import engine.util.Pair;
 
-public abstract class LightBase extends Instance implements Positionable {
+public abstract class LightBase<T extends Light> extends Instance implements Positionable {
 
 	protected static final LuaValue C_POSITION = LuaValue.valueOf("Position");
 	protected static final LuaValue C_INTENSITY = LuaValue.valueOf("Intensity");
@@ -35,7 +35,9 @@ public abstract class LightBase extends Instance implements Positionable {
 	protected static final LuaValue C_SHADOWS = LuaValue.valueOf("Shadows");
 	protected static final LuaValue C_VISIBLE = LuaValue.valueOf("Visible");
 	protected IPipeline pipeline;
-	
+
+	protected T light;
+
 	public LightBase(String typename) {
 		super(typename);
 

@@ -63,7 +63,7 @@ import engine.glv2.v2.lights.mesh.ConeGenerator;
 import engine.lua.type.object.insts.Camera;
 import engine.tasks.TaskManager;
 
-public class SpotLightHandler implements ISpotLightHandler {
+public class SpotLightHandler implements ILightHandler<SpotLightInternal> {
 
 	private List<SpotLightInternal> lights = new ArrayList<>();
 

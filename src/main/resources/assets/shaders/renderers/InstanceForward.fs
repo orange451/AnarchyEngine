@@ -51,9 +51,9 @@ uniform int totalDirectionalLights;
 #include function fresnelSchlick
 
 #include function computeShadowV2
-
+/*
 #include function calcPointLight
-
+*/
 #include function calcDirectionalLight
 
 #include function toneMap
@@ -95,9 +95,9 @@ void main() {
 								   roughness, metallic);
 	}
 
-	for (int i = 0; i < totalPointLights; i++) {
+	/*for (int i = 0; i < totalPointLights; i++) {
 		Lo += calcPointLight(pointLights[i], position, diffuseF.rgb, N, V, F0, roughness, metallic);
-	}
+	}*/
 
 	vec3 F = fresnelSchlickRoughness(max(dot(N, V), 0.0), F0, roughness);
 

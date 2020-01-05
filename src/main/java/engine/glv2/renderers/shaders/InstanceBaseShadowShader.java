@@ -22,14 +22,13 @@ import engine.glv2.shaders.data.UniformMatrix4;
 public abstract class InstanceBaseShadowShader extends ShaderProgram {
 
 	private UniformMatrix4 transformationMatrix = new UniformMatrix4("transformationMatrix");
-	protected UniformMatrix4 viewMatrix = new UniformMatrix4("viewMatrix");
 	private UniformFloat transparency = new UniformFloat("transparency");
 
 	@Override
 	protected void setupShader() {
 		super.addShader(new Shader("assets/shaders/renderers/InstanceShadow.fs", GL_FRAGMENT_SHADER));
 		super.setAttributes(new Attribute(0, "position"));
-		super.storeUniforms(transformationMatrix, viewMatrix, transparency);
+		super.storeUniforms(transformationMatrix, transparency);
 	}
 
 	public void loadTransformationMatrix(Matrix4f matrix) {

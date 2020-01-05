@@ -22,7 +22,7 @@ public class SpotLightInternal extends Light {
 	public float radius = 8;
 	public Vector3f direction = new Vector3f(1, 1, -1);
 	public int shadowResolution = 1024;
-	public boolean shadows = true;;
+	public boolean shadows = true;
 	private SpotLightShadowMap shadowMap;
 	private SpotLightCamera lightCamera;
 
@@ -60,8 +60,6 @@ public class SpotLightInternal extends Light {
 	}
 
 	public void dispose() {
-		if (shadowMap == null)
-			return;
 		shadowMap.dispose();
 	}
 

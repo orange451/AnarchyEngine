@@ -106,6 +106,11 @@ public class AnimInstanceRenderer implements IObjectRenderer {
 	}
 
 	@Override
+	public void renderShadow(LayeredCubeCamera camera) {
+		shadowRenderer.renderShadow(instances, camera);
+	}
+
+	@Override
 	public void end() {
 		instances.clear();
 	}
@@ -124,9 +129,9 @@ public class AnimInstanceRenderer implements IObjectRenderer {
 			return;
 
 		AnimatedModel animatedModel = anim.getAnimatedModel();
-		if ( animatedModel == null )
+		if (animatedModel == null)
 			return;
-		
+
 		animatedModel.renderV2();
 		instances.add(inst);
 	}

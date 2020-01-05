@@ -15,29 +15,30 @@ import org.luaj.vm2.LuaValue;
 
 import engine.InternalRenderThread;
 import engine.gl.IPipeline;
-import engine.gl.LegacyPipeline;
 import engine.gl.light.Light;
+import engine.gl.light.PointLightInternal;
+import engine.lua.lib.EnumType;
 import engine.lua.type.NumberClampPreferred;
 import engine.lua.type.data.Color3;
 import engine.lua.type.data.Vector3;
-import engine.lua.type.object.Instance;
 import engine.lua.type.object.LightBase;
 import engine.lua.type.object.TreeViewable;
-import engine.observer.RenderableWorld;
 import ide.layout.windows.icons.Icons;
 import lwjgui.paint.Color;
 
-public class PointLight extends LightBase implements TreeViewable {
-
-	private engine.gl.light.PointLightInternal light;
+public class PointLight extends LightBase<PointLightInternal> implements TreeViewable {
 
 	private static final LuaValue C_RADIUS = LuaValue.valueOf("Radius");
+	private static final LuaValue C_SHADOWMAPSIZE = LuaValue.valueOf("ShadowMapSize");
 
 	public PointLight() {
 		super("PointLight");
 		
 		this.defineField(C_RADIUS.toString(), LuaValue.valueOf(8), false);
 		this.getField(C_RADIUS).setClamp(new NumberClampPreferred(0, 1024, 0, 64));
+
+		this.defineField(C_SHADOWMAPSIZE.toString(), LuaValue.valueOf(512), false);
+		this.getField(C_SHADOWMAPSIZE).setEnum(new EnumType("TextureSize"));
 		
 		this.changedEvent().connect((args)->{
 			LuaValue key = args[0];
@@ -53,6 +54,10 @@ public class PointLight extends LightBase implements TreeViewable {
 				} else if ( key.eq_b(C_COLOR) ) {
 					Color color = ((Color3)value).toColor();
 					light.color = new Vector3f( Math.max( color.getRed(),1 )/255f, Math.max( color.getGreen(),1 )/255f, Math.max( color.getBlue(),1 )/255f );
+				} else if (key.eq_b(C_SHADOWS)) {
+					light.shadows = value.toboolean();
+				} else if (key.eq_b(C_SHADOWMAPSIZE)) {
+					light.setSize(value.toint());
 				}
 			}
 		});
@@ -99,7 +104,7 @@ public class PointLight extends LightBase implements TreeViewable {
 			Vector3f pos = ((Vector3)this.get("Position")).toJoml();
 			float radius = this.get(C_RADIUS).tofloat();
 			float intensity = this.get("Intensity").tofloat();
-			light = new engine.gl.light.PointLightInternal(pos, radius, intensity);
+			light = new PointLightInternal(pos, radius, intensity);
 			
 			// Color it
 			Color color = ((Color3)this.get("Color")).toColor();
@@ -107,6 +112,10 @@ public class PointLight extends LightBase implements TreeViewable {
 			
 			light.visible = this.get(C_VISIBLE).toboolean();
 			
+			light.shadowResolution = this.get(C_SHADOWMAPSIZE).toint();
+
+			light.shadows = this.get(C_SHADOWS).toboolean();
+
 			pipeline.getPointLightHandler().addLight(light);
 		});
 	}

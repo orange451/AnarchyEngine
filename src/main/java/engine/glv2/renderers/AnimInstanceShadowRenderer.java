@@ -22,8 +22,10 @@ import engine.gl.MaterialGL;
 import engine.gl.Resources;
 import engine.gl.mesh.animation.AnimatedModel;
 import engine.gl.mesh.animation.AnimatedModelSubMesh;
+import engine.glv2.entities.LayeredCubeCamera;
 import engine.glv2.renderers.shaders.AnimInstanceBaseShadowShader;
 import engine.glv2.renderers.shaders.AnimInstanceDirectionalShadowShader;
+import engine.glv2.renderers.shaders.AnimInstancePointShadowShader;
 import engine.glv2.renderers.shaders.AnimInstanceSpotShadowShader;
 import engine.glv2.v2.lights.DirectionalLightCamera;
 import engine.glv2.v2.lights.SpotLightCamera;
@@ -37,6 +39,7 @@ public class AnimInstanceShadowRenderer {
 
 	private AnimInstanceDirectionalShadowShader directionalShader;
 	private AnimInstanceSpotShadowShader spotShader;
+	private AnimInstancePointShadowShader pointShader;
 
 	// TODO: this should NOT be here
 	private static final LuaValue C_ANIMATIONCONTROLLER = LuaValue.valueOf("AnimationController");
@@ -46,6 +49,8 @@ public class AnimInstanceShadowRenderer {
 		directionalShader.init();
 		spotShader = new AnimInstanceSpotShadowShader();
 		spotShader.init();
+		pointShader = new AnimInstancePointShadowShader();
+		pointShader.init();
 	}
 
 	protected void renderShadow(List<Instance> instances, DirectionalLightCamera camera) {
@@ -66,11 +71,20 @@ public class AnimInstanceShadowRenderer {
 		spotShader.stop();
 	}
 
+	protected void renderShadow(List<Instance> instances, LayeredCubeCamera camera) {
+		pointShader.start();
+		pointShader.loadPointLight(camera);
+		for (Instance instance : instances) {
+			renderInstance(instance, pointShader);
+		}
+		pointShader.stop();
+	}
+
 	private void renderInstance(Instance inst, AnimInstanceBaseShadowShader shader) {
 		AnimationController anim = (AnimationController) inst.findFirstChildOfClass(C_ANIMATIONCONTROLLER);
-		if ( anim == null )
+		if (anim == null)
 			return;
-		
+
 		GameObject go = anim.getLinkedInstance();
 		if (go.isDestroyed())
 			return;
@@ -89,7 +103,7 @@ public class AnimInstanceShadowRenderer {
 		for (int i = 0; i < model.getMeshes().size(); i++) {
 			AnimatedModelSubMesh mesh = model.getMeshes().get(i);
 
-			engine.gl.MaterialGL material = Resources.MATERIAL_BLANK;
+			MaterialGL material = Resources.MATERIAL_BLANK;
 			Material ECSMat = model.getMeshToModelMap().get(mesh).getMaterial();
 			if (ECSMat != null) {
 				MaterialGL GLMat = ECSMat.getMaterial();
@@ -112,6 +126,7 @@ public class AnimInstanceShadowRenderer {
 	public void dispose() {
 		directionalShader.dispose();
 		spotShader.dispose();
+		pointShader.dispose();
 	}
 
 }

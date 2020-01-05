@@ -57,7 +57,7 @@ import engine.glv2.v2.RenderingSettings;
 import engine.lua.type.object.insts.Camera;
 import engine.tasks.TaskManager;
 
-public class DirectionalLightHandler implements IDirectionalLightHandler {
+public class DirectionalLightHandler implements ILightHandler<DirectionalLightInternal> {
 
 	private List<DirectionalLightInternal> lights = new ArrayList<>();
 

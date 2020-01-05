@@ -18,12 +18,13 @@ import engine.glv2.v2.lights.SpotLightCamera;
 public class InstanceSpotShadowShader extends InstanceBaseShadowShader {
 
 	private UniformMatrix4 projectionMatrix = new UniformMatrix4("projectionMatrix");
+	private UniformMatrix4 viewMatrix = new UniformMatrix4("viewMatrix");
 
 	@Override
 	protected void setupShader() {
 		super.setupShader();
 		super.addShader(new Shader("assets/shaders/renderers/InstanceSpotShadow.vs", GL_VERTEX_SHADER));
-		super.storeUniforms(projectionMatrix);
+		super.storeUniforms(projectionMatrix, viewMatrix);
 	}
 
 	public void loadSpotLight(SpotLightCamera camera) {

@@ -10,10 +10,11 @@
 
 package engine.gl;
 
+import engine.gl.light.DirectionalLightInternal;
+import engine.gl.light.PointLightInternal;
+import engine.gl.light.SpotLightInternal;
 import engine.glv2.v2.RenderingSettings;
-import engine.glv2.v2.lights.IDirectionalLightHandler;
-import engine.glv2.v2.lights.IPointLightHandler;
-import engine.glv2.v2.lights.ISpotLightHandler;
+import engine.glv2.v2.lights.ILightHandler;
 import engine.lua.type.object.insts.DynamicSkybox;
 import engine.lua.type.object.insts.Skybox;
 import engine.observer.Renderable;
@@ -31,18 +32,18 @@ public interface IPipeline extends Renderable {
 
 	public void setSize(int width, int height);
 
-	public IPointLightHandler getPointLightHandler();
+	public ILightHandler<PointLightInternal> getPointLightHandler();
 
-	public IDirectionalLightHandler getDirectionalLightHandler();
+	public ILightHandler<DirectionalLightInternal> getDirectionalLightHandler();
 
-	public ISpotLightHandler getSpotLightHandler();
+	public ILightHandler<SpotLightInternal> getSpotLightHandler();
 
 	public void setDyamicSkybox(DynamicSkybox dynamicSkybox);
 
 	public void setStaticSkybox(Skybox skybox);
 
 	public void reloadStaticSkybox();
-	
+
 	public RenderingSettings getRenderSettings();
 
 	public boolean isInitialized();

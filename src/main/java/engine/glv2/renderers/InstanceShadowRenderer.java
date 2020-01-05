@@ -17,8 +17,10 @@ import org.joml.Matrix4f;
 import engine.gl.MaterialGL;
 import engine.gl.Resources;
 import engine.gl.mesh.BufferedMesh;
+import engine.glv2.entities.LayeredCubeCamera;
 import engine.glv2.renderers.shaders.InstanceBaseShadowShader;
 import engine.glv2.renderers.shaders.InstanceDirectionalShadowShader;
+import engine.glv2.renderers.shaders.InstancePointShadowShader;
 import engine.glv2.renderers.shaders.InstanceSpotShadowShader;
 import engine.glv2.v2.lights.DirectionalLightCamera;
 import engine.glv2.v2.lights.SpotLightCamera;
@@ -32,12 +34,15 @@ public class InstanceShadowRenderer {
 
 	private InstanceDirectionalShadowShader directionalShader;
 	private InstanceSpotShadowShader spotShader;
+	private InstancePointShadowShader pointShader;
 
 	public InstanceShadowRenderer() {
 		directionalShader = new InstanceDirectionalShadowShader();
 		directionalShader.init();
 		spotShader = new InstanceSpotShadowShader();
 		spotShader.init();
+		pointShader = new InstancePointShadowShader();
+		pointShader.init();
 	}
 
 	protected void renderShadow(List<Instance> instances, DirectionalLightCamera camera) {
@@ -56,6 +61,15 @@ public class InstanceShadowRenderer {
 			renderInstance(instance, spotShader);
 		}
 		spotShader.stop();
+	}
+
+	protected void renderShadow(List<Instance> instances, LayeredCubeCamera camera) {
+		pointShader.start();
+		pointShader.loadPointLight(camera);
+		for (Instance instance : instances) {
+			renderInstance(instance, pointShader);
+		}
+		pointShader.stop();
 	}
 
 	private void renderInstance(Instance inst, InstanceBaseShadowShader shader) {
@@ -79,7 +93,7 @@ public class InstanceShadowRenderer {
 			if (m == null)
 				m = Resources.MESH_SPHERE;
 
-			engine.gl.MaterialGL material = Resources.MATERIAL_BLANK;
+			MaterialGL material = Resources.MATERIAL_BLANK;
 			Material ECSMat = p.getMaterial();
 			if (ECSMat != null) {
 				MaterialGL GLMat = ECSMat.getMaterial();
@@ -99,6 +113,7 @@ public class InstanceShadowRenderer {
 	public void dispose() {
 		directionalShader.dispose();
 		spotShader.dispose();
+		pointShader.dispose();
 	}
 
 }

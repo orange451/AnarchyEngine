@@ -87,6 +87,11 @@ public class RenderingManager {
 			rendererEntry.value.renderShadow(camera);
 	}
 
+	public void renderShadow(LayeredCubeCamera camera) {
+		for (Entry<IObjectRenderer> rendererEntry : objectRenderers)
+			rendererEntry.value.renderShadow(camera);
+	}
+
 	public void end() {
 		for (Entry<IObjectRenderer> rendererEntry : objectRenderers) {
 			IObjectRenderer objectRenderer = rendererEntry.value;

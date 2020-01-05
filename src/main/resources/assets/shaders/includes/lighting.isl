@@ -24,6 +24,9 @@ struct PointLight {
 	float radius;
 	float intensity;
 	bool visible;
+	samplerCubeShadow shadowMap;
+	mat4 projectionMatrix;
+	bool shadows;
 };
 #end
 
@@ -290,6 +293,18 @@ vec3 calcPointLight(PointLight light, vec3 position, vec3 diffuse, vec3 N, vec3 
 	kD *= 1.0 - metallic;
 
 	float NdotL = max(dot(N, L), 0.0);
+	if (light.shadows) {
+		vec3 samplePos = position - light.position;
+
+		vec3 absTarget = abs(samplePos);
+		float linearDepth = max(absTarget.x, max(absTarget.y, absTarget.z));
+
+		float A = light.projectionMatrix[2][2];
+		float B = light.projectionMatrix[3][2];
+		float sampleDepth = 0.5 * (-A * linearDepth + B) / linearDepth + 0.5;
+
+		NdotL *= texture(light.shadowMap, vec4(samplePos, sampleDepth));
+	}
 	return (kD * diffuse / PI + brdf) * radiance * NdotL;
 }
 #end
@@ -335,7 +350,7 @@ vec3 calcSpotLight(SpotLight light, vec3 position, vec3 diffuse, vec3 N, vec3 V,
 		for (int x = -1; x <= 1; ++x) {
 			for (int y = -1; y <= 1; ++y) {
 				vec2 offset = vec2(x, y) * multTex;
-				vec3 temp = shadowCoord.xyz + vec3(offset/* * shadowCoord.z*/, 0);
+				vec3 temp = shadowCoord.xyz + vec3(offset /* * shadowCoord.z*/, 0);
 				shadow += texture(light.shadowMap, (temp / shadowCoord.w), 0);
 			}
 		}

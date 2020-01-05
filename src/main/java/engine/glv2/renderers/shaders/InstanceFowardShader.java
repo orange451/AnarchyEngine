@@ -115,7 +115,7 @@ public class InstanceFowardShader extends ShaderProgram {
 
 	public void loadPointLights(List<PointLightInternal> lights) {
 		for (int x = 0; x < Math.min(8, lights.size()); x++)
-			this.pointLights[x].loadLight(lights.get(x));
+			this.pointLights[x].loadLight(lights.get(x), 10);
 		totalPointLights.loadInteger(Math.min(8, lights.size()));
 	}
 

@@ -19,6 +19,7 @@ import engine.glv2.v2.lights.DirectionalLightCamera;
 public class InstanceDirectionalShadowShader extends InstanceBaseShadowShader {
 
 	private UniformMatrix4 projectionMatrix[] = new UniformMatrix4[4];
+	private UniformMatrix4 viewMatrix = new UniformMatrix4("viewMatrix");
 
 	@Override
 	protected void setupShader() {
@@ -28,6 +29,7 @@ public class InstanceDirectionalShadowShader extends InstanceBaseShadowShader {
 		for (int i = 0; i < 4; i++)
 			projectionMatrix[i] = new UniformMatrix4("projectionMatrix[" + i + "]");
 		super.storeUniforms(projectionMatrix);
+		super.storeUniforms(viewMatrix);
 	}
 
 	public void loadDirectionalLight(DirectionalLightCamera camera) {

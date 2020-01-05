@@ -36,6 +36,7 @@ import static org.lwjgl.opengl.GL13C.GL_TEXTURE2;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE3;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE4;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE5;
+import static org.lwjgl.opengl.GL13C.GL_TEXTURE6;
 import static org.lwjgl.opengl.GL30C.GL_COLOR_ATTACHMENT0;
 import static org.lwjgl.opengl.GL30C.GL_RGB16F;
 
@@ -58,7 +59,7 @@ import engine.lua.type.object.insts.Camera;
 import engine.tasks.TaskManager;
 import engine.util.MeshUtils;
 
-public class PointLightHandler implements IPointLightHandler {
+public class PointLightHandler implements ILightHandler<PointLightInternal> {
 
 	private List<PointLightInternal> lights = new ArrayList<>();
 
@@ -110,9 +111,7 @@ public class PointLightHandler implements IPointLightHandler {
 			temp.scale(l.radius);
 			shader.loadTransformationMatrix(temp);
 			shader.loadPointLight(l);
-			// activateTexture(GL_TEXTURE6, GL_TEXTURE_2D_ARRAY,
-			// l.getShadowMap().getShadowMaps().getTexture());
-			// glDrawArrays(GL_TRIANGLE_STRIP, 0, quad.getVertexCount());
+			l.getShadowMap().getTexture().active(GL_TEXTURE6);
 			mesh.render(null, null, null);
 		}
 		shader.stop();
@@ -164,14 +163,20 @@ public class PointLightHandler implements IPointLightHandler {
 	public void addLight(PointLightInternal l) {
 		if (l == null)
 			return;
-		TaskManager.addTaskRenderThread(() -> lights.add(l));
+		TaskManager.addTaskRenderThread(() -> {
+			l.init();
+			lights.add(l);
+		});
 	}
 
 	@Override
 	public void removeLight(PointLightInternal l) {
 		if (l == null)
 			return;
-		TaskManager.addTaskRenderThread(() -> lights.remove(l));
+		TaskManager.addTaskRenderThread(() -> {
+			lights.remove(l);
+			l.dispose();
+		});
 	}
 
 	public List<PointLightInternal> getLights() {

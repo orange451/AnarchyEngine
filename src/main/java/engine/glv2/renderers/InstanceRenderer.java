@@ -100,6 +100,11 @@ public class InstanceRenderer implements IObjectRenderer {
 	}
 
 	@Override
+	public void renderShadow(LayeredCubeCamera camera) {
+		shadowRenderer.renderShadow(instances, camera);
+	}
+
+	@Override
 	public void end() {
 		instances.clear();
 	}
@@ -121,13 +126,13 @@ public class InstanceRenderer implements IObjectRenderer {
 			return;
 		if (go.getParent().isnil())
 			return;
-		
+
 		Prefab goPrefab = go.getPrefab();
 		if (goPrefab == null)
 			return;
-		
+
 		PrefabRenderer pfr = goPrefab.getPrefab();
-		if ( pfr == null )
+		if (pfr == null)
 			return;
 
 		Matrix4f mat = go.getWorldMatrix().toJoml();

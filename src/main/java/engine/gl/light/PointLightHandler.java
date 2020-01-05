@@ -37,10 +37,10 @@ import org.joml.Vector4f;
 import engine.gl.LegacyPipeline;
 import engine.gl.mesh.BufferedMesh;
 import engine.gl.shader.BaseShader;
-import engine.glv2.v2.lights.IPointLightHandler;
+import engine.glv2.v2.lights.ILightHandler;
 import engine.util.MeshUtils;
 
-public class PointLightHandler implements IPointLightHandler {
+public class PointLightHandler implements ILightHandler<PointLightInternal> {
 	private List<PointLightInternal> lights = Collections.synchronizedList(new ArrayList<PointLightInternal>());
 	private static BaseShader lightShader = new PointLightShader();
 	private BufferedMesh mesh = MeshUtils.sphere(1, 16);

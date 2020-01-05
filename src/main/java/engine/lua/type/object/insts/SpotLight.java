@@ -13,27 +13,21 @@ package engine.lua.type.object.insts;
 import org.joml.Vector3f;
 import org.luaj.vm2.LuaValue;
 
-import engine.Game;
-import engine.InternalGameThread;
 import engine.InternalRenderThread;
 import engine.gl.IPipeline;
-import engine.gl.LegacyPipeline;
 import engine.gl.light.Light;
+import engine.gl.light.SpotLightInternal;
 import engine.lua.lib.EnumType;
 import engine.lua.type.NumberClamp;
 import engine.lua.type.NumberClampPreferred;
 import engine.lua.type.data.Color3;
 import engine.lua.type.data.Vector3;
-import engine.lua.type.object.Instance;
 import engine.lua.type.object.LightBase;
 import engine.lua.type.object.TreeViewable;
-import engine.observer.RenderableWorld;
 import ide.layout.windows.icons.Icons;
 import lwjgui.paint.Color;
 
-public class SpotLight extends LightBase implements TreeViewable {
-
-	private engine.gl.light.SpotLightInternal light;
+public class SpotLight extends LightBase<SpotLightInternal> implements TreeViewable {
 
 	private static final LuaValue C_INNERFOVSCALE = LuaValue.valueOf("InnerFOVScale");
 	private static final LuaValue C_OUTERFOV = LuaValue.valueOf("OuterFOV");
@@ -133,7 +127,7 @@ public class SpotLight extends LightBase implements TreeViewable {
 			float innerFOV = this.get(C_INNERFOVSCALE).tofloat();
 			float intensity = this.get(C_INTENSITY).tofloat();
 			Vector3f direction = ((Vector3) this.get(C_DIRECTION)).toJoml();
-			light = new engine.gl.light.SpotLightInternal(direction, pos, outerFOV, innerFOV, radius, intensity);
+			light = new SpotLightInternal(direction, pos, outerFOV, innerFOV, radius, intensity);
 
 			// Color it
 			Color color = ((Color3)this.get("Color")).toColor();

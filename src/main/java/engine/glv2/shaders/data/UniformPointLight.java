@@ -17,6 +17,9 @@ public class UniformPointLight extends UniformObject {
 	private UniformVec3 position, color;
 	private UniformFloat radius, intensity;
 	private UniformBoolean visible;
+	private UniformMatrix4 projectionMatrix;
+	private UniformSampler shadowMap;
+	private UniformBoolean shadows;
 
 	public UniformPointLight(String name) {
 		position = new UniformVec3(name + ".position");
@@ -24,15 +27,21 @@ public class UniformPointLight extends UniformObject {
 		radius = new UniformFloat(name + ".radius");
 		intensity = new UniformFloat(name + ".intensity");
 		visible = new UniformBoolean(name + ".visible");
-		super.storeUniforms(position, color, radius, intensity, visible);
+		projectionMatrix = new UniformMatrix4(name + ".projectionMatrix");
+		shadowMap = new UniformSampler(name + ".shadowMap");
+		shadows = new UniformBoolean(name + ".shadows");
+		super.storeUniforms(position, color, radius, intensity, visible, shadowMap, shadows, projectionMatrix);
 	}
 
-	public void loadLight(PointLightInternal light) {
+	public void loadLight(PointLightInternal light, int shadowUnit) {
 		position.loadVec3(light.position);
 		color.loadVec3(light.color);
 		intensity.loadFloat(light.intensity);
 		radius.loadFloat(light.radius);
 		visible.loadBoolean(light.visible);
+		projectionMatrix.loadMatrix(light.getLightCamera().getProjectionMatrix());
+		shadowMap.loadTexUnit(shadowUnit);
+		shadows.loadBoolean(light.shadows);
 	}
 
 }

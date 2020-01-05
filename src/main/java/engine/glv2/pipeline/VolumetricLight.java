@@ -41,7 +41,7 @@ public class VolumetricLight extends DeferredPass<VolumetricLightShader> {
 	@Override
 	protected void setupTextures(RendererData rnd, DeferredPipeline dp, Texture[] auxTex) {
 		//super.activateTexture(GL_TEXTURE0, GL_TEXTURE_2D, dp.getPositionTex().getTexture());
-		super.activateTexture(GL_TEXTURE1, GL_TEXTURE_2D, dp.getNormalTex().getTexture());
+		//super.activateTexture(GL_TEXTURE1, GL_TEXTURE_2D, dp.getNormalTex().getTexture());
 	}
 
 }

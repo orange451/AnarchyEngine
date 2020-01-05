@@ -15,22 +15,17 @@ import org.luaj.vm2.LuaValue;
 
 import engine.InternalRenderThread;
 import engine.gl.IPipeline;
-import engine.gl.LegacyPipeline;
 import engine.gl.light.DirectionalLightInternal;
 import engine.gl.light.Light;
 import engine.lua.lib.EnumType;
 import engine.lua.type.data.Color3;
 import engine.lua.type.data.Vector3;
-import engine.lua.type.object.Instance;
 import engine.lua.type.object.LightBase;
 import engine.lua.type.object.TreeViewable;
-import engine.observer.RenderableWorld;
 import ide.layout.windows.icons.Icons;
 import lwjgui.paint.Color;
 
-public class DirectionalLight extends LightBase implements TreeViewable {
-
-	private DirectionalLightInternal light;
+public class DirectionalLight extends LightBase<DirectionalLightInternal> implements TreeViewable {
 
 	private static final LuaValue C_SHADOWDISTANCE = LuaValue.valueOf("ShadowDistance");
 	private static final LuaValue C_DIRECTION = LuaValue.valueOf("Direction");
@@ -111,7 +106,7 @@ public class DirectionalLight extends LightBase implements TreeViewable {
 			// Create light
 			Vector3f direction = ((Vector3) this.get(C_DIRECTION)).toJoml();
 			float intensity = this.get(C_INTENSITY).tofloat();
-			light = new engine.gl.light.DirectionalLightInternal(direction, intensity);
+			light = new DirectionalLightInternal(direction, intensity);
 			light.distance = this.get(C_SHADOWDISTANCE).toint();
 
 			// Color it
@@ -122,6 +117,8 @@ public class DirectionalLight extends LightBase implements TreeViewable {
 			light.visible = this.get(C_VISIBLE).toboolean();
 
 			light.shadowResolution = this.get(C_SHADOWMAPSIZE).toint();
+
+			light.shadows = this.get(C_SHADOWS).toboolean();
 
 			if ( pipeline.getDirectionalLightHandler() != null )
 				pipeline.getDirectionalLightHandler().addLight(light);

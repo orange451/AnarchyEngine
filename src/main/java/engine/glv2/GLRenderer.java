@@ -44,6 +44,7 @@ import engine.gl.IPipeline;
 import engine.gl.LegacyPipeline;
 import engine.gl.Surface;
 import engine.gl.light.DirectionalLightInternal;
+import engine.gl.light.PointLightInternal;
 import engine.gl.light.SpotLightInternal;
 import engine.glv2.pipeline.MultiPass;
 import engine.glv2.pipeline.PostProcess;
@@ -64,9 +65,7 @@ import engine.glv2.v2.RenderingSettings;
 import engine.glv2.v2.SkyRenderer;
 import engine.glv2.v2.Sun;
 import engine.glv2.v2.lights.DirectionalLightHandler;
-import engine.glv2.v2.lights.IDirectionalLightHandler;
-import engine.glv2.v2.lights.IPointLightHandler;
-import engine.glv2.v2.lights.ISpotLightHandler;
+import engine.glv2.v2.lights.ILightHandler;
 import engine.glv2.v2.lights.PointLightHandler;
 import engine.glv2.v2.lights.SpotLightHandler;
 import engine.lua.type.object.insts.Camera;
@@ -190,6 +189,7 @@ public class GLRenderer implements IPipeline {
 		// TODO: Render transparent shadows using an extra texture
 		if (renderingSettings.shadowsEnabled) {
 			GPUProfiler.start("Shadow Pass");
+			GPUProfiler.start("Directional");
 			for (DirectionalLightInternal l : directionalLightHandler.getLights()) {
 				if (!l.shadows || !l.visible)
 					continue;
@@ -200,7 +200,9 @@ public class GLRenderer implements IPipeline {
 				renderingManager.renderShadow(l.getLightCamera());
 				l.getShadowMap().unbind();
 			}
+			GPUProfiler.end();
 			glCullFace(GL_FRONT);
+			GPUProfiler.start("Spot");
 			for (SpotLightInternal l : spotLightHandler.getLights()) {
 				if (!l.shadows || !l.visible)
 					continue;
@@ -210,6 +212,18 @@ public class GLRenderer implements IPipeline {
 				renderingManager.renderShadow(l.getLightCamera());
 				l.getShadowMap().unbind();
 			}
+			GPUProfiler.end();
+			GPUProfiler.start("Point");
+			for (PointLightInternal l : pointLightHandler.getLights()) {
+				if (!l.shadows || !l.visible)
+					continue;
+				l.update();
+				l.getShadowMap().bind();
+				glClear(GL_DEPTH_BUFFER_BIT);
+				renderingManager.renderShadow(l.getLightCamera());
+				l.getShadowMap().unbind();
+			}
+			GPUProfiler.end();
 			glCullFace(GL_BACK);
 			GPUProfiler.end();
 		}
@@ -425,17 +439,17 @@ public class GLRenderer implements IPipeline {
 	}
 
 	@Override
-	public IPointLightHandler getPointLightHandler() {
+	public ILightHandler<PointLightInternal> getPointLightHandler() {
 		return pointLightHandler;
 	}
 
 	@Override
-	public IDirectionalLightHandler getDirectionalLightHandler() {
+	public ILightHandler<DirectionalLightInternal> getDirectionalLightHandler() {
 		return directionalLightHandler;
 	}
 
 	@Override
-	public ISpotLightHandler getSpotLightHandler() {
+	public ILightHandler<SpotLightInternal> getSpotLightHandler() {
 		return spotLightHandler;
 	}
 

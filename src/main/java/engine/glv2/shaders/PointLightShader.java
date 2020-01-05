@@ -82,7 +82,7 @@ public class PointLightShader extends ShaderProgram {
 	}
 
 	public void loadPointLight(PointLightInternal l) {
-		light.loadLight(l);
+		light.loadLight(l, 6);
 	}
 
 	public void loadTransformationMatrix(Matrix4f mat) {

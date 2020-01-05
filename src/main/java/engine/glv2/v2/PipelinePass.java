@@ -12,10 +12,8 @@ package engine.glv2.v2;
 
 import static org.lwjgl.opengl.GL11C.GL_COLOR_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11C.GL_TRIANGLE_STRIP;
-import static org.lwjgl.opengl.GL11C.glBindTexture;
 import static org.lwjgl.opengl.GL11C.glClear;
 import static org.lwjgl.opengl.GL11C.glDrawArrays;
-import static org.lwjgl.opengl.GL13C.glActiveTexture;
 
 import org.joml.Vector2f;
 
@@ -90,18 +88,6 @@ public abstract class PipelinePass<T extends BasePipelineShader, P> {
 	protected abstract T setupShader();
 
 	protected void setupShaderData(RendererData rnd, IRenderingData rd, T shader) {
-	}
-
-	@Deprecated
-	protected void activateTexture(int textureNum, int target, int texture) {
-		glActiveTexture(textureNum);
-		glBindTexture(target, texture);
-	}
-
-	@Deprecated
-	protected void activateTexture(int textureNum, Texture texture) {
-		glActiveTexture(textureNum);
-		texture.bind();
 	}
 
 	protected abstract void setupTextures(RendererData rnd, P dp, Texture[] auxTex);

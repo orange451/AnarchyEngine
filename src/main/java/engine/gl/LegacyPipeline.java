@@ -29,6 +29,9 @@ import org.lwjgl.opengl.GL13;
 
 import engine.Game;
 import engine.application.RenderableApplication;
+import engine.gl.light.DirectionalLightInternal;
+import engine.gl.light.PointLightInternal;
+import engine.gl.light.SpotLightInternal;
 import engine.gl.lua.HandlesRenderer;
 import engine.gl.lua.OutlineRenderer;
 import engine.gl.mesh.BufferedMesh;
@@ -36,9 +39,7 @@ import engine.gl.renderer.GBuffer;
 import engine.gl.renderer.TransparencyRenderer;
 import engine.gl.shader.BaseShader;
 import engine.glv2.v2.RenderingSettings;
-import engine.glv2.v2.lights.IDirectionalLightHandler;
-import engine.glv2.v2.lights.IPointLightHandler;
-import engine.glv2.v2.lights.ISpotLightHandler;
+import engine.glv2.v2.lights.ILightHandler;
 import engine.lua.type.object.Instance;
 import engine.lua.type.object.PrefabRenderer;
 import engine.lua.type.object.insts.AnimationController;
@@ -438,7 +439,7 @@ public class LegacyPipeline implements IPipeline {
 	}
 	
 	@Override
-	public IPointLightHandler getPointLightHandler() {
+	public ILightHandler<PointLightInternal> getPointLightHandler() {
 		return gbuffer.getLightProcessor().getPointLightHandler();
 	}
 
@@ -499,11 +500,10 @@ public class LegacyPipeline implements IPipeline {
 	}
 
 	@Override
-	public IDirectionalLightHandler getDirectionalLightHandler() {
+	public ILightHandler<DirectionalLightInternal> getDirectionalLightHandler() {
 		// TODO Auto-generated method stub
 		return null;
 	}
-
 	@Override
 	public void setDyamicSkybox(DynamicSkybox dynamicSkybox) {
 		// TODO Auto-generated method stub
@@ -511,7 +511,7 @@ public class LegacyPipeline implements IPipeline {
 	}
 
 	@Override
-	public ISpotLightHandler getSpotLightHandler() {
+	public ILightHandler<SpotLightInternal> getSpotLightHandler() {
 		// TODO Auto-generated method stub
 		return null;
 	}

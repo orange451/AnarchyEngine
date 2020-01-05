@@ -33,6 +33,8 @@ public interface IObjectRenderer {
 
 	public void renderShadow(SpotLightCamera camera);
 
+	public void renderShadow(LayeredCubeCamera camera);
+
 	public void dispose();
 
 	public void end();

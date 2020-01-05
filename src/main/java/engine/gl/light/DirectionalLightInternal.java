@@ -20,7 +20,7 @@ public class DirectionalLightInternal extends Light {
 	public Vector3f direction = new Vector3f(1, 1, 1);
 	public int distance = 50;
 	public int shadowResolution = 1024;
-	public boolean shadows = true;;
+	public boolean shadows = true;
 	private DirectionalLightShadowMap shadowMap;
 	private DirectionalLightCamera lightCamera;
 
@@ -52,8 +52,6 @@ public class DirectionalLightInternal extends Light {
 	}
 
 	public void dispose() {
-		if (shadowMap == null)
-			return;
 		shadowMap.dispose();
 	}
 
