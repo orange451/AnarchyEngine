@@ -168,6 +168,9 @@ public abstract class DataModel extends LuaDatatype {
 
 	@Override
 	public void set(LuaValue key, LuaValue value) {
+		if ( this.destroyed )
+			return;
+		
 		LuaValue oldValue = this.rawget(key);
 		boolean changed = !checkEquals( value, oldValue);
 		
@@ -203,6 +206,9 @@ public abstract class DataModel extends LuaDatatype {
 	}
 	
 	public void forceset(LuaValue key, LuaValue value) {
+		if ( this.destroyed )
+			return;
+		
 		LuaValue oldValue = this.get(key);
 		boolean changed = !checkEquals( value, oldValue);
 		
@@ -280,15 +286,17 @@ public abstract class DataModel extends LuaDatatype {
 	}
 	
 	private void onKeyChange(LuaValue key, LuaValue value, LuaValue oldValue) {
-		//if ( value == oldValue )
-			//return;
+		if ( this.destroyed )
+			return;
 		
 		this.onValueUpdated(key, value);
 		Game.changes = true;
 		
 		LuaEvent event = this.changedEvent();
-		event.fire(key, value, oldValue);
-		notifyPropertySubscribers(key, value);
+		if ( event != null ) {
+			event.fire(key, value, oldValue);
+			notifyPropertySubscribers(key, value);
+		}
 	}
 	
 	private boolean computeDescendant( LuaValue arg ) {
@@ -585,7 +593,8 @@ public abstract class DataModel extends LuaDatatype {
 	 * @return
 	 */
 	public LuaEvent changedEvent() {
-		return (LuaEvent)this.rawget(C_CHANGED);
+		LuaValue temp = this.rawget(C_CHANGED);
+		return temp.isnil()?null:(LuaEvent)temp;
 	}
 	
 	/**
@@ -593,7 +602,8 @@ public abstract class DataModel extends LuaDatatype {
 	 * @return
 	 */
 	public LuaEvent destroyedEvent() {
-		return (LuaEvent)this.rawget(C_DESTROYED);
+		LuaValue temp = this.rawget(C_DESTROYED);
+		return temp.isnil()?null:(LuaEvent)temp;
 	}
 	
 	/**
@@ -601,7 +611,8 @@ public abstract class DataModel extends LuaDatatype {
 	 * @return
 	 */
 	public LuaEvent childAddedEvent() {
-		return (LuaEvent)this.rawget(C_CHILDADDED);
+		LuaValue temp = this.rawget(C_CHILDADDED);
+		return temp.isnil()?null:(LuaEvent)temp;
 	}
 	
 	/**
@@ -609,7 +620,8 @@ public abstract class DataModel extends LuaDatatype {
 	 * @return
 	 */
 	public LuaEvent childRemovedEvent() {
-		return (LuaEvent)this.rawget(C_CHILDREMOVED);
+		LuaValue temp = this.rawget(C_CHILDREMOVED);
+		return temp.isnil()?null:(LuaEvent)temp;
 	}
 	
 	/**
@@ -617,7 +629,8 @@ public abstract class DataModel extends LuaDatatype {
 	 * @return
 	 */
 	public LuaEvent descendantAddedEvent() {
-		return (LuaEvent)this.rawget(C_DESCENDANTADDED);
+		LuaValue temp = this.rawget(C_DESCENDANTADDED);
+		return temp.isnil()?null:(LuaEvent)temp;
 	}
 
 	/**
@@ -625,7 +638,8 @@ public abstract class DataModel extends LuaDatatype {
 	 * @return
 	 */
 	public LuaEvent descendantRemovedEvent() {
-		return (LuaEvent)this.rawget(C_DESCENDANTREMOVED);
+		LuaValue temp = this.rawget(C_DESCENDANTREMOVED);
+		return temp.isnil()?null:(LuaEvent)temp;
 	}
 
 	/**
