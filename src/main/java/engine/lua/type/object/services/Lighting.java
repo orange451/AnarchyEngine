@@ -12,8 +12,8 @@ package engine.lua.type.object.services;
 
 import org.luaj.vm2.LuaValue;
 
+import engine.AnarchyEngineClient;
 import engine.InternalGameThread;
-import engine.application.RenderableApplication;
 import engine.gl.IPipeline;
 import engine.gl.LegacyPipeline;
 import engine.lua.type.LuaConnection;
@@ -98,10 +98,10 @@ public class Lighting extends Service implements TreeViewable {
 	}
 	
 	private LuaValue onSetSkybox(LuaValue value) {
-		IPipeline pp = RenderableApplication.pipeline;
+		IPipeline pp = AnarchyEngineClient.pipeline;
 		
 		if ( value.isnil() ) {
-			if (RenderableApplication.pipeline instanceof LegacyPipeline) {
+			if (AnarchyEngineClient.pipeline instanceof LegacyPipeline) {
 				((LegacyPipeline)pp).getGBuffer().getMergeProcessor().setSkybox(null);
 			} else {
 				pp.setDyamicSkybox(null);

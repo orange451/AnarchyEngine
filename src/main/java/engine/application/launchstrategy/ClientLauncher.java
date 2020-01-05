@@ -10,14 +10,14 @@
 
 package engine.application.launchstrategy;
 
+import engine.AnarchyEngineClient;
 import engine.InternalRenderThread;
 import engine.application.Application;
-import engine.application.RenderableApplication;
 import engine.util.JVMUtil;
 
 public class ClientLauncher {
 
-	public static boolean launch(RenderableApplication application) {
+	public static boolean launch(AnarchyEngineClient application) {
 		if ( JVMUtil.restartJVM(true, true, null) ) {
 			return false;
 		}

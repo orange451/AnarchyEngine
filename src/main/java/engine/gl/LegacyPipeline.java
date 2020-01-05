@@ -27,8 +27,8 @@ import org.luaj.vm2.LuaValue;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 
+import engine.AnarchyEngineClient;
 import engine.Game;
-import engine.application.RenderableApplication;
 import engine.gl.lua.HandlesRenderer;
 import engine.gl.lua.OutlineRenderer;
 import engine.gl.mesh.BufferedMesh;
@@ -81,7 +81,7 @@ public class LegacyPipeline implements IPipeline {
 	private static final Matrix4f IDENTITY = new Matrix4f().identity();
 
 	public LegacyPipeline() {
-		this(RenderableApplication.windowWidth, RenderableApplication.windowHeight);
+		this(AnarchyEngineClient.windowWidth, AnarchyEngineClient.windowHeight);
 	}
 	
 	public LegacyPipeline(int width, int height) {

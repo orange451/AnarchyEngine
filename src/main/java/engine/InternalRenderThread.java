@@ -24,7 +24,6 @@ import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL11;
 
-import engine.application.RenderableApplication;
 import engine.lua.type.object.services.RunService;
 import engine.observer.InternalRenderable;
 import engine.observer.PostRenderable;
@@ -91,7 +90,7 @@ public class InternalRenderThread {
 	}
 
 	public void run() {
-		long window = RenderableApplication.window;
+		long window = AnarchyEngineClient.window;
 		long startTime = System.nanoTime();
 		long timer = System.currentTimeMillis();
 		double nanoSecond = 1e+9;
@@ -147,7 +146,7 @@ public class InternalRenderThread {
 	}
 	
 	public void forceUpdate() {
-		long window = RenderableApplication.window;
+		long window = AnarchyEngineClient.window;
 
 		// Clear screen
 		GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT | GL11.GL_STENCIL_BUFFER_BIT);
