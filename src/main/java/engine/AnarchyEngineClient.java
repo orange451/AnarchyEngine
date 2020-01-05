@@ -8,7 +8,7 @@
  *
  */
 
-package engine.application;
+package engine;
 
 import static org.lwjgl.glfw.GLFW.GLFW_CONTEXT_VERSION_MAJOR;
 import static org.lwjgl.glfw.GLFW.GLFW_CONTEXT_VERSION_MINOR;
@@ -60,7 +60,7 @@ import engine.tasks.TaskManager;
 import engine.util.GLCompat;
 import ide.layout.windows.ErrorWindow;
 
-public abstract class RenderableApplication extends Application implements Renderable,InternalRenderable {
+public abstract class AnarchyEngineClient extends AnarchyEngine implements Renderable,InternalRenderable {
 	public static long window = -1;
 	private boolean initialized;
 
@@ -154,7 +154,7 @@ public abstract class RenderableApplication extends Application implements Rende
 		if ( !ClientLauncher.launch(this) )
 			return;
 
-		internalInitialize();
+		setupEngine();
 
 		GLFWErrorCallback.createPrint(System.err).set();
 		

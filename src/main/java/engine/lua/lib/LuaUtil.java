@@ -95,6 +95,7 @@ public class LuaUtil {
 	 * @param data
 	 * @return
 	 */
+	@SuppressWarnings("unchecked")
 	public static JSONObject tableToJson(LuaTable data) {
 		JSONObject json = new JSONObject();
 		
@@ -118,6 +119,7 @@ public class LuaUtil {
 		Set<?> entryset = obj.entrySet();
 		Iterator<?> iterator = entryset.iterator();
 		while(iterator.hasNext()) {
+			@SuppressWarnings("rawtypes")
 			Map.Entry entry = (Map.Entry)iterator.next();
 			table.set(LuaValue.valueOf(entry.getKey().toString()), (LuaValue)entry.getValue());
 		}

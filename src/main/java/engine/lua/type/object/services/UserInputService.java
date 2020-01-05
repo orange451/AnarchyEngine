@@ -18,8 +18,8 @@ import org.luaj.vm2.lib.TwoArgFunction;
 import org.luaj.vm2.lib.ZeroArgFunction;
 import org.lwjgl.glfw.GLFW;
 
+import engine.AnarchyEngineClient;
 import engine.Game;
-import engine.application.RenderableApplication;
 import engine.lua.lib.LuaTableReadOnly;
 import engine.lua.type.LuaEvent;
 import engine.lua.type.data.Vector2;
@@ -91,7 +91,7 @@ public class UserInputService extends Service implements TreeViewable {
 		this.getmetatable().set("GetMouseDelta", new ZeroArgFunction() {
 			@Override
 			public LuaValue call() {
-				return new Vector2((float)RenderableApplication.mouseDeltaX, (float)RenderableApplication.mouseDeltaY);
+				return new Vector2((float)AnarchyEngineClient.mouseDeltaX, (float)AnarchyEngineClient.mouseDeltaY);
 			}
 		});
 		
@@ -171,7 +171,7 @@ public class UserInputService extends Service implements TreeViewable {
 	@Override
 	protected LuaValue onValueSet(LuaValue key, LuaValue value) {
 		if ( key.toString().equals("LockMouse") ) {
-			RenderableApplication.lockMouse = value.toboolean();
+			AnarchyEngineClient.lockMouse = value.toboolean();
 		}
 		return value;
 	}
@@ -187,7 +187,7 @@ public class UserInputService extends Service implements TreeViewable {
 	}
 	
 	public boolean isKeyDown(int key) {
-		boolean system = GLFW.glfwGetKey(RenderableApplication.window, key) == GLFW.GLFW_PRESS;
+		boolean system = GLFW.glfwGetKey(AnarchyEngineClient.window, key) == GLFW.GLFW_PRESS;
 		if ( !system )
 			keysDown.remove(key);
 		
@@ -195,7 +195,7 @@ public class UserInputService extends Service implements TreeViewable {
 	}
 	
 	public boolean isMouseDown(int mouse) {
-		boolean system = GLFW.glfwGetMouseButton(RenderableApplication.window, mouse) == GLFW.GLFW_PRESS;
+		boolean system = GLFW.glfwGetMouseButton(AnarchyEngineClient.window, mouse) == GLFW.GLFW_PRESS;
 		if ( !system )
 			mouseDown.remove(mouse);
 		

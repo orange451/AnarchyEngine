@@ -11,7 +11,6 @@
 package ide.layout.windows.icons;
 
 import lwjgui.scene.Context;
-import lwjgui.scene.Node;
 import lwjgui.scene.image.Image;
 import lwjgui.scene.image.ImageView;
 

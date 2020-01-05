@@ -24,7 +24,7 @@ import javax.swing.UIManager;
 
 import org.lwjgl.glfw.GLFW;
 
-import engine.application.RenderableApplication;
+import engine.AnarchyEngineClient;
 import lwjgui.LWJGUI;
 import lwjgui.LWJGUIUtil;
 import lwjgui.geometry.Pos;
@@ -50,9 +50,9 @@ public class ErrorWindow {
 	public ErrorWindow(String string, boolean fatal) {
 		fatalError = fatal;
 		
-		System.out.println("Creating error window ("+RenderableApplication.GLFW_INITIALIZED+") " + string);
+		System.out.println("Creating error window ("+AnarchyEngineClient.GLFW_INITIALIZED+") " + string);
 		
-		if ( RenderableApplication.GLFW_INITIALIZED ) {
+		if ( AnarchyEngineClient.GLFW_INITIALIZED ) {
 			errorLWJGUI(string);
 		} else {
 			errorSwing(string);

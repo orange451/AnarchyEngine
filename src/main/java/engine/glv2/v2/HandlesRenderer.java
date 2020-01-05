@@ -16,8 +16,8 @@ import org.luaj.vm2.LuaTable;
 import org.luaj.vm2.LuaValue;
 import org.lwjgl.glfw.GLFW;
 
+import engine.AnarchyEngineClient;
 import engine.Game;
-import engine.application.RenderableApplication;
 import engine.gl.MaterialGL;
 import engine.gl.Resources;
 import engine.gl.mesh.BufferedMesh;
@@ -314,7 +314,7 @@ public class HandlesRenderer {
 		p3.sub(p1).normalize().mul(256).add(p1);
 
 		// Get closest point to the line from the mouses position
-		Vector2f mouse = new Vector2f((float) RenderableApplication.mouseX, (float) RenderableApplication.mouseY);
+		Vector2f mouse = new Vector2f((float) AnarchyEngineClient.mouseX, (float) AnarchyEngineClient.mouseY);
 		Vector2f closest = getProjectedPointLine(p2, p3, mouse);
 
 		// Reproject the closest point to 3d ray
@@ -443,7 +443,7 @@ public class HandlesRenderer {
 
 		Vector3f arrowPos = headMat.getTranslation(new Vector3f());
 		Vector2f pos = MatrixUtils.project3Dto2D(arrowPos, projection, camera.getViewMatrix().getInternal(), size);
-		Vector2f mou = new Vector2f((float) RenderableApplication.mouseX, (float) RenderableApplication.mouseY);
+		Vector2f mou = new Vector2f((float) AnarchyEngineClient.mouseX, (float) AnarchyEngineClient.mouseY);
 		boolean closer = true;
 		float d1 = arrowPos.distance(camera.getPosition().toJoml());
 		if (tempPos != null) {

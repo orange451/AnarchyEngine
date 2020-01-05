@@ -23,7 +23,6 @@ import engine.lua.lib.Enums;
 import engine.lua.type.NumberClamp;
 import engine.lua.type.object.PhysicsBase;
 import engine.lua.type.object.TreeViewable;
-import engine.physics.PhysicsObjectInternal;
 import engine.physics.PhysicsWorld;
 import engine.util.Pair;
 import ide.layout.windows.icons.Icons;

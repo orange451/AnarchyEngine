@@ -18,8 +18,8 @@ import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
 
-import engine.application.RenderableApplication;
 import engine.gl.MaterialGL;
+import engine.AnarchyEngineClient;
 import engine.gl.LegacyPipeline;
 import engine.gl.Resources;
 import engine.lua.type.data.Vector3;
@@ -158,7 +158,7 @@ public class HandlesRenderer {
 		p3.sub(p1).normalize().mul(256).add(p1);
 
 		// Get closest point to the line from the mouses position
-		Vector2f mouse = new Vector2f((float) RenderableApplication.mouseX, (float) RenderableApplication.mouseY);
+		Vector2f mouse = new Vector2f((float) AnarchyEngineClient.mouseX, (float) AnarchyEngineClient.mouseY);
 		Vector2f closest = getProjectedPointLine(p2, p3, mouse);
 
 		// Reproject the closest point to 3d ray
@@ -288,7 +288,7 @@ public class HandlesRenderer {
 		Vector2f pos = MatrixUtils.project3Dto2D(arrowPos, LegacyPipeline.pipeline_get().getProjectionMatrix(),
 				LegacyPipeline.pipeline_get().getViewMatrix(),
 				new Vector2f(LegacyPipeline.pipeline_get().getWidth(), LegacyPipeline.pipeline_get().getHeight()));
-		Vector2f mou = new Vector2f((float) RenderableApplication.mouseX, (float) RenderableApplication.mouseY);
+		Vector2f mou = new Vector2f((float) AnarchyEngineClient.mouseX, (float) AnarchyEngineClient.mouseY);
 		boolean closer = true;
 		Vector3f cameraPosition = LegacyPipeline.pipeline_get().getCamera().getPosition().toJoml();
 		float d1 = arrowPos.distance(cameraPosition);

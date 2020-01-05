@@ -15,9 +15,9 @@ import java.util.List;
 
 import org.luaj.vm2.LuaValue;
 
+import engine.AnarchyEngineClient;
 import engine.Game;
 import engine.InternalRenderThread;
-import engine.application.RenderableApplication;
 import engine.gl.LegacyPipeline;
 import engine.gl.Resources;
 import engine.gl.Surface;
@@ -63,7 +63,7 @@ public class IdeMaterialViewer extends IdePane {
 		init();
 		
 		// Increase allowence
-		RenderableApplication.renderThread.attach(()->{
+		AnarchyEngineClient.renderThread.attach(()->{
 			renderAllowence = renderAllowence+1;
 			if ( renderAllowence > 10 )
 				renderAllowence = 10;

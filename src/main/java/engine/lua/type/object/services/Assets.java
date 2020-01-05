@@ -17,6 +17,7 @@ import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.joml.Vector2f;
 import org.joml.Vector3f;
@@ -256,6 +257,8 @@ public class Assets extends Service implements TreeViewable {
 		String specificFile = FileUtils.getFileNameFromPath(filePath);
 		Prefab prefab = (Prefab) Instance.instanceLua(Prefab.class.getSimpleName());
 		
+		Map<String, Texture> cachedTextures = new HashMap<>();
+		
 		try {
 			System.out.println("Loading assimp mesh: " + filePath);
 			
@@ -349,8 +352,7 @@ public class Assets extends Service implements TreeViewable {
 	
 				// Load material
 				int materialIndex = mesh.mMaterialIndex();
-				Material tm = (materialIndex >= 0)?getMaterialFromAssimp( fileDir, materials.get(materialIndex), prefab ):new Material();
-				
+				Material tm = (materialIndex >= 0)?getMaterialFromAssimp( fileDir, materials.get(materialIndex), prefab, cachedTextures ):new Material();
 				
 				// Get asset folder material
 				Instance materialAssetFolder = prefab.findFirstChild(tm.getPreferredParent());
@@ -397,7 +399,7 @@ public class Assets extends Service implements TreeViewable {
 
 	private static HashMap<AIMaterial, Material> materialLookup = new HashMap<AIMaterial, Material>();
 	
-	private static Material getMaterialFromAssimp( String baseDir, AIMaterial material, Prefab prefab ) {
+	private static Material getMaterialFromAssimp( String baseDir, AIMaterial material, Prefab prefab, Map<String,Texture> cachedTextures ) {
 		if ( materialLookup.containsKey(material) ) {
 			Material ret = (Material) materialLookup.get(material).clone();
 			ret.forceSetParent(materialLookup.get(material).getParent());
@@ -419,36 +421,56 @@ public class Assets extends Service implements TreeViewable {
 		Material tm = new Material();
 		{
 			if ( diffuse != null ) {
-				Texture t1 = new Texture();
-				t1.forceSetName(diffuse.replace(baseDir, ""));
-				t1.setSRGB(true);
-				t1.setFilePath(diffuse);
-				t1.forceSetParent(textureAssetFolder);
-				tm.setDiffuseMap(t1);
+				if ( cachedTextures.containsKey(diffuse) ) {
+					tm.setDiffuseMap(cachedTextures.get(diffuse));
+				} else {
+					Texture t1 = new Texture();
+					t1.forceSetName(diffuse.replace(baseDir, ""));
+					t1.setSRGB(true);
+					t1.setFilePath(diffuse);
+					t1.forceSetParent(textureAssetFolder);
+					tm.setDiffuseMap(t1);
+					cachedTextures.put(diffuse, t1);
+				}
 			}
 			
 			if ( normal != null ) {
-				Texture t2 = new Texture();
-				t2.forceSetName(normal.replace(baseDir, ""));
-				t2.setFilePath(normal);
-				t2.forceSetParent(textureAssetFolder);
-				tm.setNormalMap(t2);
+				if ( cachedTextures.containsKey(normal) ) {
+					tm.setNormalMap(cachedTextures.get(normal));
+				} else {
+					Texture t2 = new Texture();
+					t2.forceSetName(normal.replace(baseDir, ""));
+					t2.setFilePath(normal);
+					t2.forceSetParent(textureAssetFolder);
+					tm.setNormalMap(t2);
+					cachedTextures.put(diffuse, t2);
+				}
 			}
 			
 			if ( specular != null ) {
-				Texture t3 = new Texture();
-				t3.forceSetName(specular.replace(baseDir, ""));
-				t3.setFilePath(specular);
-				t3.forceSetParent(textureAssetFolder);
-				tm.setRoughMap(t3);
+				if ( cachedTextures.containsKey(specular) ) {
+					tm.setRoughMap(cachedTextures.get(specular));
+				} else {
+					Texture t3 = new Texture();
+					t3.forceSetName(specular.replace(baseDir, ""));
+					t3.setFilePath(specular);
+					t3.forceSetParent(textureAssetFolder);
+					tm.setRoughMap(t3);
+					cachedTextures.put(diffuse, t3);
+				}
 			}
 			
 			if ( glossy != null ) {
-				Texture t4 = new Texture();
-				t4.forceSetName(glossy.replace(baseDir, ""));
-				t4.setFilePath(glossy);
-				t4.forceSetParent(textureAssetFolder);
-				tm.setMetalMap(t4);
+				if ( cachedTextures.containsKey(glossy) ) {
+					tm.setMetalMap(cachedTextures.get(glossy));
+				} else {
+					Texture t4 = new Texture();
+					t4.forceSetName(glossy.replace(baseDir, ""));
+					t4.setFilePath(glossy);
+					t4.forceSetParent(textureAssetFolder);
+					tm.setMetalMap(t4);
+					cachedTextures.put(diffuse, t4);
+				}
 			}
 		}
 		
@@ -525,11 +547,15 @@ public class Assets extends Service implements TreeViewable {
 			if (count > 2) {
 				count--;
 				count /= 2;
-				if (localBasePath.lastIndexOf("/") == localBasePath.length() - 1)
-					localBasePath = localBasePath.substring(0, localBasePath.lastIndexOf("/"));
-				for (int i = 0; i < count; i++)
-					localBasePath = localBasePath.substring(0, localBasePath.lastIndexOf("/"));
-				file = file.substring(2);
+				int lastSlash = localBasePath.lastIndexOf("/");
+				if ( lastSlash > -1 ) {
+					if (lastSlash == localBasePath.length() - 1)
+						localBasePath = localBasePath.substring(0, lastSlash);
+					
+					for (int i = 0; i < count; i++)
+						localBasePath = localBasePath.substring(0, lastSlash);
+					file = file.substring(2);
+				}
 			} else {
 				if (localBasePath.lastIndexOf("/") != localBasePath.length() - 1)
 					localBasePath += "/";

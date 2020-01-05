@@ -38,8 +38,8 @@ import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.ARBClipControl;
 import org.lwjgl.opengl.GL;
 
+import engine.AnarchyEngineClient;
 import engine.Game;
-import engine.application.RenderableApplication;
 import engine.gl.IPipeline;
 import engine.gl.LegacyPipeline;
 import engine.gl.Surface;
@@ -153,8 +153,8 @@ public class GLRenderer implements IPipeline {
 	}
 
 	public void init() {
-		width = RenderableApplication.windowWidth;
-		height = RenderableApplication.windowHeight;
+		width = AnarchyEngineClient.windowWidth;
+		height = AnarchyEngineClient.windowHeight;
 
 		renderingManager = new RenderingManager();
 

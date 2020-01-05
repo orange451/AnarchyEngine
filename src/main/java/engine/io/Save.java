@@ -142,17 +142,23 @@ public class Save {
 
 		// Get save path if it's not already set.
 		if ( path == null || path.length() == 0 || saveAs ) {
+			String newPath;
+			
+			// Get path
 			PointerBuffer outPath = MemoryUtil.memAllocPointer(1);
 			int result = NativeFileDialog.NFD_SaveDialog("json", projects.getAbsolutePath(), outPath);
 			if ( result == NativeFileDialog.NFD_OKAY ) {
-				path = outPath.getStringUTF8(0);
+				newPath = outPath.getStringUTF8(0);
 			} else {
 				return false;
 			}
 			
-			if ( !path.endsWith(".json") ) {
-				path = path+".json";
+			// Make sure path filetype is .json
+			if ( !newPath.endsWith(".json") ) {
+				newPath = newPath+".json";
 			}
+			
+			path = newPath;
 		}
 
 		// Setup directory folder
@@ -171,15 +177,28 @@ public class Save {
 		path = gameDirectory.getAbsolutePath() + File.separator + jsonFile;
 		System.out.println(gameDirectory);
 		System.out.println(path);
-		Game.saveDirectory = gameDirectory.getAbsolutePath();
-		Game.saveFile = path;
-		GLFW.glfwSetWindowTitle(IDE.window, IDE.TITLE + " [" + FileUtils.getFileDirectoryFromPath(path) + "]");
-
+		
 		// Resources folder
 		File resourcesFolder = new File(gameDirectory + File.separator + "Resources");
 		if ( !resourcesFolder.exists() ) {
 			resourcesFolder.mkdir();
 		}
+		
+		// Check if path was updated...
+		if ( (Game.saveDirectory != null && Game.saveDirectory.length() > 0) && !gameDirectory.getAbsolutePath().equals(Game.saveDirectory) ) {
+			File oldResources = new File(Game.saveDirectory + File.separator + "Resources");
+			System.out.println("RESAVING! " + oldResources + " / " + resourcesFolder);
+			
+			// Copy old resources into new resources
+			copyFolder(oldResources, resourcesFolder);
+		}
+		
+		// Update filepaths
+		Game.saveDirectory = gameDirectory.getAbsolutePath();
+		Game.saveFile = path;
+		GLFW.glfwSetWindowTitle(IDE.window, IDE.TITLE + " [" + FileUtils.getFileDirectoryFromPath(path) + "]");
+		
+		// Write new resources
 		writeResources(resourcesFolder);
 
 		// Start saving process
@@ -204,7 +223,7 @@ public class Save {
 
 		return true;
 	}
-	
+
 	/**
 	 * Returns the entire game represented as a JSON Object.
 	 * @return
@@ -439,6 +458,43 @@ public class Save {
 		}
 		return null;
 	}*/
+	
+	private static void copyFolder(File sourceFolder, File destinationFolder) {
+        //Check if sourceFolder is a directory or file
+        //If sourceFolder is file; then copy the file directly to new location
+        if (sourceFolder.isDirectory()) 
+        {
+            //Verify if destinationFolder is already present; If not then create it
+            if (!destinationFolder.exists()) 
+            {
+                destinationFolder.mkdir();
+                System.out.println("Directory created :: " + destinationFolder);
+            }
+             
+            //Get all files from source directory
+            String files[] = sourceFolder.list();
+             
+            //Iterate over all files and copy them to destinationFolder one by one
+            for (String file : files) 
+            {
+                File srcFile = new File(sourceFolder, file);
+                File destFile = new File(destinationFolder, file);
+                 
+                //Recursive function call
+                copyFolder(srcFile, destFile);
+            }
+        }
+        else
+        {
+            //Copy the file content from one place to another 
+            try {
+				Files.copy(sourceFolder.toPath(), destinationFolder.toPath(), StandardCopyOption.REPLACE_EXISTING);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+            System.out.println("File copied :: " + destinationFolder);
+        }
+	}
 
 	protected static void writeResources(File resourcesFolder) {
 		String resourcesPath = resourcesFolder.getAbsolutePath();

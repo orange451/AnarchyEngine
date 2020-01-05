@@ -12,6 +12,7 @@ package ide.layout;
 
 import org.json.simple.JSONObject;
 
+import engine.AnarchyEngine;
 import engine.Game;
 import engine.InternalGameThread;
 import engine.application.impl.ClientApplication;
@@ -37,7 +38,6 @@ import lwjgui.scene.control.MenuItem;
 import lwjgui.scene.control.SeparatorMenuItem;
 import lwjgui.scene.control.SplitPane;
 import lwjgui.scene.layout.BorderPane;
-import lwjgui.scene.layout.Pane;
 
 public class IdeLayout {
 	
@@ -315,7 +315,7 @@ public class IdeLayout {
 			Runnable r = new Runnable() {
 				@Override
 				public void run() {
-					InternalGameThread.terminate();
+					AnarchyEngine.instance.terminate();
 				}
 			};
 			if ( Game.changes ) {

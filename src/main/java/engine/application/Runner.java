@@ -13,6 +13,7 @@ package engine.application;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
 
+import engine.AnarchyEngineClient;
 import engine.Game;
 import engine.InternalRenderThread;
 import engine.glv2.GLRenderer;
@@ -25,7 +26,7 @@ import lwjgui.gl.GenericShader;
 import lwjgui.scene.Window;
 import lwjgui.scene.layout.StackPane;
 
-public abstract class Runner extends RenderableApplication {
+public abstract class Runner extends AnarchyEngineClient {
 	private static StackPane rootPane;
 	private static GenericShader shader;
 	

@@ -45,7 +45,6 @@ public class Workspace extends Service implements RenderableWorld,TreeViewable,T
 
 	private static final LuaValue C_GRAVITY = LuaValue.valueOf("Gravity");
 	private static final LuaValue C_CURRENTCAMERA = LuaValue.valueOf("CurrentCamera");
-	private static final LuaValue C_BLACKLIST = LuaValue.valueOf("Blacklist");
 	private static final LuaValue C_RAYIGNORETYPE = LuaValue.valueOf("RayIgnoreType");
 
 	public Workspace() {

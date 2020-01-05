@@ -27,8 +27,8 @@ import org.luaj.vm2.LuaValue;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 
+import engine.AnarchyEngineClient;
 import engine.Game;
-import engine.application.RenderableApplication;
 import engine.gl.light.DirectionalLightInternal;
 import engine.gl.light.PointLightInternal;
 import engine.gl.light.SpotLightInternal;
@@ -82,7 +82,7 @@ public class LegacyPipeline implements IPipeline {
 	private static final Matrix4f IDENTITY = new Matrix4f().identity();
 
 	public LegacyPipeline() {
-		this(RenderableApplication.windowWidth, RenderableApplication.windowHeight);
+		this(AnarchyEngineClient.windowWidth, AnarchyEngineClient.windowHeight);
 	}
 	
 	public LegacyPipeline(int width, int height) {

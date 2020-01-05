@@ -10,7 +10,6 @@
 
 package engine.lua.lib;
 
-import org.luaj.vm2.LuaString;
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.TwoArgFunction;
 import org.lwjgl.glfw.GLFW;
