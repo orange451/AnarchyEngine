@@ -11,14 +11,22 @@
 package engine.application;
 
 import engine.Game;
-import engine.GameEngine;
+import engine.InternalGameThread;
+import engine.InternalRenderThread;
 import engine.application.launchstrategy.ServerLauncher;
-import engine.lua.LuaEngine;
-import engine.lua.type.object.services.GameECS;
+import engine.observer.Renderable;
 import engine.observer.Tickable;
 
-public abstract class Application extends GameEngine implements Tickable {
-
+public abstract class Application implements Tickable {
+	public static Application instance = null;
+	public static InternalRenderThread renderThread = null;
+	public static InternalGameThread gameThread = null;
+	public static Game game;
+	
+	public static boolean isRenderable() {
+		return instance instanceof Renderable;
+	}
+	
 	public static void launch(Object o) {
 		// Figure out the right class to call
 		StackTraceElement[] cause = Thread.currentThread().getStackTrace();
@@ -52,7 +60,7 @@ public abstract class Application extends GameEngine implements Tickable {
 	}
 
 	public Application() {
-		GameEngine.gameEngine = this;
+		instance = this;
 		game = new Game();
 	}
 
@@ -61,23 +69,16 @@ public abstract class Application extends GameEngine implements Tickable {
 	}
 
 	protected void onStart(String[] args) {
-		internalInitialize();
+		setupEngine();
 		ServerLauncher.launch(this);
 		initialize(args);
 	}
-
-	public void internalInitialize() {
-		
-		// Turn on lua
-		LuaEngine.initialize();
-		
-		// Create the game instance
-		Game.setGame(new GameECS());
-		
-		// Start a new project
-		Game.changes = false;
-		Game.newProject();
+	
+	public void terminate() {
+		cleanupEngine();
 	}
 
+	protected abstract void setupEngine();
+	protected abstract void cleanupEngine();
 	public abstract void initialize(String[] args);
 }

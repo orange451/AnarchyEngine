@@ -10,8 +10,8 @@
 
 package engine.application.launchstrategy;
 
-import engine.GameEngine;
 import engine.InternalRenderThread;
+import engine.application.Application;
 import engine.application.RenderableApplication;
 import engine.util.JVMUtil;
 
@@ -26,7 +26,7 @@ public class ClientLauncher {
 		ServerLauncher.launch(application);
 		
 		// Start rendering thread
-		GameEngine.renderThread = new InternalRenderThread(application);
+		Application.renderThread = new InternalRenderThread(application);
 		return true;
 	}
 }

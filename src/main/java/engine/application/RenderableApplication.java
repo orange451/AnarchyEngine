@@ -51,6 +51,7 @@ import org.lwjgl.glfw.GLFWWindowSizeCallbackI;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.system.MemoryStack;
 
+import engine.AnarchyEngine;
 import engine.application.launchstrategy.ClientLauncher;
 import engine.gl.IPipeline;
 import engine.gl.Resources;
@@ -60,7 +61,7 @@ import engine.tasks.TaskManager;
 import engine.util.GLCompat;
 import ide.layout.windows.ErrorWindow;
 
-public abstract class RenderableApplication extends Application implements Renderable,InternalRenderable {
+public abstract class RenderableApplication extends AnarchyEngine implements Renderable,InternalRenderable {
 	public static long window = -1;
 	private boolean initialized;
 
@@ -154,7 +155,7 @@ public abstract class RenderableApplication extends Application implements Rende
 		if ( !ClientLauncher.launch(this) )
 			return;
 
-		internalInitialize();
+		setupEngine();
 
 		GLFWErrorCallback.createPrint(System.err).set();
 		

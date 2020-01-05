@@ -120,7 +120,7 @@ public class InternalRenderThread {
 			
 			// Check for window closing
 			if ( GLFW.glfwWindowShouldClose(window) ) {
-				InternalGameThread.terminate();
+				AnarchyEngine.instance.terminate();
 			}
 		}
 		TaskManager.stopRenderBackgroundThread();

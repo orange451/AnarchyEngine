@@ -12,6 +12,7 @@ package ide.layout;
 
 import org.json.simple.JSONObject;
 
+import engine.AnarchyEngine;
 import engine.Game;
 import engine.InternalGameThread;
 import engine.application.impl.ClientApplication;
@@ -315,7 +316,7 @@ public class IdeLayout {
 			Runnable r = new Runnable() {
 				@Override
 				public void run() {
-					InternalGameThread.terminate();
+					AnarchyEngine.instance.terminate();
 				}
 			};
 			if ( Game.changes ) {

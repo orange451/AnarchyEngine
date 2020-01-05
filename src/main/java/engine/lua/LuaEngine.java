@@ -157,4 +157,8 @@ public class LuaEngine {
 			}
 		}
 	}
+
+	public static void cleanup() {
+		// TODO cleanup lua engine?
+	}
 }
