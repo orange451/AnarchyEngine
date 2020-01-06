@@ -81,7 +81,7 @@ public class Animation extends Instance implements TreeViewable {
 	 * @return
 	 */
 	public AnimationKeyframeSequence getNearestSequenceBefore(double time) {
-		double minTime = 0;
+		double minTime = -1;
 		AnimationKeyframeSequence ret = null;
 		
 		if ( children == null || children.size() == 0 )
@@ -131,5 +131,9 @@ public class Animation extends Instance implements TreeViewable {
 		}
 	
 		return ret;
+	}
+
+	public AnimationKeyframeSequence getFirstSequence() {
+		return this.getNearestSequenceAfter(0);
 	}
 }
