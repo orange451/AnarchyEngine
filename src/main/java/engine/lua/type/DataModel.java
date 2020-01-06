@@ -518,6 +518,9 @@ public abstract class DataModel extends LuaDatatype {
 	 * @return
 	 */
 	public LuaValue getClassName() {
+		if ( this.destroyed )
+			return LuaValue.NIL;
+		
 		return this.get(C_CLASSNAME);
 	}
 
@@ -527,6 +530,9 @@ public abstract class DataModel extends LuaDatatype {
 	 * @return
 	 */
 	public LuaValue getParent() {
+		if ( this.destroyed )
+			return LuaValue.NIL;
+		
 		return this.get(C_PARENT);
 	}
 	
