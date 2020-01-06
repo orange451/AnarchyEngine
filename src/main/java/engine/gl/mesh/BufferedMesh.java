@@ -383,6 +383,7 @@ public class BufferedMesh implements RenderableMesh {
 		COLOR4(3),
 		VERTEX2(4),
 		COLOR3(5),
+		TANGENT3(6),
 		;
 		
 		private byte index;
@@ -410,22 +411,20 @@ public class BufferedMesh implements RenderableMesh {
 	/**
 	 * Export a mesh to a given filepath.<br>
 	 * The format is simple:<br>
-	 * Header: 4-bytes (int) --> Amount vertices
+	 * Header: <br> 
+	 * 	Char[](4 bytes): MESH<br>
+	 * 	Char[](3 bytes): Version number<br>
+	 * 	Int(4 bytes): Amount Vertices<br>
 	 * <br>
-	 * Body: 48-bytes per vertex (12 ints per vertex) --> Vertex data
-	 * <br>
-	 * 	Int 1: --> Vertex x<br>
-	 * 	Int 2: --> Vertex y<br>
-	 * 	Int 3: --> Vertex z<br>
-	 * 	Int 4: --> Vertex normal x<br>
-	 * 	Int 5: --> Vertex normal y<br>
-	 * 	Int 6: --> Vertex normal z<br>
-	 * 	Int 7: --> Vertex UV s<br>
-	 * 	Int 8: --> Vertex UV t<br>
-	 * 	Int 9:  --> Vertex Color r<br>
-	 * 	Int 10: --> Vertex Color g<br>
-	 * 	Int 11: --> Vertex Color b<br>
-	 * 	Int 12: --> Vertex Color a<br>
+	 * Body(loop): Read byte --> Mesh Command<br>
+	 * 	255: New Vertex<br>
+	 * 	0: VERTEX3 --> Read 3 floats<br>
+	 * 	1: NORMAL3 --> Read 3 floats<br>
+	 * 	2: UV2 --> Read 2 floats<br>
+	 * 	3: COLOR4 --> Read 4 floats<br>
+	 * 	4: VERTEX2 --> Read 2 floats<br>
+	 * 	5: COLOR3 --> Read 3 floats<br>
+	 * 	6: TANGENT3 --> Read 3 floats<br>
 	 * @param mesh
 	 * @param filepath
 	 */
@@ -454,6 +453,10 @@ public class BufferedMesh implements RenderableMesh {
 				// Write vertex colors
 				bin.write(MeshFormat.COLOR4.getIndex());
 				bin.write(v.getRGBA());
+				
+				// Write vertex colors
+				bin.write(MeshFormat.TANGENT3.getIndex());
+				bin.write(v.getTangentXYZ());
 			}
 		}
 	}
@@ -546,6 +549,10 @@ public class BufferedMesh implements RenderableMesh {
 					// Read RGBA color
 					if ( readCommand == MeshFormat.COLOR4 )
 						vertex.setRGBA(bin.readFloat(), bin.readFloat(), bin.readFloat(), bin.readFloat());
+					
+					// Read TANGENT
+					if ( readCommand == MeshFormat.TANGENT3 )
+						vertex.setTangentXYZ(bin.readFloat(), bin.readFloat(), bin.readFloat());
 				}
 			} else {
 				// Reopen and read LEGACY format... THIS WILL BE REMOVED IN THE FUTURE
@@ -571,6 +578,10 @@ public class BufferedMesh implements RenderableMesh {
 					);
 					ret.setVertex(i, v);
 				}
+				
+				// Manually compute tangets!
+				// New Mesh format stores them, so use the new one pls!
+				ret.computeTangents();
 			}
 			
 			bin.close();
@@ -579,5 +590,41 @@ public class BufferedMesh implements RenderableMesh {
 		}
 		
 		return ret;
+	}
+
+	private void computeTangents() {
+		for (int i = 0; i < vertices.length; i+=3) {
+			Vertex v1 = vertices[i+0];
+			Vertex v2 = vertices[i+1];
+			Vertex v3 = vertices[i+2];
+			
+			float[] pos1 = v1.getXYZ();
+			float[] pos2 = v2.getXYZ();
+			float[] pos3 = v3.getXYZ();
+			
+			float[] uv1 = v1.getST();
+			float[] uv2 = v2.getST();
+			float[] uv3 = v3.getST();
+			
+	        float[] deltaPos1 = new float[] {pos2[0]-pos1[0], pos2[1]-pos1[1], pos2[2]-pos1[2]};
+	        float[] deltaPos2 = new float[] {pos3[0]-pos1[0], pos3[1]-pos1[1], pos3[2]-pos1[2]};
+
+	        // UV delta
+	        float[] deltaUV1 = new float[] {uv2[0]-uv1[0], uv2[1]-uv1[1], uv2[2]-uv1[2]};
+	        float[] deltaUV2 = new float[] {uv3[0]-uv1[0], uv3[1]-uv1[1], uv3[2]-uv1[2]};
+	        
+	        // Compute tangent
+	        float r = 1.0f / (deltaUV1[0] * deltaUV2[1] - deltaUV1[1] * deltaUV2[0]);
+	        float[] tangent = new float[] {
+	        		((deltaPos1[0] * deltaUV2[1]) - (deltaPos2[0] * deltaUV1[1]))*r,
+	        		((deltaPos1[1] * deltaUV2[1]) - (deltaPos2[1] * deltaUV1[1]))*r,
+	        		((deltaPos1[2] * deltaUV2[1]) - (deltaPos2[2] * deltaUV1[1]))*r
+	        };
+
+	        // Set tangent vector for triangle
+	        v1.setTangentXYZ(tangent[0], tangent[1], tangent[2]);
+	        v2.setTangentXYZ(tangent[0], tangent[1], tangent[2]);
+	        v3.setTangentXYZ(tangent[0], tangent[1], tangent[2]);
+		}
 	}
 }

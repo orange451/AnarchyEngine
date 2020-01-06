@@ -17,7 +17,8 @@ import org.joml.Vector3f;
 public class Vertex {
 	// Vertex data
 	private float[] v_xyz = new float[] {0f, 0f, 0f};
-	private float[] n_xyz = new float[] {1f, 1f, 1f};
+	private float[] n_xyz = new float[] {0f, 0f, 1f};
+	private float[] t_xyz = new float[] {0f, 0f, 0f};
 	private float[] rgba = new float[] {1f, 1f, 1f, 1f};
 	private float[] st = new float[] {0f, 0f};
 
@@ -27,12 +28,14 @@ public class Vertex {
 	// Elements per parameter
 	public static final int positionElementCount = 3;
 	public static final int normalElementCount = 3;
+	public static final int tangentElementCount = 3;
 	public static final int textureElementCount = 2;
 	public static final int colorElementCount = 4;
 
 	// Bytes per parameter
 	public static final int positionByteCount = positionElementCount * elementBytes;
 	public static final int normalByteCount = normalElementCount * elementBytes;
+	public static final int tangentByteCount = tangentElementCount * elementBytes;
 	public static final int textureByteCount = textureElementCount * elementBytes;
 	public static final int colorByteCount = colorElementCount * elementBytes;
 
@@ -43,19 +46,23 @@ public class Vertex {
 	public static final int colorByteOffset = textureByteOffset + textureByteCount;
 
 	// The amount of elements that a vertex has
-	public static final int elementCount = positionElementCount + normalElementCount + textureElementCount + colorElementCount; 
+	public static final int elementCount = positionElementCount + normalElementCount + tangentElementCount + textureElementCount + colorElementCount; 
 	// The size of a vertex in bytes, like in C/C++: sizeof(Vertex)
-	public static final int stride = positionByteCount + normalByteCount + textureByteCount + colorByteCount;
+	public static final int stride = positionByteCount + normalByteCount + tangentByteCount + textureByteCount + colorByteCount;
 
 	public Vertex() {
 		//
 	}
 	
-	public Vertex(float x, float y, float z, float nx, float ny, float nz, float s, float t, float r, float g, float b, float a) {
+	public Vertex(float x, float y, float z, float nx, float ny, float nz, float tx, float ty, float tz, float s, float t, float r, float g, float b, float a) {
 		setXYZ(x, y, z);
 		setNormalXYZ(nx, ny, nz);
 		setRGBA(r, g, b, a);
 		setST(s, t);
+	}
+	
+	public Vertex(float x, float y, float z, float nx, float ny, float nz, float s, float t, float r, float g, float b, float a) {
+		this(x, y, z, nx, ny, nz, 0, 0, 0, s, t, r, g, b, a);
 	}
 
 	public Vertex(float x, float y, float z, float nx, float ny, float nz, float s, float t) {
@@ -72,6 +79,11 @@ public class Vertex {
 	// Setters
 	public Vertex setXYZ(float x, float y, float z) {
 		this.v_xyz = new float[] { x, y, z};
+		return this;
+	}
+	
+	public Vertex setTangentXYZ(float x, float y, float z) {
+		this.t_xyz = new float[] {x, y, z};
 		return this;
 	}
 
@@ -102,6 +114,10 @@ public class Vertex {
 		out[i++] = this.n_xyz[0];
 		out[i++] = this.n_xyz[1];
 		out[i++] = this.n_xyz[2];
+		// Insert TANGENT elements
+		out[i++] = this.t_xyz[0];
+		out[i++] = this.t_xyz[1];
+		out[i++] = this.t_xyz[2];
 		// Insert ST elements
 		out[i++] = this.st[0];
 		out[i++] = this.st[1];
@@ -112,6 +128,10 @@ public class Vertex {
 		out[i++] = this.rgba[3];
 
 		return out;
+	}
+	
+	public float[] getTangentXYZ() {
+		return new float[] {this.t_xyz[0], this.t_xyz[1], this.t_xyz[2]};
 	}
 
 	public float[] ST() {

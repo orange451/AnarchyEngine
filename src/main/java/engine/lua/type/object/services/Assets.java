@@ -328,6 +328,7 @@ public class Assets extends Service implements TreeViewable {
 				// Get every face in mesh
 				org.lwjgl.assimp.AIVector3D.Buffer vertices = mesh.mVertices();
 				org.lwjgl.assimp.AIVector3D.Buffer normals = mesh.mNormals();
+				org.lwjgl.assimp.AIVector3D.Buffer tangents = mesh.mTangents();
 				org.lwjgl.assimp.AIFace.Buffer faces = mesh.mFaces();
 				for (int j = 0; j < mesh.mNumFaces(); j++) {
 					AIFace face = faces.get(j);
@@ -345,12 +346,17 @@ public class Assets extends Service implements TreeViewable {
 						// Vert Data
 						Vector2f textureCoords = new Vector2f();
 						Vector3f normalVector = new Vector3f();
+						Vector3f tangentVector = new Vector3f();
 	
 						// Get the vertex info for this index.
 						AIVector3D vertex = vertices.get(index);
 						if ( normals != null ) {
 							AIVector3D normal = normals.get(index);
 							normalVector.set(normal.x(),normal.y(),normal.z());
+						}
+						if ( tangents != null ) {
+							AIVector3D tangent = tangents.get(index);
+							tangentVector.set(tangent.x(), tangent.y(), tangent.z());
 						}
 						if ( mesh.mTextureCoords(0)!=null ) {
 							AIVector3D tex = mesh.mTextureCoords(0).get(index);
@@ -359,6 +365,7 @@ public class Assets extends Service implements TreeViewable {
 	
 						// Send vertex to output mesh
 						Vertex output = new Vertex( vertex.x()*scale, vertex.y()*scale, vertex.z()*scale, normalVector.x, normalVector.y, normalVector.z, textureCoords.x, textureCoords.y, 1, 1, 1, 1 );
+						output.setTangentXYZ(tangentVector.x, tangentVector.y, tangentVector.z);
 						bm.setVertex(vertCounter, output);
 						vertexMap.add(vertCounter);
 						vertCounter++;

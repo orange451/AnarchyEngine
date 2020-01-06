@@ -604,6 +604,7 @@ public class MeshUtils {
 			// Get every face in mesh
 			AIVector3D.Buffer vertices = mesh.mVertices();
 			AIVector3D.Buffer normals = mesh.mNormals();
+			AIVector3D.Buffer tangents = mesh.mTangents();
 			AIFace.Buffer faces = mesh.mFaces();
 			for (int j = 0; j < mesh.mNumFaces(); j++) {
 				AIFace face = faces.get(j);
@@ -615,12 +616,17 @@ public class MeshUtils {
 					// Vert Data
 					Vector2f textureCoords = new Vector2f();
 					Vector3f normalVector = new Vector3f();
+					Vector3f tangentVector = new Vector3f();
 
 					// Get the vertex info for this index.
 					AIVector3D vertex = vertices.get(index);
 					if ( normals != null ) {
 						AIVector3D normal = normals.get(index);
 						normalVector.set(normal.x(),normal.y(),normal.z());
+					}
+					if ( tangents != null ) {
+						AIVector3D tangent = tangents.get(index);
+						tangentVector.set(tangent.x(), tangent.y(), tangent.z());
 					}
 					if ( mesh.mTextureCoords(0)!=null ) {
 						AIVector3D tex = mesh.mTextureCoords(0).get(index);
@@ -629,6 +635,7 @@ public class MeshUtils {
 
 					// Send vertex to output mesh
 					Vertex output = new Vertex( vertex.x(), vertex.y(), vertex.z(), normalVector.x, normalVector.y, normalVector.z, textureCoords.x, textureCoords.y, 1, 1, 1, 1 );
+					output.setTangentXYZ(tangentVector.x, tangentVector.y, tangentVector.z);
 					bm.setVertex(vertCounter++, output);
 				}
 			}
