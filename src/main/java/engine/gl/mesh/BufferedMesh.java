@@ -280,13 +280,15 @@ public class BufferedMesh implements RenderableMesh {
 		glEnableVertexAttribArray(1);
 		glEnableVertexAttribArray(2);
 		glEnableVertexAttribArray(3);
+		glEnableVertexAttribArray(4);
 
 		// Define the attributes
 		boolean normalized = false;
 		glVertexAttribPointer(0, Vertex.positionElementCount, GL_FLOAT, normalized, Vertex.stride, Vertex.positionByteOffset);
 		glVertexAttribPointer(1, Vertex.normalElementCount, GL_FLOAT,  normalized, Vertex.stride, Vertex.normalByteOffset);
-		glVertexAttribPointer(2, Vertex.textureElementCount, GL_FLOAT,  normalized, Vertex.stride, Vertex.textureByteOffset);
-		glVertexAttribPointer(3, Vertex.colorElementCount, GL_FLOAT, normalized, Vertex.stride, Vertex.colorByteOffset);
+		glVertexAttribPointer(2, Vertex.tangentElementCount, GL_FLOAT,  normalized, Vertex.stride, Vertex.tangetByteOffset);
+		glVertexAttribPointer(3, Vertex.textureElementCount, GL_FLOAT,  normalized, Vertex.stride, Vertex.textureByteOffset);
+		glVertexAttribPointer(4, Vertex.colorElementCount, GL_FLOAT, normalized, Vertex.stride, Vertex.colorByteOffset);
 	}
 
 	/**
@@ -610,8 +612,8 @@ public class BufferedMesh implements RenderableMesh {
 	        float[] deltaPos2 = new float[] {pos3[0]-pos1[0], pos3[1]-pos1[1], pos3[2]-pos1[2]};
 
 	        // UV delta
-	        float[] deltaUV1 = new float[] {uv2[0]-uv1[0], uv2[1]-uv1[1], uv2[2]-uv1[2]};
-	        float[] deltaUV2 = new float[] {uv3[0]-uv1[0], uv3[1]-uv1[1], uv3[2]-uv1[2]};
+	        float[] deltaUV1 = new float[] {uv2[0]-uv1[0], uv2[1]-uv1[1]};
+	        float[] deltaUV2 = new float[] {uv3[0]-uv1[0], uv3[1]-uv1[1]};
 	        
 	        // Compute tangent
 	        float r = 1.0f / (deltaUV1[0] * deltaUV2[1] - deltaUV1[1] * deltaUV2[0]);

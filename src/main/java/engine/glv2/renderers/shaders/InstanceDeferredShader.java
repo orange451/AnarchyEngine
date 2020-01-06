@@ -54,8 +54,8 @@ public class InstanceDeferredShader extends ShaderProgram {
 	protected void setupShader() {
 		super.addShader(new Shader("assets/shaders/renderers/InstanceDeferred.vs", GL_VERTEX_SHADER));
 		super.addShader(new Shader("assets/shaders/renderers/InstanceDeferred.fs", GL_FRAGMENT_SHADER));
-		super.setAttributes(new Attribute(0, "position"), new Attribute(1, "normals"),
-				new Attribute(2, "textureCoords"), new Attribute(3, "inColor"));
+		super.setAttributes(new Attribute(0, "position"), new Attribute(1, "normals"), new Attribute(2, "tangent"),
+				new Attribute(3, "textureCoords"), new Attribute(4, "inColor"));
 		super.storeUniforms(transformationMatrix, material, projectionMatrix, viewMatrix, jitterMatrix, useTAA,
 				transformationMatrixPrev, viewMatrixPrev, projectionMatrixPrev);
 	}

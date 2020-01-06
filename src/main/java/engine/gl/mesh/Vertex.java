@@ -42,7 +42,8 @@ public class Vertex {
 	// Byte offsets per parameter
 	public static final int positionByteOffset = 0;
 	public static final int normalByteOffset = positionByteOffset + positionByteCount;
-	public static final int textureByteOffset = normalByteOffset + normalByteCount;
+	public static final int tangetByteOffset = normalByteOffset + tangentByteCount;
+	public static final int textureByteOffset = tangetByteOffset + normalByteCount;
 	public static final int colorByteOffset = textureByteOffset + textureByteCount;
 
 	// The amount of elements that a vertex has
