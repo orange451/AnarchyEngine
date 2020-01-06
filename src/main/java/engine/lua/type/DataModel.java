@@ -544,6 +544,9 @@ public abstract class DataModel extends LuaDatatype {
 		if ( parent == this.getParent() )
 			return;
 		
+		if ( destroyed )
+			return;
+		
 		this.set(C_PARENT, parent);
 	}
 	

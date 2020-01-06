@@ -434,19 +434,20 @@ public class Game implements Tickable {
 		if ( !isLoaded() )
 			return;
 		
-		if ( Game.workspace() == null )
+		Workspace workspace = Game.workspace();
+		if ( workspace == null )
 			return;
 
-		LuaEngine.globals.set(C_WORKSPACE, Game.workspace());
+		LuaEngine.globals.set(C_WORKSPACE, workspace);
 
 		// Make sure there's a camera
-		if ( Game.workspace().getCurrentCamera() == null ) {
+		if ( workspace.getCurrentCamera() == null ) {
 			ticksNoCamera++;
 			if ( ticksNoCamera > 2 ) {
 				Camera c = new Camera();
 				c.setArchivable(false);
-				c.forceSetParent(Game.workspace());
-				Game.workspace().setCurrentCamera(c);
+				c.forceSetParent(workspace);
+				workspace.setCurrentCamera(c);
 				ticksNoCamera = 0;
 			}
 		} else {

@@ -173,7 +173,7 @@ public class Workspace extends Service implements RenderableWorld,TreeViewable,T
 	}
 	
 	public void setCurrentCamera(Camera camera) {
-		if ( camera == null || camera.isnil() )
+		if ( camera == null || camera.isnil() || camera.isDestroyed() )
 			return;
 		
 		camera.setParent(this);
