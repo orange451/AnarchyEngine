@@ -129,6 +129,7 @@ public class AnimatedModelSubMesh {
 		glEnableVertexAttribArray(3);
 		glEnableVertexAttribArray(4);
 		glEnableVertexAttribArray(5);
+		glEnableVertexAttribArray(6);
 		
 		int offset1 = Vertex.colorByteOffset + Vertex.colorByteCount;
 		int offset2 = offset1 + weightBoneIndicesByteCount;
@@ -137,10 +138,10 @@ public class AnimatedModelSubMesh {
 		GL20.glVertexAttribPointer(0, Vertex.positionElementCount,   GL11.GL_FLOAT, normalized, stride, Vertex.positionByteOffset);
 		GL20.glVertexAttribPointer(1, Vertex.normalElementCount,     GL11.GL_FLOAT, normalized, stride, Vertex.normalByteOffset);
 		GL20.glVertexAttribPointer(2, Vertex.tangentElementCount,    GL11.GL_FLOAT, normalized, stride, Vertex.tangentByteCount);
-		GL20.glVertexAttribPointer(2, Vertex.textureElementCount,    GL11.GL_FLOAT, normalized, stride, Vertex.textureByteOffset);
-		GL20.glVertexAttribPointer(3, Vertex.colorElementCount,      GL11.GL_FLOAT, normalized, stride, Vertex.colorByteOffset);
-		GL20.glVertexAttribPointer(4, weightBoneIndicesElementCount, GL11.GL_FLOAT, normalized, stride, offset1);
-		GL20.glVertexAttribPointer(5, weightBoneWeightElementCount,  GL11.GL_FLOAT, normalized, stride, offset2);
+		GL20.glVertexAttribPointer(3, Vertex.textureElementCount,    GL11.GL_FLOAT, normalized, stride, Vertex.textureByteOffset);
+		GL20.glVertexAttribPointer(4, Vertex.colorElementCount,      GL11.GL_FLOAT, normalized, stride, Vertex.colorByteOffset);
+		GL20.glVertexAttribPointer(5, weightBoneIndicesElementCount, GL11.GL_FLOAT, normalized, stride, offset1);
+		GL20.glVertexAttribPointer(6, weightBoneWeightElementCount,  GL11.GL_FLOAT, normalized, stride, offset2);
 	}
 	
 	private float[] getElements(int vertex) {
