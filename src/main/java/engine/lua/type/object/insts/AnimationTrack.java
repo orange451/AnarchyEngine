@@ -75,8 +75,13 @@ public class AnimationTrack extends Instance {
 		
 		// Handle animation looping
 		if ( this.getTimePosition() > this.getLength() ) {
-			this.forceset(C_TIMEPOSITION, LuaValue.valueOf(0));
-			update(0);
+			AnimationKeyframeSequence temp = this.getAnimation().getFirstSequence();
+			if ( temp != null ) {
+				this.setCurrentKeyframe(temp);
+			} else {
+				this.forceset(C_TIMEPOSITION, LuaValue.valueOf(0));
+				update(0);
+			}
 		}
 	}
 	
@@ -124,8 +129,10 @@ public class AnimationTrack extends Instance {
 	public void setCurrentKeyframe(AnimationKeyframeSequence frame) {
 		if ( frame == null )
 			this.rawset(C_CURRENTKEYFRAME, LuaValue.NIL);
-		else
+		else {
 			this.rawset(C_CURRENTKEYFRAME, frame);
+			this.rawset(C_TIMEPOSITION, LuaValue.valueOf(frame.getTime()));
+		}
 	}
 	
 	public AnimationKeyframeSequence getNextKeyframe() {
