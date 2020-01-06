@@ -70,15 +70,12 @@ void main() {
 	roughness *= material.roughness;
 	metallic *= material.metallic;
 
-	// if (diffuseF.a == 0.0)
-	//	discard;
+	if (transparency == 0.0)
+		discard;
 
-	vec3 norm = texture(material.normalTex, pass_textureCoords).rgb;
-	vec3 map = vec3(norm.x, norm.y, 1.0);
-	map = map * -2.0 + 1.0;
-	map.z = sqrt(1.0 - dot(map.xx, map.yy));
-	map.y = map.y;
-	vec3 normal = normalize(TBN * map);
+	vec3 normal = texture(material.normalTex, pass_textureCoords).rgb;
+	normal = normalize(normal * 2.0 - 1.0);
+	normal = normalize(TBN * normal);
 
 	vec3 position = pass_position.xyz;
 

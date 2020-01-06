@@ -26,9 +26,9 @@ public class AnimInstanceDeferredShader extends InstanceDeferredShader {
 	protected void setupShader() {
 		super.setupShader();
 		super.addShader(new Shader("assets/shaders/renderers/AnimInstanceDeferred.vs", GL_VERTEX_SHADER));
-		super.setAttributes(new Attribute(0, "position"), new Attribute(1, "normals"),
-				new Attribute(2, "textureCoords"), new Attribute(3, "inColor"), new Attribute(4, "boneIndices"),
-				new Attribute(5, "boneWeights"));
+		super.setAttributes(new Attribute(0, "position"), new Attribute(1, "normals"), new Attribute(2, "tangent"),
+				new Attribute(3, "textureCoords"), new Attribute(4, "inColor"), new Attribute(5, "boneIndices"),
+				new Attribute(6, "boneWeights"));
 		super.storeUniforms(boneMat, boneMatPrev);
 	}
 

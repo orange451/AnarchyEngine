@@ -137,7 +137,7 @@ public class AnimatedModelSubMesh {
 		boolean normalized = false;
 		GL20.glVertexAttribPointer(0, Vertex.positionElementCount,   GL11.GL_FLOAT, normalized, stride, Vertex.positionByteOffset);
 		GL20.glVertexAttribPointer(1, Vertex.normalElementCount,     GL11.GL_FLOAT, normalized, stride, Vertex.normalByteOffset);
-		GL20.glVertexAttribPointer(2, Vertex.tangentElementCount,    GL11.GL_FLOAT, normalized, stride, Vertex.tangentByteCount);
+		GL20.glVertexAttribPointer(2, Vertex.tangentElementCount,    GL11.GL_FLOAT, normalized, stride, Vertex.tangetByteOffset);
 		GL20.glVertexAttribPointer(3, Vertex.textureElementCount,    GL11.GL_FLOAT, normalized, stride, Vertex.textureByteOffset);
 		GL20.glVertexAttribPointer(4, Vertex.colorElementCount,      GL11.GL_FLOAT, normalized, stride, Vertex.colorByteOffset);
 		GL20.glVertexAttribPointer(5, weightBoneIndicesElementCount, GL11.GL_FLOAT, normalized, stride, offset1);
