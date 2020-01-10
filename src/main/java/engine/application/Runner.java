@@ -42,7 +42,7 @@ public abstract class Runner extends AnarchyEngineClient {
 		shader = new GenericShader();
 		
 		// Enable LWJGUI on this window (used for UI drawing)
-		Window win = LWJGUI.initialize(window, true);
+		Window win = LWJGUI.initialize(window);
 		win.setWindowAutoDraw(false); // To make it so we control swapbuffers
 		win.setWindowAutoClear(false); // To make it so we control glClear()
 		

@@ -40,7 +40,7 @@ public class IDE extends AnarchyEngineClient {
 		GLFW.glfwSetWindowTitle(window, TITLE);
 		
 		// Setup LWJGUI
-		win = LWJGUI.initialize(window, true);
+		win = LWJGUI.initialize(window);
 		win.setWindowAutoDraw(false); // We want to draw the main IDE window manually
 		win.setWindowAutoClear(false); // We want control of clearing
 		
