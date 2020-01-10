@@ -38,8 +38,7 @@ import lwjgui.theme.Theme;
 public class InsertWindow {
 	
 	public InsertWindow() {
-		long handle = LWJGUIUtil.createOpenGLCoreWindow("Insert Object: " + InsertWindow.this.getParent().getFullName(), 2, 2, false, true);
-		Window window = LWJGUI.initialize(handle);
+		Window window = LWJGUI.initialize();
 		
 		StackPane root = new StackPane();
 		root.setBackgroundLegacy(Theme.current().getControl());
@@ -115,6 +114,7 @@ public class InsertWindow {
 			}
 		}
 		
+		window.setTitle("Insert Object: " + InsertWindow.this.getParent().getFullName());
 		window.setScene(new Scene( root, 300, 250 ));
 		window.show();
 	}

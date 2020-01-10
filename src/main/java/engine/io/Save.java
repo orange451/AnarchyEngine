@@ -60,16 +60,12 @@ public class Save {
 	private static HashMap<Instance, SavedInstance> instanceMap;
 
 	public static void requestSave(Runnable after) {
-		long win = LWJGUIUtil.createOpenGLCoreWindow("Save Dialog", 300, 100, false, true);
-		Window window = LWJGUI.initialize(win);
+		//long win = LWJGUIUtil.createOpenGLCoreWindow("Save Dialog", 300, 100, false, true);
+		Window window = LWJGUI.initialize();
 		window.setCanUserClose(false);
-		window.show();
-
-		Scene scene = window.getScene();
 
 		// Create root pane
 		BorderPane root = new BorderPane();
-		scene.setRoot(root);
 
 		// Create a label
 		Label l = new Label("Unsaved changes. Would you like to save?");
@@ -92,7 +88,7 @@ public class Save {
 		Button b = new Button("Yes");
 		b.setMinWidth(64);
 		b.setOnAction(event -> {
-			GLFW.glfwSetWindowShouldClose(win, true);
+			window.close();
 			if ( save() ) {
 				InternalRenderThread.runLater(()->{
 					after.run();
@@ -105,7 +101,7 @@ public class Save {
 		Button b2 = new Button("No");
 		b2.setMinWidth(64);
 		b2.setOnAction(event -> {
-			GLFW.glfwSetWindowShouldClose(win, true);
+			window.close();
 			InternalRenderThread.runLater(()->{
 				after.run();
 			});
@@ -116,9 +112,13 @@ public class Save {
 		Button b3 = new Button("Cancel");
 		b3.setMinWidth(64);
 		b3.setOnAction(event -> {
-			GLFW.glfwSetWindowShouldClose(win, true);
+			window.close();
 		});
 		t.getChildren().add(b3);
+		
+		// Show window
+		window.setScene(new Scene(root, 300, 100));
+		window.show();
 	}
 	
 	public static boolean save() {
