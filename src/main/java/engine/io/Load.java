@@ -28,7 +28,7 @@ import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.jse.CoerceJavaToLua;
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.glfw.GLFW;
-import org.lwjgl.system.MemoryUtil;
+import org.lwjgl.system.MemoryStack;
 import org.lwjgl.util.nfd.NativeFileDialog;
 
 import engine.Game;
@@ -43,7 +43,8 @@ public class Load {
 	
 	public static void load() {
 		String path = "";
-		PointerBuffer outPath = MemoryUtil.memAllocPointer(1);
+		MemoryStack.stackPush();
+		PointerBuffer outPath = MemoryStack.stackMallocPointer(1);
 		File f1 = new File("");
 		File f2 = new File("Projects");
 		int result = NativeFileDialog.NFD_OpenDialog("json", (f2 == null ? f1 : f2).getAbsolutePath(), outPath);
@@ -52,6 +53,7 @@ public class Load {
 		} else {
 			return;
 		}
+		MemoryStack.stackPop();
 		
 		// Load the desired path
 		load(path);
