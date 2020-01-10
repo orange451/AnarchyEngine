@@ -27,7 +27,7 @@ import org.json.simple.JSONObject;
 import org.luaj.vm2.LuaValue;
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.glfw.GLFW;
-import org.lwjgl.system.MemoryUtil;
+import org.lwjgl.system.MemoryStack;
 import org.lwjgl.util.nfd.NativeFileDialog;
 
 import engine.FilePath;
@@ -145,13 +145,15 @@ public class Save {
 			String newPath;
 			
 			// Get path
-			PointerBuffer outPath = MemoryUtil.memAllocPointer(1);
+			MemoryStack.stackPush();
+			PointerBuffer outPath = MemoryStack.stackMallocPointer(1);
 			int result = NativeFileDialog.NFD_SaveDialog("json", projects.getAbsolutePath(), outPath);
 			if ( result == NativeFileDialog.NFD_OKAY ) {
 				newPath = outPath.getStringUTF8(0);
 			} else {
 				return false;
 			}
+			MemoryStack.stackPop();
 			
 			// Make sure path filetype is .json
 			if ( !newPath.endsWith(".json") ) {
