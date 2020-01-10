@@ -145,15 +145,15 @@ public class Save {
 			String newPath;
 			
 			// Get path
-			MemoryStack.stackPush();
-			PointerBuffer outPath = MemoryStack.stackMallocPointer(1);
+			MemoryStack stack = MemoryStack.stackPush();
+			PointerBuffer outPath = stack.mallocPointer(1);
 			int result = NativeFileDialog.NFD_SaveDialog("json", projects.getAbsolutePath(), outPath);
 			if ( result == NativeFileDialog.NFD_OKAY ) {
 				newPath = outPath.getStringUTF8(0);
 			} else {
 				return false;
 			}
-			MemoryStack.stackPop();
+			stack.pop();
 			
 			// Make sure path filetype is .json
 			if ( !newPath.endsWith(".json") ) {

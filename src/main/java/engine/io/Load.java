@@ -43,8 +43,8 @@ public class Load {
 	
 	public static void load() {
 		String path = "";
-		MemoryStack.stackPush();
-		PointerBuffer outPath = MemoryStack.stackMallocPointer(1);
+		MemoryStack stack = MemoryStack.stackPush();
+		PointerBuffer outPath = stack.mallocPointer(1);
 		File f1 = new File("");
 		File f2 = new File("Projects");
 		int result = NativeFileDialog.NFD_OpenDialog("json", (f2 == null ? f1 : f2).getAbsolutePath(), outPath);
@@ -53,7 +53,7 @@ public class Load {
 		} else {
 			return;
 		}
-		MemoryStack.stackPop();
+		stack.pop();
 		
 		// Load the desired path
 		load(path);

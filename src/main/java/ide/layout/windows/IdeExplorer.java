@@ -54,7 +54,6 @@ import engine.lua.type.object.insts.Vector2Value;
 import engine.lua.type.object.insts.Vector3Value;
 import engine.lua.type.object.services.RenderSettings;
 import engine.lua.type.object.services.StarterPlayerScripts;
-import engine.tasks.TaskManager;
 import ide.IDE;
 import ide.layout.IdePane;
 import ide.layout.windows.icons.Icons;
@@ -155,12 +154,12 @@ public class IdeExplorer extends IdePane {
 		
 		// Game reset
 		Game.resetEvent().connect((args) -> {
-			TaskManager.addTaskRenderThread(() ->rebuild());
+			rebuild();
 		});
 		
 		// First (initial) load
 		InternalGameThread.runLater(() -> {
-			TaskManager.addTaskRenderThread(() ->rebuild());
+			rebuild();
 		});
 		
 		// Selection change
