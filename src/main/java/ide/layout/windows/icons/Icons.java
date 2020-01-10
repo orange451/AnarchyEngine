@@ -68,28 +68,28 @@ public class Icons {
 	public static final Icons icon_redo = new Icons("Redo.png");
 	public static final Icons icon_value = new Icons("Value2.png");
 	
-	private final Image image;
+	private final String image;
 	
 	public Icons(String path) {
-		image = new Image("ide/layout/windows/icons/" + path);
+		image = "ide/layout/windows/icons/" + path;
 	}
 	
-	public Image getImage() {
+	public String getImage() {
 		return image;
 	}
 	
 	public ImageView getView() {
-		ImageView iconView = new ImageView(image);
+		ImageView iconView = new ImageView(new Image(image));
 		iconView.setPrefSize(16, 16);
 		return iconView;
 	}
 	
 	public ImageView getViewWithIcon(Icons icon) {
-		ImageView t = new ImageView(image) {
+		ImageView t = new ImageView(new Image(image)) {
 			private ImageView internalIcon;
 			
 			{
-				this.internalIcon = new ImageView(icon.getImage());
+				this.internalIcon = new ImageView(new Image(icon.getImage()));
 				this.internalIcon.setPrefSize(16, 16);
 			}
 			

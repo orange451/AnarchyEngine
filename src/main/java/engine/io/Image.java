@@ -144,6 +144,7 @@ public class Image {
 		data.flip();
 
 		this.setData( data );
+		memFree(data);
 	}
 
 	public void resize(int width, int height) {

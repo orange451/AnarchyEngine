@@ -118,7 +118,7 @@ public class IDE extends AnarchyEngineClient {
 		// Render UI:
 		//   (final 3d scene gets rendered as a component)
 		//   (3d scene is attached to render thread)
-		LWJGUI.render();
+		LWJGUI.render(false);
 	}
 
 	@Override

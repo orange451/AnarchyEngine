@@ -267,7 +267,6 @@ public class MeshUtils {
 			mesh.setVertex( pointer++, tris[1].getVertex(1) );
 			mesh.setVertex( pointer++, tris[1].getVertex(2) );
 		}
-
 		// Create tops
 		if ( closed ) {
 			OFFSET.z -= height/2f;
@@ -307,7 +306,6 @@ public class MeshUtils {
 			temp.setVertex(a++, t2);
 			temp.setVertex(a++, t3);
 		}
-		
 		temp.clip();
 		
 		return temp;
@@ -422,7 +420,6 @@ public class MeshUtils {
 		mesh.setVertex(3, new Vertex( x2, y2, 0, 0, 0, 1,  tx2, ty2 ));
 		mesh.setVertex(4, new Vertex( x1, y2, 0, 0, 0, 1,  tx1, ty2 ));
 		mesh.setVertex(5, new Vertex( x1, y1, 0, 0, 0, 1,  tx1, ty1 ));
-
 		return mesh;
 	}
 
@@ -457,7 +454,6 @@ public class MeshUtils {
 		mesh.setVertex(3, new Vertex( x2, y2, z2, 0, 0, 1,  hrep, vrep ));
 		mesh.setVertex(4, new Vertex( x1, y2, z2, 0, 0, 1,  0,    vrep ));
 		mesh.setVertex(5, new Vertex( x1, y1, z1, 0, 0, 1,  0,    0 ));
-
 		return mesh;
 	}
 

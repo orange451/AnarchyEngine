@@ -35,7 +35,7 @@ public class Resources {
 
 	public static AIPropertyStore propertyStore;
 
-	public static void initialize() {
+	public static void init() {
 		TEXTURE_WHITE_SRGB = TextureUtils.loadSRGBTextureFromImage(new Image(Color.WHITE, 1, 1));
 		TEXTURE_BLACK_SRGB = TextureUtils.loadSRGBTextureFromImage(new Image(Color.BLACK, 1, 1));
 		TEXTURE_WHITE_RGBA = TextureUtils.loadRGBATextureFromImage(new Image(Color.WHITE, 1, 1));
@@ -53,5 +53,13 @@ public class Resources {
 
 		propertyStore = aiCreatePropertyStore();
 		aiSetImportPropertyFloat(propertyStore, AI_CONFIG_PP_CT_MAX_SMOOTHING_ANGLE, 30f);
+	}
+	
+	public static void dispose() {
+		TEXTURE_WHITE_SRGB.delete();
+		TEXTURE_BLACK_SRGB.delete();
+		TEXTURE_WHITE_RGBA.delete();
+		TEXTURE_NORMAL_RGBA.delete();
+		TEXTURE_DEBUG.delete();
 	}
 }

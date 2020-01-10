@@ -36,13 +36,13 @@ import engine.lua.type.object.insts.BoolValue;
 import engine.lua.type.object.insts.Camera;
 import engine.lua.type.object.insts.Color3Value;
 import engine.lua.type.object.insts.DirectionalLight;
-import engine.lua.type.object.insts.NumberValue;
 import engine.lua.type.object.insts.Folder;
 import engine.lua.type.object.insts.GameObject;
 import engine.lua.type.object.insts.GlobalScript;
 import engine.lua.type.object.insts.IntValue;
 import engine.lua.type.object.insts.LocalScript;
 import engine.lua.type.object.insts.Matrix4Value;
+import engine.lua.type.object.insts.NumberValue;
 import engine.lua.type.object.insts.ObjectValue;
 import engine.lua.type.object.insts.PhysicsObject;
 import engine.lua.type.object.insts.PlayerPhysics;
@@ -54,6 +54,7 @@ import engine.lua.type.object.insts.Vector2Value;
 import engine.lua.type.object.insts.Vector3Value;
 import engine.lua.type.object.services.RenderSettings;
 import engine.lua.type.object.services.StarterPlayerScripts;
+import engine.tasks.TaskManager;
 import ide.IDE;
 import ide.layout.IdePane;
 import ide.layout.windows.icons.Icons;
@@ -153,13 +154,13 @@ public class IdeExplorer extends IdePane {
 		});
 		
 		// Game reset
-		Game.resetEvent().connect((args)-> {
-			rebuild();
+		Game.resetEvent().connect((args) -> {
+			TaskManager.addTaskRenderThread(() ->rebuild());
 		});
 		
 		// First (initial) load
-		InternalGameThread.runLater(()->{
-			rebuild();
+		InternalGameThread.runLater(() -> {
+			TaskManager.addTaskRenderThread(() ->rebuild());
 		});
 		
 		// Selection change

@@ -96,7 +96,7 @@ public class IdeLayout {
 		
 		// Dock south
 		south.dock(new IdeConsole());
-		south.dock(new IdeMaterialViewer());
+		//south.dock(new IdeMaterialViewer());
 		
 		LWJGUI.runLater(() -> {
 			south.select(south.getTabs().get(0));

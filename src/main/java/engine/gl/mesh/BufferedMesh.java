@@ -622,7 +622,13 @@ public class BufferedMesh implements RenderableMesh {
 	        		((deltaPos1[1] * deltaUV2[1]) - (deltaPos2[1] * deltaUV1[1]))*r,
 	        		((deltaPos1[2] * deltaUV2[1]) - (deltaPos2[2] * deltaUV1[1]))*r
 	        };
-
+	        
+	        float[] bitangent = new float[] {
+	        		((deltaPos1[0] * -deltaUV2[0]) - (deltaPos2[0] * deltaUV1[0]))*r,
+	        		((deltaPos1[1] * -deltaUV2[0]) - (deltaPos2[1] * deltaUV1[0]))*r,
+	        		((deltaPos1[2] * -deltaUV2[0]) - (deltaPos2[2] * deltaUV1[0]))*r
+	        };
+	        
 	        // Set tangent vector for triangle
 	        v1.setTangentXYZ(tangent[0], tangent[1], tangent[2]);
 	        v2.setTangentXYZ(tangent[0], tangent[1], tangent[2]);

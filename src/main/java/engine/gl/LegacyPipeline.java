@@ -538,4 +538,16 @@ public class LegacyPipeline implements IPipeline {
 	public boolean isInitialized() {
 		return this.initialized;
 	}
+
+	@Override
+	public void init() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void dispose() {
+		// TODO Auto-generated method stub
+		
+	}
 }

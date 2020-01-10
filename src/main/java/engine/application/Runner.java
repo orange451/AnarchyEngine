@@ -102,7 +102,7 @@ public abstract class Runner extends AnarchyEngineClient {
 		// Draw pipeline's buffer to screen
 		pipeline.getPipelineBuffer().render(shader, true);
 
-		LWJGUI.render(); // Gets directly rendered on-top of buffer (in same FBO)
+		LWJGUI.render(false); // Gets directly rendered on-top of buffer (in same FBO)
 	}
 	
 	public abstract void loadScene(String[] args);

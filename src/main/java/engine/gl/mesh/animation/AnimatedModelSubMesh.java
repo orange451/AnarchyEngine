@@ -21,10 +21,10 @@ import static org.lwjgl.opengl.GL30.glGenVertexArrays;
 import java.nio.FloatBuffer;
 
 import org.joml.Vector4f;
-import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL15;
 import org.lwjgl.opengl.GL20;
+import org.lwjgl.system.MemoryUtil;
 
 import engine.gl.mesh.BufferedMesh;
 import engine.gl.mesh.Vertex;
@@ -33,7 +33,6 @@ public class AnimatedModelSubMesh {
 	private Vertex[] vertices;
 	private Vector4f[] weightBoneIndices;
 	private Vector4f[] weightBoneWeights;
-	private FloatBuffer verticesBuffer;
 	private boolean modified;
 	private int vaoId = -1;
 	private int vboId = -1;
@@ -88,17 +87,13 @@ public class AnimatedModelSubMesh {
 
 	private void sendToGPU() {
 		// Create new vertex buffer
-		if (this.verticesBuffer == null) {
-			this.verticesBuffer = BufferUtils.createFloatBuffer(vertices.length * elementCount);
-		} else {
-			this.verticesBuffer.clear();
-		}
+		FloatBuffer verticesBuffer = MemoryUtil.memAllocFloat(vertices.length * elementCount);
 		
 		// Fill vertex buffer
 		for (int i = 0; i < vertices.length; i++) {
-			this.verticesBuffer.put(this.getElements(i));
+			verticesBuffer.put(this.getElements(i));
 		}
-		this.verticesBuffer.flip();
+		verticesBuffer.flip();
 		
 		// Generate a new VBO id
 		if (vboId == -1)
@@ -118,6 +113,8 @@ public class AnimatedModelSubMesh {
 		// Unbind Model
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 		glBindVertexArray(0);
+		
+		MemoryUtil.memAddress(verticesBuffer);
 		
 		modified = false;
 	}

@@ -143,46 +143,46 @@ public class GLRenderer implements IPipeline {
 			}
 		});
 
+	}
+
+	@Override
+	public void init() {
 		try {
-			init();
+			width = AnarchyEngineClient.windowWidth;
+			height = AnarchyEngineClient.windowHeight;
+
+			renderingManager = new RenderingManager();
+
+			envRenderer = new EnvironmentRenderer(64, false);
+			envRendererEntities = new EnvironmentRenderer(128, true);
+			irradianceCapture = new IrradianceCapture();
+			rnd.irradianceCapture = irradianceCapture.getCubeTexture();
+			preFilteredEnvironment = new PreFilteredEnvironment();
+			rnd.brdfLUT = preFilteredEnvironment.getBRDFLUT();
+			rnd.environmentMap = preFilteredEnvironment.getTexture();
+			skyRenderer = new SkyRenderer(loader);
+			renderingManager.addRenderer(new InstanceRenderer());
+			renderingManager.addRenderer(new AnimInstanceRenderer());
+			handlesRenderer = new HandlesRenderer();
+			dp = new MultiPass(width, height);
+			pp = new PostProcess(width, height);
+			projMatrix = Maths.createProjectionMatrix(width, height, 90, 0.1f, Float.POSITIVE_INFINITY, true);
+
+			rnd.exposure = Game.lighting().getExposure();
+			directionalLightHandler = new DirectionalLightHandler(width, height);
+			pointLightHandler = new PointLightHandler(width, height);
+			spotLightHandler = new SpotLightHandler(width, height);
+			rnd.plh = pointLightHandler;
+			rnd.dlh = directionalLightHandler;
+			rnd.slh = spotLightHandler;
+			rnd.rs = renderingSettings;
+			size.set(width, height);
+			enabled = true;
 			initialized = true;
 		} catch (Exception e) {
 			e.printStackTrace();
 			new ErrorWindow("Error initializing renderer", true);
 		}
-	}
-
-	public void init() {
-		width = AnarchyEngineClient.windowWidth;
-		height = AnarchyEngineClient.windowHeight;
-
-		renderingManager = new RenderingManager();
-
-		envRenderer = new EnvironmentRenderer(64, false);
-		envRendererEntities = new EnvironmentRenderer(128, true);
-		irradianceCapture = new IrradianceCapture();
-		rnd.irradianceCapture = irradianceCapture.getCubeTexture();
-		preFilteredEnvironment = new PreFilteredEnvironment();
-		rnd.brdfLUT = preFilteredEnvironment.getBRDFLUT();
-		rnd.environmentMap = preFilteredEnvironment.getTexture();
-		skyRenderer = new SkyRenderer(loader);
-		renderingManager.addRenderer(new InstanceRenderer());
-		renderingManager.addRenderer(new AnimInstanceRenderer());
-		handlesRenderer = new HandlesRenderer();
-		dp = new MultiPass(width, height);
-		pp = new PostProcess(width, height);
-		projMatrix = Maths.createProjectionMatrix(width, height, 90, 0.1f, Float.POSITIVE_INFINITY, true);
-
-		rnd.exposure = Game.lighting().getExposure();
-		directionalLightHandler = new DirectionalLightHandler(width, height);
-		pointLightHandler = new PointLightHandler(width, height);
-		spotLightHandler = new SpotLightHandler(width, height);
-		rnd.plh = pointLightHandler;
-		rnd.dlh = directionalLightHandler;
-		rnd.slh = spotLightHandler;
-		rnd.rs = renderingSettings;
-		size.set(width, height);
-		enabled = true;
 	}
 
 	private void shadowPass() {
@@ -402,6 +402,7 @@ public class GLRenderer implements IPipeline {
 		spotLightHandler.resize(width, height);
 	}
 
+	@Override
 	public void dispose() {
 		envRenderer.dispose();
 		envRendererEntities.dispose();

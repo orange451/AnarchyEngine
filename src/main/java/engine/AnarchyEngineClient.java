@@ -59,6 +59,7 @@ import engine.observer.Renderable;
 import engine.tasks.TaskManager;
 import engine.util.GLCompat;
 import ide.layout.windows.ErrorWindow;
+import lwjgui.LWJGUI;
 
 public abstract class AnarchyEngineClient extends AnarchyEngine implements Renderable,InternalRenderable {
 	public static long window = -1;
@@ -237,7 +238,6 @@ public abstract class AnarchyEngineClient extends AnarchyEngine implements Rende
 		// Start thread
 		try {
 			GLFW_INITIALIZED = true;
-			Resources.initialize();
 			initialize(args);
 			initialized = true;
 		} catch(Exception e) {
@@ -245,7 +245,12 @@ public abstract class AnarchyEngineClient extends AnarchyEngine implements Rende
 			new ErrorWindow("Error initializing engine.", true);
 			return;
 		}
+		Resources.init();
+		pipeline.init();
 		renderThread.run();
+		pipeline.dispose();
+		Resources.dispose();
+		LWJGUI.dispose();
 
 		GL.setCapabilities(null);
 		glfwMakeContextCurrent(NULL);

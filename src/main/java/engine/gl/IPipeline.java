@@ -47,4 +47,8 @@ public interface IPipeline extends Renderable {
 	public RenderingSettings getRenderSettings();
 
 	public boolean isInitialized();
+
+	public void init();
+
+	public void dispose();
 }

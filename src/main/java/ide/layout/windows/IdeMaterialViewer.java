@@ -60,7 +60,6 @@ public class IdeMaterialViewer extends IdePane {
 		Game.loadEvent().connect((args)->{
 			//init();
 		});
-		init();
 		
 		// Increase allowence
 		AnarchyEngineClient.renderThread.attach(()->{
@@ -81,7 +80,9 @@ public class IdeMaterialViewer extends IdePane {
 		materialBox.setPrefHeight(scrollPane.getViewportHeight());
 	}
 	
-	private void init() {
+	@Override
+	public void init() {
+		super.init();
 		if ( materialBox != null ) {
 			materialBox.getItems().clear();
 			materialToNodeMap.clear();
