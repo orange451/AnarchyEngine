@@ -14,6 +14,8 @@ import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.TwoArgFunction;
 import org.lwjgl.glfw.GLFW;
 
+import lwjgui.geometry.Pos;
+
 public class Enums extends TwoArgFunction {
 
 	public LuaValue call(LuaValue modname, LuaValue env) {
@@ -50,6 +52,21 @@ public class Enums extends TwoArgFunction {
 					this.rawset("Center", 2);
 					this.rawset("WheelUp", 3);
 					this.rawset("WheelDown", 4);
+				}
+			});
+			
+			// Gui Alignment
+			this.rawset("GuiAlignment", new LuaTableReadOnly() {
+				{
+					this.rawset("TopLeft", Pos.TOP_LEFT.toString());
+					this.rawset("TopCenter", Pos.TOP_CENTER.toString());
+					this.rawset("TopRight", Pos.TOP_RIGHT.toString());
+					this.rawset("CenterLeft", Pos.CENTER_LEFT.toString());
+					this.rawset("Center", Pos.CENTER.toString());
+					this.rawset("CenterRight", Pos.CENTER_RIGHT.toString());
+					this.rawset("BottomLeft", Pos.BOTTOM_LEFT.toString());
+					this.rawset("BottomCenter", Pos.BOTTOM_CENTER.toString());
+					this.rawset("BottomRight", Pos.BOTTOM_RIGHT.toString());
 				}
 			});
 			
@@ -183,5 +200,15 @@ public class Enums extends TwoArgFunction {
 			return LuaValue.NIL;
 		
 		return c;
+	}
+
+	/**
+	 * Matches an enum. Returns nil if enum is not found.
+	 * @param enumType
+	 * @param enumName
+	 * @return
+	 */
+	public static LuaValue matchEnum(String enumType, String enumName) {
+		return Enums.matchEnum(LuaValue.valueOf(enumType), LuaValue.valueOf(enumName));
 	}
 }

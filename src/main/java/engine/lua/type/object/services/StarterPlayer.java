@@ -20,6 +20,7 @@ import ide.layout.windows.icons.Icons;
 public class StarterPlayer extends Service implements TreeViewable {
 
 	private static final LuaValue C_STARTERPLAYERSCRIPTS = LuaValue.valueOf("StarterPlayerScripts");
+	private static final LuaValue C_STARTERPLAYERGUI = LuaValue.valueOf("StarterPlayerGui");
 	
 	public StarterPlayer() {
 		super("StarterPlayer");
@@ -42,5 +43,9 @@ public class StarterPlayer extends Service implements TreeViewable {
 
 	public Instance starterPlayerScripts() {
 		return findFirstChild(C_STARTERPLAYERSCRIPTS);
+	}
+
+	public Instance starterPlayerGui() {
+		return findFirstChild(C_STARTERPLAYERGUI);
 	}
 }

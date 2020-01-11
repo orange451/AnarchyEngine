@@ -25,6 +25,7 @@ public class Player extends Instance implements TreeViewable {
 	private static final LuaValue C_CONNECTION = LuaValue.valueOf("Connection");
 	private static final LuaValue C_CLIENTOWNSPHYSICS = LuaValue.valueOf("ClientOwnsPhysics");
 	private static final LuaValue C_PLAYERSCRIPTS = LuaValue.valueOf("PlayerScripts");
+	private static final LuaValue C_PLAYERGUI = LuaValue.valueOf("PlayerGui");
 	
 	public Player() {
 		super("Player");
@@ -76,9 +77,12 @@ public class Player extends Instance implements TreeViewable {
 		return p.toboolean();
 	}
 
-
 	public Instance playerScripts() {
 		return findFirstChild(C_PLAYERSCRIPTS);
+	}
+	
+	public Instance playerGui() {
+		return findFirstChild(C_PLAYERGUI);
 	}
 
 	public void start() {
@@ -97,6 +101,15 @@ public class Player extends Instance implements TreeViewable {
 			Instance obj = cc.get(j);
 			Instance clo = obj.clone();
 			clo.forceSetParent(this.playerScripts());
+		}
+		
+		// Copy starter player gui in to player
+		Instance starterGui = Game.starterPlayer().starterPlayerGui();
+		List<Instance> cg = starterGui.getChildren();
+		for (int j = 0; j < cg.size(); j++) {
+			Instance obj = cg.get(j);
+			Instance clo = obj.clone();
+			clo.forceSetParent(this.playerGui());
 		}
 	}
 }

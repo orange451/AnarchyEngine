@@ -61,6 +61,7 @@ public class LuaEngine {
 			
 			// Register instance types (GameObject/Camera/Etc)
 			loadDataTypes("engine.lua.type.object.insts");
+			loadDataTypes("engine.lua.type.object.insts.ui");
 		}
 	}
 	

@@ -1,0 +1,41 @@
+package engine.lua.type.object.insts.ui;
+
+import org.luaj.vm2.LuaValue;
+
+import engine.lua.lib.EnumType;
+import engine.lua.lib.Enums;
+import engine.lua.type.data.Vector2;
+import engine.lua.type.object.Instance;
+import engine.lua.type.object.TreeViewable;
+
+public abstract class GuiBase extends Instance implements TreeViewable {
+
+	protected static final LuaValue C_SIZE = LuaValue.valueOf("Size");
+	protected static final LuaValue C_ALIGNMENT = LuaValue.valueOf("Alignment");
+
+	public GuiBase(String name) {
+		super(name);
+
+		this.defineField(C_SIZE.toString(), new Vector2(100, 100), false);
+		
+		this.defineField(C_ALIGNMENT.toString(), LuaValue.valueOf("TopLeft"), false);
+		this.getField(C_ALIGNMENT).setEnum(new EnumType("GuiAlignment"));
+	}
+	
+	public Vector2 getSize() {
+		LuaValue val = this.get(C_SIZE);
+		return val.isnil()?new Vector2():(Vector2)val;
+	}
+
+	public float getWidth() {
+		return this.getSize().getX();
+	}
+
+	public float getHeight() {
+		return this.getSize().getY();
+	}
+
+	public String getAlignment() {
+		return Enums.matchEnum(LuaValue.valueOf("GuiAlignment"), this.get(C_ALIGNMENT)).toString();
+	}
+}

@@ -33,6 +33,7 @@ public class GameECS extends Instance {
 		// On load event
 		this.rawset("Loaded", new LuaEvent());
 		this.rawset("Started", new LuaEvent());
+		this.rawset("Stopping", new LuaEvent());
 		this.rawset("ResetEvent", new LuaEvent());
 		this.rawset("SelectionChanged", new LuaEvent());
 		

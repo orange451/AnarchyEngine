@@ -41,6 +41,7 @@ import engine.lua.type.object.Service;
 import engine.lua.type.object.insts.Camera;
 import engine.lua.type.object.insts.GlobalScript;
 import engine.lua.type.object.insts.Player;
+import engine.lua.type.object.insts.PlayerGui;
 import engine.lua.type.object.insts.PlayerScripts;
 import engine.lua.type.object.services.Assets;
 import engine.lua.type.object.services.Connections;
@@ -55,6 +56,7 @@ import engine.lua.type.object.services.RunService;
 import engine.lua.type.object.services.ScriptService;
 import engine.lua.type.object.services.SoundService;
 import engine.lua.type.object.services.StarterPlayer;
+import engine.lua.type.object.services.StarterPlayerGui;
 import engine.lua.type.object.services.StarterPlayerScripts;
 import engine.lua.type.object.services.Storage;
 import engine.lua.type.object.services.UserInputService;
@@ -350,8 +352,13 @@ public class Game implements Tickable {
 				// Register services (new blank project)
 				Game.services();
 				
-				if ( Game.starterPlayer().findFirstChild("StarterPlayerScripts") == null ) {
+				if ( Game.starterPlayer().starterPlayerScripts() == null ) {
 					StarterPlayerScripts pls = new StarterPlayerScripts();
+					pls.forceSetParent(Game.starterPlayer());
+				}
+				
+				if ( Game.starterPlayer().starterPlayerGui() == null ) {
+					StarterPlayerGui pls = new StarterPlayerGui();
 					pls.forceSetParent(Game.starterPlayer());
 				}
 				
@@ -544,6 +551,8 @@ public class Game implements Tickable {
 		if ( Game.running == running )
 			return;
 		
+		stoppingEvent().fire();
+		
 		Game.running = running;
 		Game.game().rawset(C_RUNNING, LuaValue.valueOf(running));
 		game.gameUpdate(true);
@@ -559,6 +568,10 @@ public class Game implements Tickable {
 				// Player scripts folder
 				Instance sc = new PlayerScripts();
 				sc.forceSetParent(p);
+				
+				// Player gui folder
+				Instance pg = new PlayerGui();
+				pg.forceSetParent(p);
 				
 				// Simulate a client connection
 				p.start();
@@ -631,6 +644,14 @@ public class Game implements Tickable {
 	 */
 	public static LuaEvent startEvent() {
 		return ((LuaEvent)LuaEngine.globals.get("game").get("Started"));
+	}
+	
+	/**
+	 * Event that gets fired when the game is finished initializing.
+	 * @return
+	 */
+	public static LuaEvent stoppingEvent() {
+		return ((LuaEvent)LuaEngine.globals.get("game").get("Stopping"));
 	}
 
 	public static void setLoaded(boolean loaded) {

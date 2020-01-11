@@ -17,6 +17,7 @@ import engine.AnarchyEngineClient;
 import engine.Game;
 import engine.InternalRenderThread;
 import engine.glv2.GLRenderer;
+import engine.lua.lib.Enums;
 import engine.lua.type.object.services.UserInputService;
 import lwjgui.LWJGUI;
 import lwjgui.event.ScrollEvent;
@@ -72,7 +73,7 @@ public abstract class Runner extends AnarchyEngineClient {
 		});
 		rootPane.setOnMouseScrolled(event ->{
 			UserInputService uis = (UserInputService) Game.getService("UserInputService");
-			uis.onMouseScroll(((ScrollEvent)event).y > 0 ? 3 : 4 );
+			uis.onMouseScroll(((ScrollEvent)event).y > 0 ? Enums.matchEnum("Mouse", "WheelUp").checkint() : Enums.matchEnum("Mouse", "WheelDown").checkint() );
 		});
 		
 		// Tell the game to run

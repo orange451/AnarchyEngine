@@ -66,7 +66,10 @@ public final class ClassFinder {
 		        String entryName;
 		        for(File actual: contenuti){
 		            entryName = actual.getName();
-		            entryName = entryName.substring(0, entryName.lastIndexOf('.'));
+		            int lastDot = entryName.lastIndexOf('.');
+		            if ( lastDot < 0 )
+		            	continue;
+		            entryName = entryName.substring(0, lastDot);
 		            names.add(entryName);
 		        }
 			} catch (URISyntaxException e) {

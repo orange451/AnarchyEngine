@@ -27,6 +27,8 @@ public class Icons {
 	public static final Icons icon_asset_folder_prefab = new Icons("AssetFolderPrefab.png");
 	public static final Icons icon_cut = new Icons("Cut.png");
 	public static final Icons icon_copy = new Icons("Copy.png");
+	public static final Icons icon_frame = new Icons("Frame.png");
+	public static final Icons icon_gui = new Icons("Gui.png");
 	public static final Icons icon_paste = new Icons("Paste.png");
 	public static final Icons icon_new = new Icons("New.png");
 	public static final Icons icon_save = new Icons("Save.png");
@@ -37,6 +39,7 @@ public class Icons {
 	public static final Icons icon_script_local = new Icons("ScriptLocal.png");
 	public static final Icons icon_script_global = new Icons("ScriptGlobal.png");
 	public static final Icons icon_player_scripts = new Icons("PlayerScripts.png");
+	public static final Icons icon_player_gui = new Icons("PlayerGui.png");
 	public static final Icons icon_starter_player = new Icons("StarterPlayer.png");
 	public static final Icons icon_workspace = new Icons("World.png");
 	public static final Icons icon_storage = new Icons("Storage.png");

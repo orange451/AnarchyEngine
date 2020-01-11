@@ -45,7 +45,7 @@ public class IdeLayout {
 	private IdeVerticalDock west;
 	private IdeVerticalDock east;
 	private IdeDockPane center;
-	private IdePane gameView;
+	public IdeGameView gameView;
 	
 	public IdeLayout(Group root) {
 		root.setAlignment(Pos.TOP_LEFT);

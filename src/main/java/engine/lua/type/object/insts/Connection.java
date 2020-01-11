@@ -77,6 +77,10 @@ public abstract class Connection extends Instance {
 		Instance ps = new PlayerScripts();
 		ps.forceSetParent(p);
 		
+		// Player scripts folder
+		PlayerGui pg = new PlayerGui();
+		pg.forceSetParent(p);
+		
 		// Put in game
 		Connection.this.rawset(C_PLAYER, p);
 		p.forceSetParent(Game.players());

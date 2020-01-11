@@ -24,13 +24,17 @@ import lwjgui.gl.GenericShader;
 import lwjgui.gl.Renderer;
 import lwjgui.paint.Color;
 import lwjgui.scene.Context;
+import lwjgui.scene.Node;
 import lwjgui.scene.control.Label;
 import lwjgui.scene.layout.OpenGLPane;
+import lwjgui.scene.layout.StackPane;
 
 public class IdeGameView extends IdePane {
-	private OpenGLPane internal;
+	private OpenGLPane gameView;
 	private IPipeline pipeline;
 	private Label fps;
+	
+	public StackPane uiPane;
 	
 	public IdeGameView(IPipeline pipeline) {
 		super("Game", false);
@@ -38,12 +42,22 @@ public class IdeGameView extends IdePane {
 		this.pipeline = pipeline;
 		this.setAlignment(Pos.CENTER);
 		
-		internal = new OpenGLPane();
-		internal.setMinSize(1, 1);
-		internal.setFillToParentHeight(true);
-		internal.setFillToParentWidth(true);
-		internal.setFlipY(true);
-		internal.setRendererCallback(new Renderer() {
+		this.uiPane = new StackPane() {
+			@Override
+			public void position(Node parent) {
+				this.forceSize(gameView.getWidth(), gameView.getHeight());
+				super.position(parent);
+			}
+		};
+		this.uiPane.setAlignment(Pos.TOP_LEFT);
+		
+		
+		this.gameView = new OpenGLPane();
+		gameView.setMinSize(1, 1);
+		gameView.setFillToParentHeight(true);
+		gameView.setFillToParentWidth(true);
+		gameView.setFlipY(true);
+		gameView.setRendererCallback(new Renderer() {
 			GenericShader shader;
 			{
 				shader = new GenericShader();
@@ -58,47 +72,47 @@ public class IdeGameView extends IdePane {
 				surface.render(shader);
 			}
 		});
-		this.getChildren().add(internal);
+		this.getChildren().add(gameView);
 		
-		internal.setOnKeyPressed(event -> {
+		uiPane.setOnKeyPressed(event -> {
 			UserInputService uis = (UserInputService) Game.getService("UserInputService");
 			if ( uis == null )
 				return;
 			
-			if ( !internal.isDescendentSelected() )
+			if ( !gameView.isDescendentSelected() )
 				return;
 			
 			uis.onKeyPressed(event.getKey());
 		});
-		internal.setOnKeyReleased(event -> {
+		uiPane.setOnKeyReleased(event -> {
 			UserInputService uis = (UserInputService) Game.getService("UserInputService");
 			if ( uis == null )
 				return;
 			
-			if ( !internal.isDescendentSelected() )
+			if ( !gameView.isDescendentSelected() )
 				return;
 			
 			uis.onKeyReleased(event.getKey());
 		});
-		internal.setOnMousePressed(event -> {
+		uiPane.setOnMousePressed(event -> {
 			UserInputService uis = (UserInputService) Game.getService("UserInputService");
 			if ( uis == null )
 				return;
 			
 			uis.onMousePress(event.button);
-			cached_context.setSelected(internal);
+			cached_context.setSelected(gameView);
 		});
-		internal.setOnMouseReleased(event -> {
+		uiPane.setOnMouseReleased(event -> {
 			UserInputService uis = (UserInputService) Game.getService("UserInputService");
 			if ( uis == null )
 				return;
 			
 			uis.onMouseRelease(event.button);
 		});
-		internal.setOnMouseScrolled(event ->{
+		uiPane.setOnMouseScrolled(event ->{
 			UserInputService uis = (UserInputService) Game.getService("UserInputService");
 			
-			if ( !internal.isDescendentHovered() && !this.cached_context.isHovered(internal) )
+			if ( !gameView.isDescendentHovered() && !this.cached_context.isHovered(gameView) )
 				return;
 			
 			uis.onMouseScroll(((ScrollEvent)event).y > 0 ? 3 : 4 );
@@ -107,9 +121,11 @@ public class IdeGameView extends IdePane {
 		this.fps = new Label("fps");
 		this.fps.setTextFill(Color.WHITE);
 		this.fps.setMouseTransparent(true);
-		this.internal.getChildren().add(fps);
-		this.internal.setAlignment(Pos.TOP_LEFT);
-		this.internal.setPadding(new Insets(2,2,2,2));
+		this.gameView.getChildren().add(fps);
+		this.gameView.setAlignment(Pos.TOP_LEFT);
+		this.gameView.setPadding(new Insets(2,2,2,2));
+		
+		this.gameView.getChildren().add(this.uiPane);
 		
 		StandardUserControls.bind(this);
 	}
@@ -133,6 +149,6 @@ public class IdeGameView extends IdePane {
 		
 		super.render(context);
 
-		IDE.pipeline.setSize((int)internal.getWidth(), (int)internal.getHeight());
+		IDE.pipeline.setSize((int)gameView.getWidth(), (int)gameView.getHeight());
 	}
 }
