@@ -7,6 +7,7 @@ import engine.lua.lib.Enums;
 import engine.lua.type.data.Vector2;
 import engine.lua.type.object.Instance;
 import engine.lua.type.object.TreeViewable;
+import lwjgui.geometry.Pos;
 
 public abstract class GuiBase extends Instance implements TreeViewable {
 
@@ -36,6 +37,7 @@ public abstract class GuiBase extends Instance implements TreeViewable {
 	}
 
 	public String getAlignment() {
-		return Enums.matchEnum(LuaValue.valueOf("GuiAlignment"), this.get(C_ALIGNMENT)).toString();
+		LuaValue alignment = Enums.matchEnum(LuaValue.valueOf("GuiAlignment"), this.get(C_ALIGNMENT));
+		return alignment.isnil()?Pos.CENTER.toString():alignment.toString();
 	}
 }

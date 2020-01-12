@@ -84,6 +84,8 @@ public abstract class AnarchyEngineClient extends AnarchyEngine implements Rende
 	public static boolean GLFW_INITIALIZED;
 	
 	public static IPipeline pipeline;
+	
+	public static AnarchyEngineClientUIFrame uiNode;
 
 	public void attachRenderable( Renderable o ) {
 		renderThread.attach(o);
@@ -224,13 +226,15 @@ public abstract class AnarchyEngineClient extends AnarchyEngine implements Rende
 		glfwMakeContextCurrent(window);
 
 		// Enable v-sync
-		glfwSwapInterval(1);
+		glfwSwapInterval(0);
 
 		// Make the window visible
 		glfwShowWindow(window);
 
 		// Setup opengl
 		GL.createCapabilities(true);
+		
+		uiNode = new AnarchyEngineClientUIFrame();
 
 		TaskManager.switchToSharedContext(window);
 		TaskManager.setRenderThread(Thread.currentThread());

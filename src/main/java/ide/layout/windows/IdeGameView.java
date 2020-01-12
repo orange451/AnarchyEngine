@@ -10,6 +10,7 @@
 
 package ide.layout.windows;
 
+import engine.AnarchyEngineClient;
 import engine.Game;
 import engine.InternalRenderThread;
 import engine.gl.IPipeline;
@@ -34,23 +35,11 @@ public class IdeGameView extends IdePane {
 	private IPipeline pipeline;
 	private Label fps;
 	
-	public StackPane uiPane;
-	
 	public IdeGameView(IPipeline pipeline) {
 		super("Game", false);
 		
 		this.pipeline = pipeline;
 		this.setAlignment(Pos.CENTER);
-		
-		this.uiPane = new StackPane() {
-			@Override
-			public void position(Node parent) {
-				this.forceSize(gameView.getWidth(), gameView.getHeight());
-				super.position(parent);
-			}
-		};
-		this.uiPane.setAlignment(Pos.TOP_LEFT);
-		
 		
 		this.gameView = new OpenGLPane();
 		gameView.setMinSize(1, 1);
@@ -74,50 +63,6 @@ public class IdeGameView extends IdePane {
 		});
 		this.getChildren().add(gameView);
 		
-		uiPane.setOnKeyPressed(event -> {
-			UserInputService uis = (UserInputService) Game.getService("UserInputService");
-			if ( uis == null )
-				return;
-			
-			if ( !gameView.isDescendentSelected() )
-				return;
-			
-			uis.onKeyPressed(event.getKey());
-		});
-		uiPane.setOnKeyReleased(event -> {
-			UserInputService uis = (UserInputService) Game.getService("UserInputService");
-			if ( uis == null )
-				return;
-			
-			if ( !gameView.isDescendentSelected() )
-				return;
-			
-			uis.onKeyReleased(event.getKey());
-		});
-		uiPane.setOnMousePressed(event -> {
-			UserInputService uis = (UserInputService) Game.getService("UserInputService");
-			if ( uis == null )
-				return;
-			
-			uis.onMousePress(event.button);
-			cached_context.setSelected(gameView);
-		});
-		uiPane.setOnMouseReleased(event -> {
-			UserInputService uis = (UserInputService) Game.getService("UserInputService");
-			if ( uis == null )
-				return;
-			
-			uis.onMouseRelease(event.button);
-		});
-		uiPane.setOnMouseScrolled(event ->{
-			UserInputService uis = (UserInputService) Game.getService("UserInputService");
-			
-			if ( !gameView.isDescendentHovered() && !this.cached_context.isHovered(gameView) )
-				return;
-			
-			uis.onMouseScroll(((ScrollEvent)event).y > 0 ? 3 : 4 );
-		});
-		
 		this.fps = new Label("fps");
 		this.fps.setTextFill(Color.WHITE);
 		this.fps.setMouseTransparent(true);
@@ -125,7 +70,7 @@ public class IdeGameView extends IdePane {
 		this.gameView.setAlignment(Pos.TOP_LEFT);
 		this.gameView.setPadding(new Insets(2,2,2,2));
 		
-		this.gameView.getChildren().add(this.uiPane);
+		this.gameView.getChildren().add(AnarchyEngineClient.uiNode);
 		
 		StandardUserControls.bind(this);
 	}

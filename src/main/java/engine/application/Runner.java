@@ -28,13 +28,13 @@ import lwjgui.scene.Window;
 import lwjgui.scene.layout.StackPane;
 
 public abstract class Runner extends AnarchyEngineClient {
-	private static StackPane rootPane;
+	//private static StackPane rootPane;
 	private static GenericShader shader;
 	
-	public StackPane getRootPane() {
+	/*public StackPane getRootPane() {
 		return rootPane;
 	}
-	
+	*/
 	@Override
 	public void initialize(String[] args) {
 		// Add rendering pipeline
@@ -47,8 +47,10 @@ public abstract class Runner extends AnarchyEngineClient {
 		win.setWindowAutoDraw(false); // To make it so we control swapbuffers
 		win.setWindowAutoClear(false); // To make it so we control glClear()
 		
+		win.getScene().setRoot(AnarchyEngineClient.uiNode);
+		
 		// TEST UI
-		rootPane = new StackPane();
+		/*rootPane = new StackPane();
 		rootPane.setPadding(new Insets(4,4,4,4));
 		rootPane.setAlignment(Pos.TOP_LEFT);
 		rootPane.setBackground(null);
@@ -74,7 +76,7 @@ public abstract class Runner extends AnarchyEngineClient {
 		rootPane.setOnMouseScrolled(event ->{
 			UserInputService uis = (UserInputService) Game.getService("UserInputService");
 			uis.onMouseScroll(((ScrollEvent)event).y > 0 ? Enums.matchEnum("Mouse", "WheelUp").checkint() : Enums.matchEnum("Mouse", "WheelDown").checkint() );
-		});
+		});*/
 		
 		// Tell the game to run
 		InternalRenderThread.runLater(()->{

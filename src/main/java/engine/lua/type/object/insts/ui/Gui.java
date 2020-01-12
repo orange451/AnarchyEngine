@@ -15,6 +15,7 @@ import java.util.Map;
 
 import org.luaj.vm2.LuaValue;
 
+import engine.InternalRenderThread;
 import engine.lua.type.data.Vector2;
 import ide.layout.windows.icons.Icons;
 import lwjgui.geometry.Insets;
@@ -33,7 +34,12 @@ public class Gui extends GuiBase {
 
 		this.getField(LuaValue.valueOf("Size")).setLocked(true);
 		
-		this.root = new StackPane();
+		this.root = new StackPane() {
+			@Override
+			public Pos usingAlignment() {
+				return this.getAlignment()==null?Pos.CENTER:this.getAlignment();
+			}
+		};
 		this.root.setPadding(new Insets(8));
 		this.root.setBackgroundLegacy(Color.ORANGE);
 		
@@ -82,13 +88,17 @@ public class Gui extends GuiBase {
 		this.changedEvent().connect((args)->{
 			onGuiChange((GuiBase)this);
 		});
+		
 		onGuiChange((GuiBase)this);
+		InternalRenderThread.runLater(()->{
+			onGuiChange((GuiBase)this);
+		});
 	}
 
 	private void onGuiChange(GuiBase frame) {
 		Pane pane = uiMap.get(frame);
 		if ( frame == this ) {
-			pane = (Pane) root.getParent();
+			pane = root;
 		}
 		
 		if ( pane == null || frame == null )
