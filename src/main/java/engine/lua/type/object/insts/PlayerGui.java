@@ -16,18 +16,16 @@ import java.util.List;
 import org.luaj.vm2.LuaValue;
 
 import engine.AnarchyEngineClient;
-import engine.Game;
 import engine.lua.type.object.Instance;
 import engine.lua.type.object.RunScript;
 import engine.lua.type.object.TreeViewable;
 import engine.lua.type.object.insts.ui.Gui;
-import ide.IDE;
 import ide.layout.windows.icons.Icons;
-import lwjgui.scene.layout.StackPane;
+import lwjgui.scene.layout.Pane;
 
 public class PlayerGui extends Instance implements TreeViewable,RunScript {
 	
-	private List<StackPane> guis = new ArrayList<StackPane>();
+	private List<Pane> guis = new ArrayList<>();
 	
 	public PlayerGui() {
 		super("PlayerGui");
@@ -40,7 +38,7 @@ public class PlayerGui extends Instance implements TreeViewable,RunScript {
 		this.childAddedEvent().connect((args)->{
 			LuaValue arg = args[0];
 			if ( arg instanceof Gui ) {
-				StackPane gui = ((Gui)arg).root;
+				Pane gui = ((Gui)arg).root;
 				AnarchyEngineClient.uiNode.getChildren().add(gui);
 				guis.add(gui);
 			}
@@ -49,7 +47,7 @@ public class PlayerGui extends Instance implements TreeViewable,RunScript {
 		this.childRemovedEvent().connect((args)->{
 			LuaValue arg = args[0];
 			if ( arg instanceof Gui ) {
-				StackPane gui = ((Gui)arg).root;
+				Pane gui = ((Gui)arg).root;
 				AnarchyEngineClient.uiNode.getChildren().remove(gui);
 				guis.remove(gui);
 			}
@@ -73,7 +71,7 @@ public class PlayerGui extends Instance implements TreeViewable,RunScript {
 
 	@Override
 	public void onDestroy() {
-		for (StackPane gui : guis ) {
+		for (Pane gui : guis ) {
 			AnarchyEngineClient.uiNode.getChildren().remove(gui);
 		}
 		

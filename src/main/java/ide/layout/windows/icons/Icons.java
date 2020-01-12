@@ -70,6 +70,8 @@ public class Icons {
 	public static final Icons icon_undo = new Icons("Undo.png");
 	public static final Icons icon_redo = new Icons("Redo.png");
 	public static final Icons icon_value = new Icons("Value2.png");
+	public static final Icons icon_vbox = new Icons("vbox.png");
+	public static final Icons icon_hbox = new Icons("hbox.png");
 	
 	private final String image;
 	

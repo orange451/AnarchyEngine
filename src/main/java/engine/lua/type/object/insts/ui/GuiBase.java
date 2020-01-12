@@ -8,8 +8,7 @@ import engine.lua.type.data.Vector2;
 import engine.lua.type.object.Instance;
 import engine.lua.type.object.TreeViewable;
 import lwjgui.geometry.Pos;
-import lwjgui.scene.Node;
-import lwjgui.scene.layout.StackPane;
+import lwjgui.scene.layout.Pane;
 
 public abstract class GuiBase extends Instance implements TreeViewable {
 
@@ -19,10 +18,14 @@ public abstract class GuiBase extends Instance implements TreeViewable {
 	public GuiBase(String name) {
 		super(name);
 
-		this.defineField(C_SIZE.toString(), new Vector2(100, 100), false);
+		this.defineField(C_SIZE.toString(), new Vector2(0, 0), false);
 		
 		this.defineField(C_ALIGNMENT.toString(), LuaValue.valueOf("TopLeft"), false);
 		this.getField(C_ALIGNMENT).setEnum(new EnumType("GuiAlignment"));
+	}
+	
+	public void setSize(Vector2 vector) {
+		this.set(C_SIZE, new Vector2(vector.toJoml()));
 	}
 	
 	public Vector2 getSize() {
@@ -43,5 +46,5 @@ public abstract class GuiBase extends Instance implements TreeViewable {
 		return alignment.isnil()?Pos.CENTER.toString():alignment.toString();
 	}
 	
-	public abstract StackPane getUINode();
+	public abstract Pane getUINode();
 }

@@ -23,11 +23,12 @@ import engine.lua.type.object.TreeViewable;
 import engine.lua.type.object.insts.ui.Gui;
 import ide.IDE;
 import ide.layout.windows.icons.Icons;
+import lwjgui.scene.layout.Pane;
 import lwjgui.scene.layout.StackPane;
 
 public class StarterPlayerGui extends Instance implements TreeViewable {
 	
-	private List<StackPane> guis = new ArrayList<StackPane>();
+	private List<Pane> guis = new ArrayList<>();
 
 	public StarterPlayerGui() {
 		super("StarterPlayerGui");
@@ -49,7 +50,7 @@ public class StarterPlayerGui extends Instance implements TreeViewable {
 		this.childAddedEvent().connect((args)->{
 			LuaValue arg = args[0];
 			if ( arg instanceof Gui ) {
-				StackPane gui = ((Gui)arg).root;
+				Pane gui = ((Gui)arg).root;
 				AnarchyEngineClient.uiNode.getChildren().add(gui);
 				guis.add(gui);
 			}
@@ -58,20 +59,20 @@ public class StarterPlayerGui extends Instance implements TreeViewable {
 		this.childRemovedEvent().connect((args)->{
 			LuaValue arg = args[0];
 			if ( arg instanceof Gui ) {
-				StackPane gui = ((Gui)arg).root;
+				Pane gui = ((Gui)arg).root;
 				AnarchyEngineClient.uiNode.getChildren().remove(gui);
 				guis.remove(gui);
 			}
 		});
 		
 		Game.startEvent().connect((args)->{
-			for (StackPane gui : guis ) {
+			for (Pane gui : guis ) {
 				gui.setVisible(false);
 			}
 		});
 		
 		Game.stoppingEvent().connect((args)->{
-			for (StackPane gui : guis ) {
+			for (Pane gui : guis ) {
 				gui.setVisible(true);
 			}
 		});
@@ -94,7 +95,7 @@ public class StarterPlayerGui extends Instance implements TreeViewable {
 
 	@Override
 	public void onDestroy() {
-		for (StackPane gui : guis ) {
+		for (Pane gui : guis ) {
 			AnarchyEngineClient.uiNode.getChildren().remove(gui);
 		}
 		

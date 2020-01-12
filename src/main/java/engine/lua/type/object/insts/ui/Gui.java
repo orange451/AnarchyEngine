@@ -23,12 +23,13 @@ import lwjgui.geometry.Pos;
 import lwjgui.paint.Color;
 import lwjgui.scene.layout.Pane;
 import lwjgui.scene.layout.StackPane;
+import lwjgui.scene.layout.Pane;
 
 public class Gui extends GuiBase {
 	
-	public StackPane root;
-	private Map<GuiBase, StackPane> uiMap = new HashMap<>();
-	private Map<StackPane,StackPane> nodeToNodeMap = new HashMap<>();
+	public Pane root;
+	private Map<GuiBase, Pane> uiMap = new HashMap<>();
+	private Map<Pane,Pane> nodeToNodeMap = new HashMap<>();
 	
 	public Gui() {
 		super("Gui");
@@ -42,18 +43,18 @@ public class Gui extends GuiBase {
 		
 		this.descendantAddedEvent().connect((args)->{
 			LuaValue arg = args[0];
-			if ( arg instanceof Frame ) {
+			if ( arg instanceof GuiBase ) {
 				
 				// Create new pane
-				StackPane pane = ((Frame)arg).getUINode();
-				pane.setBackgroundLegacy(Color.WHITE);
+				Pane pane = ((GuiBase)arg).getUINode();
+				pane.setBackgroundLegacy(new Color(Math.random(),Math.random(),Math.random()));
 				
 				// Add it to list
-				uiMap.put((Frame) arg, pane);
+				uiMap.put((GuiBase) arg, pane);
 				onGuiChange((GuiBase)arg);
 				
 				// Track changes
-				((Frame)arg).changedEvent().connect((cargs)->{
+				((GuiBase)arg).changedEvent().connect((cargs)->{
 					onGuiChange((GuiBase)arg);
 				});
 			}
@@ -61,9 +62,9 @@ public class Gui extends GuiBase {
 		
 		this.descendantRemovedEvent().connect((args)->{
 			LuaValue arg = args[0];
-			if ( arg instanceof Frame ) {
-				StackPane pane = uiMap.get(((Frame)arg));
-				StackPane parent = nodeToNodeMap.get(pane);
+			if ( arg instanceof GuiBase ) {
+				Pane pane = uiMap.get(((GuiBase)arg));
+				Pane parent = nodeToNodeMap.get(pane);
 				if ( parent != null ) {
 					parent.getChildren().remove(pane);
 					nodeToNodeMap.remove(pane);
@@ -80,22 +81,22 @@ public class Gui extends GuiBase {
 		});
 	}
 
-	private void onGuiChange(GuiBase frame) {
-		Pane pane = uiMap.get(frame);
-		if ( frame == this ) {
+	private void onGuiChange(GuiBase GuiBase) {
+		Pane pane = uiMap.get(GuiBase);
+		if ( GuiBase == this ) {
 			pane = root;
 		}
 		
-		if ( pane == null || frame == null )
+		if ( pane == null || GuiBase == null )
 			return;
 		
 		// Update size
-		pane.setPrefSize(frame.getWidth(), frame.getHeight());
-		pane.setAlignment(Pos.valueOf(frame.getAlignment()));
+		pane.setPrefSize(GuiBase.getWidth(), GuiBase.getHeight());
+		pane.setAlignment(Pos.valueOf(GuiBase.getAlignment()));
 		
 		// If parent change, remove from old parent
-		StackPane parentPane = uiMap.get(frame.getParent());
-		StackPane currentParentPane = nodeToNodeMap.get(pane);
+		Pane parentPane = uiMap.get(GuiBase.getParent());
+		Pane currentParentPane = nodeToNodeMap.get(pane);
 		if ( currentParentPane != null && !currentParentPane.equals(parentPane) )
 			currentParentPane.getChildren().remove(pane);
 		
@@ -106,7 +107,7 @@ public class Gui extends GuiBase {
 		// Add us to new parent
 		if ( !parentPane.getChildren().contains(pane) ) {
 			parentPane.getChildren().add(pane);
-			nodeToNodeMap.put((StackPane) pane, parentPane);
+			nodeToNodeMap.put((Pane) pane, parentPane);
 		}
 	}
 
@@ -134,7 +135,7 @@ public class Gui extends GuiBase {
 	}
 
 	@Override
-	public StackPane getUINode() {
+	public Pane getUINode() {
 		return new StackPane() {
 			@Override
 			public Pos usingAlignment() {
