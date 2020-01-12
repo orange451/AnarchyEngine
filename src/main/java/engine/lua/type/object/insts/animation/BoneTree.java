@@ -8,28 +8,26 @@
  *
  */
 
-package engine.lua.type.object.insts;
+package engine.lua.type.object.insts.animation;
 
 import org.luaj.vm2.LuaValue;
-
-import engine.lua.type.data.Color3;
 import engine.lua.type.object.Instance;
 import engine.lua.type.object.TreeViewable;
 import ide.layout.windows.icons.Icons;
 
-public class Color3Value extends Instance implements TreeViewable {
+public class BoneTree extends Instance implements TreeViewable {
 
-	protected static final LuaValue C_VALUE = LuaValue.valueOf("Value");
-	
-	public Color3Value() {
-		super("Color3Value");
+	public BoneTree() {
+		super("BoneTree");
 		
-		this.defineField(C_VALUE.toString(), Color3.white(), false);
+		this.setInstanceable(false);
+
+		this.getField(LuaValue.valueOf("Archivable")).setLocked(true);
 	}
 
 	@Override
 	protected LuaValue onValueSet(LuaValue key, LuaValue value) {
-		return value;
+		return value;	
 	}
 
 	@Override
@@ -44,15 +42,6 @@ public class Color3Value extends Instance implements TreeViewable {
 
 	@Override
 	public Icons getIcon() {
-		return Icons.icon_value;
-	}
-	
-	public Color3 getValue() {
-		LuaValue value = this.get(C_VALUE);
-		return value.isnil()?null:(Color3)value;
-	}
-	
-	public void setValue(Color3 value) {
-		this.set(C_VALUE, value.clone());
+		return Icons.icon_animation_data;
 	}
 }

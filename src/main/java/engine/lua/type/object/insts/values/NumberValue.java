@@ -8,7 +8,7 @@
  *
  */
 
-package engine.lua.type.object.insts;
+package engine.lua.type.object.insts.values;
 
 import org.luaj.vm2.LuaValue;
 
@@ -16,14 +16,14 @@ import engine.lua.type.object.Instance;
 import engine.lua.type.object.TreeViewable;
 import ide.layout.windows.icons.Icons;
 
-public class BoolValue extends Instance implements TreeViewable {
+public class NumberValue extends Instance implements TreeViewable {
 
 	protected static final LuaValue C_VALUE = LuaValue.valueOf("Value");
 	
-	public BoolValue() {
-		super("BoolValue");
+	public NumberValue() {
+		super("NumberValue");
 		
-		this.defineField(C_VALUE.toString(), LuaValue.valueOf(false), false);
+		this.defineField(C_VALUE.toString(), LuaValue.valueOf(0.0), false);
 	}
 
 	@Override
@@ -46,12 +46,12 @@ public class BoolValue extends Instance implements TreeViewable {
 		return Icons.icon_value;
 	}
 	
-	public boolean getValue() {
+	public float getValue() {
 		LuaValue value = this.get(C_VALUE);
-		return value.isnil()?null:value.toboolean();
+		return value.isnil()?null:value.tofloat();
 	}
 	
-	public void setValue(boolean value) {
+	public void setValue(float value) {
 		this.set(C_VALUE, LuaValue.valueOf(value));
 	}
 }

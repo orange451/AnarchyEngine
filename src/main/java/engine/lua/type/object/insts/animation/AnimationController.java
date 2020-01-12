@@ -8,7 +8,7 @@
  *
  */
 
-package engine.lua.type.object.insts;
+package engine.lua.type.object.insts.animation;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -26,6 +26,8 @@ import engine.gl.shader.BaseShader;
 import engine.lua.type.LuaConnection;
 import engine.lua.type.data.Matrix4;
 import engine.lua.type.object.Instance;
+import engine.lua.type.object.insts.GameObject;
+import engine.lua.type.object.insts.Prefab;
 
 public class AnimationController extends Instance {
 	
@@ -199,7 +201,8 @@ public class AnimationController extends Instance {
 			if ( firstBone == null )
 				continue;
 			
-			computeBones( keyframe, firstBone, new Matrix4f().translate(linked.getWorldMatrix().toJoml().getTranslation(new Vector3f())));
+			Matrix4f initialMatrix = new Matrix4f().translate(linked.getWorldMatrix().toJoml().getTranslation(new Vector3f()));
+			computeBones( keyframe, firstBone, initialMatrix);
 		}
 	}
 	
@@ -221,11 +224,13 @@ public class AnimationController extends Instance {
 			playingAnimations.remove(track);
 		
 		playingAnimations.add(track);
+		track.update(0);
 		
 		AnimationKeyframeSequence frame = track.getAnimation().getNearestSequenceBefore(track.getTimePosition());
-		if ( frame != null ) {
+		if ( frame == null )
+			frame = track.getAnimation().getFirstSequence();
+		if ( frame != null )
 			track.setCurrentKeyframe(frame);
-		}
 	}
 	
 	/**
@@ -247,17 +252,19 @@ public class AnimationController extends Instance {
 	
 	private static final Matrix4f IDENTITY = new Matrix4f().identity();
 	private void computeBones(AnimationKeyframeSequence keyframe, Instance root, Matrix4f parentMatrix) {
-		Matrix4f globalTransformation = new Matrix4f(parentMatrix);
+		Matrix4f localBindMatrix = IDENTITY;
 		String boneName = root.getName();
+		
+		Instance animationData = ((Instance)((Instance)((Instance)keyframe.getParent()).getParent()).getParent());
+		Instance bones = animationData.findFirstChild("Bones");
+		Instance bone = bones.findFirstChild(root.getName());
+		if ( bone != null )
+			localBindMatrix = ((Bone)bone).getOffsetMatrix().getInternal();
 		
 		// Check if this bone has a keyframe
 		if ( root instanceof BoneTreeNode ) {
 			Instance keyframeBone = keyframe.findFirstChild(root.getName());
 			if ( keyframeBone != null && keyframeBone instanceof AnimationKeyframe ) {
-				Instance animationData = ((Instance)((Instance)((Instance)keyframe.getParent()).getParent()).getParent());
-				Instance bones = animationData.findFirstChild("Bones");
-				Instance bone = bones.findFirstChild(keyframeBone.getName());
-				
 				if ( bone != null && bone instanceof Bone ) {
 					boneName = bone.getName();
 					
@@ -279,18 +286,23 @@ public class AnimationController extends Instance {
 		if ( previousRootInverse == null )
 			previousRootInverse = IDENTITY;
 		
-		// Update this bones matrix
-		globalTransformation.mul(previousRootTransformation);
+		// Compute absolute matrix (pass to children)
+		Matrix4f absolute = new Matrix4f();
+		absolute.mul(parentMatrix);
+		absolute.mul(previousRootTransformation);
+		
+		// Compute BONE MATRIX (used in shader)
 		Matrix4f finalTransform = new Matrix4f();
 		finalTransform.mul(previousRootInverse);
-		finalTransform.mul(globalTransformation);
-		boneAbsolutePositions.put(boneName, new Matrix4(finalTransform));
+		finalTransform.mul(localBindMatrix);
+		finalTransform.mul(absolute);
+		boneAbsolutePositions.put(boneName, new Matrix4(finalTransform.invert()));
 		
 		// Update children
-		List<Instance> bones = root.getChildren();
-		for (int i = 0; i < bones.size(); i++) {
-			Instance newRoot = bones.get(i);
-			computeBones( keyframe, newRoot, globalTransformation );
+		List<Instance> boneList = root.getChildren();
+		for (int i = 0; i < boneList.size(); i++) {
+			Instance newRoot = boneList.get(i);
+			computeBones( keyframe, newRoot, absolute );
 		}
 	}
 

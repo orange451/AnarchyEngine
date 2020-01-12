@@ -28,7 +28,7 @@ import engine.glv2.entities.LayeredCubeCamera;
 import engine.glv2.v2.lights.DirectionalLightCamera;
 import engine.glv2.v2.lights.SpotLightCamera;
 import engine.lua.type.object.Instance;
-import engine.lua.type.object.insts.AnimationController;
+import engine.lua.type.object.insts.animation.AnimationController;
 import engine.observer.RenderableInstance;
 
 public class RenderingManager {

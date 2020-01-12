@@ -35,16 +35,16 @@ import engine.gl.renderer.GBuffer;
 import engine.gl.shader.BaseShader;
 import engine.lua.type.data.Matrix4;
 import engine.lua.type.object.Instance;
-import engine.lua.type.object.insts.AnimationController;
-import engine.lua.type.object.insts.Bone;
-import engine.lua.type.object.insts.BoneTreeNode;
-import engine.lua.type.object.insts.BoneWeight;
-import engine.lua.type.object.insts.Bones;
 import engine.lua.type.object.insts.GameObject;
 import engine.lua.type.object.insts.Material;
 import engine.lua.type.object.insts.Mesh;
 import engine.lua.type.object.insts.Model;
 import engine.lua.type.object.insts.Prefab;
+import engine.lua.type.object.insts.animation.AnimationController;
+import engine.lua.type.object.insts.animation.Bone;
+import engine.lua.type.object.insts.animation.BoneTreeNode;
+import engine.lua.type.object.insts.animation.BoneWeight;
+import engine.lua.type.object.insts.animation.Bones;
 
 public class AnimatedModel {
 	protected static final int MAX_BONES = 64;
@@ -109,7 +109,7 @@ public class AnimatedModel {
 		for (int i = 0; i < children.size(); i++) {
 
 			// We can safely cast to bone -> Children list is guaranteed bones
-			engine.lua.type.object.insts.Bone bone = (engine.lua.type.object.insts.Bone) children.get(i);
+			engine.lua.type.object.insts.animation.Bone bone = (engine.lua.type.object.insts.animation.Bone) children.get(i);
 
 			Mesh mesh = bone.getMesh();
 			BufferedMesh bufferedMesh = mesh.getMesh();

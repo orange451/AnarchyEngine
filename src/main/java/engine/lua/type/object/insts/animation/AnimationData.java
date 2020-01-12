@@ -8,7 +8,7 @@
  *
  */
 
-package engine.lua.type.object.insts;
+package engine.lua.type.object.insts.animation;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -32,6 +32,7 @@ import org.lwjgl.assimp.AIVertexWeight;
 import engine.lua.type.data.Matrix4;
 import engine.lua.type.object.Instance;
 import engine.lua.type.object.TreeViewable;
+import engine.lua.type.object.insts.Mesh;
 import ide.layout.windows.icons.Icons;
 
 public class AnimationData extends Instance implements TreeViewable {

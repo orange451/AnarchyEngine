@@ -8,23 +8,23 @@
  *
  */
 
-package engine.lua.type.object.insts;
+package engine.lua.type.object.insts.values;
 
+import org.luaj.vm2.LuaString;
 import org.luaj.vm2.LuaValue;
 
-import engine.lua.type.data.Vector2;
 import engine.lua.type.object.Instance;
 import engine.lua.type.object.TreeViewable;
 import ide.layout.windows.icons.Icons;
 
-public class Vector2Value extends Instance implements TreeViewable {
+public class StringValue extends Instance implements TreeViewable {
 
 	protected static final LuaValue C_VALUE = LuaValue.valueOf("Value");
 	
-	public Vector2Value() {
-		super("Vector2Value");
+	public StringValue() {
+		super("StringValue");
 		
-		this.defineField(C_VALUE.toString(), new Vector2(), false);
+		this.defineField(C_VALUE.toString(), LuaString.valueOf(""), false);
 	}
 
 	@Override
@@ -47,12 +47,12 @@ public class Vector2Value extends Instance implements TreeViewable {
 		return Icons.icon_value;
 	}
 	
-	public Vector2 getValue() {
+	public String getValue() {
 		LuaValue value = this.get(C_VALUE);
-		return value.isnil()?null:(Vector2)value;
+		return value.isnil()?null:value.toString();
 	}
 	
-	public void setValue(Vector2 value) {
-		this.set(C_VALUE, value.clone());
+	public void setValue(String value) {
+		this.set(C_VALUE, LuaString.valueOf(value));
 	}
 }

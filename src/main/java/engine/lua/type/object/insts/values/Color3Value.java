@@ -8,24 +8,23 @@
  *
  */
 
-package engine.lua.type.object.insts;
+package engine.lua.type.object.insts.values;
 
-import org.joml.Matrix4f;
 import org.luaj.vm2.LuaValue;
 
-import engine.lua.type.data.Matrix4;
+import engine.lua.type.data.Color3;
 import engine.lua.type.object.Instance;
 import engine.lua.type.object.TreeViewable;
 import ide.layout.windows.icons.Icons;
 
-public class AnimationKeyframe extends Instance implements TreeViewable {
+public class Color3Value extends Instance implements TreeViewable {
 
-	public AnimationKeyframe() {
-		super("AnimationKeyframe");
-		this.setInstanceable(false);
+	protected static final LuaValue C_VALUE = LuaValue.valueOf("Value");
+	
+	public Color3Value() {
+		super("Color3Value");
 		
-		this.getField(LuaValue.valueOf("Archivable")).setLocked(true);
-		this.defineField("Matrix", new Matrix4(), false);
+		this.defineField(C_VALUE.toString(), Color3.white(), false);
 	}
 
 	@Override
@@ -45,19 +44,15 @@ public class AnimationKeyframe extends Instance implements TreeViewable {
 
 	@Override
 	public Icons getIcon() {
-		return Icons.icon_film;
-	}
-
-	public Matrix4 getMatrix() {
-		LuaValue ret = this.get("Matrix");
-		return ret==null?null:(Matrix4)ret;
+		return Icons.icon_value;
 	}
 	
-	public Matrix4f getMatrixInternal() {
-		Matrix4 mat = getMatrix();
-		if ( mat == null )
-			return null;
-		
-		return mat.getInternal();
+	public Color3 getValue() {
+		LuaValue value = this.get(C_VALUE);
+		return value.isnil()?null:(Color3)value;
+	}
+	
+	public void setValue(Color3 value) {
+		this.set(C_VALUE, value.clone());
 	}
 }

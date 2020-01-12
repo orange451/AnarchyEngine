@@ -8,23 +8,23 @@
  *
  */
 
-package engine.lua.type.object.insts;
+package engine.lua.type.object.insts.values;
 
-import org.luaj.vm2.LuaString;
 import org.luaj.vm2.LuaValue;
 
+import engine.lua.type.data.Matrix4;
 import engine.lua.type.object.Instance;
 import engine.lua.type.object.TreeViewable;
 import ide.layout.windows.icons.Icons;
 
-public class StringValue extends Instance implements TreeViewable {
+public class Matrix4Value extends Instance implements TreeViewable {
 
 	protected static final LuaValue C_VALUE = LuaValue.valueOf("Value");
 	
-	public StringValue() {
-		super("StringValue");
+	public Matrix4Value() {
+		super("Matrix4Value");
 		
-		this.defineField(C_VALUE.toString(), LuaString.valueOf(""), false);
+		this.defineField(C_VALUE.toString(), new Matrix4(), false);
 	}
 
 	@Override
@@ -47,12 +47,12 @@ public class StringValue extends Instance implements TreeViewable {
 		return Icons.icon_value;
 	}
 	
-	public String getValue() {
+	public Matrix4 getValue() {
 		LuaValue value = this.get(C_VALUE);
-		return value.isnil()?null:value.toString();
+		return value.isnil()?null:(Matrix4)value;
 	}
 	
-	public void setValue(String value) {
-		this.set(C_VALUE, LuaString.valueOf(value));
+	public void setValue(Matrix4 value) {
+		this.set(C_VALUE, value.clone());
 	}
 }

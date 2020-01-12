@@ -8,8 +8,9 @@
  *
  */
 
-package engine.lua.type.object.insts;
+package engine.lua.type.object.insts.animation;
 
+import org.joml.Matrix4f;
 import org.luaj.vm2.LuaValue;
 
 import engine.lua.type.data.Matrix4;
@@ -17,14 +18,14 @@ import engine.lua.type.object.Instance;
 import engine.lua.type.object.TreeViewable;
 import ide.layout.windows.icons.Icons;
 
-public class Matrix4Value extends Instance implements TreeViewable {
+public class AnimationKeyframe extends Instance implements TreeViewable {
 
-	protected static final LuaValue C_VALUE = LuaValue.valueOf("Value");
-	
-	public Matrix4Value() {
-		super("Matrix4Value");
+	public AnimationKeyframe() {
+		super("AnimationKeyframe");
+		this.setInstanceable(false);
 		
-		this.defineField(C_VALUE.toString(), new Matrix4(), false);
+		this.getField(LuaValue.valueOf("Archivable")).setLocked(true);
+		this.defineField("Matrix", new Matrix4(), false);
 	}
 
 	@Override
@@ -44,15 +45,19 @@ public class Matrix4Value extends Instance implements TreeViewable {
 
 	@Override
 	public Icons getIcon() {
-		return Icons.icon_value;
+		return Icons.icon_film;
+	}
+
+	public Matrix4 getMatrix() {
+		LuaValue ret = this.get("Matrix");
+		return ret==null?null:(Matrix4)ret;
 	}
 	
-	public Matrix4 getValue() {
-		LuaValue value = this.get(C_VALUE);
-		return value.isnil()?null:(Matrix4)value;
-	}
-	
-	public void setValue(Matrix4 value) {
-		this.set(C_VALUE, value.clone());
+	public Matrix4f getMatrixInternal() {
+		Matrix4 mat = getMatrix();
+		if ( mat == null )
+			return null;
+		
+		return mat.getInternal();
 	}
 }

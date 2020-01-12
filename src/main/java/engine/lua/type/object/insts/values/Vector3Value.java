@@ -8,7 +8,7 @@
  *
  */
 
-package engine.lua.type.object.insts;
+package engine.lua.type.object.insts.values;
 
 import org.joml.Vector3f;
 import org.luaj.vm2.LuaValue;

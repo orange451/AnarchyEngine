@@ -45,9 +45,9 @@ import engine.glv2.v2.IRenderingData;
 import engine.glv2.v2.RendererData;
 import engine.lua.type.object.Instance;
 import engine.lua.type.object.PrefabRenderer;
-import engine.lua.type.object.insts.AnimationController;
 import engine.lua.type.object.insts.GameObject;
 import engine.lua.type.object.insts.Material;
+import engine.lua.type.object.insts.animation.AnimationController;
 
 public class AnimInstanceForwardRenderer {
 

@@ -8,39 +8,49 @@
  *
  */
 
-package engine.lua.type.object.insts;
+package engine.lua.type.object.insts.animation;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import org.luaj.vm2.LuaValue;
 
-import engine.lua.type.data.Matrix4;
 import engine.lua.type.object.Instance;
 import engine.lua.type.object.TreeViewable;
 import ide.layout.windows.icons.Icons;
 
-public class Bones extends Instance implements TreeViewable {
+public class AnimationKeyframeSequence extends Instance implements TreeViewable {
+
+	protected List<AnimationKeyframe> keyframes;
 	
-	public static final LuaValue C_ROOTINVERSE = LuaValue.valueOf("RootInverse");
+	private static LuaValue C_TIME = LuaValue.valueOf("Time");
 	
-	public Bones() {
-		super("Bones");
+	public AnimationKeyframeSequence() {
+		super("AnimationKeyframeSequence");
 		
 		this.setInstanceable(false);
-
+		
 		this.getField(LuaValue.valueOf("Archivable")).setLocked(true);
 		
-		this.defineField(C_ROOTINVERSE.toString(), new Matrix4(), true);
+		this.defineField(C_TIME.toString(), LuaValue.valueOf(0), true);
 		
+		keyframes = new ArrayList<AnimationKeyframe>();
 		this.childAddedEvent().connect((args)->{
-			LuaValue c = args[0];
-			if ( c instanceof Bone ) {
-				System.out.println("Adding bone " + c);
-			}
+			if ( args.length != 1 )
+				return;
+			
+			LuaValue child = args[0];
+			if ( !(child instanceof AnimationKeyframe) )
+				return;
+			
+			AnimationKeyframe keyframe = (AnimationKeyframe) child;
+			keyframes.add( keyframe);
 		});
 	}
 
 	@Override
 	protected LuaValue onValueSet(LuaValue key, LuaValue value) {
-		return value;	
+		return value;
 	}
 
 	@Override
@@ -55,6 +65,10 @@ public class Bones extends Instance implements TreeViewable {
 
 	@Override
 	public Icons getIcon() {
-		return Icons.icon_animation_data;
+		return Icons.icon_film;
+	}
+
+	public double getTime() {
+		return this.get(C_TIME).todouble();
 	}
 }
