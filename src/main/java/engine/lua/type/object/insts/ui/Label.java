@@ -23,7 +23,7 @@ public class Label extends GuiBase {
 	public Label() {
 		super("Label");
 		
-		this.defineField(C_TEXT.toString(), LuaString.valueOf(""), false);
+		this.defineField(C_TEXT.toString(), LuaString.valueOf("Label"), false);
 	}
 
 	@Override

@@ -83,6 +83,7 @@ public class Gui extends GuiBase {
 
 	private void onGuiChange(GuiBase guiBase) {
 		Node pane = uiMap.get(guiBase);
+		System.out.println("CHANGE EVENT: " + guiBase + " / " + pane);
 		if ( guiBase == this )
 			pane = root;
 		
@@ -144,7 +145,7 @@ public class Gui extends GuiBase {
 
 	@Override
 	public void updateNode(Node node) {
-		// TODO Auto-generated method stub
-		
+		node.setPrefSize(getWidth(), getHeight());
+		node.setAlignment(Pos.valueOf(getAlignment()));
 	}
 }
