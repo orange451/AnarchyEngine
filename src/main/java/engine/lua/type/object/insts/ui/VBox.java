@@ -15,7 +15,7 @@ import org.luaj.vm2.LuaValue;
 import ide.layout.windows.icons.Icons;
 import lwjgui.scene.layout.Pane;
 
-public class VBox extends GuiBase {
+public class VBox extends GuiBaseFrame {
 	
 	public VBox() {
 		super("VBox");

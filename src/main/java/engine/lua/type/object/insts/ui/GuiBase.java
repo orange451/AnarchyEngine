@@ -8,7 +8,7 @@ import engine.lua.type.data.Vector2;
 import engine.lua.type.object.Instance;
 import engine.lua.type.object.TreeViewable;
 import lwjgui.geometry.Pos;
-import lwjgui.scene.layout.Pane;
+import lwjgui.scene.Node;
 
 public abstract class GuiBase extends Instance implements TreeViewable {
 
@@ -46,5 +46,7 @@ public abstract class GuiBase extends Instance implements TreeViewable {
 		return alignment.isnil()?Pos.CENTER.toString():alignment.toString();
 	}
 	
-	public abstract Pane getUINode();
+	public abstract Node getUINode();
+	
+	public abstract void updateNode(Node node);
 }

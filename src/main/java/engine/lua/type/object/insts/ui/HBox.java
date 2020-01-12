@@ -15,7 +15,7 @@ import org.luaj.vm2.LuaValue;
 import ide.layout.windows.icons.Icons;
 import lwjgui.scene.layout.Pane;
 
-public class HBox extends GuiBase {
+public class HBox extends GuiBaseFrame {
 	
 	public HBox() {
 		super("HBox");

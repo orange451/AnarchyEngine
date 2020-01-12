@@ -10,19 +10,20 @@
 
 package engine.lua.type.object.insts.ui;
 
+import org.luaj.vm2.LuaString;
 import org.luaj.vm2.LuaValue;
 
-import engine.lua.type.data.Vector2;
 import ide.layout.windows.icons.Icons;
-import lwjgui.scene.layout.Pane;
-import lwjgui.scene.layout.StackPane;
+import lwjgui.scene.Node;
 
-public class Frame extends GuiBaseFrame {
+public class Label extends GuiBase {
 	
-	public Frame() {
-		super("Frame");
+	protected static final LuaValue C_TEXT = LuaValue.valueOf("Text");
+	
+	public Label() {
+		super("Label");
 		
-		this.setSize(new Vector2(100,100));
+		this.defineField(C_TEXT.toString(), LuaString.valueOf(""), false);
 	}
 
 	@Override
@@ -42,11 +43,25 @@ public class Frame extends GuiBaseFrame {
 
 	@Override
 	public Icons getIcon() {
-		return Icons.icon_frame;
+		return Icons.icon_label;
+	}
+	
+	public String getText() {
+		return this.get(C_TEXT).toString();
+	}
+	
+	public void setText(String text) {
+		this.set(C_TEXT, LuaValue.valueOf(text));
 	}
 
 	@Override
-	public Pane getUINode() {
-		return new StackPane();
+	public Node getUINode() {
+		return new lwjgui.scene.control.Label();
+	}
+
+	@Override
+	public void updateNode(Node node) {
+		System.out.println("Updating text!");
+		((lwjgui.scene.control.Label)node).setText(this.getText());
 	}
 }
