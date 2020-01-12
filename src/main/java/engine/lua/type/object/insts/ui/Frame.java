@@ -13,6 +13,7 @@ package engine.lua.type.object.insts.ui;
 import org.luaj.vm2.LuaValue;
 
 import ide.layout.windows.icons.Icons;
+import lwjgui.scene.layout.StackPane;
 
 public class Frame extends GuiBase {
 	
@@ -38,5 +39,10 @@ public class Frame extends GuiBase {
 	@Override
 	public Icons getIcon() {
 		return Icons.icon_frame;
+	}
+
+	@Override
+	public StackPane getUINode() {
+		return new StackPane();
 	}
 }

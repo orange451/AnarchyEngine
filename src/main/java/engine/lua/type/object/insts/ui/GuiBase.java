@@ -8,6 +8,8 @@ import engine.lua.type.data.Vector2;
 import engine.lua.type.object.Instance;
 import engine.lua.type.object.TreeViewable;
 import lwjgui.geometry.Pos;
+import lwjgui.scene.Node;
+import lwjgui.scene.layout.StackPane;
 
 public abstract class GuiBase extends Instance implements TreeViewable {
 
@@ -40,4 +42,6 @@ public abstract class GuiBase extends Instance implements TreeViewable {
 		LuaValue alignment = Enums.matchEnum(LuaValue.valueOf("GuiAlignment"), this.get(C_ALIGNMENT));
 		return alignment.isnil()?Pos.CENTER.toString():alignment.toString();
 	}
+	
+	public abstract StackPane getUINode();
 }
