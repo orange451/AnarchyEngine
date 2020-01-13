@@ -15,6 +15,7 @@ import java.util.Map;
 
 import org.luaj.vm2.LuaValue;
 
+import engine.lua.type.LuaConnection;
 import engine.lua.type.data.Vector2;
 import ide.layout.windows.icons.Icons;
 import lwjgui.geometry.Insets;
@@ -28,6 +29,7 @@ public class Gui extends GuiBase {
 	
 	public Pane root;
 	private Map<GuiBase, Node> uiMap = new HashMap<>();
+	private Map<GuiBase, LuaConnection> uiConnections = new HashMap<>();
 	private Map<Node,Node> nodeToNodeMap = new HashMap<>();
 	
 	public Gui() {
@@ -43,7 +45,6 @@ public class Gui extends GuiBase {
 		this.descendantAddedEvent().connect((args)->{
 			LuaValue arg = args[0];
 			if ( arg instanceof GuiBase ) {
-				
 				// Create new pane
 				Node pane = ((GuiBase)arg).getUINode();
 				if ( pane instanceof Pane )
@@ -54,9 +55,12 @@ public class Gui extends GuiBase {
 				onGuiChange((GuiBase)arg);
 				
 				// Track changes
-				((GuiBase)arg).changedEvent().connect((cargs)->{
+				LuaConnection connection = ((GuiBase)arg).changedEvent().connect((cargs)->{
 					onGuiChange((GuiBase)arg);
 				});
+				
+				// Add connection to map
+				uiConnections.put((GuiBase) arg, connection);
 			}
 		});
 		
@@ -70,7 +74,16 @@ public class Gui extends GuiBase {
 					nodeToNodeMap.remove(pane);
 				}
 				
+				// Remove node from map
 				uiMap.remove(arg);
+				
+				// Disconnect connection
+				LuaConnection connection = uiConnections.get((GuiBase)arg);
+				if ( connection != null )
+					connection.disconnect();
+				
+				// Remove connection from map
+				uiConnections.remove(arg);
 			}
 		});
 
@@ -82,31 +95,31 @@ public class Gui extends GuiBase {
 	}
 
 	private void onGuiChange(GuiBase guiBase) {
-		Node pane = uiMap.get(guiBase);
-		System.out.println("CHANGE EVENT: " + guiBase + " / " + pane);
+		Node node = uiMap.get(guiBase);
+		System.out.println("CHANGE EVENT: " + guiBase + " / " + node);
 		if ( guiBase == this )
-			pane = root;
+			node = root;
 		
-		if ( pane == null || guiBase == null )
+		if ( node == null || guiBase == null )
 			return;
 		
 		// Update size
-		guiBase.updateNode(pane);
+		guiBase.updateNode(node);
 		
 		// If parent change, remove from old parent
 		Node parentPane = uiMap.get(guiBase.getParent());
-		Node currentParentPane = nodeToNodeMap.get(pane);
+		Node currentParentPane = nodeToNodeMap.get(node);
 		if ( currentParentPane != null && !currentParentPane.equals(parentPane) && currentParentPane instanceof Pane )
-			((Pane)currentParentPane).getChildren().remove(pane);
+			((Pane)currentParentPane).getChildren().remove(node);
 		
 		// Make sure we have a parent
 		if ( parentPane == null )
 			return;
 
 		// Add us to new parent
-		if ( parentPane instanceof Pane && !((Pane)parentPane).getChildren().contains(pane) ) {
-			((Pane)parentPane).getChildren().add(pane);
-			nodeToNodeMap.put((Pane) pane, parentPane);
+		if ( parentPane instanceof Pane && !((Pane)parentPane).getChildren().contains(node) ) {
+			((Pane)parentPane).getChildren().add(node);
+			nodeToNodeMap.put(node, parentPane);
 		}
 	}
 

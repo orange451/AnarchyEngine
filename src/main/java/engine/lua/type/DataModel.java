@@ -167,6 +167,11 @@ public abstract class DataModel extends LuaDatatype {
 	}
 
 	@Override
+	public void set(String key, LuaValue value) {
+		this.set(LuaValue.valueOf(key), value);
+	}
+	
+	@Override
 	public void set(LuaValue key, LuaValue value) {
 		if ( this.destroyed )
 			return;

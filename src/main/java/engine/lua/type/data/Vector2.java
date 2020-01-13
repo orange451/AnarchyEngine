@@ -243,7 +243,7 @@ public class Vector2 extends LuaValuetype {
 	@Override
 	public LuaValuetype fromString(String input) {
 		String[] t = input.replace(" ", "").split(",");
-		if ( t.length != 3 )
+		if ( t.length != 2 )
 			return this;
 		
 		Vector2 vec = new Vector2(new Vector2f(
