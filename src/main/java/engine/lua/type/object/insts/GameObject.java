@@ -17,13 +17,11 @@ import org.luaj.vm2.LuaValue;
 import engine.Game;
 import engine.InternalGameThread;
 import engine.InternalRenderThread;
-import engine.gl.shader.BaseShader;
 import engine.lua.type.NumberClamp;
 import engine.lua.type.data.Matrix4;
 import engine.lua.type.data.Vector3;
 import engine.lua.type.object.Instance;
 import engine.lua.type.object.Positionable;
-import engine.lua.type.object.PrefabRenderer;
 import engine.lua.type.object.TreeViewable;
 import engine.observer.RenderableInstance;
 import engine.util.AABBUtil;
@@ -77,22 +75,6 @@ public class GameObject extends Instance implements RenderableInstance,TreeViewa
 				}
 			}
 		});
-	}
-	
-	public void render(BaseShader shader) {
-		if ( this.getParent().isnil() )
-			return;
-		
-		if ( this.get(C_PREFAB).isnil() )
-			return;
-		
-		// Get prefab/matrix
-		Prefab luaPrefab = (Prefab) this.rawget(C_PREFAB);
-		Matrix4 matrix = (Matrix4) this.rawget(C_WORLDMATRIX);
-		
-		// Render
-		PrefabRenderer prefab = luaPrefab.getPrefab();
-		prefab.render(shader, matrix.getInternal());
 	}
 	
 	/**

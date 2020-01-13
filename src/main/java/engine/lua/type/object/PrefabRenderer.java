@@ -15,16 +15,10 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
-import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
-import engine.gl.MaterialGL;
-import engine.gl.LegacyPipeline;
-import engine.gl.Resources;
 import engine.gl.mesh.BufferedMesh;
-import engine.gl.shader.BaseShader;
 import engine.lua.type.LuaConnection;
-import engine.lua.type.object.insts.Material;
 import engine.lua.type.object.insts.Mesh;
 import engine.lua.type.object.insts.Model;
 import engine.lua.type.object.insts.Prefab;
@@ -50,46 +44,6 @@ public class PrefabRenderer {
 		});
 	}
 
-	private Matrix4f tempWorldMatrix = new Matrix4f();
-	
-	public void render(BaseShader shader, Matrix4f worldMatrix) {
-		// World matrix remains the same for all meshes inside. So you can optimize by setting once.
-		Matrix4f wmat = tempWorldMatrix.set(worldMatrix);
-		wmat.scale(parent.getScale());
-		shader.setWorldMatrix(wmat);
-		
-		// Loop through each model and render
-		synchronized(models) {
-			for (int i = 0; i < models.size(); i++) {
-				Model p = models.get(i);
-				
-				// Get mesh
-				BufferedMesh mesh = p.getMeshInternal();
-				if ( mesh == null )
-					mesh = Resources.MESH_SPHERE;
-				
-				// Get material
-				engine.gl.MaterialGL material = Resources.MATERIAL_BLANK;
-				Material ECSMat = p.getMaterial();
-				if ( ECSMat != null) {
-					MaterialGL GLMat = ECSMat.getMaterial();
-					if ( GLMat != null ) {
-						material = GLMat;
-					}
-				}
-				
-				// If transparent send to transparent queue
-				if ( material.getTransparency() > 0 ) {
-					LegacyPipeline.pipeline_get().addTransparentRenderableToQueue(p, wmat, 0.0f);
-					continue;
-				}
-				
-				// Draw
-				mesh.render(shader, null, material);
-			}
-		}
-	}
-	
 	private void calculateAABB() {
 		float scale = parent.getScale();
 		Model[] temp = models.toArray(new Model[models.size()]);

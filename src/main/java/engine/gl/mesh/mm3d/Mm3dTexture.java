@@ -30,8 +30,8 @@ public class Mm3dTexture {
 		
 		if ( path.contains(".") )
 			this.diffuseTexture = TextureUtils.loadSRGBTexture(path);
-		else
-			this.diffuseTexture = Resources.TEXTURE_WHITE_SRGB;
+		//else
+			//this.diffuseTexture = Resources.TEXTURE_WHITE_SRGB;
 	}
 	
 	public String getFullPath() {

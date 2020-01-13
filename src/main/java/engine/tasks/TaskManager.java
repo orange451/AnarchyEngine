@@ -37,18 +37,17 @@ public class TaskManager {
 
 	private static Queue<Task<?>> tasksMainThread = new ConcurrentLinkedQueue<>(),
 			tasksBackgroundThread = new ConcurrentLinkedQueue<>();
-	private static Thread mainThread, backgroundThread;
+	private static Thread backgroundThread;
 	private static boolean syncInterruptBackground;
 
 	private static long asyncWindow;
 
 	private static Queue<Task<?>> tasksRenderThread = new ConcurrentLinkedQueue<>(),
 			tasksRenderBackgroundThread = new ConcurrentLinkedQueue<>();
-	private static Thread renderThread, renderBackgroundThread;
+	private static Thread renderBackgroundThread;
 	private static boolean runBackgroundThread = true, syncInterruptRenderBackground = true;
 
 	public static void init() {
-		mainThread = Thread.currentThread(); // Let's assume init thread it's main
 		backgroundThread = new Thread(() -> {
 			while (true) {
 				if (!tasksBackgroundThread.isEmpty()) {
@@ -94,10 +93,7 @@ public class TaskManager {
 		if (t == null)
 			return null;
 
-		if (Thread.currentThread().getId() == mainThread.getId())
-			t.callI();
-		else
-			tasksMainThread.add(t);
+		tasksMainThread.add(t);
 		return t;
 	}
 
@@ -105,14 +101,10 @@ public class TaskManager {
 		if (t == null)
 			return null;
 
-		if (Thread.currentThread().getId() == backgroundThread.getId())
-			t.callI();
-		else {
-			tasksBackgroundThread.add(t);
-			if (!syncInterruptBackground) {
-				syncInterruptBackground = true;
-				backgroundThread.interrupt();
-			}
+		tasksBackgroundThread.add(t);
+		if (!syncInterruptBackground) {
+			syncInterruptBackground = true;
+			backgroundThread.interrupt();
 		}
 		return t;
 	}
@@ -155,10 +147,7 @@ public class TaskManager {
 		if (t == null)
 			return null;
 
-		if (Thread.currentThread().getId() == renderThread.getId())
-			t.callI();
-		else
-			tasksRenderThread.add(t);
+		tasksRenderThread.add(t);
 		return t;
 	}
 
@@ -166,14 +155,10 @@ public class TaskManager {
 		if (t == null)
 			return null;
 
-		if (Thread.currentThread().getId() == renderBackgroundThread.getId())
-			t.callI();
-		else {
-			tasksRenderBackgroundThread.add(t);
-			if (!syncInterruptRenderBackground) {
-				syncInterruptRenderBackground = true;
-				renderBackgroundThread.interrupt();
-			}
+		tasksRenderBackgroundThread.add(t);
+		if (!syncInterruptRenderBackground) {
+			syncInterruptRenderBackground = true;
+			renderBackgroundThread.interrupt();
 		}
 		return t;
 	}
@@ -225,10 +210,6 @@ public class TaskManager {
 		while (renderBackgroundThread.isAlive())
 			ThreadUtils.sleep(100);
 		glfwDestroyWindow(asyncWindow);
-	}
-
-	public static void setRenderThread(Thread renderThread) {
-		TaskManager.renderThread = renderThread;
 	}
 
 }

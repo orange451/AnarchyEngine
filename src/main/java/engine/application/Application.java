@@ -48,15 +48,18 @@ public abstract class Application implements Tickable {
 		if (callingClassName == null) {
 			throw new RuntimeException("Error: unable to determine Application class");
 		}
+		Object app = null;
 
 		try {
 			Class<?> theClass = Class.forName(callingClassName, true, Thread.currentThread().getContextClassLoader());
-			Object app = theClass.newInstance();
-			Application application = (Application) app;
-			application.onStart((String[]) o);
+			app = theClass.newInstance();
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
+		if (app == null)
+			return;
+		Application application = (Application) app;
+		application.onStart((String[]) o);
 	}
 
 	public Application() {

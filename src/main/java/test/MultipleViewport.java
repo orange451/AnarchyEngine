@@ -31,7 +31,7 @@ public class MultipleViewport extends ClientApplication {
 		secondaryPipeline.render();
 
 		// Draw to screen
-		secondaryPipeline.ortho(windowWidth, windowHeight);
+		/*secondaryPipeline.ortho(windowWidth, windowHeight);
 		secondaryPipeline.shader_reset();
 		secondaryPipeline.getPipelineBuffer().getTextureDiffuse().bind();
 		GL11.glViewport(0, 0, viewportWidth, viewportHeight);
@@ -39,7 +39,7 @@ public class MultipleViewport extends ClientApplication {
 		GL11.glEnable(GL11.GL_BLEND);
 		GL11.glBlendFunc(GL11.GL_ONE, GL11.GL_ONE_MINUS_SRC_ALPHA);
 
-		secondaryPipeline.fullscreenQuad();
+		secondaryPipeline.fullscreenQuad();*/
 	}
 
 	@Override

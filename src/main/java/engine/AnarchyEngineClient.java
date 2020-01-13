@@ -237,7 +237,6 @@ public abstract class AnarchyEngineClient extends AnarchyEngine implements Rende
 		uiNode = new AnarchyEngineClientUIFrame();
 
 		TaskManager.switchToSharedContext(window);
-		TaskManager.setRenderThread(Thread.currentThread());
 
 		// Start thread
 		try {

@@ -40,7 +40,7 @@ import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL20;
-import engine.gl.SkyBox;
+
 import engine.gl.Texture2D;
 import engine.io.Image;
 import engine.util.TextureUtils;
@@ -570,22 +570,4 @@ public class BaseShader {
 		lastSetTexture.put(unit, texture);
 	}
 
-	/**
-	 * Sets the current texture unit in the shader.
-	 * @param uniform
-	 * @param texture
-	 * @param unit
-	 */
-	public void texture_set_stage(int uniform, SkyBox texture, int unit) {
-		if ( texture == null || (lastSetTexture.containsKey(unit)&&lastSetTexture.get(unit)==texture.getTextureID()) )
-			return;
-
-		GL13.glActiveTexture(GL13.GL_TEXTURE0 + unit);
-		texture.bind();
-		if ( uniform != -1 ) {
-			shader_set_uniform_i(uniform, unit);
-		}
-		
-		lastSetTexture.put(unit, texture.getTextureID());
-	}
 }

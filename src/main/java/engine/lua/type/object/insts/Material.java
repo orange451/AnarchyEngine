@@ -15,8 +15,6 @@ import java.util.HashMap;
 import org.joml.Vector3f;
 import org.luaj.vm2.LuaValue;
 
-import engine.gl.Resources;
-import engine.gl.Texture2D;
 import engine.lua.type.LuaConnection;
 import engine.lua.type.LuaEvent;
 import engine.lua.type.NumberClamp;
@@ -221,26 +219,24 @@ public class Material extends Asset implements TreeViewable {
 			}
 			changed = false;
 			
-			Texture2D dt = null;
+			engine.glv2.objects.Texture dt = null;
 			if ( !this.rawget(C_DIFFUSETEXTURE).isnil() ) {
 				dt = ((Texture)this.rawget(C_DIFFUSETEXTURE)).getTexture();
 			}
 			material.setDiffuseTexture(dt);
 
-			Texture2D nt = null;
+			engine.glv2.objects.Texture nt = null;
 			if ( !this.rawget(C_NORMALTEXTURE).isnil() ) {
 				nt = ((Texture)this.rawget(C_NORMALTEXTURE)).getTexture();
-				if ( nt.equals(Resources.TEXTURE_WHITE_RGBA) || nt.equals(Resources.TEXTURE_WHITE_SRGB) )
-					nt = null;
 			}
 			material.setNormalTexture(nt);
 			
-			Texture2D mt = null;
+			engine.glv2.objects.Texture mt = null;
 			if ( !this.rawget(C_METALLICTEXTURE).isnil() )
 				mt = ((Texture)this.rawget(C_METALLICTEXTURE)).getTexture();
 			material.setMetalnessTexture(mt);
 			
-			Texture2D rt = null;
+			engine.glv2.objects.Texture rt = null;
 			if ( !this.rawget(C_ROUGHNESSTEXTURE).isnil() )
 				rt = ((Texture)this.rawget(C_ROUGHNESSTEXTURE)).getTexture();
 			material.setRoughnessTexture(rt);

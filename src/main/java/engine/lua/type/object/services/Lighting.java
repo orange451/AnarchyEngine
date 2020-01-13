@@ -102,7 +102,6 @@ public class Lighting extends Service implements TreeViewable {
 		
 		if ( value.isnil() ) {
 			if (AnarchyEngineClient.pipeline instanceof LegacyPipeline) {
-				((LegacyPipeline)pp).getGBuffer().getMergeProcessor().setSkybox(null);
 			} else {
 				pp.setDyamicSkybox(null);
 				pp.setStaticSkybox(null);

@@ -154,7 +154,6 @@ public class SkyRenderer {
 			glCullFace(GL_BACK);
 		} else if (staticSky != null) {
 			if (staticSky.getImage() != null) {
-				staticSky.getImage().getTexture(); // Trigger image load
 				if (staticSky.getImage().hasLoaded()) {
 					staticSkyShader.start();
 					staticSkyShader.loadCamera(rd.camera, rd.projectionMatrix);
@@ -310,12 +309,12 @@ public class SkyRenderer {
 		stc.init();
 
 		glDisable(GL_BLEND);
-
+		
 		framebuffer.bind();
 		stc.start();
 		cube.bind(0);
 		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, staticSky.getImage().getTexture().getID());
+		glBindTexture(GL_TEXTURE_2D, staticSky.getImage().getTexture().getTexture());
 		stc.loadProjectionMatrix(camera.getProjectionMatrix());
 		for (int i = 0; i < 6; i++) {
 			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,

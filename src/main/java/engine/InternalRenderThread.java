@@ -12,8 +12,6 @@ package engine;
 
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -39,8 +37,6 @@ public class InternalRenderThread {
 	private Observable observable;
 	private ArrayList<Renderable> externalNotify;
 	
-	private static List<Runnable> runnables = Collections.synchronizedList(new ArrayList<Runnable>());
-
 	public InternalRenderThread(Renderable observer) {
 		this.observable = new Observable() {
 			@Override
@@ -91,10 +87,9 @@ public class InternalRenderThread {
 		long startTime = System.nanoTime();
 		long timer = System.currentTimeMillis();
 		double nanoSecond = 1e+9;
+		Sync sync = new Sync();
 
 		while ( InternalGameThread.isRunning() ) {
-			TaskManager.updateRenderThread();
-
 			//long t1 = System.nanoTime();
 			forceUpdate();
 			//long t2 = System.nanoTime();
@@ -112,7 +107,7 @@ public class InternalRenderThread {
 			startTime = System.nanoTime();
 
 			// Sync
-			Sync.sync( Math.max(Math.min(1000, desiredFPS), 30) );
+			sync.sync( Math.max(Math.min(1000, desiredFPS), 30) );
 			
 			// Check for window closing
 			if ( GLFW.glfwWindowShouldClose(window) ) {
@@ -131,16 +126,14 @@ public class InternalRenderThread {
 	}
 
 	public static void runLater(Runnable runnable) {
-		if ( runnables == null )
-			return;
-		
-		synchronized(runnables) {
-			runnables.add(runnable);
-		}
+		TaskManager.addTaskRenderThread(runnable);
 	}
 	
 	public void forceUpdate() {
 		long window = AnarchyEngineClient.window;
+		GLFW.glfwMakeContextCurrent(window);
+
+		TaskManager.updateRenderThread();
 
 		// Clear screen
 		GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT | GL11.GL_STENCIL_BUFFER_BIT);
@@ -150,7 +143,6 @@ public class InternalRenderThread {
 		GLFW.glfwPollEvents();
 		
 		// Set context to the window
-		GLFW.glfwMakeContextCurrent(window);
 
 		// Draw event
 		if ( Game.isLoaded() ) {
@@ -164,15 +156,6 @@ public class InternalRenderThread {
 			runService.renderPostEvent().fire(LuaValue.valueOf(delta));
 		}
 		
-		// Run runnables
-		synchronized(runnables) {
-			while ( runnables.size() > 0 ) {
-				Runnable r = runnables.get(0);
-				r.run();
-				runnables.remove(r);
-			}
-		}
-
 		// Send commands to GPU
 		GLFW.glfwSwapBuffers(window);
 	}

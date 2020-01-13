@@ -10,22 +10,19 @@
 
 package engine.gl;
 
-import static org.lwjgl.assimp.Assimp.*;
+import static org.lwjgl.assimp.Assimp.AI_CONFIG_PP_CT_MAX_SMOOTHING_ANGLE;
+import static org.lwjgl.assimp.Assimp.aiCreatePropertyStore;
+import static org.lwjgl.assimp.Assimp.aiSetImportPropertyFloat;
 
 import org.lwjgl.assimp.AIPropertyStore;
 
 import engine.gl.mesh.BufferedMesh;
-import engine.io.Image;
+import engine.glv2.objects.Texture;
+import engine.resources.ResourcesManager;
+import engine.tasks.TaskManager;
 import engine.util.MeshUtils;
-import engine.util.TextureUtils;
-import lwjgui.paint.Color;
 
 public class Resources {
-	public static Texture2D TEXTURE_WHITE_SRGB;
-	public static Texture2D TEXTURE_BLACK_SRGB;
-	public static Texture2D TEXTURE_WHITE_RGBA;
-	public static Texture2D TEXTURE_NORMAL_RGBA;
-	public static Texture2D TEXTURE_DEBUG;
 	public static BufferedMesh MESH_SPHERE;
 	public static BufferedMesh MESH_CUBE;
 	public static BufferedMesh MESH_CONE;
@@ -35,12 +32,17 @@ public class Resources {
 
 	public static AIPropertyStore propertyStore;
 
+	public static Texture diffuse, normal, roughness, metallic;
+
 	public static void init() {
-		TEXTURE_WHITE_SRGB = TextureUtils.loadSRGBTextureFromImage(new Image(Color.WHITE, 1, 1));
-		TEXTURE_BLACK_SRGB = TextureUtils.loadSRGBTextureFromImage(new Image(Color.BLACK, 1, 1));
-		TEXTURE_WHITE_RGBA = TextureUtils.loadRGBATextureFromImage(new Image(Color.WHITE, 1, 1));
-		TEXTURE_NORMAL_RGBA = TextureUtils.loadRGBATextureFromImage(new Image(new Color(127, 127, 255), 1, 1));
-		TEXTURE_DEBUG = TextureUtils.loadRGBATexture("engine/gl/checker.png");
+		ResourcesManager.loadTexture("assets/textures/def/d.png", (value) -> diffuse = value);
+		ResourcesManager.loadTextureMisc("assets/textures/def/d_n.png", (value) -> normal = value);
+		ResourcesManager.loadTextureMisc("assets/textures/def/d_r.png", (value) -> roughness = value);
+		ResourcesManager.loadTextureMisc("assets/textures/def/d_m.png", (value) -> metallic = value);
+		TaskManager.addTaskRenderBackgroundThread(() -> {
+			MATERIAL_BLANK = new MaterialGL().setDiffuseTexture(diffuse).setNormalTexture(normal)
+					.setRoughnessTexture(roughness).setMetalnessTexture(metallic);
+		});
 
 		MESH_SPHERE = MeshUtils.sphere(1, 16);
 		MESH_CUBE = MeshUtils.cube(1);
@@ -48,18 +50,14 @@ public class Resources {
 		MESH_CYLINDER = MeshUtils.cylinder(1, 1, 16);
 		MESH_UNIT_QUAD = MeshUtils.quad(1, 1);
 
-		MATERIAL_BLANK = new MaterialGL().setDiffuseTexture(TEXTURE_WHITE_RGBA).setNormalTexture(TEXTURE_NORMAL_RGBA)
-				.setMetalnessTexture(TEXTURE_WHITE_SRGB).setRoughnessTexture(TEXTURE_WHITE_SRGB);
-
 		propertyStore = aiCreatePropertyStore();
 		aiSetImportPropertyFloat(propertyStore, AI_CONFIG_PP_CT_MAX_SMOOTHING_ANGLE, 30f);
 	}
-	
+
 	public static void dispose() {
-		TEXTURE_WHITE_SRGB.delete();
-		TEXTURE_BLACK_SRGB.delete();
-		TEXTURE_WHITE_RGBA.delete();
-		TEXTURE_NORMAL_RGBA.delete();
-		TEXTURE_DEBUG.delete();
+		diffuse.dispose();
+		normal.dispose();
+		roughness.dispose();
+		metallic.dispose();
 	}
 }

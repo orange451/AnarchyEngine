@@ -28,7 +28,6 @@ import org.json.simple.parser.ParseException;
 import org.luaj.vm2.LuaValue;
 import org.lwjgl.glfw.GLFW;
 
-import engine.io.AsynchronousResourceLoader;
 import engine.io.Load;
 import engine.io.Save;
 import engine.lua.LuaEngine;
@@ -68,7 +67,6 @@ import ide.IDE;
 public class Game implements Tickable {
 	private static Game game;
 	private static boolean loaded;
-	private static AsynchronousResourceLoader resourceLoader;
 	private static List<Runnable> runnables = Collections.synchronizedList(new ArrayList<Runnable>());
 	private static List<Instance> selectedInstances = Collections.synchronizedList(new ArrayList<Instance>());
 	
@@ -193,10 +191,6 @@ public class Game implements Tickable {
 		return servs;
 	}
 	
-	public static AsynchronousResourceLoader resourceLoader() {
-		return resourceLoader;
-	}
-
 	private static final LuaValue C_GAME = LuaValue.valueOf("game");
 	private static final LuaValue C_WORKSPACE = LuaValue.valueOf("Workspace");
 	private static final LuaValue C_LIGHTING = LuaValue.valueOf("Lighting");
@@ -395,9 +389,6 @@ public class Game implements Tickable {
 			didLoad = true;
 		}
 		loaded = true;
-		
-		if ( resourceLoader == null )
-			resourceLoader = new AsynchronousResourceLoader();
 		
 		selectedInstances.clear();
 		game.gameUpdate(true);

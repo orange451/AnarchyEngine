@@ -63,6 +63,7 @@ import engine.lua.type.object.services.StarterPlayerScripts;
 import ide.IDE;
 import ide.layout.IdePane;
 import ide.layout.windows.icons.Icons;
+import lwjgui.LWJGUI;
 import lwjgui.collections.ObservableList;
 import lwjgui.geometry.Insets;
 import lwjgui.scene.Node;
@@ -452,7 +453,7 @@ public class IdeExplorer extends IdePane {
 		// Cut
 		MenuItem insert = new MenuItem("Insert Object  \u25ba", Icons.icon_new.getView());
 		insert.setOnAction(event -> {
-			new InsertWindow();
+			LWJGUI.runLater(() -> new InsertWindow());
 		});
 		c.getItems().add(insert);
 		

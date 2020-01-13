@@ -77,11 +77,12 @@ public class InternalGameThread extends Observable implements Runnable {
 		
 		double nanoSecond = 1e+9;
 		long lastTime = System.nanoTime();
+		Sync sync = new Sync();
 		while(running) {
 			TaskManager.updateMainThread();
 
 			// Limit TPS to desiredTPS max
-			float cvtps = Math.max(Math.min(120, desiredTPS), 2);
+			int cvtps = Math.max(Math.min(120, desiredTPS), 2);
 
 			// Get approximate delta time
 			double ticksPerSecond = nanoSecond/cvtps;
@@ -128,7 +129,7 @@ public class InternalGameThread extends Observable implements Runnable {
 					}
 				}
 
-				Sync.sync( (int)cvtps );
+				sync.sync( cvtps );
 			}
 		}
 		TaskManager.runAndStopMainThread();

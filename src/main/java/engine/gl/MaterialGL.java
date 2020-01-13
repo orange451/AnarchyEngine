@@ -12,16 +12,15 @@ package engine.gl;
 
 import org.joml.Vector3f;
 
-import engine.gl.ibl.SkySphere;
-import engine.gl.ibl.SkySphereIBL;
 import engine.gl.shader.BaseShader;
+import engine.glv2.objects.Texture;
 import lwjgui.paint.Color;
 
 public class MaterialGL {
-	private Texture2D diffuseTexture;
-	private Texture2D normalTexture;
-	private Texture2D metalnessTexture;
-	private Texture2D roughnessTexture;
+	private Texture diffuseTexture;
+	private Texture normalTexture;
+	private Texture metalnessTexture;
+	private Texture roughnessTexture;
 
 	private float metalness = 0.2f;
 	private float roughness = 0.3f;
@@ -104,9 +103,9 @@ public class MaterialGL {
 		return this.color;
 	}
 
-	public MaterialGL setDiffuseTexture(Texture2D texture) {
+	public MaterialGL setDiffuseTexture(Texture texture) {
 		if ( texture == null ) {
-			this.diffuseTexture = Resources.TEXTURE_WHITE_SRGB;
+			this.diffuseTexture = Resources.diffuse;
 		} else {
 			this.diffuseTexture = texture;
 		}
@@ -114,9 +113,9 @@ public class MaterialGL {
 		return this;
 	}	
 	
-	public MaterialGL setNormalTexture(Texture2D texture) {
+	public MaterialGL setNormalTexture(Texture texture) {
 		if ( texture == null ) {
-			this.normalTexture = Resources.TEXTURE_NORMAL_RGBA;
+			this.normalTexture = Resources.normal;
 		} else {
 			this.normalTexture = texture;
 		}
@@ -124,9 +123,9 @@ public class MaterialGL {
 		return this;
 	}
 	
-	public MaterialGL setMetalnessTexture(Texture2D texture) {
+	public MaterialGL setMetalnessTexture(Texture texture) {
 		if ( texture == null ) {
-			this.metalnessTexture = Resources.TEXTURE_WHITE_RGBA;
+			this.metalnessTexture = Resources.metallic;
 		} else {
 			this.metalnessTexture = texture;
 		}
@@ -134,9 +133,9 @@ public class MaterialGL {
 		return this;
 	}
 	
-	public MaterialGL setRoughnessTexture(Texture2D texture) {
+	public MaterialGL setRoughnessTexture(Texture texture) {
 		if ( texture == null ) {
-			this.roughnessTexture = Resources.TEXTURE_WHITE_RGBA;
+			this.roughnessTexture = Resources.roughness;
 		} else {
 			this.roughnessTexture = texture;
 		}
@@ -144,82 +143,28 @@ public class MaterialGL {
 		return this;
 	}
 
-	public Texture2D getDiffuseTexture() {
+	public Texture getDiffuseTexture() {
 		return this.diffuseTexture;
 	}
 
-	public Texture2D getNormalTexture() {
+	public Texture getNormalTexture() {
 		return this.normalTexture;
 	}
 
-	public Texture2D getMetalnessTexture() {
+	public Texture getMetalnessTexture() {
 		return this.metalnessTexture;
 	}
 
-	public Texture2D getRoughnessTexture() {
+	public Texture getRoughnessTexture() {
 		return this.roughnessTexture;
 	}
 
-	private final static String U_METALNESS = "uMetalness";
-	private final static String U_ROUGHNESS = "uRoughness";
-	private final static String U_REFLECTIVE = "uReflective";
-	private final static String U_MATERIALCOLOR = "uMaterialColor";
-	private final static String U_MATERIALEMISSIVE = "uMaterialEmissive";
-	private final static String U_AMBIENT = "uAmbient";
-	private final static String U_ENABLESKYBOX = "enableSkybox";
-	private final static String U_ENABLEIBL = "enableIBL";
-	private final static String U_NORMALMAPENABLED = "normalMapEnabled";
-	private final static String U_TRANSPARENCYMATERIAL = "uTransparencyMaterial";
-
-	private final static String U_TEXTURE_CUBEMAP = "texture_cubemap";
-	private final static String U_SKYBOX_POWER = "uSkyBoxLightPower";
-	private final static String U_SKYBOX_MULTIPLIER = "uSkyBoxLightMultiplier";
-	
+	@Deprecated
 	public void bind(BaseShader shader) {
 		if ( shader == null )
 			return;
 		
 		shader.debug = true;
-		
-		// Bind diffuse/albedo
-		shader.texture_set_stage(shader.diffuseTextureLoc, diffuseTexture, 0);
-		
-		// Bind normalmap
-		shader.texture_set_stage(shader.normalTextureLoc, normalTexture, 1);
-		
-		// Bind metalness
-		shader.texture_set_stage(shader.metalnessTextureLoc, metalnessTexture, 2);
-		
-		// Bind roughness
-		shader.texture_set_stage(shader.roughnessTextureLoc, roughnessTexture, 3);
-		
-		// Bind environment map
-		SkyBox cubemap = LegacyPipeline.pipeline_get().getGBuffer().getMergeProcessor().getSkybox();
-		
-		// Bind IBL map (if it exists)
-		SkySphere ibl = null;
-		if ( cubemap != null ) {
-			shader.texture_set_stage(shader.shader_get_uniform(U_TEXTURE_CUBEMAP), cubemap, 4);
-			
-			if ( cubemap instanceof SkySphereIBL ) {
-				shader.shader_set_uniform_f(shader.shader_get_uniform(U_SKYBOX_POWER), ((SkySphereIBL)cubemap).getLightPower());
-				shader.shader_set_uniform_f(shader.shader_get_uniform(U_SKYBOX_MULTIPLIER), ((SkySphereIBL)cubemap).getLightMultiplier());
-			} else {
-				shader.shader_set_uniform_f(shader.shader_get_uniform(U_SKYBOX_MULTIPLIER), 1.0f);
-			}
-		}
-
-		// Set uniforms
-		shader.shader_set_uniform_f(shader.shader_get_uniform(U_METALNESS), metalness);
-		shader.shader_set_uniform_f(shader.shader_get_uniform(U_ROUGHNESS), roughness);
-		shader.shader_set_uniform_f(shader.shader_get_uniform(U_REFLECTIVE), reflective);
-		shader.shader_set_uniform_f(shader.shader_get_uniform(U_MATERIALCOLOR), color);
-		shader.shader_set_uniform_f(shader.shader_get_uniform(U_MATERIALEMISSIVE), emissive);
-		shader.shader_set_uniform_f(shader.shader_get_uniform(U_AMBIENT), LegacyPipeline.pipeline_get().getGBuffer().getAmbient());
-		shader.shader_set_uniform_f(shader.shader_get_uniform(U_ENABLESKYBOX), cubemap == null ? 0:1);
-		shader.shader_set_uniform_f(shader.shader_get_uniform(U_ENABLEIBL), ibl == null ? 0:1);
-		shader.shader_set_uniform_f(shader.shader_get_uniform(U_NORMALMAPENABLED), normalTexture.equals(Resources.TEXTURE_NORMAL_RGBA) ? 0:1);
-		shader.shader_set_uniform_f(shader.shader_get_uniform(U_TRANSPARENCYMATERIAL), transparency);
 	}
 
 }

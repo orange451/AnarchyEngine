@@ -242,12 +242,15 @@ public class ModelMM3D {
 				if (group.getMaterial() >= 0 && group.getMaterial() < 4096) {
 					Mm3dMaterial m3dMat = this.materials.get(group.getMaterial());
 					MaterialGL material = m3dMat.getModelMaterial();
-					if ( m3dMat.getTextureIndex() < this.textures.size() )
-						material.setDiffuseTexture(this.textures.get(m3dMat.getTextureIndex()).getDiffuseTexture());
+					
+					// TODO: Texture2D
+					//if ( m3dMat.getTextureIndex() < this.textures.size() )
+						//material.setDiffuseTexture(this.textures.get(m3dMat.getTextureIndex()).getDiffuseTexture());
 
 					staticModel.addModel(tempModel, material);
 				} else {
-					staticModel.addModel(tempModel, new MaterialGL().setDiffuseTexture(Resources.TEXTURE_WHITE_SRGB));
+					//TODO: Texture2D
+					//staticModel.addModel(tempModel, new MaterialGL().setDiffuseTexture(Resources.TEXTURE_WHITE_SRGB));
 				}
 			}
 		}
@@ -354,13 +357,15 @@ public class ModelMM3D {
 			// Diffuse Texture
 			if ( values[0].equals("map_Kd") ) {
 				String tex = values[1];
-				currentMaterial.setDiffuseTexture( TextureUtils.loadSRGBTexture( directory + tex ) );
+				//TODO: Texture2D
+				//currentMaterial.setDiffuseTexture( TextureUtils.loadSRGBTexture( directory + tex ) );
 			}
 
 			// Normal Texture
 			if ( values[0].equals("map_Kn") ) {
 				String tex = values[1];
-				currentMaterial.setNormalTexture( TextureUtils.loadRGBATexture( directory + tex ) );
+				//TODO: Texture2D
+				//currentMaterial.setNormalTexture( TextureUtils.loadRGBATexture( directory + tex ) );
 			}
 		}
 	}

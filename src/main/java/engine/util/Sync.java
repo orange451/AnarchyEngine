@@ -1,18 +1,4 @@
 /*
- *
- * Copyright (C) 2015-2020 Anarchy Engine Open Source Contributors (see CONTRIBUTORS.md)
- *
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at https://mozilla.org/MPL/2.0/.
- *
- */
-
-package engine.util;
-
-import java.util.HashMap;
-
-/*
  * Copyright (c) 2002-2012 LWJGL Project
  * All rights reserved.
  *
@@ -43,130 +29,81 @@ import java.util.HashMap;
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+package engine.util;
 
 /**
-* A highly accurate sync method that continually adapts to the system 
-* it runs on to provide reliable results.
-*
-* @author Riven
-* @author kappaOne
-* @author orange451
-*/
+ * A highly accurate sync method that continually adapts to the system it runs
+ * on to provide reliable results.
+ *
+ * @author Riven
+ * @author kappaOne
+ */
 public class Sync {
-
-	/** number of nano seconds in a second */
-	private static final long NANOS_IN_SECOND = 1000L * 1000L * 1000L;
-
-	/** The time to sleep/yield until the next frame */
-	private static HashMap<Thread,Long> nextFrameMap;
 	
-	/** whether the initialisation code has run */
-	private static HashMap<Thread,Boolean> initialisedMap;
-	
-	/** for calculating the averages the previous sleep/yield times are stored */
-	private static HashMap<Thread,RunningAvg> sleepDurationsMap;
-	private static HashMap<Thread,RunningAvg> yieldDurationsMap;
-	
-	/** initialise above fields */
 	static {
-		nextFrameMap = new HashMap<Thread,Long>();
-		initialisedMap = new HashMap<Thread,Boolean>();
-		sleepDurationsMap = new HashMap<Thread,RunningAvg>();
-		yieldDurationsMap = new HashMap<Thread,RunningAvg>();
-	}
-	
-	
-	/**
-	 * An accurate sync method that will attempt to run at a constant frame rate.
-	 * It should be called once every frame.
-	 * 
-	 * @param fps - the desired frame rate, in frames per second
-	 */
-	public static void sync(int fps) {
-		Thread c = checkThread();
-		if (fps <= 0) return;
-		if (!initialisedMap.get(c)) initialise();
-		
-		Long nextFrame = nextFrameMap.get(c);
-		RunningAvg sleepDurations = sleepDurationsMap.get(c);
-		RunningAvg yieldDurations = yieldDurationsMap.get(c);
-		
-		try {
-			// sleep until the average sleep time is greater than the time remaining till nextFrame
-			for (long t0 = getTime(), t1; (nextFrame - t0) > sleepDurations.avg(); t0 = t1) {
-				Thread.sleep(1);
-				sleepDurations.add((t1 = getTime()) - t0); // update average sleep time
-			}
-	
-			// slowly dampen sleep average if too high to avoid yielding too much
-			sleepDurations.dampenForLowResTicker();
-	
-			// yield until the average yield time is greater than the time remaining till nextFrame
-			for (long t0 = getTime(), t1; (nextFrame - t0) > yieldDurations.avg(); t0 = t1) {
-				Thread.yield();
-				yieldDurations.add((t1 = getTime()) - t0); // update average yield time
-			}
-		} catch (InterruptedException e) {
-			//
-		}
-		
-		// schedule next frame, drop frame(s) if already too late for next frame
-		nextFrameMap.put(c, Math.max(nextFrame + NANOS_IN_SECOND / fps, getTime()));
-	}
-	
-	private static Thread checkThread() {
-		Thread c = Thread.currentThread();
-
-		if ( !nextFrameMap.containsKey(c) )
-			nextFrameMap.put(c, (long) 0);
-		
-		if ( !initialisedMap.containsKey(c) )
-			initialisedMap.put(c, false);
-		
-		if ( !sleepDurationsMap.containsKey(c) )
-			sleepDurationsMap.put(c, new RunningAvg(10));
-		
-		if ( !yieldDurationsMap.containsKey(c) )
-			yieldDurationsMap.put(c, new RunningAvg(10));
-
-		return c;
-	}
-
-	/**
-	 * This method will initialise the sync method by setting initial
-	 * values for sleepDurations/yieldDurations and nextFrame.
-	 * 
-	 * If running on windows it will start the sleep timer fix.
-	 */
-	private static void initialise() {
-		Thread c = checkThread();
-		
-		initialisedMap.put(c,true);
-		
-		sleepDurationsMap.get(c).init(1000 * 1000);
-		yieldDurationsMap.get(c).init((int) (-(getTime() - getTime()) * 1.333));
-		
-		nextFrameMap.put(c, getTime());
-		
 		String osName = System.getProperty("os.name");
-		
 		if (osName.startsWith("Win")) {
-			// On windows the sleep functions can be highly inaccurate by 
-			// over 10ms making in unusable. However it can be forced to 
+			// On windows the sleep functions can be highly inaccurate by
+			// over 10ms making in unusable. However it can be forced to
 			// be a bit more accurate by running a separate sleeping daemon
 			// thread.
-			Thread timerAccuracyThread = new Thread(new Runnable() {
-				public void run() {
+			Thread timerAccuracyThread = new Thread(() -> {
+				while (true) {
 					try {
 						Thread.sleep(Long.MAX_VALUE);
-					} catch (Exception e) {}
+					} catch (Exception e) {
+					}
 				}
 			});
-			
+
 			timerAccuracyThread.setName("LWJGL Timer");
 			timerAccuracyThread.setDaemon(true);
 			timerAccuracyThread.start();
 		}
+	}
+
+	private static final long NANOS_IN_SECOND = 1000L * 1000L * 1000L;
+	private long nextFrame = 0;
+	private RunningAvg sleepDurations = new RunningAvg(10);
+	private RunningAvg yieldDurations = new RunningAvg(10);
+	private double lastLoopTime;
+	public float timeCount;
+
+	public void sync(int fps) {
+		if (fps <= 0)
+			return;
+		try {
+			for (long t0 = getTime(), t1; (nextFrame - t0) > sleepDurations.avg(); t0 = t1) {
+				Thread.sleep(1);
+				sleepDurations.add((t1 = getTime()) - t0); // update average
+															// sleep time
+			}
+			sleepDurations.dampenForLowResTicker();
+			for (long t0 = getTime(), t1; (nextFrame - t0) > yieldDurations.avg(); t0 = t1) {
+				Thread.yield();
+				yieldDurations.add((t1 = getTime()) - t0); // update average
+															// yield time
+			}
+		} catch (InterruptedException e) {
+
+		}
+
+		nextFrame = Math.max(nextFrame + NANOS_IN_SECOND / fps, getTime());
+	}
+
+	public Sync() {
+		sleepDurations.init(1000 * 1000);
+		yieldDurations.init((int) (-(getTime() - getTime()) * 1.333));
+		nextFrame = getTime();
+		lastLoopTime = System.nanoTime();
+	}
+
+	public float getDelta() {
+		long time = System.nanoTime();
+		double delta = (float) (time - this.lastLoopTime);
+		this.lastLoopTime = time;
+		this.timeCount += delta / 1000000000;
+		return (float) (delta / 1000000000);
 	}
 
 	/**
@@ -178,12 +115,13 @@ public class Sync {
 		return System.nanoTime();
 	}
 
-	private static class RunningAvg {
+	private class RunningAvg {
 		private final long[] slots;
 		private int offset;
-		
-		private static final long DAMPEN_THRESHOLD = 10 * 1000L * 1000L; // 10ms in nanoseconds
-		private static final float DAMPEN_FACTOR = 0.9f; // don't change: 0.9f is exactly right!
+
+		private static final long DAMPEN_THRESHOLD = 10 * 1000L * 1000L; // 10ms
+		private static final float DAMPEN_FACTOR = 0.9f; // don't change: 0.9f
+															// is exactly right!
 
 		public RunningAvg(int slotCount) {
 			this.slots = new long[slotCount];
@@ -208,7 +146,7 @@ public class Sync {
 			}
 			return sum / this.slots.length;
 		}
-		
+
 		public void dampenForLowResTicker() {
 			if (this.avg() > DAMPEN_THRESHOLD) {
 				for (int i = 0; i < this.slots.length; i++) {
@@ -217,4 +155,5 @@ public class Sync {
 			}
 		}
 	}
+
 }

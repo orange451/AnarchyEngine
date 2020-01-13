@@ -183,7 +183,7 @@ public class IdeMaterialViewer extends IdePane {
 					BGMESH.forceSetParent((LuaValue) renderableWorld);
 					
 					Texture BGTEXTURE = new Texture();
-					BGTEXTURE.setTexture(Resources.TEXTURE_DEBUG);
+					//BGTEXTURE.setTexture(Resources.TEXTURE_DEBUG);
 					BGTEXTURE.forceSetParent((LuaValue) renderableWorld);
 					
 					Material BGMATERIAL = new Material();
@@ -215,7 +215,7 @@ public class IdeMaterialViewer extends IdePane {
 					if ( shader == null ) {
 						shader = new GenericShader();
 					}
-					
+					/*
 					if ( materialPipeline == null && renderAllowence > 0 && Game.isLoaded() ) {
 						renderAllowence -= 1;
 						
@@ -273,7 +273,7 @@ public class IdeMaterialViewer extends IdePane {
 					if ( materialPipeline != null ) {
 						Surface surface = materialPipeline.getPipelineBuffer();
 						surface.render(shader);
-					}
+					}*/
 				}
 			});
 			this.getChildren().add(oglPane);

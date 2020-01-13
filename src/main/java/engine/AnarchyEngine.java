@@ -51,9 +51,5 @@ public abstract class AnarchyEngine extends Application {
 		
 		// Turn off lua
 		LuaEngine.cleanup();
-		
-		// Shut down resource loader
-		System.out.println("Shutting down resources");
-		Game.resourceLoader().shutdown();
 	}
 }

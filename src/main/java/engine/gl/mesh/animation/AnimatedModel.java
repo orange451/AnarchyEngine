@@ -10,9 +10,6 @@
 
 package engine.gl.mesh.animation;
 
-import static org.lwjgl.opengl.GL30.glBindFragDataLocation;
-
-import java.net.URL;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -22,21 +19,12 @@ import java.util.Map.Entry;
 import org.joml.Matrix4f;
 import org.joml.Vector4f;
 import org.luaj.vm2.LuaValue;
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL20;
 import org.lwjgl.system.MemoryUtil;
 
-import engine.InternalRenderThread;
-import engine.gl.MaterialGL;
-import engine.gl.LegacyPipeline;
-import engine.gl.Resources;
 import engine.gl.mesh.BufferedMesh;
-import engine.gl.renderer.GBuffer;
-import engine.gl.shader.BaseShader;
 import engine.lua.type.data.Matrix4;
 import engine.lua.type.object.Instance;
 import engine.lua.type.object.insts.GameObject;
-import engine.lua.type.object.insts.Material;
 import engine.lua.type.object.insts.Mesh;
 import engine.lua.type.object.insts.Model;
 import engine.lua.type.object.insts.Prefab;
@@ -56,22 +44,16 @@ public class AnimatedModel {
 	private HashMap<String, Integer> boneIndices;
 	private HashMap<Integer, String> indexToBoneMap;
 	private Bones bonesFolder;
-	private Prefab prefab;
 	
 	protected HashMap<AnimatedModelSubMesh, Model> meshToModelMap = new HashMap<>();
 	protected List<AnimatedModelSubMesh> meshes = new ArrayList<>();
 	protected AnimationController controller;
 	
 	private Matrix4f tempMat;
-	private SkinningShader shader;
 	
 	public AnimatedModel(AnimationController controller) {
 		this.controller = controller;
 		this.tempMat = new Matrix4f();
-		
-		InternalRenderThread.runLater(()->{
-			this.shader = new SkinningShader();
-		});
 	}
 	
 	private static final LuaValue C_BONETREE = LuaValue.valueOf("BoneTree");
@@ -82,7 +64,6 @@ public class AnimatedModel {
 
 		GameObject linked = controller.getLinkedInstance();
 		Prefab prefab = linked.getPrefab();
-		this.prefab = prefab;
 
 		// Get animation data
 		Instance aData = prefab.findFirstChildOfClass("AnimationData");
@@ -273,57 +254,6 @@ public class AnimatedModel {
 		boneBuffer.flip();
 	}
 	
-	private Matrix4f renderMat = new Matrix4f();
-	public void render(Matrix4f worldMatrix) {
-		if ( shader == null )
-			return;
-		
-		// Compute absolute positions of bones
-		if ( meshes.size() == 0 )
-			rebuild();
-		updateBones();
-		
-		// Apply skinning shader
-		BaseShader oldShader = LegacyPipeline.pipeline_get().shader_get();
-		LegacyPipeline.pipeline_get().shader_set(shader);
-		
-		// Send bones to GPU
-		int boneLocation = this.shader.shader_get_uniform("boneMat");
-		if (boneLocation != -1) {
-			GL20.glUniformMatrix4fv(boneLocation, false, boneBuffer);
-		}
-
-		// Set material/world matrix
-		Resources.MATERIAL_BLANK.bind(this.shader);
-		this.renderMat.set(worldMatrix);
-		this.renderMat.scale(prefab.getScale());
-		this.shader.setWorldMatrix(this.renderMat);
-		
-		// Loop through each mesh and render
-		for (int i = 0; i < meshes.size(); i++) {
-			AnimatedModelSubMesh mesh = this.meshes.get(i);
-			
-			// Bind mesh
-			mesh.bind();
-			
-			// Bind material
-			Model model = meshToModelMap.get(mesh);
-			Material material = model.getMaterial();
-			if ( material != null ) {
-				MaterialGL GLMat = material.getMaterial();
-				if ( GLMat != null ) {
-					GLMat.bind(this.shader);
-				}
-			}
-			
-			// Draw mesh
-			GL11.glDrawArrays(GL11.GL_TRIANGLES, 0, mesh.size());
-			mesh.unbind();
-		}
-		
-		LegacyPipeline.pipeline_get().shader_set(oldShader);
-	}
-	
 	// TODO: In fact, only rebuilds the buffers
 	public void renderV2() {
 		if (meshes.size() == 0)
@@ -354,32 +284,6 @@ public class AnimatedModel {
 		public BoneData() {
 			this.weights = new ArrayList<Float>();
 			this.indices = new ArrayList<Integer>();
-		}
-	}
-	
-	static class SkinningShader extends BaseShader {
-		public SkinningShader() {
-			super(
-				new URL[] {
-						GBuffer.class.getResource("skinningDeferred.vert")
-				},
-				new URL[] {
-						GBuffer.class.getResource("normalmap.frag"),
-						GBuffer.class.getResource("reflect.frag"),
-						GBuffer.class.getResource("fresnel.frag"),
-						GBuffer.class.getResource("reflectivePBR.frag"),
-						GBuffer.class.getResource("write.frag"),
-						GBuffer.class.getResource("deferred.frag")
-				}
-			);
-		}
-		
-		@Override
-		public void create(int id) {
-			glBindFragDataLocation(id, 0, "gBuffer0");
-			glBindFragDataLocation(id, 1, "gBuffer1");
-			glBindFragDataLocation(id, 2, "gBuffer2");
-			glBindFragDataLocation(id, 3, "gBuffer3");
 		}
 	}
 }

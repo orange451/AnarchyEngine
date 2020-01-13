@@ -14,24 +14,18 @@ import org.luaj.vm2.LuaValue;
 
 import engine.FileFormats;
 import engine.FilePath;
-import engine.Game;
-import engine.gl.Resources;
-import engine.gl.Texture2D;
-import engine.io.AsynchronousImage;
 import engine.io.FileResource;
-import engine.io.Image;
 import engine.lua.type.LuaEvent;
 import engine.lua.type.object.AssetLoadable;
 import engine.lua.type.object.TreeViewable;
-import engine.util.TextureUtils;
+import engine.resources.ResourcesManager;
+import engine.tasks.TaskManager;
 import ide.layout.windows.icons.Icons;
 
 public class Texture extends AssetLoadable implements TreeViewable,FileResource {
-	private Texture2D texture;
+	private engine.glv2.objects.Texture texture;
 	private boolean changed;
 	private boolean loaded;
-	private AsynchronousImage image;
-	private Image loadedImage;
 	
 	private static final LuaValue C_TEXTURELOADED = LuaValue.valueOf("TextureLoaded");
 	private static final LuaValue C_SRGB = LuaValue.valueOf("SRGB");
@@ -55,56 +49,33 @@ public class Texture extends AssetLoadable implements TreeViewable,FileResource 
 		this.set(C_SRGB, LuaValue.valueOf(b));
 	}
 	
-	public void setTexture(Texture2D force) {
+	public void setTexture(engine.glv2.objects.Texture force) {
 		this.texture = force;
 		this.changed = false;
 		this.loaded = true;
 	}
 	
-	public Image getImage() {
-		// Force load the texture
-		getTexture();
-		
-		// return it
-		return this.loadedImage;
-	}
-	
-	public Texture2D getTexture() {
-		if ( image != null && image.isLoaded() && !loaded ) {
-			changed = true;
-			loaded = true;
-		}
-		
-		if ( this.texture == null || changed ) {
-			if ( image == null || !image.isLoaded() || this.get(C_FILEPATH).isnil() || this.get(C_FILEPATH).toString().length() == 0 ) {
-				if ( this.get(C_SRGB).checkboolean() ) {
-					setTexture( Resources.TEXTURE_WHITE_SRGB );
-				} else {
-					setTexture( Resources.TEXTURE_WHITE_RGBA );
-				}
-				this.loaded = false;
-			} else {
-				this.loadedImage = image.getResource();
-				if ( this.get(C_SRGB).checkboolean() ) {
-					setTexture( TextureUtils.loadSRGBTextureFromImage(image.getResource()) );
-				} else {
-					setTexture( TextureUtils.loadRGBATextureFromImage(image.getResource()) );
-				}
-				((LuaEvent)this.rawget(C_TEXTURELOADED)).fire();
-			}
-		}
+	public engine.glv2.objects.Texture getTexture() {
 		return this.texture;
 	}
-	
+
 	private void reloadFromFile(String path) {
 		String realPath = FilePath.convertToSystem(path);
-		
-		loaded = false; // Force image to reload
-		image = new AsynchronousImage(realPath, this.rawget(C_FLIPY).toboolean());
-		Game.resourceLoader().addResource(image);
-		
-		loadedImage = null;
-		texture = null;
+		//image = new AsynchronousImage(realPath, this.rawget(C_FLIPY).toboolean());
+		if (this.get(C_SRGB).checkboolean())
+			ResourcesManager.loadTexture(realPath, this::loaded);
+		else
+			ResourcesManager.loadTextureMisc(realPath, this::loaded);
+	}
+	
+	private void loaded(engine.glv2.objects.Texture texture) {
+		if (this.texture != null)
+			ResourcesManager.disposeTexture(this.texture);
+		this.texture = texture;
+		loaded = true;
+		TaskManager.addTaskRenderThread(() -> {
+			((LuaEvent)this.rawget(C_TEXTURELOADED)).fire();
+		});
 	}
 
 	@Override
@@ -136,6 +107,8 @@ public class Texture extends AssetLoadable implements TreeViewable,FileResource 
 	@Override
 	public void onDestroy() {
 		//
+		if (texture != null)
+			ResourcesManager.disposeTexture(texture);
 	}
 
 	@Override
