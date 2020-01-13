@@ -27,7 +27,7 @@ public class Icons {
 	public static final Icons icon_asset_folder_prefab = new Icons("AssetFolderPrefab.png");
 	public static final Icons icon_cut = new Icons("Cut.png");
 	public static final Icons icon_copy = new Icons("Copy.png");
-	public static final Icons icon_frame = new Icons("Frame.png");
+	public static final Icons icon_pane = new Icons("Pane.png");
 	public static final Icons icon_gui = new Icons("Gui.png");
 	public static final Icons icon_paste = new Icons("Paste.png");
 	public static final Icons icon_new = new Icons("New.png");
@@ -73,6 +73,7 @@ public class Icons {
 	public static final Icons icon_label = new Icons("TextLabel.png");
 	public static final Icons icon_vbox = new Icons("vbox.png");
 	public static final Icons icon_hbox = new Icons("hbox.png");
+	public static final Icons icon_text_field = new Icons("TextField.png");
 	
 	private final String image;
 	

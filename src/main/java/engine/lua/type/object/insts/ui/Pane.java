@@ -14,13 +14,12 @@ import org.luaj.vm2.LuaValue;
 
 import engine.lua.type.data.Vector2;
 import ide.layout.windows.icons.Icons;
-import lwjgui.scene.layout.Pane;
 import lwjgui.scene.layout.StackPane;
 
-public class Frame extends GuiBaseFrame {
+public class Pane extends GuiBasePane {
 	
-	public Frame() {
-		super("Frame");
+	public Pane() {
+		super("Pane");
 		
 		this.setSize(new Vector2(100,100));
 	}
@@ -42,11 +41,11 @@ public class Frame extends GuiBaseFrame {
 
 	@Override
 	public Icons getIcon() {
-		return Icons.icon_frame;
+		return Icons.icon_pane;
 	}
 
 	@Override
-	public Pane getUINode() {
+	public lwjgui.scene.layout.Pane getUINode() {
 		return new StackPane();
 	}
 }

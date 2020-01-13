@@ -18,11 +18,11 @@ import lwjgui.paint.Color;
 import lwjgui.scene.Node;
 import lwjgui.scene.layout.Pane;
 
-public abstract class GuiBaseFrame extends GuiBase {
+public abstract class GuiBasePane extends GuiBase {
 	
 	protected static final LuaValue C_BACKGROUNDCOLOR = LuaValue.valueOf("BackgroundColor");
 	
-	public GuiBaseFrame(String name) {
+	public GuiBasePane(String name) {
 		super(name);
 		
 		this.defineField(C_BACKGROUNDCOLOR.toString(), new Color3(Color.WHITE), false);
