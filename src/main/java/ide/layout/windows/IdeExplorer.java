@@ -43,6 +43,12 @@ import engine.lua.type.object.insts.animation.AnimationData;
 import engine.lua.type.object.insts.script.GlobalScript;
 import engine.lua.type.object.insts.script.LocalScript;
 import engine.lua.type.object.insts.script.Script;
+import engine.lua.type.object.insts.ui.Gui;
+import engine.lua.type.object.insts.ui.HBox;
+import engine.lua.type.object.insts.ui.Label;
+import engine.lua.type.object.insts.ui.Pane;
+import engine.lua.type.object.insts.ui.TextField;
+import engine.lua.type.object.insts.ui.VBox;
 import engine.lua.type.object.insts.values.BoolValue;
 import engine.lua.type.object.insts.values.Color3Value;
 import engine.lua.type.object.insts.values.IntValue;
@@ -95,6 +101,13 @@ public class IdeExplorer extends IdePane {
 		priority.put(Script.class, 35);
 		priority.put(LocalScript.class, 35);
 		priority.put(GlobalScript.class, 35);
+
+		priority.put(Gui.class, 31);
+		priority.put(HBox.class, 30);
+		priority.put(VBox.class, 30);
+		priority.put(Pane.class, 30);
+		priority.put(Label.class, 30);
+		priority.put(TextField.class, 30);
 
 		priority.put(DirectionalLight.class, 25);
 		priority.put(PointLight.class, 24);
