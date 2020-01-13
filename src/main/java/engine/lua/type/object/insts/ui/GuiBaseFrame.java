@@ -10,18 +10,45 @@
 
 package engine.lua.type.object.insts.ui;
 
+import org.luaj.vm2.LuaValue;
+
+import engine.lua.type.data.Color3;
 import lwjgui.geometry.Pos;
+import lwjgui.paint.Color;
 import lwjgui.scene.Node;
+import lwjgui.scene.layout.Pane;
 
 public abstract class GuiBaseFrame extends GuiBase {
 	
+	protected static final LuaValue C_BACKGROUNDCOLOR = LuaValue.valueOf("BackgroundColor");
+	
 	public GuiBaseFrame(String name) {
 		super(name);
+		
+		this.defineField(C_BACKGROUNDCOLOR.toString(), new Color3(Color.WHITE), false);
+	}
+	
+	/**
+	 * Get the background color for this frame.
+	 * @return
+	 */
+	public Color3 getBackgroundColor() {
+		LuaValue val = this.get(C_BACKGROUNDCOLOR);
+		return val.isnil()?null:(Color3)val;
+	}
+	
+	/**
+	 * Set the background color for this frame.
+	 * @param color
+	 */
+	public void setTextColor(Color3 color) {
+		this.set(C_BACKGROUNDCOLOR, new Color3(color));
 	}
 
 	@Override
 	public void updateNode(Node node) {
 		node.setPrefSize(getWidth(), getHeight());
 		node.setAlignment(Pos.valueOf(getAlignment()));
+		((Pane)node).setBackgroundLegacy(this.getBackgroundColor().toColor());
 	}
 }

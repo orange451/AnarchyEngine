@@ -25,6 +25,18 @@ public class Color3 extends LuaValuetype {
 
 	private Color internal;
 	
+	public Color3(Color color) {
+		this();
+		
+		this.rawset("R", LuaValue.valueOf(color.getRed()));
+		this.rawset("G", LuaValue.valueOf(color.getGreen()));
+		this.rawset("B", LuaValue.valueOf(color.getBlue()));
+	}
+	
+	public Color3(Color3 color) {
+		this(color.internal);
+	}
+	
 	public Color3() {
 		
 		// Create ToString function
@@ -212,14 +224,6 @@ public class Color3 extends LuaValuetype {
 		inst.rawset("R", LuaValue.valueOf(r));
 		inst.rawset("G", LuaValue.valueOf(g));
 		inst.rawset("B", LuaValue.valueOf(b));
-		return inst;
-	}
-
-	public static Color3 newInstance(Color color) {
-		Color3 inst = new Color3();
-		inst.rawset("R", LuaValue.valueOf(color.getRed()));
-		inst.rawset("G", LuaValue.valueOf(color.getGreen()));
-		inst.rawset("B", LuaValue.valueOf(color.getBlue()));
 		return inst;
 	}
 

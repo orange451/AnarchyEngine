@@ -393,7 +393,7 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 			
 			if ( editable ) {
 				this.picker.setOnAction(event -> {
-					setWithHistory(this.instance, LuaValue.valueOf(field), Color3.newInstance(this.picker.getColor()));
+					setWithHistory(this.instance, LuaValue.valueOf(field), new Color3(this.picker.getColor()));
 				});
 			}
 		}

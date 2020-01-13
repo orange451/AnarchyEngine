@@ -13,17 +13,21 @@ package engine.lua.type.object.insts.ui;
 import org.luaj.vm2.LuaString;
 import org.luaj.vm2.LuaValue;
 
+import engine.lua.type.data.Color3;
 import ide.layout.windows.icons.Icons;
+import lwjgui.paint.Color;
 import lwjgui.scene.Node;
 
 public class Label extends GuiBase {
 	
 	protected static final LuaValue C_TEXT = LuaValue.valueOf("Text");
+	protected static final LuaValue C_TEXTCOLOR = LuaValue.valueOf("TextColor");
 	
 	public Label() {
 		super("Label");
-		
+
 		this.defineField(C_TEXT.toString(), LuaString.valueOf("Label"), false);
+		this.defineField(C_TEXTCOLOR.toString(), new Color3(Color.BLACK), false);
 	}
 
 	@Override
@@ -46,10 +50,18 @@ public class Label extends GuiBase {
 		return Icons.icon_label;
 	}
 	
+	/**
+	 * Return the text for the label.
+	 * @return
+	 */
 	public String getText() {
 		return this.get(C_TEXT).toString();
 	}
 	
+	/**
+	 * Set the text for the label.
+	 * @param text
+	 */
 	public void setText(String text) {
 		this.set(C_TEXT, LuaValue.valueOf(text));
 	}
@@ -57,11 +69,28 @@ public class Label extends GuiBase {
 	@Override
 	public Node getUINode() {
 		return new lwjgui.scene.control.Label();
+	}	
+	
+	/**
+	 * Get the Text color for this frame.
+	 * @return
+	 */
+	public Color3 getTextColor() {
+		LuaValue val = this.get(C_TEXTCOLOR);
+		return val.isnil()?null:(Color3)val;
+	}
+	
+	/**
+	 * Set the Text color for this frame.
+	 * @param color
+	 */
+	public void setTextColor(Color3 color) {
+		this.set(C_TEXTCOLOR, new Color3(color));
 	}
 
 	@Override
 	public void updateNode(Node node) {
-		System.out.println("Updating text!");
 		((lwjgui.scene.control.Label)node).setText(this.getText());
+		((lwjgui.scene.control.Label)node).setTextFill(this.getTextColor().toColor());
 	}
 }

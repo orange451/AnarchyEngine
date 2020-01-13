@@ -15,6 +15,7 @@ import java.util.Map;
 
 import org.luaj.vm2.LuaValue;
 
+import engine.Game;
 import engine.lua.type.LuaConnection;
 import engine.lua.type.data.Vector2;
 import ide.layout.windows.icons.Icons;
@@ -24,6 +25,7 @@ import lwjgui.paint.Color;
 import lwjgui.scene.Node;
 import lwjgui.scene.layout.Pane;
 import lwjgui.scene.layout.StackPane;
+import lwjgui.style.BoxShadow;
 
 public class Gui extends GuiBase {
 	
@@ -38,17 +40,14 @@ public class Gui extends GuiBase {
 		this.getField(LuaValue.valueOf("Size")).setLocked(true);
 		
 		this.root = (Pane) getUINode();
-		this.root.setPadding(new Insets(8));
-		this.root.setBackgroundLegacy(Color.ORANGE);
 		uiMap.put(this, this.root);
 		
 		this.descendantAddedEvent().connect((args)->{
 			LuaValue arg = args[0];
 			if ( arg instanceof GuiBase ) {
+				
 				// Create new pane
 				Node pane = ((GuiBase)arg).getUINode();
-				if ( pane instanceof Pane )
-					((Pane)pane).setBackgroundLegacy(new Color(Math.random(),Math.random(),Math.random()));
 				
 				// Add it to list
 				uiMap.put((GuiBase) arg, pane);
@@ -152,6 +151,16 @@ public class Gui extends GuiBase {
 			@Override
 			public Pos usingAlignment() {
 				return this.getAlignment()==null?Pos.CENTER:this.getAlignment();
+			}
+			
+			@Override
+			public void position(Node parent) {
+				super.position(parent);
+
+				// Handle selection graphic
+				this.getBoxShadowList().clear();
+				if ( Game.isSelected(Gui.this) || Game.isDescendantSelected(Gui.this) )
+					this.getBoxShadowList().add(new BoxShadow(0, 0, 1, 2, Color.ORANGE, false));
 			}
 		};
 	}

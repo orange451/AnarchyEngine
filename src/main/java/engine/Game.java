@@ -43,6 +43,7 @@ import engine.lua.type.object.insts.Player;
 import engine.lua.type.object.insts.PlayerGui;
 import engine.lua.type.object.insts.PlayerScripts;
 import engine.lua.type.object.insts.script.GlobalScript;
+import engine.lua.type.object.insts.ui.Gui;
 import engine.lua.type.object.services.Assets;
 import engine.lua.type.object.services.Connections;
 import engine.lua.type.object.services.Core;
@@ -509,6 +510,18 @@ public class Game implements Tickable {
 	
 	public static boolean isSelected(Instance inst) {
 		return selectedInstances.contains(inst);
+	}
+	
+	public static boolean isDescendantSelected(Instance inst) {
+		List<Instance> desc = inst.getDescendantsUnsafe();
+		synchronized(desc) {
+			for (Instance descendant : desc ) {
+				if ( isSelected(descendant) )
+					return true;
+			}
+		}
+		
+		return false;
 	}
 
 	public static List<Instance> selected() {

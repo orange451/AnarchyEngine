@@ -24,23 +24,43 @@ public abstract class GuiBase extends Instance implements TreeViewable {
 		this.getField(C_ALIGNMENT).setEnum(new EnumType("GuiAlignment"));
 	}
 	
+	/**
+	 * Set the 2 dimensional preferred size for the gui element.
+	 * @param vector
+	 */
 	public void setSize(Vector2 vector) {
 		this.set(C_SIZE, new Vector2(vector.toJoml()));
 	}
 	
+	/**
+	 * Get the 2 dimensional preferred size for the gui element.
+	 * @return
+	 */
 	public Vector2 getSize() {
 		LuaValue val = this.get(C_SIZE);
 		return val.isnil()?new Vector2():(Vector2)val;
 	}
 
+	/**
+	 * Return the preferred width of this gui element.
+	 * @return
+	 */
 	public float getWidth() {
 		return this.getSize().getX();
 	}
 
+	/**
+	 * Return the preferred height of this gui element.
+	 * @return
+	 */
 	public float getHeight() {
 		return this.getSize().getY();
 	}
 
+	/**
+	 * Get the inner-alignment for this gui element. This will control how direction children are positioned inside this element.
+	 * @return
+	 */
 	public String getAlignment() {
 		LuaValue alignment = Enums.matchEnum(LuaValue.valueOf("GuiAlignment"), this.get(C_ALIGNMENT));
 		return alignment.isnil()?Pos.CENTER.toString():alignment.toString();
