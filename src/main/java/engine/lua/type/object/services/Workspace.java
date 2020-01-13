@@ -28,7 +28,7 @@ import engine.lua.type.data.Ray;
 import engine.lua.type.data.Vector3;
 import engine.lua.type.object.Instance;
 import engine.lua.type.object.PhysicsBase;
-import engine.lua.type.object.RunScript;
+import engine.lua.type.object.ScriptExecutor;
 import engine.lua.type.object.Service;
 import engine.lua.type.object.TreeViewable;
 import engine.lua.type.object.insts.Camera;
@@ -39,7 +39,7 @@ import engine.physics.PhysicsObjectInternal;
 import engine.physics.PhysicsWorld;
 import ide.layout.windows.icons.Icons;
 
-public class Workspace extends Service implements RenderableWorld,TreeViewable,Tickable,RunScript  {
+public class Workspace extends Service implements RenderableWorld,TreeViewable,Tickable,ScriptExecutor  {
 	private static PhysicsWorld physicsWorld;
 	private List<Instance> descendants = Collections.synchronizedList(new ArrayList<Instance>());
 

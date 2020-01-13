@@ -128,7 +128,7 @@ public abstract class ScriptBase extends Instance implements GameSubscriber {
 		int a = 0;
 		LuaValue parent = this.getParent();
 		while (!parent.isnil() && a < 32) {
-			if ( parent instanceof RunScript ) {
+			if ( parent instanceof ScriptExecutor ) {
 				inRunnableService = true;
 				break;
 			}

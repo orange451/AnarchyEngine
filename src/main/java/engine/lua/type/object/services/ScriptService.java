@@ -12,12 +12,12 @@ package engine.lua.type.object.services;
 
 import org.luaj.vm2.LuaValue;
 
-import engine.lua.type.object.RunScript;
+import engine.lua.type.object.ScriptExecutor;
 import engine.lua.type.object.Service;
 import engine.lua.type.object.TreeViewable;
 import ide.layout.windows.icons.Icons;
 
-public class ScriptService extends Service implements TreeViewable,RunScript {
+public class ScriptService extends Service implements TreeViewable,ScriptExecutor {
 
 	public ScriptService() {
 		super("ScriptService");

@@ -17,13 +17,13 @@ import org.luaj.vm2.LuaValue;
 
 import engine.AnarchyEngineClient;
 import engine.lua.type.object.Instance;
-import engine.lua.type.object.RunScript;
+import engine.lua.type.object.ScriptExecutor;
 import engine.lua.type.object.TreeViewable;
 import engine.lua.type.object.insts.ui.Gui;
 import ide.layout.windows.icons.Icons;
 import lwjgui.scene.layout.Pane;
 
-public class PlayerGui extends Instance implements TreeViewable,RunScript {
+public class PlayerGui extends Instance implements TreeViewable,ScriptExecutor {
 	
 	private List<Pane> guis = new ArrayList<>();
 	

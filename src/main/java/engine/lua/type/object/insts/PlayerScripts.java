@@ -13,11 +13,11 @@ package engine.lua.type.object.insts;
 import org.luaj.vm2.LuaValue;
 
 import engine.lua.type.object.Instance;
-import engine.lua.type.object.RunScript;
+import engine.lua.type.object.ScriptExecutor;
 import engine.lua.type.object.TreeViewable;
 import ide.layout.windows.icons.Icons;
 
-public class PlayerScripts extends Instance implements TreeViewable,RunScript {
+public class PlayerScripts extends Instance implements TreeViewable,ScriptExecutor {
 
 	public PlayerScripts() {
 		super("PlayerScripts");

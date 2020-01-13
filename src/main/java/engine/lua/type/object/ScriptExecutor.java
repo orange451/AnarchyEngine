@@ -10,6 +10,11 @@
 
 package engine.lua.type.object;
 
-public interface RunScript {
-
+/**
+ * Interface used to mark whether a script, when it descends this object, may be executed.
+ * @author Andrew
+ *
+ */
+public interface ScriptExecutor {
+	//
 }

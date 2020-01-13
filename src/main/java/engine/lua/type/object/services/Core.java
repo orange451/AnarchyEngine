@@ -12,11 +12,11 @@ package engine.lua.type.object.services;
 
 import org.luaj.vm2.LuaValue;
 
-import engine.lua.type.object.RunScript;
+import engine.lua.type.object.ScriptExecutor;
 import engine.lua.type.object.Service;
 import engine.lua.type.object.TreeInvisible;
 
-public class Core extends Service implements TreeInvisible,RunScript {
+public class Core extends Service implements TreeInvisible,ScriptExecutor {
 
 	public Core() {
 		super("Core");
