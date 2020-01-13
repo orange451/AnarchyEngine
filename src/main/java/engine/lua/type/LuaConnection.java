@@ -15,7 +15,7 @@ import java.util.List;
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.ZeroArgFunction;
 
-import engine.lua.type.object.insts.Script;
+import engine.lua.type.object.insts.script.Script;
 
 public class LuaConnection extends LuaDatatype {
 	private LuaValue function;

@@ -8,7 +8,7 @@
  *
  */
 
-package engine.lua.type.object.insts;
+package engine.lua.type.object.insts.script;
 
 import engine.Game;
 import engine.lua.type.object.ScriptBase;

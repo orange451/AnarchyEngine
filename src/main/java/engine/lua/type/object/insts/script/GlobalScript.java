@@ -8,27 +8,25 @@
  *
  */
 
-package engine.lua.type.object.insts;
+package engine.lua.type.object.insts.script;
 
-import engine.Game;
-import engine.lua.network.internal.NonReplicatable;
 import engine.lua.type.object.ScriptBase;
 import engine.lua.type.object.TreeViewable;
 import ide.layout.windows.icons.Icons;
 
-public class Script extends ScriptBase implements TreeViewable,NonReplicatable {
+public class GlobalScript extends ScriptBase implements TreeViewable {
 
-	public Script() {
-		super("Script");
+	public GlobalScript() {
+		super("GlobalScript");
 	}
 
 	@Override
 	public Icons getIcon() {
-		return Icons.icon_script;
+		return Icons.icon_script_global;
 	}
 
 	@Override
 	public boolean getCanRun() {
-		return Game.isServer() || Game.internalTesting;
+		return true;
 	}
 }
