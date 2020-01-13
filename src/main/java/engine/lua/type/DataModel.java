@@ -36,6 +36,7 @@ public abstract class DataModel extends LuaDatatype {
 
 	private static final LuaValue C_CHANGED = LuaValue.valueOf("Changed");
 	private static final LuaValue C_DESTROYED = LuaValue.valueOf("Destroyed");
+	private static final LuaValue C_CREATED = LuaValue.valueOf("Created");
 	private static final LuaValue C_CHILDADDED = LuaValue.valueOf("ChildAdded");
 	private static final LuaValue C_CHILDREMOVED = LuaValue.valueOf("ChildRemoved");
 	private static final LuaValue C_DESCENDANTADDED = LuaValue.valueOf("DescendantAdded");
@@ -51,7 +52,7 @@ public abstract class DataModel extends LuaDatatype {
 	
 	protected boolean initialized;
 	protected boolean destroyed;
-
+	private boolean created;
 	
 	private String internalName;
 	
@@ -98,6 +99,7 @@ public abstract class DataModel extends LuaDatatype {
 
 		this.rawset(C_CHANGED,		new LuaEvent());
 		this.rawset(C_DESTROYED,	new LuaEvent());
+		this.rawset(C_CREATED, 		new LuaEvent());
 		this.rawset(C_CHILDADDED,	new LuaEvent());
 		this.rawset(C_CHILDREMOVED,	new LuaEvent());
 		this.rawset(C_DESCENDANTADDED,		new LuaEvent());
@@ -350,7 +352,8 @@ public abstract class DataModel extends LuaDatatype {
 	private void checkSetParent(LuaValue key, LuaValue oldParent, LuaValue newParent) {
 		if ( key.eq_b(C_PARENT) ) {
 			
-			if ( newParent == this )
+			// Parent cant be itself or a descendant of itself
+			if ( newParent instanceof DataModel && (newParent == this || ((DataModel)newParent).isDescendantOf(this) ) )
 				throw new LuaError("Instance can not be its own parent");
 			
 			// If the parent hasen't changed, don't run code.
@@ -369,6 +372,12 @@ public abstract class DataModel extends LuaDatatype {
 			// Add self to new parent
 			if ( newParent instanceof Instance && !((Instance)newParent).isDestroyed() ) {
 				Instance newParInst = (Instance) newParent;
+				
+				// Fire created event
+				if ( !created ) {
+					created = true;
+					this.createdEvent().fire();
+				}
 				
 				// Add to children list
 				List<Instance> newParentChildren = newParInst.getChildren();
@@ -617,6 +626,15 @@ public abstract class DataModel extends LuaDatatype {
 	 */
 	public LuaEvent destroyedEvent() {
 		LuaValue temp = this.rawget(C_DESTROYED);
+		return temp.isnil()?null:(LuaEvent)temp;
+	}
+	
+	/**
+	 * The created-event for the DataModel. This event will fire the first time the datamodel becomes a descendant of game.
+	 * @return
+	 */
+	public LuaEvent createdEvent() {
+		LuaValue temp = this.rawget(C_CREATED);
 		return temp.isnil()?null:(LuaEvent)temp;
 	}
 	
