@@ -14,6 +14,7 @@ import org.luaj.vm2.LuaValue;
 
 import engine.FileFormats;
 import engine.FilePath;
+import engine.gl.Resources;
 import engine.io.FileResource;
 import engine.lua.type.LuaEvent;
 import engine.lua.type.object.AssetLoadable;
@@ -22,78 +23,97 @@ import engine.resources.ResourcesManager;
 import engine.tasks.TaskManager;
 import ide.layout.windows.icons.Icons;
 
-public class Texture extends AssetLoadable implements TreeViewable,FileResource {
+public class Texture extends AssetLoadable implements TreeViewable, FileResource {
 	private engine.glv2.objects.Texture texture;
-	private boolean changed;
 	private boolean loaded;
-	
+	private String path;
+
 	private static final LuaValue C_TEXTURELOADED = LuaValue.valueOf("TextureLoaded");
 	private static final LuaValue C_SRGB = LuaValue.valueOf("SRGB");
 	private static final LuaValue C_FLIPY = LuaValue.valueOf("FlipY");
 	private static final LuaValue C_TEXTURES = LuaValue.valueOf("Textures");
-	
+
 	public Texture() {
 		super("Texture");
-		
+
 		this.defineField(C_SRGB.toString(), LuaValue.FALSE, false);
 		this.defineField(C_FLIPY.toString(), LuaValue.FALSE, false);
-		
+
 		this.rawset(C_TEXTURELOADED, new LuaEvent());
+
+		this.createdEvent().connect((args) -> {
+			// Stuff
+			if (this.get(C_FILEPATH).isnil() || this.get(C_FILEPATH).toString().length() == 0) {
+				if (this.get(C_SRGB).checkboolean())
+					texture = Resources.diffuse;
+				else
+					texture = Resources.diffuseMisc;
+			} else {
+				this.reloadFromFile();
+			}
+		});
 	}
-	
+
 	public LuaEvent textureLoadedEvent() {
 		return (LuaEvent) this.rawget(C_TEXTURELOADED);
 	}
-	
+
 	public void setSRGB(boolean b) {
 		this.set(C_SRGB, LuaValue.valueOf(b));
 	}
-	
+
 	public void setTexture(engine.glv2.objects.Texture force) {
 		this.texture = force;
-		this.changed = false;
 		this.loaded = true;
 	}
-	
+
 	public engine.glv2.objects.Texture getTexture() {
 		return this.texture;
 	}
 
-	private void reloadFromFile(String path) {
+	private void reloadFromFile() {
 		String realPath = FilePath.convertToSystem(path);
-		//image = new AsynchronousImage(realPath, this.rawget(C_FLIPY).toboolean());
+		// image = new AsynchronousImage(realPath, this.rawget(C_FLIPY).toboolean());
 		if (this.get(C_SRGB).checkboolean())
-			ResourcesManager.loadTexture(realPath, this::loaded);
+			ResourcesManager.loadTexture(realPath, this.rawget(C_FLIPY).toboolean(), this::loaded);
 		else
-			ResourcesManager.loadTextureMisc(realPath, this::loaded);
+			ResourcesManager.loadTextureMisc(realPath, this.rawget(C_FLIPY).toboolean(), this::loaded);
 	}
-	
+
 	private void loaded(engine.glv2.objects.Texture texture) {
 		if (this.texture != null)
 			ResourcesManager.disposeTexture(this.texture);
 		this.texture = texture;
 		loaded = true;
 		TaskManager.addTaskRenderThread(() -> {
-			((LuaEvent)this.rawget(C_TEXTURELOADED)).fire();
+			((LuaEvent) this.rawget(C_TEXTURELOADED)).fire();
 		});
 	}
 
 	@Override
 	protected LuaValue onValueSet(LuaValue key, LuaValue value) {
-		if ( this.containsField(key) ) {
-			if ( key.eq_b(C_FILEPATH) || key.eq_b(C_FLIPY) ) {
-				if ( key.eq_b(C_FLIPY) ) {
+		if (this.containsField(key)) {
+			if (key.eq_b(C_FILEPATH) || key.eq_b(C_FLIPY) || key.eq_b(C_SRGB)) {
+				if (key.eq_b(C_FLIPY)) {
 					this.rawset(key, value);
 				}
-				
+
 				String texturePath = value.toString();
-				if ( !key.eq_b(C_FILEPATH) )
+				if (!key.eq_b(C_FILEPATH))
 					texturePath = this.getFilePath();
-				
-				final String fTexPath = texturePath;
-				this.reloadFromFile(fTexPath);
+
+				path = texturePath;
+				if (created) {
+					if (this.get(C_FILEPATH).isnil() || this.get(C_FILEPATH).toString().length() == 0) {
+						if (this.get(C_SRGB).checkboolean())
+							texture = Resources.diffuse;
+						else
+							texture = Resources.diffuseMisc;
+					} else {
+						this.reloadFromFile();
+					}
+				}
 			} else {
-				changed = true; // Force image to be re-sent to GPU
 			}
 		}
 		return value;
@@ -120,7 +140,7 @@ public class Texture extends AssetLoadable implements TreeViewable,FileResource 
 	public LuaValue getPreferredParent() {
 		return C_TEXTURES;
 	}
-	
+
 	public static String getFileTypes() {
 		return FileFormats.TEXTURES;
 	}

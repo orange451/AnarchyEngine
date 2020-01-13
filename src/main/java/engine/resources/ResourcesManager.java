@@ -49,25 +49,34 @@ public final class ResourcesManager {
 	}
 
 	public static Task<Texture> loadTextureMisc(String fileName, OnFinished<Texture> dst) {
-		return loadTextureMisc(fileName, GL_LINEAR, true, dst);
+		return loadTextureMisc(fileName, GL_LINEAR, true, false, dst);
 	}
 
-	public static Task<Texture> loadTextureMisc(String fileName, int filter, boolean textureMipMapAF,
+	public static Task<Texture> loadTextureMisc(String fileName, boolean flipY, OnFinished<Texture> dst) {
+		return loadTextureMisc(fileName, GL_LINEAR, true, flipY, dst);
+	}
+
+	public static Task<Texture> loadTextureMisc(String fileName, int filter, boolean textureMipMapAF, boolean flipY,
 			OnFinished<Texture> dst) {
 		System.out.println("Texture scheduled to load: " + fileName);
 		return TaskManager.submitRenderBackgroundThread(
-				new LoadTextureTask(fileName, filter, GL_REPEAT, GL_RGBA, textureMipMapAF).setOnFinished(dst));
+				new LoadTextureTask(fileName, filter, GL_REPEAT, GL_RGBA, textureMipMapAF, flipY).setOnFinished(dst));
 	}
 
 	public static Task<Texture> loadTexture(String fileName, OnFinished<Texture> dst) {
-		return loadTexture(fileName, GL_LINEAR, true, dst);
+		return loadTexture(fileName, GL_LINEAR, true, false, dst);
 	}
 
-	public static Task<Texture> loadTexture(String fileName, int filter, boolean textureMipMapAF,
+	public static Task<Texture> loadTexture(String fileName, boolean flipY, OnFinished<Texture> dst) {
+		return loadTexture(fileName, GL_LINEAR, true, flipY, dst);
+	}
+
+	public static Task<Texture> loadTexture(String fileName, int filter, boolean textureMipMapAF, boolean flipY,
 			OnFinished<Texture> dst) {
 		System.out.println("Texture scheduled to load: " + fileName);
 		return TaskManager.submitRenderBackgroundThread(
-				new LoadTextureTask(fileName, filter, GL_REPEAT, GL_SRGB_ALPHA, textureMipMapAF).setOnFinished(dst));
+				new LoadTextureTask(fileName, filter, GL_REPEAT, GL_SRGB_ALPHA, textureMipMapAF, flipY)
+						.setOnFinished(dst));
 	}
 
 	public static void disposeTexture(Texture texture) {

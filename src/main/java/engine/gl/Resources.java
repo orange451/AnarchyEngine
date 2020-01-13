@@ -32,13 +32,14 @@ public class Resources {
 
 	public static AIPropertyStore propertyStore;
 
-	public static Texture diffuse, normal, roughness, metallic;
+	public static Texture diffuse, diffuseMisc, normal, roughness, metallic;
 
 	public static void init() {
-		ResourcesManager.loadTexture("assets/textures/def/d.png", (value) -> diffuse = value);
-		ResourcesManager.loadTextureMisc("assets/textures/def/d_n.png", (value) -> normal = value);
-		ResourcesManager.loadTextureMisc("assets/textures/def/d_r.png", (value) -> roughness = value);
-		ResourcesManager.loadTextureMisc("assets/textures/def/d_m.png", (value) -> metallic = value);
+		ResourcesManager.loadTexture("assets/textures/def/d.png", (value) -> diffuse = value.setDisposable(false));
+		ResourcesManager.loadTextureMisc("assets/textures/def/d.png", (value) -> diffuseMisc = value.setDisposable(false));
+		ResourcesManager.loadTextureMisc("assets/textures/def/d_n.png", (value) -> normal = value.setDisposable(false));
+		ResourcesManager.loadTextureMisc("assets/textures/def/d_r.png", (value) -> roughness = value.setDisposable(false));
+		ResourcesManager.loadTextureMisc("assets/textures/def/d_m.png", (value) -> metallic = value.setDisposable(false));
 		TaskManager.addTaskRenderBackgroundThread(() -> {
 			MATERIAL_BLANK = new MaterialGL().setDiffuseTexture(diffuse).setNormalTexture(normal)
 					.setRoughnessTexture(roughness).setMetalnessTexture(metallic);
@@ -55,9 +56,10 @@ public class Resources {
 	}
 
 	public static void dispose() {
-		diffuse.dispose();
-		normal.dispose();
-		roughness.dispose();
-		metallic.dispose();
+		diffuse.setDisposable(true).dispose();
+		diffuseMisc.setDisposable(true).dispose();
+		normal.setDisposable(true).dispose();
+		roughness.setDisposable(true).dispose();
+		metallic.setDisposable(true).dispose();
 	}
 }

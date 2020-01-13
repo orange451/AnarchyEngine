@@ -52,7 +52,7 @@ public abstract class DataModel extends LuaDatatype {
 	
 	protected boolean initialized;
 	protected boolean destroyed;
-	private boolean created;
+	protected boolean created;
 	
 	private String internalName;
 	

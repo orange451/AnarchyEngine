@@ -14,6 +14,7 @@ import static org.lwjgl.opengl.GL11C.GL_TEXTURE_2D;
 import static org.lwjgl.stb.STBImage.stbi_failure_reason;
 import static org.lwjgl.stb.STBImage.stbi_info_from_memory;
 import static org.lwjgl.stb.STBImage.stbi_load_from_memory;
+import static org.lwjgl.stb.STBImage.stbi_set_flip_vertically_on_load;
 import static org.lwjgl.system.MemoryStack.stackPush;
 import static org.lwjgl.system.MemoryUtil.memFree;
 
@@ -34,26 +35,27 @@ public class LoadTextureTask extends Task<Texture> {
 	private int filter;
 	private int textureWarp;
 	private int format;
-	private boolean textureMipMapAF;
+	private boolean textureMipMapAF, flipY;
 
-	public LoadTextureTask(String file, int filter, int textureWarp, int format, boolean textureMipMapAF) {
+	public LoadTextureTask(String file, int filter, int textureWarp, int format, boolean textureMipMapAF, boolean flipY) {
 		this.file = file;
 		this.filter = filter;
 		this.textureWarp = textureWarp;
 		this.format = format;
 		this.textureMipMapAF = textureMipMapAF;
+		this.flipY = flipY;
 	}
 
 	@Override
 	protected Texture call() {
 		System.out.println("Loading: " + file);
-		RawTexture data = decodeTextureFile(file);
+		RawTexture data = decodeTextureFile(file, flipY);
 		int id = ResourcesManager.backend.loadTexture(filter, textureWarp, format, textureMipMapAF, data);
 		data.dispose();
 		return new Texture(id, GL_TEXTURE_2D, data.getWidth(), data.getHeight());
 	}
 
-	private RawTexture decodeTextureFile(String file) {
+	private RawTexture decodeTextureFile(String file, boolean flipY) {
 		ByteBuffer imageBuffer;
 		try {
 			imageBuffer = ResourcesManager.ioResourceToByteBuffer(file, 1024 * 1024);
@@ -75,6 +77,7 @@ public class LoadTextureTask extends Task<Texture> {
 			// System.out.println("Image width: " + w.get(0) + "\nImage height: " + h.get(0)
 			// + "\nImage components: "
 			// + comp.get(0) + "\nImage HDR: " + stbi_is_hdr_from_memory(imageBuffer));
+			stbi_set_flip_vertically_on_load(flipY);
 
 			image = stbi_load_from_memory(imageBuffer, w, h, comp, 0);
 			memFree(imageBuffer);

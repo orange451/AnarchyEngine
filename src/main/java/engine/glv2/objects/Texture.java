@@ -20,6 +20,8 @@ public class Texture implements IVisualObject {
 	private final int texture, target;
 	private final int width, height;
 
+	private boolean disposable = true;
+
 	@Deprecated
 	public Texture(int texture) {
 		this.texture = texture;
@@ -56,7 +58,8 @@ public class Texture implements IVisualObject {
 
 	@Override
 	public void dispose() {
-		glDeleteTextures(texture);
+		if (disposable)
+			glDeleteTextures(texture);
 	}
 
 	public int getTexture() {
@@ -76,6 +79,11 @@ public class Texture implements IVisualObject {
 	@Deprecated
 	public int getID() {
 		return texture;
+	}
+
+	public Texture setDisposable(boolean disposable) {
+		this.disposable = disposable;
+		return this;
 	}
 
 	@Override
