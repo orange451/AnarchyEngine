@@ -14,10 +14,10 @@ import java.io.IOException;
 
 import org.joml.Vector2f;
 
-import engine.application.Runner;
+import engine.application.AnarchyEngineRunner;
 import engine.io.Load;
 
-public class ServerApplication extends Runner {
+public class ServerApplication extends AnarchyEngineRunner {
 	public ServerApplication() {
 		//
 	}

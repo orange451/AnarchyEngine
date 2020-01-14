@@ -25,6 +25,8 @@ import ide.layout.IdeLayout;
 import ide.layout.windows.IdeLuaEditor;
 import lwjgui.LWJGUI;
 import lwjgui.scene.Group;
+import lwjgui.theme.Theme;
+import lwjgui.theme.ThemeDark;
 
 public class IDE extends AnarchyEngineClient {
 	public static IdeLayout layout;
@@ -43,7 +45,7 @@ public class IDE extends AnarchyEngineClient {
 		Group background = new Group();
 		win.getScene().setRoot(background);
 		
-		//Theme.setTheme(new ThemeDark());
+		Theme.setTheme(new ThemeDark());
 		
 		// Redraw window if resized
 		win.addEventListener(new lwjgui.event.listener.WindowSizeListener() {
