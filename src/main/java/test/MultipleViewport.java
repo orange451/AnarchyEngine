@@ -28,7 +28,7 @@ public class MultipleViewport extends ClientApplication {
 			return;
 
 		// Render secondary Buffer
-		secondaryPipeline.render();
+		//secondaryPipeline.render();
 
 		// Draw to screen
 		/*secondaryPipeline.ortho(windowWidth, windowHeight);
@@ -49,8 +49,8 @@ public class MultipleViewport extends ClientApplication {
 
 		// Create secondary pipeline
 		secondaryPipeline = new LegacyPipeline();
-		secondaryPipeline.setRenderableWorld(renderableWorld);
-		secondaryPipeline.setSize(400, 400);
+		//secondaryPipeline.setRenderableWorld(renderableWorld);
+		//secondaryPipeline.setSize(400, 400);
 
 		{
 			Camera camera = new Camera();

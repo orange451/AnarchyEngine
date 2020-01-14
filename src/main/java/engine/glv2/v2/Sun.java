@@ -12,7 +12,7 @@ package engine.glv2.v2;
 
 import org.joml.Vector3f;
 
-import engine.gl.light.DirectionalLightInternal;
+import engine.glv2.v2.lights.DirectionalLightInternal;
 import engine.lua.type.object.insts.DynamicSkybox;
 
 public class Sun {

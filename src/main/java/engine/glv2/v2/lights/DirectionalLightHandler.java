@@ -45,7 +45,6 @@ import java.util.List;
 
 import org.joml.Matrix4f;
 
-import engine.gl.light.DirectionalLightInternal;
 import engine.glv2.objects.Framebuffer;
 import engine.glv2.objects.FramebufferBuilder;
 import engine.glv2.objects.Texture;

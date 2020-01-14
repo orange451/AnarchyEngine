@@ -46,7 +46,6 @@ import java.util.List;
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
 
-import engine.gl.light.PointLightInternal;
 import engine.gl.mesh.BufferedMesh;
 import engine.glv2.objects.Framebuffer;
 import engine.glv2.objects.FramebufferBuilder;
@@ -98,6 +97,7 @@ public class PointLightHandler implements ILightHandler<PointLightInternal> {
 		shader.loadCameraData(camera, projectionMatrix);
 		shader.loadUseShadows(rs.shadowsEnabled);
 		shader.loadTexel(texel);
+		mesh.bind();
 		dp.getDiffuseTex().active(GL_TEXTURE0);
 		dp.getNormalTex().active(GL_TEXTURE2);
 		dp.getDepthTex().active(GL_TEXTURE3);
@@ -112,8 +112,9 @@ public class PointLightHandler implements ILightHandler<PointLightInternal> {
 			shader.loadTransformationMatrix(temp);
 			shader.loadPointLight(l);
 			l.getShadowMap().getTexture().active(GL_TEXTURE6);
-			mesh.render(null, null, null);
+			mesh.render();
 		}
+		mesh.unbind();
 		shader.stop();
 		glCullFace(GL_BACK);
 		glDisable(GL_BLEND);

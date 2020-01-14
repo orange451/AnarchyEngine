@@ -10,7 +10,7 @@
 
 package engine.glv2.shaders.data;
 
-import engine.gl.light.DirectionalLightInternal;
+import engine.glv2.v2.lights.DirectionalLightInternal;
 
 public class UniformDirectionalLight extends UniformObject {
 

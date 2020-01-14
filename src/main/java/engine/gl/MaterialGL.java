@@ -12,7 +12,6 @@ package engine.gl;
 
 import org.joml.Vector3f;
 
-import engine.gl.shader.BaseShader;
 import engine.glv2.objects.Texture;
 import lwjgui.paint.Color;
 
@@ -157,14 +156,6 @@ public class MaterialGL {
 
 	public Texture getRoughnessTexture() {
 		return this.roughnessTexture;
-	}
-
-	@Deprecated
-	public void bind(BaseShader shader) {
-		if ( shader == null )
-			return;
-		
-		shader.debug = true;
 	}
 
 }

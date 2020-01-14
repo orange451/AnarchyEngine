@@ -20,7 +20,6 @@ import engine.Game;
 import engine.InternalRenderThread;
 import engine.gl.LegacyPipeline;
 import engine.gl.Resources;
-import engine.gl.Surface;
 import engine.lua.type.data.Vector3;
 import engine.lua.type.object.Instance;
 import engine.lua.type.object.insts.Camera;
@@ -300,7 +299,7 @@ public class IdeMaterialViewer extends IdePane {
 			InternalRenderThread.runLater(()->{
 				if ( materialPipeline == null )
 					return;
-				materialPipeline.render();
+				//materialPipeline.render();
 			});
 		}
 	}

@@ -10,15 +10,16 @@
 
 package engine.gl;
 
-import engine.gl.light.DirectionalLightInternal;
-import engine.gl.light.PointLightInternal;
-import engine.gl.light.SpotLightInternal;
 import engine.glv2.v2.RenderingSettings;
+import engine.glv2.v2.lights.DirectionalLightInternal;
 import engine.glv2.v2.lights.ILightHandler;
+import engine.glv2.v2.lights.PointLightInternal;
+import engine.glv2.v2.lights.SpotLightInternal;
 import engine.lua.type.object.insts.DynamicSkybox;
 import engine.lua.type.object.insts.Skybox;
 import engine.observer.Renderable;
 import engine.observer.RenderableWorld;
+import lwjgui.scene.layout.StackPane;
 
 public interface IPipeline extends Renderable {
 
@@ -28,7 +29,7 @@ public interface IPipeline extends Renderable {
 
 	public void setEnabled(boolean enabled);
 
-	public Surface getPipelineBuffer();
+	public StackPane getDisplayPane();
 
 	public void setSize(int width, int height);
 

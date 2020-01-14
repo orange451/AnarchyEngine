@@ -87,9 +87,11 @@ public class HandlesRenderer {
 		glDisable(GL_DEPTH_TEST);
 		shader.start();
 		shader.loadCamera(camera, projection);
+		MESH.bind();
 		for (Instance instance : instances) {
 			renderInstance(instance);
 		}
+		MESH.unbind();
 		renderInstances(instances, camera, projection, size);
 		shader.stop();
 		glEnable(GL_DEPTH_TEST);
@@ -154,29 +156,29 @@ public class HandlesRenderer {
 		shader.loadMaterial(MATERIAL);
 		// Draw
 		shader.loadTransformationMatrix(t1);
-		MESH.render(null, null, null);
+		MESH.render();
 		shader.loadTransformationMatrix(t2);
-		MESH.render(null, null, null);
+		MESH.render();
 		shader.loadTransformationMatrix(t3);
-		MESH.render(null, null, null);
+		MESH.render();
 		shader.loadTransformationMatrix(t4);
-		MESH.render(null, null, null);
+		MESH.render();
 		shader.loadTransformationMatrix(t5);
-		MESH.render(null, null, null);
+		MESH.render();
 		shader.loadTransformationMatrix(t6);
-		MESH.render(null, null, null);
+		MESH.render();
 		shader.loadTransformationMatrix(t7);
-		MESH.render(null, null, null);
+		MESH.render();
 		shader.loadTransformationMatrix(t8);
-		MESH.render(null, null, null);
+		MESH.render();
 		shader.loadTransformationMatrix(t9);
-		MESH.render(null, null, null);
+		MESH.render();
 		shader.loadTransformationMatrix(t10);
-		MESH.render(null, null, null);
+		MESH.render();
 		shader.loadTransformationMatrix(t11);
-		MESH.render(null, null, null);
+		MESH.render();
 		shader.loadTransformationMatrix(t12);
-		MESH.render(null, null, null);
+		MESH.render();
 	}
 
 	private void renderInstances(List<Instance> instances, Camera camera, Matrix4f projection, Vector2f size) {
@@ -437,9 +439,13 @@ public class HandlesRenderer {
 		// Draw
 		shader.loadMaterial(baseMaterial);
 		shader.loadTransformationMatrix(worldMat);
-		Resources.MESH_CYLINDER.render(null, null, null);
+		Resources.MESH_CYLINDER.bind();
+		Resources.MESH_CYLINDER.render();
+		Resources.MESH_CYLINDER.unbind();
 		shader.loadTransformationMatrix(headMat);
-		Resources.MESH_CONE.render(null, null, null);
+		Resources.MESH_CONE.bind();
+		Resources.MESH_CONE.render();
+		Resources.MESH_CONE.unbind();
 
 		Vector3f arrowPos = headMat.getTranslation(new Vector3f());
 		Vector2f pos = MatrixUtils.project3Dto2D(arrowPos, projection, camera.getViewMatrix().getInternal(), size);

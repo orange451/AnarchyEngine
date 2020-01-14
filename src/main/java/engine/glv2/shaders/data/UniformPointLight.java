@@ -10,7 +10,7 @@
 
 package engine.glv2.shaders.data;
 
-import engine.gl.light.PointLightInternal;
+import engine.glv2.v2.lights.PointLightInternal;
 
 public class UniformPointLight extends UniformObject {
 

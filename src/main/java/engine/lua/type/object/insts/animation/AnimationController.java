@@ -22,7 +22,6 @@ import org.luaj.vm2.lib.TwoArgFunction;
 import engine.Game;
 import engine.InternalGameThread;
 import engine.gl.mesh.animation.AnimatedModel;
-import engine.gl.shader.BaseShader;
 import engine.lua.type.LuaConnection;
 import engine.lua.type.data.Matrix4;
 import engine.lua.type.object.Instance;
@@ -238,8 +237,6 @@ public class AnimationController extends Instance {
 		return this.playingAnimations.size();
 	}
 
-	public void debugRender(BaseShader shader) {		
-	}
 	
 	private static final Matrix4f IDENTITY = new Matrix4f().identity();
 	private void computeBones(AnimationKeyframeSequence keyframe, Instance root, Matrix4f parentMatrix) {

@@ -54,12 +54,14 @@ import org.lwjgl.system.MemoryStack;
 import engine.application.launchstrategy.ClientLauncher;
 import engine.gl.IPipeline;
 import engine.gl.Resources;
+import engine.glv2.GLRenderer;
 import engine.observer.InternalRenderable;
 import engine.observer.Renderable;
 import engine.tasks.TaskManager;
 import engine.util.GLCompat;
 import ide.layout.windows.ErrorWindow;
 import lwjgui.LWJGUI;
+import lwjgui.scene.Window;
 
 public abstract class AnarchyEngineClient extends AnarchyEngine implements Renderable,InternalRenderable {
 	public static long window = -1;
@@ -84,7 +86,9 @@ public abstract class AnarchyEngineClient extends AnarchyEngine implements Rende
 	public static boolean GLFW_INITIALIZED;
 	
 	public static IPipeline pipeline;
-	
+
+	public static Window win;
+
 	public static AnarchyEngineClientUIFrame uiNode;
 
 	public void attachRenderable( Renderable o ) {
@@ -234,9 +238,18 @@ public abstract class AnarchyEngineClient extends AnarchyEngine implements Rende
 		// Setup opengl
 		GL.createCapabilities(true);
 		
+		// Setup LWJGUI
+		win = LWJGUI.initialize(window);
+		win.setWindowAutoDraw(false); // We want to draw the main IDE window manually
+		win.setWindowAutoClear(false); // We want control of clearing
+
 		uiNode = new AnarchyEngineClientUIFrame();
 
 		TaskManager.switchToSharedContext(window);
+
+		Resources.init();
+		this.attachRenderable(pipeline = new GLRenderer(win.getContext().getNVG()));
+		pipeline.init();
 
 		// Start thread
 		try {
@@ -248,8 +261,6 @@ public abstract class AnarchyEngineClient extends AnarchyEngine implements Rende
 			new ErrorWindow("Error initializing engine.", true);
 			return;
 		}
-		Resources.init();
-		pipeline.init();
 		renderThread.run();
 		pipeline.dispose();
 		Resources.dispose();

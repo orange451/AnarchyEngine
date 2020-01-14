@@ -15,8 +15,8 @@ import org.luaj.vm2.LuaValue;
 
 import engine.InternalRenderThread;
 import engine.gl.IPipeline;
-import engine.gl.light.Light;
-import engine.gl.light.SpotLightInternal;
+import engine.glv2.v2.lights.Light;
+import engine.glv2.v2.lights.SpotLightInternal;
 import engine.lua.lib.EnumType;
 import engine.lua.type.NumberClamp;
 import engine.lua.type.NumberClampPreferred;

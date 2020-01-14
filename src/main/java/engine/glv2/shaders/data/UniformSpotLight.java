@@ -10,7 +10,7 @@
 
 package engine.glv2.shaders.data;
 
-import engine.gl.light.SpotLightInternal;
+import engine.glv2.v2.lights.SpotLightInternal;
 
 public class UniformSpotLight extends UniformObject {
 

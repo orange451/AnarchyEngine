@@ -8,7 +8,7 @@
  *
  */
 
-package engine.gl.light;
+package engine.glv2.v2.lights;
 
 import org.joml.Vector3f;
 

@@ -16,7 +16,7 @@ import org.luaj.vm2.LuaValue;
 import engine.Game;
 import engine.gl.IPipeline;
 import engine.gl.LegacyPipeline;
-import engine.gl.light.Light;
+import engine.glv2.v2.lights.Light;
 import engine.lua.type.NumberClampPreferred;
 import engine.lua.type.data.Color3;
 import engine.lua.type.data.Matrix4;

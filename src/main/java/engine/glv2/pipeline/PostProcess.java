@@ -14,8 +14,8 @@ import engine.glv2.v2.PostProcessPipeline;
 
 public class PostProcess extends PostProcessPipeline {
 
-	public PostProcess(int width, int height) {
-		super(width, height);
+	public PostProcess(int width, int height, long nvg) {
+		super(width, height, nvg);
 	}
 
 	private FXAA fxaa; // Done

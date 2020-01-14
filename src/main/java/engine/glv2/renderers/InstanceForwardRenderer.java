@@ -34,11 +34,11 @@ import org.joml.Vector3f;
 
 import engine.gl.MaterialGL;
 import engine.gl.Resources;
-import engine.gl.light.PointLightInternal;
 import engine.gl.mesh.BufferedMesh;
 import engine.glv2.renderers.shaders.InstanceFowardShader;
 import engine.glv2.v2.IRenderingData;
 import engine.glv2.v2.RendererData;
+import engine.glv2.v2.lights.PointLightInternal;
 import engine.lua.type.object.Instance;
 import engine.lua.type.object.PrefabRenderer;
 import engine.lua.type.object.insts.GameObject;
@@ -137,7 +137,9 @@ public class InstanceForwardRenderer {
 			prepareMaterial(material);
 			shader.loadMaterial(material);
 			shader.loadTransparency(trans);
-			m.render(null, null, null);
+			m.bind();
+			m.render();
+			m.unbind();
 		}
 	}
 

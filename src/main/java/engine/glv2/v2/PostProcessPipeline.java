@@ -10,6 +10,9 @@
 
 package engine.glv2.v2;
 
+import static org.lwjgl.nanovg.NanoVG.NVG_IMAGE_FLIPY;
+import static org.lwjgl.nanovg.NanoVG.nvgDeleteImage;
+import static org.lwjgl.nanovg.NanoVGGL3.nvglCreateImageFromHandle;
 import static org.lwjgl.opengl.GL11.GL_CULL_FACE;
 import static org.lwjgl.opengl.GL11C.GL_DEPTH_COMPONENT;
 import static org.lwjgl.opengl.GL11C.GL_DEPTH_TEST;
@@ -38,13 +41,14 @@ import static org.lwjgl.opengl.GL30C.GL_RGBA16F;
 import java.util.ArrayList;
 import java.util.List;
 
-import engine.gl.Surface;
 import engine.glv2.objects.Framebuffer;
 import engine.glv2.objects.FramebufferBuilder;
 import engine.glv2.objects.Texture;
 import engine.glv2.objects.TextureBuilder;
 import engine.glv2.objects.VAO;
 import engine.glv2.shaders.FinalShader;
+import lwjgui.scene.layout.StackPane;
+import lwjgui.style.BackgroundNVGImage;
 
 public abstract class PostProcessPipeline {
 
@@ -60,11 +64,17 @@ public abstract class PostProcessPipeline {
 
 	private FinalShader finalShader;
 
-	private Surface finalSurface;
+	private int nvgTexture;
 
-	public PostProcessPipeline(int width, int height) {
+	private long nvg;
+
+	private StackPane displayPane;
+	private BackgroundNVGImage image;
+
+	public PostProcessPipeline(int width, int height, long nvg) {
 		this.width = width;
 		this.height = height;
+		this.nvg = nvg;
 		passes = new ArrayList<>();
 		auxTex = new Texture[3];
 		init();
@@ -83,7 +93,11 @@ public abstract class PostProcessPipeline {
 			pass.init(width, height);
 		finalShader = new FinalShader("postprocess/Final");
 		finalShader.init();
-		finalSurface = new Surface(width, height);
+		displayPane = new StackPane();
+		displayPane.setBackground(image = new BackgroundNVGImage(nvgTexture));
+		displayPane.setMinSize(1, 1);
+		displayPane.setFillToParentHeight(true);
+		displayPane.setFillToParentWidth(true);
 	}
 
 	public abstract void setupPasses();
@@ -108,15 +122,15 @@ public abstract class PostProcessPipeline {
 	public void render() {
 		glDisable(GL_CULL_FACE);
 		glDisable(GL_DEPTH_TEST);
-		finalSurface.bind();
+		main.bind();
 		finalShader.start();
 		quad.bind(0);
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, auxTex[0].getTexture());
-		glDrawArrays(GL_TRIANGLE_STRIP, 0, quad.getVertexCount());
+		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 		quad.unbind(0);
 		finalShader.stop();
-		finalSurface.unbind();
+		main.unbind();
 		glEnable(GL_DEPTH_TEST);
 	}
 
@@ -127,8 +141,7 @@ public abstract class PostProcessPipeline {
 		generatePipeline();
 		for (PostProcesPass<?> pass : passes)
 			pass.resize(width, height);
-		finalSurface.cleanup();
-		finalSurface = new Surface(width, height);
+		image.setNVGImage(nvgTexture);
 	}
 
 	public void dispose() {
@@ -170,12 +183,15 @@ public abstract class PostProcessPipeline {
 		fb.framebufferTexture(GL_COLOR_ATTACHMENT0, mainTex, 0);
 		fb.framebufferTexture(GL_DEPTH_ATTACHMENT, depthTex, 0);
 		main = fb.endFramebuffer();
+
+		nvgTexture = nvglCreateImageFromHandle(nvg, mainTex.getTexture(), width, width, NVG_IMAGE_FLIPY);
 	}
 
 	private void disposePipeline() {
 		main.dispose();
 		mainTex.dispose();
 		depthTex.dispose();
+		nvgDeleteImage(nvg, nvgTexture);
 	}
 
 	public Texture getMainTex() {
@@ -186,8 +202,8 @@ public abstract class PostProcessPipeline {
 		return depthTex;
 	}
 
-	public Surface getFinalSurface() {
-		return finalSurface;
+	public StackPane getDisplayPane() {
+		return displayPane;
 	}
 
 	/**

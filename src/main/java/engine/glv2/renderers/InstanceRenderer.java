@@ -167,7 +167,9 @@ public class InstanceRenderer implements IObjectRenderer {
 
 			prepareMaterial(material);
 			shader.loadMaterial(material);
-			m.render(null, null, null);
+			m.bind();
+			m.render();
+			m.unbind();
 		}
 	}
 

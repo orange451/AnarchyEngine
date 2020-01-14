@@ -16,7 +16,6 @@ import static org.lwjgl.opengl.GL20C.GL_VERTEX_SHADER;
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
 
-import engine.gl.light.SpotLightInternal;
 import engine.glv2.shaders.data.Attribute;
 import engine.glv2.shaders.data.UniformBoolean;
 import engine.glv2.shaders.data.UniformMatrix4;
@@ -24,6 +23,7 @@ import engine.glv2.shaders.data.UniformSampler;
 import engine.glv2.shaders.data.UniformSpotLight;
 import engine.glv2.shaders.data.UniformVec2;
 import engine.glv2.shaders.data.UniformVec3;
+import engine.glv2.v2.lights.SpotLightInternal;
 import engine.lua.type.object.insts.Camera;
 
 public class SpotLightShader extends ShaderProgram {

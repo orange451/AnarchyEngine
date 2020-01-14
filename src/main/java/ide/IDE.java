@@ -19,18 +19,15 @@ import engine.AnarchyEngineClient;
 import engine.Game;
 import engine.InternalGameThread;
 import engine.InternalRenderThread;
-import engine.glv2.GLRenderer;
 import engine.io.Load;
 import engine.lua.type.object.ScriptBase;
 import ide.layout.IdeLayout;
 import ide.layout.windows.IdeLuaEditor;
 import lwjgui.LWJGUI;
 import lwjgui.scene.Group;
-import lwjgui.scene.Window;
 
 public class IDE extends AnarchyEngineClient {
 	public static IdeLayout layout;
-	public static Window win;
 	
 	public static final String TITLE = "Anarchy Engine - Build " + Game.version();
 	
@@ -38,11 +35,6 @@ public class IDE extends AnarchyEngineClient {
 	public void initialize(String[] args) {
 		// Window title
 		GLFW.glfwSetWindowTitle(window, TITLE);
-		
-		// Setup LWJGUI
-		win = LWJGUI.initialize(window);
-		win.setWindowAutoDraw(false); // We want to draw the main IDE window manually
-		win.setWindowAutoClear(false); // We want control of clearing
 		
 		InternalRenderThread.desiredFPS = 60;
 		InternalGameThread.desiredTPS = 60;
@@ -60,10 +52,6 @@ public class IDE extends AnarchyEngineClient {
 				renderThread.forceUpdate();
 			}
 		});
-		
-		// Create rendering pipeline
-		//this.attachRenderable(pipeline = new LegacyPipeline());
-		this.attachRenderable(pipeline = new GLRenderer());
 		
 		// Setup mane IDE layout
 		layout = new IdeLayout(background);

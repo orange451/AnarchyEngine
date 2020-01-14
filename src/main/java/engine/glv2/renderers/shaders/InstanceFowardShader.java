@@ -18,8 +18,6 @@ import java.util.List;
 import org.joml.Matrix4f;
 
 import engine.gl.MaterialGL;
-import engine.gl.light.DirectionalLightInternal;
-import engine.gl.light.PointLightInternal;
 import engine.glv2.shaders.ShaderProgram;
 import engine.glv2.shaders.data.Attribute;
 import engine.glv2.shaders.data.UniformBoolean;
@@ -31,6 +29,8 @@ import engine.glv2.shaders.data.UniformMatrix4;
 import engine.glv2.shaders.data.UniformPointLight;
 import engine.glv2.shaders.data.UniformSampler;
 import engine.glv2.shaders.data.UniformVec3;
+import engine.glv2.v2.lights.DirectionalLightInternal;
+import engine.glv2.v2.lights.PointLightInternal;
 import engine.lua.type.object.insts.Camera;
 
 public class InstanceFowardShader extends ShaderProgram {

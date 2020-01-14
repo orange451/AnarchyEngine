@@ -8,13 +8,12 @@
  *
  */
 
-package engine.gl.light;
+package engine.glv2.v2.lights;
 
 import org.joml.Vector3f;
 
 import engine.InternalRenderThread;
 import engine.glv2.entities.LayeredCubeCamera;
-import engine.glv2.v2.lights.PointLightShadowMap;
 
 public class PointLightInternal extends Light {
 	public float radius = 64;

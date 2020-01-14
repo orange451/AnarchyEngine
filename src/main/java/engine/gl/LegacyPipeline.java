@@ -12,17 +12,10 @@ package engine.gl;
 
 import java.util.HashMap;
 
-import engine.gl.light.DirectionalLightInternal;
-import engine.gl.light.PointLightInternal;
-import engine.gl.light.SpotLightInternal;
-import engine.glv2.v2.RenderingSettings;
-import engine.glv2.v2.lights.ILightHandler;
-import engine.lua.type.object.insts.DynamicSkybox;
-import engine.lua.type.object.insts.Skybox;
 import engine.observer.RenderableWorld;
 
 @Deprecated
-public class LegacyPipeline implements IPipeline {
+public class LegacyPipeline  {
 	private static IPipeline currentPipeline;
 	private static HashMap<RenderableWorld, IPipeline> pipelineMap = new HashMap<>();
 	
@@ -42,99 +35,4 @@ public class LegacyPipeline implements IPipeline {
 		return currentPipeline;
 	}
 
-	@Override
-	public void render() {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void setRenderableWorld(RenderableWorld instance) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public RenderableWorld getRenderableWorld() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void setEnabled(boolean enabled) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public Surface getPipelineBuffer() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void setSize(int width, int height) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public ILightHandler<PointLightInternal> getPointLightHandler() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public ILightHandler<DirectionalLightInternal> getDirectionalLightHandler() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public ILightHandler<SpotLightInternal> getSpotLightHandler() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void setDyamicSkybox(DynamicSkybox dynamicSkybox) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void setStaticSkybox(Skybox skybox) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void reloadStaticSkybox() {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public RenderingSettings getRenderSettings() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public boolean isInitialized() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public void init() {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void dispose() {
-		// TODO Auto-generated method stub
-		
-	}
 }

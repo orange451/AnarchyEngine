@@ -106,7 +106,9 @@ public class InstanceShadowRenderer {
 			float trans = iMatTrans * iObjTrans;
 			if (trans != 1.0)
 				continue;
-			m.render(null, null, null);
+			m.bind();
+			m.render();
+			m.unbind();
 		}
 	}
 

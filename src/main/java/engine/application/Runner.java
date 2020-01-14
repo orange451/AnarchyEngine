@@ -16,20 +16,10 @@ import org.lwjgl.opengl.GL11;
 import engine.AnarchyEngineClient;
 import engine.Game;
 import engine.InternalRenderThread;
-import engine.glv2.GLRenderer;
-import engine.lua.lib.Enums;
-import engine.lua.type.object.services.UserInputService;
 import lwjgui.LWJGUI;
-import lwjgui.event.ScrollEvent;
-import lwjgui.geometry.Insets;
-import lwjgui.geometry.Pos;
-import lwjgui.gl.GenericShader;
-import lwjgui.scene.Window;
-import lwjgui.scene.layout.StackPane;
 
 public abstract class Runner extends AnarchyEngineClient {
 	//private static StackPane rootPane;
-	private static GenericShader shader;
 	
 	/*public StackPane getRootPane() {
 		return rootPane;
@@ -37,16 +27,6 @@ public abstract class Runner extends AnarchyEngineClient {
 	*/
 	@Override
 	public void initialize(String[] args) {
-		// Add rendering pipeline
-		//pipeline = new Pipeline();
-		pipeline = new GLRenderer();
-		shader = new GenericShader();
-		
-		// Enable LWJGUI on this window (used for UI drawing)
-		Window win = LWJGUI.initialize(window);
-		win.setWindowAutoDraw(false); // To make it so we control swapbuffers
-		win.setWindowAutoClear(false); // To make it so we control glClear()
-		
 		win.getScene().setRoot(AnarchyEngineClient.uiNode);
 		
 		// TEST UI
@@ -101,9 +81,6 @@ public abstract class Runner extends AnarchyEngineClient {
 		
 		// Set viewport
 		GL11.glViewport(0, 0, viewportWidth, viewportHeight);
-
-		// Draw pipeline's buffer to screen
-		pipeline.getPipelineBuffer().render(shader, true);
 
 		LWJGUI.render(false); // Gets directly rendered on-top of buffer (in same FBO)
 	}

@@ -8,13 +8,11 @@
  *
  */
 
-package engine.gl.light;
+package engine.glv2.v2.lights;
 
 import org.joml.Vector3f;
 
 import engine.InternalRenderThread;
-import engine.glv2.v2.lights.DirectionalLightCamera;
-import engine.glv2.v2.lights.DirectionalLightShadowMap;
 
 public class DirectionalLightInternal extends Light {
 	public Vector3f direction = new Vector3f(1, 1, 1);

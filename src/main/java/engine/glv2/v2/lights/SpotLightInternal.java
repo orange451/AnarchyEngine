@@ -8,13 +8,11 @@
  *
  */
 
-package engine.gl.light;
+package engine.glv2.v2.lights;
 
 import org.joml.Vector3f;
 
 import engine.InternalRenderThread;
-import engine.glv2.v2.lights.SpotLightCamera;
-import engine.glv2.v2.lights.SpotLightShadowMap;
 
 public class SpotLightInternal extends Light {
 	public float outerFOV = 80;

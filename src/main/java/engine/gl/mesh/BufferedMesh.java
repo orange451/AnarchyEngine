@@ -25,19 +25,15 @@ import static org.lwjgl.opengl.GL30.glGenVertexArrays;
 
 import java.nio.FloatBuffer;
 
-import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.lwjgl.opengl.GL15;
 import org.lwjgl.opengl.GL30;
 import org.lwjgl.system.MemoryUtil;
 
-import engine.InternalRenderThread;
-import engine.gl.MaterialGL;
-import engine.gl.shader.BaseShader;
 import engine.io.BinaryInputStream;
 import engine.io.BinaryOutputStream;
 import engine.observer.RenderableMesh;
-import engine.util.AABBUtil;
+import engine.tasks.TaskManager;
 import engine.util.Pair;
 
 public class BufferedMesh implements RenderableMesh {
@@ -295,6 +291,9 @@ public class BufferedMesh implements RenderableMesh {
 	 * Bind this VAO to the OpenGL state.
 	 */
 	public void bind() {
+		if ( modified ) {
+			sendToGPU();
+		}
 		glBindVertexArray(vaoId);
 	}
 
@@ -310,42 +309,16 @@ public class BufferedMesh implements RenderableMesh {
 	 * It must be re-filled with vertex data.
 	 */
 	public void cleanup() {
-		InternalRenderThread.runLater(()->{
+		TaskManager.addTaskRenderThread(()->{
 			GL30.glDeleteVertexArrays(vaoId);
 			GL15.glDeleteBuffers(vboId);
 		});
 		vertices = null;
 	}
 
-	/**
-	 * Render this mesh at a given world matrix with a given material.
-	 * @param genericShader
-	 * @param worldMatrix
-	 * @param material
-	 */
-	public void render(BaseShader shader, Matrix4f worldMatrix, MaterialGL material) {
-		if ( modified ) {
-			sendToGPU();
-		}
-
-		// Bind the material for drawing
-		if ( material != null ) {
-			material.bind(shader);
-		}
-
-		// Bind the VAO for drawing
-		this.bind();
-
-		// Set world matrix
-		if ( worldMatrix != null ) {
-			shader.setWorldMatrix(worldMatrix);
-		}
-
-		// Draw
+	@Override
+	public void render() {
 		glDrawArrays(GL_TRIANGLES, 0, vertices.length);
-
-		// Unbind VAO
-		this.unbind();
 	}
 
 	/**

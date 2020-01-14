@@ -37,12 +37,12 @@ import org.luaj.vm2.LuaValue;
 
 import engine.gl.MaterialGL;
 import engine.gl.Resources;
-import engine.gl.light.PointLightInternal;
 import engine.gl.mesh.animation.AnimatedModel;
 import engine.gl.mesh.animation.AnimatedModelSubMesh;
 import engine.glv2.renderers.shaders.AnimInstanceFowardShader;
 import engine.glv2.v2.IRenderingData;
 import engine.glv2.v2.RendererData;
+import engine.glv2.v2.lights.PointLightInternal;
 import engine.lua.type.object.Instance;
 import engine.lua.type.object.PrefabRenderer;
 import engine.lua.type.object.insts.GameObject;

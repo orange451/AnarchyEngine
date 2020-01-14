@@ -25,9 +25,7 @@ import engine.gl.mesh.BufferedMesh;
 import engine.gl.mesh.BufferedPrefab;
 import engine.gl.mesh.Triangle;
 import engine.gl.mesh.Vertex;
-import engine.gl.shader.BaseShader;
 import engine.util.FileIO;
-import engine.util.TextureUtils;
 import lwjgui.paint.Color;
 
 public class ModelMM3D {
@@ -60,9 +58,9 @@ public class ModelMM3D {
 		this.textures   = new ArrayList<Mm3dTexture>();
 	}
 
-	public void renderStaticModel( BaseShader shader, Matrix4f worldMatrix) {
+	/*public void renderStaticModel( BaseShader shader, Matrix4f worldMatrix) {
 		this.staticModel.render( shader, worldMatrix );
-	}
+	}*/
 
 	public BufferedMesh getCollapsedModel() {
 		return this.collapsedModel;
@@ -95,7 +93,7 @@ public class ModelMM3D {
 		return 0;
 	}
 
-	public void renderJoints(BaseShader shader, Matrix4f worldMatrix) {
+	/*public void renderJoints(BaseShader shader, Matrix4f worldMatrix) {
 		// Draw all the Joints
 		for (int i = 0; i < joints.size(); i++) {
 			Mm3dJoint currentJoint = joints.get(i);
@@ -109,13 +107,13 @@ public class ModelMM3D {
 			if (currentJoint.getParent() == -1)
 				color = Color.RED;
 
-			/*GameResources.cubeModel.matrix_set_from_4x4(ma_mat);
+			GameResources.cubeModel.matrix_set_from_4x4(ma_mat);
 			GameResources.cubeModel.matrix_set_scaling(0.125f, 0.125f, 0.125f);
 			GameResources.cubeModel.matrix_add_translation(0, 0, 0);
 			GameResources.cubeModel.draw(Resources.blankTexture, null, null, null, shader, color);
-			GameResources.cubeModel.matrix_reset();*/
+			GameResources.cubeModel.matrix_reset();
 		}
-	}
+	}*/
 
 	public int getAnimationFromName(String animationName) {
 		for (int i = 0; i < animations.size(); i++) {
@@ -285,7 +283,7 @@ public class ModelMM3D {
 		if (materials.size() == 0)
 			return;
 
-		URL url = TextureUtils.class.getClassLoader().getResource( directory + string );
+		URL url = this.getClass().getClassLoader().getResource( directory + string );
 		if (url == null) {
 			try {
 				url = new File( directory + string ).toURL();

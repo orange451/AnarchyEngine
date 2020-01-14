@@ -42,10 +42,6 @@ import engine.AnarchyEngineClient;
 import engine.Game;
 import engine.gl.IPipeline;
 import engine.gl.LegacyPipeline;
-import engine.gl.Surface;
-import engine.gl.light.DirectionalLightInternal;
-import engine.gl.light.PointLightInternal;
-import engine.gl.light.SpotLightInternal;
 import engine.glv2.pipeline.MultiPass;
 import engine.glv2.pipeline.PostProcess;
 import engine.glv2.renderers.AnimInstanceRenderer;
@@ -65,15 +61,19 @@ import engine.glv2.v2.RenderingSettings;
 import engine.glv2.v2.SkyRenderer;
 import engine.glv2.v2.Sun;
 import engine.glv2.v2.lights.DirectionalLightHandler;
+import engine.glv2.v2.lights.DirectionalLightInternal;
 import engine.glv2.v2.lights.ILightHandler;
 import engine.glv2.v2.lights.PointLightHandler;
+import engine.glv2.v2.lights.PointLightInternal;
 import engine.glv2.v2.lights.SpotLightHandler;
+import engine.glv2.v2.lights.SpotLightInternal;
 import engine.lua.type.object.insts.Camera;
 import engine.lua.type.object.insts.DynamicSkybox;
 import engine.lua.type.object.insts.Skybox;
 import engine.lua.type.object.services.Lighting;
 import engine.observer.RenderableWorld;
 import ide.layout.windows.ErrorWindow;
+import lwjgui.scene.layout.StackPane;
 
 public class GLRenderer implements IPipeline {
 
@@ -114,8 +114,11 @@ public class GLRenderer implements IPipeline {
 	private boolean useARBClipControl = false;
 
 	private boolean initialized;
+	
+	private long nvg;
 
-	public GLRenderer() {
+	public GLRenderer(long nvg) {
+		this.nvg = nvg;
 		useARBClipControl = GL.getCapabilities().GL_ARB_clip_control;
 
 		rnd = new RendererData();
@@ -165,7 +168,7 @@ public class GLRenderer implements IPipeline {
 			renderingManager.addRenderer(new AnimInstanceRenderer());
 			handlesRenderer = new HandlesRenderer();
 			dp = new MultiPass(width, height);
-			pp = new PostProcess(width, height);
+			pp = new PostProcess(width, height, nvg);
 			projMatrix = Maths.createProjectionMatrix(width, height, 90, 0.1f, Float.POSITIVE_INFINITY, true);
 
 			rnd.exposure = Game.lighting().getExposure();
@@ -435,8 +438,8 @@ public class GLRenderer implements IPipeline {
 	}
 
 	@Override
-	public Surface getPipelineBuffer() {
-		return pp.getFinalSurface();
+	public StackPane getDisplayPane() {
+		return pp.getDisplayPane();
 	}
 
 	@Override

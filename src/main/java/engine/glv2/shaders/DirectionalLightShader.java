@@ -15,13 +15,13 @@ import static org.lwjgl.opengl.GL20C.GL_VERTEX_SHADER;
 
 import org.joml.Matrix4f;
 
-import engine.gl.light.DirectionalLightInternal;
 import engine.glv2.shaders.data.Attribute;
 import engine.glv2.shaders.data.UniformBoolean;
 import engine.glv2.shaders.data.UniformDirectionalLight;
 import engine.glv2.shaders.data.UniformMatrix4;
 import engine.glv2.shaders.data.UniformSampler;
 import engine.glv2.shaders.data.UniformVec3;
+import engine.glv2.v2.lights.DirectionalLightInternal;
 import engine.lua.type.object.insts.Camera;
 
 public class DirectionalLightShader extends ShaderProgram {

@@ -11,27 +11,19 @@
 package ide.layout.windows;
 
 import engine.AnarchyEngineClient;
-import engine.Game;
 import engine.InternalRenderThread;
 import engine.gl.IPipeline;
-import engine.gl.Surface;
-import engine.lua.type.object.services.UserInputService;
 import ide.IDE;
 import ide.layout.IdePane;
-import lwjgui.event.ScrollEvent;
 import lwjgui.geometry.Insets;
 import lwjgui.geometry.Pos;
-import lwjgui.gl.GenericShader;
-import lwjgui.gl.Renderer;
 import lwjgui.paint.Color;
 import lwjgui.scene.Context;
-import lwjgui.scene.Node;
 import lwjgui.scene.control.Label;
-import lwjgui.scene.layout.OpenGLPane;
 import lwjgui.scene.layout.StackPane;
 
 public class IdeGameView extends IdePane {
-	private OpenGLPane gameView;
+	private StackPane gameView;
 	private IPipeline pipeline;
 	private Label fps;
 	
@@ -41,26 +33,7 @@ public class IdeGameView extends IdePane {
 		this.pipeline = pipeline;
 		this.setAlignment(Pos.CENTER);
 		
-		this.gameView = new OpenGLPane();
-		gameView.setMinSize(1, 1);
-		gameView.setFillToParentHeight(true);
-		gameView.setFillToParentWidth(true);
-		gameView.setFlipY(true);
-		gameView.setRendererCallback(new Renderer() {
-			GenericShader shader;
-			{
-				shader = new GenericShader();
-			}
-			
-			@Override
-			public void render(Context context) {
-				if ( !IdeGameView.this.pipeline.isInitialized() )
-					return;
-				
-				Surface surface = IdeGameView.this.pipeline.getPipelineBuffer();
-				surface.render(shader);
-			}
-		});
+		gameView = pipeline.getDisplayPane();
 		this.getChildren().add(gameView);
 		
 		this.fps = new Label("fps");
