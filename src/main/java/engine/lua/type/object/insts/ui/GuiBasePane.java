@@ -13,6 +13,7 @@ package engine.lua.type.object.insts.ui;
 import org.luaj.vm2.LuaValue;
 
 import engine.lua.type.data.Color3;
+import engine.lua.type.data.Color4;
 import lwjgui.geometry.Pos;
 import lwjgui.paint.Color;
 import lwjgui.scene.Node;
@@ -25,24 +26,24 @@ public abstract class GuiBasePane extends GuiBase {
 	public GuiBasePane(String name) {
 		super(name);
 		
-		this.defineField(C_BACKGROUNDCOLOR.toString(), new Color3(Color.WHITE), false);
+		this.defineField(C_BACKGROUNDCOLOR.toString(), new Color4(Color.WHITE), false);
 	}
 	
 	/**
 	 * Get the background color for this frame.
 	 * @return
 	 */
-	public Color3 getBackgroundColor() {
+	public Color4 getBackgroundColor() {
 		LuaValue val = this.get(C_BACKGROUNDCOLOR);
-		return val.isnil()?null:(Color3)val;
+		return val.isnil()?null:(Color4)val;
 	}
 	
 	/**
 	 * Set the background color for this frame.
 	 * @param color
 	 */
-	public void setTextColor(Color3 color) {
-		this.set(C_BACKGROUNDCOLOR, new Color3(color));
+	public void setBackgroundColor(Color4 color) {
+		this.set(C_BACKGROUNDCOLOR, new Color4(color));
 	}
 
 	@Override

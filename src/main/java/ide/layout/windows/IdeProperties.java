@@ -35,6 +35,8 @@ import engine.lua.type.LuaValuetype;
 import engine.lua.type.NumberClamp;
 import engine.lua.type.NumberClampPreferred;
 import engine.lua.type.data.Color3;
+import engine.lua.type.data.Color4;
+import engine.lua.type.data.ColorBase;
 import engine.lua.type.object.AssetLoadable;
 import engine.lua.type.object.Instance;
 import engine.lua.type.object.InstancePropertySubscriber;
@@ -199,11 +201,14 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 		// Edit a filepath
 		if ( field.equals("FilePath") )
 			return new FilePathPropertyModifier(instance, field, value, editable);
-		
-		// Edit a color
-		if ( value instanceof Color3 ) {
-			return new ColorPropertyModifier(instance, field, value, editable);
-		}
+
+		// Edit a color3
+		if ( value instanceof Color3 )
+			return new ColorPropertyModifier(instance, field, value, editable, false);
+
+		// Edit a color4
+		if ( value instanceof Color4 )
+			return new ColorPropertyModifier(instance, field, value, editable, true);
 		
 		// Edit a boolean
 		if ( value.isboolean() ) {
@@ -378,7 +383,7 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 	static class ColorPropertyModifier extends PropertyModifier {
 		private ColorPicker picker;
 		
-		public ColorPropertyModifier(Instance instance, String field, LuaValue value, boolean editable) {
+		public ColorPropertyModifier(Instance instance, String field, LuaValue value, boolean editable, boolean supportsAlpha) {
 			super(instance,field,value,editable);
 			
 			Color color = Color.WHITE;
@@ -389,18 +394,20 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 			this.picker.setMaxHeight(16);
 			this.picker.setPadding(new Insets(0,8,0,8));
 			this.picker.setFontSize(16);
+			this.picker.setSupportsAlpha(supportsAlpha);
 			this.getChildren().add(picker);
 			
 			if ( editable ) {
 				this.picker.setOnAction(event -> {
-					setWithHistory(this.instance, LuaValue.valueOf(field), new Color3(this.picker.getColor()));
+					LuaValue output = supportsAlpha?new Color4(this.picker.getColor()):new Color3(this.picker.getColor());
+					setWithHistory(this.instance, LuaValue.valueOf(field), output);
 				});
 			}
 		}
 		
 		@Override
 		public void update(LuaValue value) {
-			this.picker.setColor(((Color3)value).toColor());
+			this.picker.setColor(((ColorBase)value).toColor());
 		}
 	}
 	

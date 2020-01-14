@@ -10,79 +10,82 @@
 
 package engine.lua.type.data;
 
-import org.joml.Vector3f;
+import org.joml.Vector4f;
 import org.json.simple.JSONObject;
 import org.luaj.vm2.LuaTable;
 import org.luaj.vm2.LuaValue;
-import org.luaj.vm2.lib.ThreeArgFunction;
 import org.luaj.vm2.lib.TwoArgFunction;
 import org.luaj.vm2.lib.ZeroArgFunction;
 
+import engine.lua.lib.FourArgFunction;
 import engine.lua.type.LuaValuetype;
 import lwjgui.paint.Color;
 
-public class Color3 extends ColorBase {
+public class Color4 extends ColorBase {
 
 	private Color internal;
 	
-	public Color3(Color color) {
+	public Color4(Color color) {
 		this();
 		
 		this.rawset("R", LuaValue.valueOf(color.getRed()));
 		this.rawset("G", LuaValue.valueOf(color.getGreen()));
 		this.rawset("B", LuaValue.valueOf(color.getBlue()));
+		this.rawset("A", LuaValue.valueOf(color.getAlphaF()));
 	}
 	
-	public Color3(Color3 color) {
+	public Color4(Color4 color) {
 		this(color.internal);
 	}
 	
-	public Color3() {
+	public Color4() {
 		
 		// Create ToString function
 		this.getmetatable().set("ToString", new ZeroArgFunction() {
 			@Override
 			public LuaValue call() {
-				return LuaValue.valueOf(Color3.this.toString());
+				return LuaValue.valueOf(Color4.this.toString());
 			}
 		});
 		
 		this.getmetatable().set(LuaValue.ADD, new TwoArgFunction() {
 			public LuaValue call(LuaValue left, LuaValue right) {
-				Color3 left2 = getColor(left);
-				Color3 right2 = getColor(right);
-				return newInstance(left2.getR() + right2.getR(), left2.getG() + right2.getG(), left2.getB() + right2.getB());
+				Color4 left2 = getColor(left);
+				Color4 right2 = getColor(right);
+				return newInstance(left2.getR() + right2.getR(), left2.getG() + right2.getG(), left2.getB() + right2.getB(), left2.getA() + right2.getA());
 			}
 		});
 		
 		this.getmetatable().set(LuaValue.SUB, new TwoArgFunction() {
 			public LuaValue call(LuaValue left, LuaValue right) {
-				Color3 left2 = getColor(left);
-				Color3 right2 = getColor(right);
-				return newInstance(left2.getR() - right2.getR(), left2.getG() - right2.getG(), left2.getB() - right2.getB());
+				Color4 left2 = getColor(left);
+				Color4 right2 = getColor(right);
+				return newInstance(left2.getR() - right2.getR(), left2.getG() - right2.getG(), left2.getB() - right2.getB(), left2.getA() - right2.getA());
 			}
 		});
 		
 		this.getmetatable().set(LuaValue.MUL, new TwoArgFunction() {
 			public LuaValue call(LuaValue left, LuaValue right) {
-				Color3 left2 = getColor(left);
-				Color3 right2 = getColor(right);
+				Color4 left2 = getColor(left);
+				Color4 right2 = getColor(right);
 				return newInstance(
 					(int)(((left2.getR()/255f) * (right2.getR()/255f)) * 255),
 					(int)(((left2.getG()/255f) * (right2.getG()/255f)) * 255),
-					(int)(((left2.getB()/255f) * (right2.getB()/255f)) * 255)
+					(int)(((left2.getB()/255f) * (right2.getB()/255f)) * 255),
+					left2.getA() * right2.getA()
 				);
 			}
 		});
 		
 		this.getmetatable().set(LuaValue.DIV, new TwoArgFunction() {
 			public LuaValue call(LuaValue left, LuaValue right) {
-				Color3 left2 = getColor(left);
-				Color3 right2 = getColor(right);
+				Color4 left2 = getColor(left);
+				Color4 right2 = getColor(right);
 				return newInstance(
 						(int)(((left2.getR()/255f) / (right2.getR()/255f)) * 255),
 						(int)(((left2.getG()/255f) / (right2.getG()/255f)) * 255),
-						(int)(((left2.getB()/255f) / (right2.getB()/255f)) * 255)
+						(int)(((left2.getB()/255f) / (right2.getB()/255f)) * 255),
+						left2.getA() / right2.getA()
 					);
 			}
 		});
@@ -91,52 +94,53 @@ public class Color3 extends ColorBase {
 		defineField("R", LuaValue.valueOf(0), true);
 		defineField("G", LuaValue.valueOf(0), true);
 		defineField("B", LuaValue.valueOf(0), true);
+		defineField("A", LuaValue.valueOf(0), true);
 	}
 	
-	private Color3 getColor(LuaValue value) {
-		if ( value instanceof Color3 )
-			return ((Color3)value);
+	private Color4 getColor(LuaValue value) {
+		if ( value instanceof Color4 )
+			return ((Color4)value);
 		
 		if ( value.isnumber() ) {
 			int t = (int) (value.tofloat() * 255);
-			return newInstance(t, t, t);
+			return newInstance(t, t, t, 1);
 		}
 		
 		// Cant get color...
-		LuaValue.error("Error casting value to type Vector3");
+		LuaValue.error("Error casting value to type " + this.typename());
 		return null;
 	}
 
-	public static Color3 red() {
-		return Color3.newInstance(255, 0, 0);
+	public static Color4 red() {
+		return Color4.newInstance(255, 0, 0, 1);
 	}
 	
-	public static Color3 green() {
-		return Color3.newInstance(0, 255, 0);
+	public static Color4 green() {
+		return Color4.newInstance(0, 255, 0, 1);
 	}
 	
-	public static Color3 blue() {
-		return Color3.newInstance(0, 0, 255);
+	public static Color4 blue() {
+		return Color4.newInstance(0, 0, 255, 1);
 	}
 	
-	public static Color3 white() {
-		return Color3.newInstance(255, 255, 255);
+	public static Color4 white() {
+		return Color4.newInstance(255, 255, 255, 1);
 	}
 	
-	public static Color3 black() {
-		return Color3.newInstance(0, 0, 0);
+	public static Color4 black() {
+		return Color4.newInstance(0, 0, 0, 1);
 	}
 	
-	public static Color3 gray() {
-		return Color3.newInstance(128, 128, 128);
+	public static Color4 gray() {
+		return Color4.newInstance(128, 128, 128, 1);
 	}
 	
-	public static Color3 darkgray() {
-		return Color3.newInstance(64, 64, 64);
+	public static Color4 darkgray() {
+		return Color4.newInstance(64, 64, 64, 1);
 	}
 	
-	public static Color3 lightgray() {
-		return Color3.newInstance(192, 192, 192);
+	public static Color4 lightgray() {
+		return Color4.newInstance(192, 192, 192, 1);
 	}
 
 	@Override
@@ -194,7 +198,7 @@ public class Color3 extends ColorBase {
 	@Override
 	public Color toColor() {
 		if ( internal == null )
-			internal = new Color(getR(), getG(), getB());
+			internal = new Color(getR()/255f, getG()/255f, getB()/255f, getA());
 		
 		return internal;
 	}
@@ -211,30 +215,35 @@ public class Color3 extends ColorBase {
 		return Math.max(0, Math.min(255, this.get("B").checkint() ));
 	}
 
+	public float getA() {
+		return Math.max(0, Math.min(1, this.get("A").tofloat() ));
+	}
+
 	protected LuaValue newInstanceFunction() {
-		return new ThreeArgFunction() {
+		return new FourArgFunction() {
 			@Override
-			public LuaValue call(LuaValue arg1, LuaValue arg2, LuaValue arg3) {
-				return newInstance(arg1.toint(), arg2.toint(), arg3.toint());
+			public LuaValue call(LuaValue arg1, LuaValue arg2, LuaValue arg3, LuaValue arg4) {
+				return newInstance(arg1.toint(), arg2.toint(), arg3.toint(), arg4.tofloat());
 			}
 		};
 	}
 
-	public static Color3 newInstance(int r, int g, int b) {
-		Color3 inst = new Color3();
+	public static Color4 newInstance(int r, int g, int b, float a) {
+		Color4 inst = new Color4();
 		inst.rawset("R", LuaValue.valueOf(r));
 		inst.rawset("G", LuaValue.valueOf(g));
 		inst.rawset("B", LuaValue.valueOf(b));
+		inst.rawset("A", LuaValue.valueOf(a));
 		return inst;
 	}
 
 	@Override
 	public String typename() {
-		return "Color3";
+		return "Color4";
 	}
 	
 	public String toString() {
-		return getR() + ", " + getG() + ", " + getB();
+		return getR() + ", " + getG() + ", " + getB() + ", " + getA();
 	}
 
 	
@@ -244,11 +253,12 @@ public class Color3 extends ColorBase {
 	
 	public LuaValuetype fromString(String input) {
 		String[] t = input.replace(" ", "").split(",");
-		if ( t.length != 3 )
+		if ( t.length != 4 )
 			return this;
 		this.rawset("R", LuaValue.valueOf(Integer.parseInt(t[0])));
 		this.rawset("G", LuaValue.valueOf(Integer.parseInt(t[1])));
 		this.rawset("B", LuaValue.valueOf(Integer.parseInt(t[2])));
+		this.rawset("A", LuaValue.valueOf(Float.parseFloat(t[3])));
 		internal = null;
 		return this;
 	}
@@ -270,23 +280,25 @@ public class Color3 extends ColorBase {
 		j.put("R", (long)this.getR());
 		j.put("G", (long)this.getG());
 		j.put("B", (long)this.getB());
+		j.put("A", (double)this.getA());
 		return j;
 	}
 	
-	public static Color3 fromJSON(JSONObject json) {
+	public static Color4 fromJSON(JSONObject json) {
 		return newInstance(
 				(int)((Long)json.get("R")).intValue(),
 				(int)((Long)json.get("G")).intValue(),
-				(int)((Long)json.get("B")).intValue()
+				(int)((Long)json.get("B")).intValue(),
+				(float)((Double)json.get("A")).floatValue()
 				);
 	}
 
 	@Override
 	public LuaValuetype clone() {
-		return newInstance(this.getR(), this.getG(), this.getB());
+		return newInstance(this.getR(), this.getG(), this.getB(), this.getA());
 	}
 
-	public Vector3f toJOML() {
-		return new Vector3f( getR()/255f, getG()/255f, getB()/255f );
+	public Vector4f toJOML() {
+		return new Vector4f( getR()/255f, getG()/255f, getB()/255f, getA() );
 	}
 }
