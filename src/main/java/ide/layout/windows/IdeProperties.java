@@ -469,7 +469,7 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 			this.setPadding(Insets.EMPTY);
 			this.textField = new TextField() {
 				{
-					((Region)this.getChildren().get(0)).setPadding(new Insets(0,0,0,4));
+					((ScrollPane)this.getChildren().get(0)).setInternalPadding(new Insets(0,0,0,3));
 				}
 				
 				@Override

@@ -51,6 +51,7 @@ import engine.lua.type.object.insts.ui.TextField;
 import engine.lua.type.object.insts.ui.VBox;
 import engine.lua.type.object.insts.values.BoolValue;
 import engine.lua.type.object.insts.values.Color3Value;
+import engine.lua.type.object.insts.values.Color4Value;
 import engine.lua.type.object.insts.values.IntValue;
 import engine.lua.type.object.insts.values.Matrix4Value;
 import engine.lua.type.object.insts.values.NumberValue;
@@ -128,6 +129,7 @@ public class IdeExplorer extends IdePane {
 		priority.put(NumberValue.class, 5);
 		priority.put(ObjectValue.class, 5);
 		priority.put(Color3Value.class, 5);
+		priority.put(Color4Value.class, 5);
 		priority.put(Vector2Value.class, 5);
 		priority.put(Vector3Value.class, 5);
 		priority.put(Matrix4Value.class, 5);
