@@ -41,17 +41,21 @@ public class Texture extends AssetLoadable implements TreeViewable, FileResource
 
 		this.rawset(C_TEXTURELOADED, new LuaEvent());
 
+		// Check for texture change on create
 		this.createdEvent().connect((args) -> {
-			// Stuff
-			if (this.get(C_FILEPATH).isnil() || this.get(C_FILEPATH).toString().length() == 0) {
-				if (this.get(C_SRGB).checkboolean())
-					texture = Resources.diffuse;
-				else
-					texture = Resources.diffuseMisc;
-			} else {
-				this.reloadFromFile();
-			}
+			internalCheckTexture();
 		});
+	}
+	
+	private void internalCheckTexture() {
+		if (this.get(C_FILEPATH).isnil() || this.get(C_FILEPATH).toString().length() == 0) {
+			if (this.get(C_SRGB).checkboolean())
+				texture = Resources.diffuse;
+			else
+				texture = Resources.diffuseMisc;
+		} else {
+			this.reloadFromFile();
+		}
 	}
 
 	public LuaEvent textureLoadedEvent() {
@@ -94,26 +98,18 @@ public class Texture extends AssetLoadable implements TreeViewable, FileResource
 	protected LuaValue onValueSet(LuaValue key, LuaValue value) {
 		if (this.containsField(key)) {
 			if (key.eq_b(C_FILEPATH) || key.eq_b(C_FLIPY) || key.eq_b(C_SRGB)) {
-				if (key.eq_b(C_FLIPY)) {
+				
+				// FORCE SET FLIPY AND SRGB before we continue...
+				if ( key.eq_b(C_FLIPY) || key.eq_b(C_SRGB) )
 					this.rawset(key, value);
-				}
 
 				String texturePath = value.toString();
 				if (!key.eq_b(C_FILEPATH))
 					texturePath = this.getFilePath();
 
 				path = texturePath;
-				if (created) {
-					if (this.get(C_FILEPATH).isnil() || this.get(C_FILEPATH).toString().length() == 0) {
-						if (this.get(C_SRGB).checkboolean())
-							texture = Resources.diffuse;
-						else
-							texture = Resources.diffuseMisc;
-					} else {
-						this.reloadFromFile();
-					}
-				}
-			} else {
+				if (created)
+					internalCheckTexture();
 			}
 		}
 		return value;
