@@ -635,9 +635,23 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 						selected = true;
 						SELECTING_OBJECT = true;
 						t = new StackPane();
+						t.setAlignment(Pos.CENTER_RIGHT);
 						t.setPrefSize(this.getWidth(),this.getHeight());
 						t.setBackgroundLegacy(new Color(0, 32, 255, 128));
 						this.getChildren().add(t);
+						
+						StackPane cancel = new StackPane();
+						cancel.setBackgroundLegacy(new Color(200, 32, 32));
+						cancel.setPrefSize(this.getHeight(), this.getHeight());
+						cancel.setAlignment(Pos.CENTER);
+						Label l = new Label("x");
+						l.setMouseTransparent(true);
+						cancel.getChildren().add(l);
+						t.getChildren().add(cancel);
+						
+						cancel.setOnMouseClicked((event2)->{
+							set(LuaValue.NIL);
+						});
 					} else {
 						cancel();
 					}
@@ -679,25 +693,23 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 			}
 		}
 		
-		public void set(LuaValue instance) {
-			if ( instance == null || (!instance.isnil() && !(instance instanceof Instance)) )
-				return;
+		public void set(LuaValue instance) {	
 			
+			// Stop selection
 			this.cancel();
+			
+			// Update selection
 			try {
 				setWithHistory(this.instance, LuaValue.valueOf(field), instance);
 			}catch(Exception e) {
 				//
 			}
 			
-			//Game.deselectAll();
-			//Game.select(this.instance);
-			
-			//InternalRenderThread.runLater(()->{
-				Game.deselectAll();
+			// Handle game selection (since we clicked an object)
+			Game.deselectAll();
+			if ( instance != null && !instance.isnil() && instance instanceof Instance )
 				Game.deselect((Instance) instance);
-				Game.select(this.instance);
-			//});
+			Game.select(this.instance);
 		}
 		
 		public void cancel() {
