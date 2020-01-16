@@ -12,30 +12,22 @@ package ide.layout.windows;
 
 import engine.lua.type.object.ScriptBase;
 import ide.layout.IdePane;
+import ide.layout.windows.code.HighlightableCodeEditor;
+import ide.layout.windows.code.LuaEditor;
+import ide.layout.windows.code.SearchableCodeEditor;
 import lwjgui.paint.Color;
 import lwjgui.scene.Node;
 import lwjgui.theme.Theme;
 
 public class IdeLuaEditor extends IdePane {
 	private ScriptBase inst;
-	private SearchableCodeEditor code;
+	private HighlightableCodeEditor code;
 	
 	public IdeLuaEditor(ScriptBase script) {
 		super(script.getName() + ".lua", true);
 
-		code = new SearchableCodeEditor() {
-			
-		};
+		code = new LuaEditor();
 		this.getChildren().add(code);
-
-		// Do syntax highlighting on pattern
-		code.setOnTextChange((event) -> {
-			code.resetHighlighting();
-			if (Theme.current() instanceof lwjgui.theme.ThemeWhite)
-				code.setFontFill(Color.BLACK);
-
-			code.applyHighlighting();
-		});
 
 		code.setText(script.getSource());
 		this.inst = script;
