@@ -192,9 +192,11 @@ public class Load {
 	private static void loadObject(HashMap<Long, LoadedInstance> instancesMap, LoadedInstance inst) {
 		if ( inst.loaded )
 			return;
-		
+		if ( inst.instance == null )
+			return;
 		if ( !inst.instance.getName().equals(inst.Name) )
 			inst.instance.forceSetName(inst.Name);
+		
 		inst.loaded = true;
 		
 		// Set all properties
