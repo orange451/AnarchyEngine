@@ -14,8 +14,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.luaj.vm2.LuaValue;
 
@@ -44,6 +46,7 @@ import engine.lua.type.object.insts.script.GlobalScript;
 import engine.lua.type.object.insts.script.LocalScript;
 import engine.lua.type.object.insts.script.Script;
 import engine.lua.type.object.insts.ui.Gui;
+import engine.lua.type.object.insts.ui.GuiBase;
 import engine.lua.type.object.insts.ui.HBox;
 import engine.lua.type.object.insts.ui.Label;
 import engine.lua.type.object.insts.ui.Pane;
@@ -105,11 +108,7 @@ public class IdeExplorer extends IdePane {
 		priority.put(GlobalScript.class, 35);
 
 		priority.put(Gui.class, 31);
-		priority.put(HBox.class, 30);
-		priority.put(VBox.class, 30);
-		priority.put(Pane.class, 30);
-		priority.put(Label.class, 30);
-		priority.put(TextField.class, 30);
+		priority.put(GuiBase.class, 30);
 
 		priority.put(DirectionalLight.class, 25);
 		priority.put(PointLight.class, 24);
@@ -141,6 +140,20 @@ public class IdeExplorer extends IdePane {
 	
 	protected static int getPriority(Class<? extends Instance> cls) {
 		Integer ret = priority.get(cls);
+		if ( ret == null ) {
+			Iterator<Entry<Class<? extends Instance>, Integer>> iterator = priority.entrySet().iterator();
+			while(iterator.hasNext()) {
+				Entry<Class<? extends Instance>, Integer> entry = iterator.next();
+				Class<? extends Instance> testClaz = entry.getKey();
+				int p = entry.getValue();
+				
+				if ( testClaz.isAssignableFrom(cls) ) {
+					System.out.println("\t\tADDING NEW PRIORITY: " + testClaz + " / " + p);
+					priority.put(testClaz, p);
+					ret = p;
+				}
+			}
+		}
 		if ( ret == null )
 			return 0;
 		
