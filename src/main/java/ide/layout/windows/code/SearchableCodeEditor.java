@@ -39,8 +39,7 @@ public abstract class SearchableCodeEditor extends HighlightableCodeEditor {
 						((Pane)SearchableCodeEditor.this.getParent()).getChildren().add(searchbar = new SearchBar());
 					} else {
 						if (this.searchbar.isSelected() || this.searchbar.isDescendentSelected()) {
-							((Pane)SearchableCodeEditor.this.getParent()).getChildren().remove(searchbar);
-							searchbar = null;
+							closeSearchbar();
 						}
 					}
 
@@ -73,13 +72,19 @@ public abstract class SearchableCodeEditor extends HighlightableCodeEditor {
 		SEARCH_PATTERN = SEARCH_PATTERN.replaceAll("[\\W]", "\\\\$0");
 		
 		ret.put("SEARCH", new HighlightData()
-							.priority(Integer.MAX_VALUE)
+							.priority(Integer.MIN_VALUE)
 							.regex(SEARCH_PATTERN)
 							.fontMeta(new FontMetaData()
 									.background(Color.YELLOW.alpha(0.7f))
 									.color(Color.BLACK)));
 		
 		return ret;
+	}
+	
+	private void closeSearchbar() {
+		setSearchTerm("");
+		((Pane)SearchableCodeEditor.this.getParent()).getChildren().remove(searchbar);
+		searchbar = null;
 	}
 	
 	class SearchBar extends FloatingPane {
@@ -176,8 +181,7 @@ public abstract class SearchableCodeEditor extends HighlightableCodeEditor {
 
 			// Close Button logic
 			this.closeButton.setOnMouseClicked((event) -> {
-				((Pane)SearchableCodeEditor.this.getParent()).getChildren().remove(searchbar);
-				searchbar = null;
+				closeSearchbar();
 			});
 
 			// Force our input to be selected
