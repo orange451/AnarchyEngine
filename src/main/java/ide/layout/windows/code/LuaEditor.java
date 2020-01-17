@@ -30,9 +30,10 @@ public class LuaEditor extends AutoSyntaxCodeEditor {
 				int closeParenthesisDifference = (int) (line.chars().filter(ch -> ch == '(').count() - line.chars().filter(ch -> ch == ')').count());
 
 				int amtTabs = getTabs(line);
+				int amtTabsNext = getTabs(this.getLine(this.getCaretFromRowLine(this.getRowFromCaret(this.getCaretPosition())+1, 0)));
 				String TABS = generateCharacters(amtTabs, '\t');
 				String CLOSE_PAREN = generateCharacters(closeParenthesisDifference, ')');
-
+				
 				// Indent next line
 				if (amtTabs > 0) {
 					insertText(getCaretPosition(), TABS);
@@ -40,14 +41,17 @@ public class LuaEditor extends AutoSyntaxCodeEditor {
 				}
 
 				// Add end block
-				if (ifThen || function || forDo || whileDo) {
+				if ((ifThen || function || forDo || whileDo)) {
 					// Tab once more if entering block
 					insertText(getCaretPosition(), "\t");
 					setCaretPosition(getCaretPosition() + 1);
 
 					// end
-					insertText(getCaretPosition(), "\n" + TABS + "end" + CLOSE_PAREN);
+					if ( amtTabsNext <= amtTabs )
+						insertText(getCaretPosition(), "\n" + TABS + "end" + CLOSE_PAREN);
 				}
+				
+				event.consume();
 			}
 		});
 	}
@@ -111,7 +115,7 @@ public class LuaEditor extends AutoSyntaxCodeEditor {
 		
 		regex.put("NUMBER", new HighlightData()
 								.priority(20)
-								.regex("^\\d*\\.\\d+" + "|" + "\\d+\\.\\d" + "|" + "\\d+")
+								.regex(" ^\\d*\\.\\d+" + "|" + "\\d+\\.\\d" + "|" + "\\d+")
 								.fontMeta(
 										new FontMetaData().color(new Color("#2B957F"))
 								));
