@@ -91,6 +91,8 @@ public class AnimInstanceCubeRenderer {
 			return;
 
 		GameObject go = anim.getLinkedInstance();
+		if ( go == null )
+			return;
 		if (go.isDestroyed())
 			return;
 		if (go.getParent().isnil())
