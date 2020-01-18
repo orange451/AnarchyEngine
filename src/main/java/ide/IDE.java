@@ -21,7 +21,9 @@ import engine.InternalGameThread;
 import engine.InternalRenderThread;
 import engine.io.Load;
 import engine.lua.type.object.ScriptBase;
+import engine.lua.type.object.insts.CSS;
 import ide.layout.IdeLayout;
+import ide.layout.windows.IdeCSSEditor;
 import ide.layout.windows.IdeLuaEditor;
 import lwjgui.LWJGUI;
 import lwjgui.scene.Group;
@@ -118,6 +120,11 @@ public class IDE extends AnarchyEngineClient {
 
 	public static void openScript(ScriptBase instance) {
 		IdeLuaEditor lua = new IdeLuaEditor((ScriptBase) instance);
+		layout.getCenter().dock(lua);
+	}
+
+	public static void openCSS(CSS instance) {
+		IdeCSSEditor lua = new IdeCSSEditor(instance);
 		layout.getCenter().dock(lua);
 	}
 

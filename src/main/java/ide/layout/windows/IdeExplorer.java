@@ -32,6 +32,7 @@ import engine.lua.type.object.insts.AssetFolder;
 import engine.lua.type.object.insts.AudioPlayer2D;
 import engine.lua.type.object.insts.AudioPlayer3D;
 import engine.lua.type.object.insts.AudioSource;
+import engine.lua.type.object.insts.CSS;
 import engine.lua.type.object.insts.Camera;
 import engine.lua.type.object.insts.DirectionalLight;
 import engine.lua.type.object.insts.Folder;
@@ -42,16 +43,8 @@ import engine.lua.type.object.insts.PointLight;
 import engine.lua.type.object.insts.SpotLight;
 import engine.lua.type.object.insts.animation.AnimationController;
 import engine.lua.type.object.insts.animation.AnimationData;
-import engine.lua.type.object.insts.script.GlobalScript;
-import engine.lua.type.object.insts.script.LocalScript;
-import engine.lua.type.object.insts.script.Script;
 import engine.lua.type.object.insts.ui.Gui;
 import engine.lua.type.object.insts.ui.GuiBase;
-import engine.lua.type.object.insts.ui.HBox;
-import engine.lua.type.object.insts.ui.Label;
-import engine.lua.type.object.insts.ui.Pane;
-import engine.lua.type.object.insts.ui.TextField;
-import engine.lua.type.object.insts.ui.VBox;
 import engine.lua.type.object.insts.values.BoolValue;
 import engine.lua.type.object.insts.values.Color3Value;
 import engine.lua.type.object.insts.values.Color4Value;
@@ -103,10 +96,8 @@ public class IdeExplorer extends IdePane {
 		priority.put(AnimationData.class, 40);
 		
 		priority.put(ScriptBase.class, 35);
-		priority.put(Script.class, 35);
-		priority.put(LocalScript.class, 35);
-		priority.put(GlobalScript.class, 35);
 
+		priority.put(CSS.class, 32);
 		priority.put(Gui.class, 31);
 		priority.put(GuiBase.class, 30);
 
@@ -375,6 +366,9 @@ public class IdeExplorer extends IdePane {
 					if ( clicks == 2 ) {
 						if ( instance instanceof ScriptBase ) {
 							IDE.openScript((ScriptBase)instance);
+						}
+						if ( instance instanceof CSS ) {
+							IDE.openCSS((CSS)instance);
 						}
 					}
 				});

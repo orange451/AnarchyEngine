@@ -29,8 +29,8 @@ public class LuaEditor extends AutoSyntaxCodeEditor {
 				boolean function = line.contains("function(") && line.contains(")");
 				int closeParenthesisDifference = (int) (line.chars().filter(ch -> ch == '(').count() - line.chars().filter(ch -> ch == ')').count());
 
-				int amtTabs = getTabs(line);
-				int amtTabsNext = getTabs(this.getLine(this.getCaretFromRowLine(this.getRowFromCaret(this.getCaretPosition())+1, 0)));
+				int amtTabs = countCharacters(line, '\t');
+				int amtTabsNext = countCharacters(this.getLine(this.getCaretFromRowLine(this.getRowFromCaret(this.getCaretPosition())+1, 0)), '\t');
 				String TABS = generateCharacters(amtTabs, '\t');
 				String CLOSE_PAREN = generateCharacters(closeParenthesisDifference, ')');
 				

@@ -312,6 +312,24 @@ public abstract class ContextMenuType {
 		}
 	};
 	
+	public static final ContextMenuType EDIT_CSS = new ContextMenuType(CSS.class) {
+
+		@Override
+		public String getMenuName() {
+			return "Edit CSS";
+		}
+
+		@Override
+		public ImageView getMenuGraphic() {
+			return Icons.icon_script_css.getView();
+		}
+
+		@Override
+		public void onClick(Instance instance) {
+			IDE.openCSS((CSS) instance);
+		}
+	};
+	
 	private static List<ContextMenuType> contextMenus;
 	private String matchName;
 	private List<Class<? extends Instance>> classes = new ArrayList<>();

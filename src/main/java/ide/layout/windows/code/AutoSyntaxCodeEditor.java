@@ -6,11 +6,11 @@ public abstract class AutoSyntaxCodeEditor extends SearchableCodeEditor {
 	 * @param t
 	 * @return
 	 */
-	protected int getTabs(String t) {
+	protected int countCharacters(String t, char ch) {
 		int a = 0;
 		for (int i = 0; i < t.length(); i++) {
 			char c = t.charAt(i);
-			if (c == '\t')
+			if (c == ch)
 				a++;
 			else
 				break;
