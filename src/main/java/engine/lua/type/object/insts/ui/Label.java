@@ -14,6 +14,7 @@ import org.luaj.vm2.LuaString;
 import org.luaj.vm2.LuaValue;
 
 import engine.lua.type.data.Color3;
+import engine.lua.type.data.Color4;
 import ide.layout.windows.icons.Icons;
 import lwjgui.paint.Color;
 import lwjgui.scene.Node;
@@ -22,12 +23,14 @@ public class Label extends GuiBase {
 	
 	protected static final LuaValue C_TEXT = LuaValue.valueOf("Text");
 	protected static final LuaValue C_TEXTCOLOR = LuaValue.valueOf("TextColor");
+	protected static final LuaValue C_FONTSIZE = LuaValue.valueOf("FontSize");
 	
 	public Label() {
 		super("Label");
 
 		this.defineField(C_TEXT.toString(), LuaString.valueOf("Label"), false);
-		this.defineField(C_TEXTCOLOR.toString(), new Color3(Color.BLACK), false);
+		this.defineField(C_TEXTCOLOR.toString(), new Color4(Color.BLACK), false);
+		this.defineField(C_FONTSIZE.toString(), LuaString.valueOf(16), false);
 	}
 
 	@Override
@@ -51,6 +54,22 @@ public class Label extends GuiBase {
 	}
 	
 	/**
+	 * Return the font size for the label.
+	 * @return
+	 */
+	public float getFontSize() {
+		return this.get(C_FONTSIZE).tofloat();
+	}
+	
+	/**
+	 * Set font size.
+	 * @param size
+	 */
+	public void setFontSize(float size) {
+		this.set(C_FONTSIZE, LuaValue.valueOf(size));
+	}
+	
+	/**
 	 * Return the text for the label.
 	 * @return
 	 */
@@ -64,20 +83,15 @@ public class Label extends GuiBase {
 	 */
 	public void setText(String text) {
 		this.set(C_TEXT, LuaValue.valueOf(text));
-	}
-
-	@Override
-	public Node getUINode() {
-		return new lwjgui.scene.control.Label();
 	}	
 	
 	/**
 	 * Get the Text color for this frame.
 	 * @return
 	 */
-	public Color3 getTextColor() {
+	public Color4 getTextColor() {
 		LuaValue val = this.get(C_TEXTCOLOR);
-		return val.isnil()?null:(Color3)val;
+		return val.isnil()?null:(Color4)val;
 	}
 	
 	/**
@@ -89,8 +103,14 @@ public class Label extends GuiBase {
 	}
 
 	@Override
+	public Node getUINode() {
+		return new lwjgui.scene.control.Label(getText());
+	}
+
+	@Override
 	public void updateNode(Node node) {
 		((lwjgui.scene.control.Label)node).setText(this.getText());
 		((lwjgui.scene.control.Label)node).setTextFill(this.getTextColor().toColor());
+		((lwjgui.scene.control.Label)node).setFontSize(this.getFontSize());
 	}
 }

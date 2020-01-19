@@ -95,30 +95,34 @@ public class Gui extends GuiBase {
 
 	private void onGuiChange(GuiBase guiBase) {
 		Node node = uiMap.get(guiBase);
-		System.out.println("CHANGE EVENT: " + guiBase + " / " + node);
 		if ( guiBase == this )
 			node = root;
 		
 		if ( node == null || guiBase == null )
 			return;
 		
-		// Update size
-		guiBase.updateNode(node);
-		
-		// If parent change, remove from old parent
-		Node parentPane = uiMap.get(guiBase.getParent());
-		Node currentParentPane = nodeToNodeMap.get(node);
-		if ( currentParentPane != null && !currentParentPane.equals(parentPane) && currentParentPane instanceof Pane )
-			((Pane)currentParentPane).getChildren().remove(node);
-		
-		// Make sure we have a parent
-		if ( parentPane == null )
-			return;
-
-		// Add us to new parent
-		if ( parentPane instanceof Pane && !((Pane)parentPane).getChildren().contains(node) ) {
-			((Pane)parentPane).getChildren().add(node);
-			nodeToNodeMap.put(node, parentPane);
+		try {
+			// Update size
+			guiBase.updateNode(node);
+			
+			// If parent change, remove from old parent
+			Node parentPane = uiMap.get(guiBase.getParent());
+			//System.out.println("CHANGE EVENT: " + guiBase + " / " + node + " :: " + parentPane);
+			Node currentParentPane = nodeToNodeMap.get(node);
+			if ( currentParentPane != null && !currentParentPane.equals(parentPane) && currentParentPane instanceof Pane )
+				((Pane)currentParentPane).getChildren().remove(node);
+			
+			// Make sure we have a parent
+			if ( parentPane == null )
+				return;
+	
+			// Add us to new parent
+			if ( parentPane instanceof Pane && !((Pane)parentPane).getChildren().contains(node) ) {
+				((Pane)parentPane).getChildren().add(node);
+				nodeToNodeMap.put(node, parentPane);
+			}
+		} catch(Exception e) {
+			e.printStackTrace();
 		}
 	}
 
@@ -159,7 +163,7 @@ public class Gui extends GuiBase {
 
 				// Handle selection graphic
 				this.getBoxShadowList().clear();
-				if ( Game.isSelected(Gui.this) || Game.isDescendantSelected(Gui.this) )
+				if ( Game.isSelected(Gui.this) )
 					this.getBoxShadowList().add(new BoxShadow(0, 0, 1, 2, Color.ORANGE, false));
 			}
 		};
