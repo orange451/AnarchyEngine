@@ -286,10 +286,10 @@ public class Color4 extends ColorBase {
 	
 	public static Color4 fromJSON(JSONObject json) {
 		return newInstance(
-				(int)((Long)json.get("R")).intValue(),
-				(int)((Long)json.get("G")).intValue(),
-				(int)((Long)json.get("B")).intValue(),
-				(float)((Double)json.get("A")).floatValue()
+				(int)((Number)json.get("R")).intValue(),
+				(int)((Number)json.get("G")).intValue(),
+				(int)((Number)json.get("B")).intValue(),
+				(float)((Number)json.get("A")).floatValue()
 				);
 	}
 
