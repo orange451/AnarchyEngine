@@ -28,6 +28,7 @@ import engine.lua.type.object.insts.*;
 import engine.lua.type.object.insts.script.GlobalScript;
 import engine.lua.type.object.insts.script.LocalScript;
 import engine.lua.type.object.insts.script.Script;
+import engine.lua.type.object.insts.ui.CSS;
 import engine.util.FileUtils;
 import ide.IDE;
 import ide.layout.windows.icons.Icons;

@@ -21,7 +21,7 @@ import engine.InternalGameThread;
 import engine.InternalRenderThread;
 import engine.io.Load;
 import engine.lua.type.object.ScriptBase;
-import engine.lua.type.object.insts.CSS;
+import engine.lua.type.object.insts.ui.CSS;
 import ide.layout.IdeLayout;
 import ide.layout.windows.IdeCSSEditor;
 import ide.layout.windows.IdeLuaEditor;

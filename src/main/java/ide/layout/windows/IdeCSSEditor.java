@@ -10,7 +10,7 @@
 
 package ide.layout.windows;
 
-import engine.lua.type.object.insts.CSS;
+import engine.lua.type.object.insts.ui.CSS;
 import ide.layout.IdePane;
 import ide.layout.windows.code.CSSEditor;
 import ide.layout.windows.code.HighlightableCodeEditor;

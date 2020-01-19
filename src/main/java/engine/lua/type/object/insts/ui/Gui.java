@@ -18,8 +18,8 @@ import org.luaj.vm2.LuaValue;
 import engine.Game;
 import engine.lua.type.LuaConnection;
 import engine.lua.type.data.Vector2;
+import engine.lua.type.object.Instance;
 import ide.layout.windows.icons.Icons;
-import lwjgui.geometry.Insets;
 import lwjgui.geometry.Pos;
 import lwjgui.paint.Color;
 import lwjgui.scene.Node;
@@ -31,11 +31,12 @@ public class Gui extends GuiBase {
 	
 	public Pane root;
 	private Map<GuiBase, Node> uiMap = new HashMap<>();
-	private Map<GuiBase, LuaConnection> uiConnections = new HashMap<>();
 	private Map<Node,Node> nodeToNodeMap = new HashMap<>();
 	
 	public Gui() {
 		super("Gui");
+		
+		this.gui = this;
 
 		this.getField(LuaValue.valueOf("Size")).setLocked(true);
 		
@@ -50,6 +51,7 @@ public class Gui extends GuiBase {
 				Node pane = ((GuiBase)arg).getUINode();
 				
 				// Add it to list
+				((GuiBase)arg).gui = this;
 				uiMap.put((GuiBase) arg, pane);
 				onGuiChange((GuiBase)arg);
 				
@@ -66,7 +68,7 @@ public class Gui extends GuiBase {
 		this.descendantRemovedEvent().connect((args)->{
 			LuaValue arg = args[0];
 			if ( arg instanceof GuiBase ) {
-				Node pane = uiMap.get(((GuiBase)arg));
+				Node pane = getNode((GuiBase)arg);
 				Node parent = nodeToNodeMap.get(pane);
 				if ( parent != null && parent instanceof Pane ) {
 					((Pane)parent).getChildren().remove(pane);
@@ -77,7 +79,7 @@ public class Gui extends GuiBase {
 				uiMap.remove(arg);
 				
 				// Disconnect connection
-				LuaConnection connection = uiConnections.get((GuiBase)arg);
+				LuaConnection connection = uiConnections.get((Instance)arg);
 				if ( connection != null )
 					connection.disconnect();
 				
@@ -92,9 +94,18 @@ public class Gui extends GuiBase {
 			onGuiChange((GuiBase)this);
 		});
 	}
+	
+	/**
+	 * Returns the lwjgui node related to this guibase object
+	 * @param guiObject
+	 * @return
+	 */
+	public Node getNode(GuiBase guiObject) {
+		return this.uiMap.get(guiObject);
+	}
 
 	private void onGuiChange(GuiBase guiBase) {
-		Node node = uiMap.get(guiBase);
+		Node node = getNode(guiBase);
 		if ( guiBase == this )
 			node = root;
 		
@@ -104,6 +115,7 @@ public class Gui extends GuiBase {
 		try {
 			// Update size
 			guiBase.updateNode(node);
+			node.setElementId(guiBase.getName());
 			
 			// If parent change, remove from old parent
 			Node parentPane = uiMap.get(guiBase.getParent());
