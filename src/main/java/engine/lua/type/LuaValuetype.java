@@ -51,4 +51,5 @@ public abstract class LuaValuetype extends LuaDatatype {
 	public abstract LuaValuetype fromString(String input);
 	
 	public abstract LuaValuetype clone();
+	public abstract String typename();
 }

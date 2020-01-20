@@ -10,21 +10,21 @@
 
 package engine.lua.type.object.insts.values;
 
-import org.luaj.vm2.LuaString;
+import org.luaj.vm2.LuaInteger;
 import org.luaj.vm2.LuaValue;
 
-import engine.lua.type.object.Instance;
+import engine.lua.type.data.List1;
 import engine.lua.type.object.TreeViewable;
 import ide.layout.windows.icons.Icons;
 
-public class StringValue extends ValueBase implements TreeViewable {
+public class List1Value extends ValueBase implements TreeViewable {
 
 	protected static final LuaValue C_VALUE = LuaValue.valueOf("Value");
 	
-	public StringValue() {
-		super("StringValue");
+	public List1Value() {
+		super("List1Value");
 		
-		this.defineField(C_VALUE.toString(), LuaString.valueOf(""), false);
+		this.defineField(C_VALUE.toString(), new List1(), false);
 	}
 
 	@Override
@@ -47,12 +47,12 @@ public class StringValue extends ValueBase implements TreeViewable {
 		return Icons.icon_value;
 	}
 	
-	public String getValue() {
+	public int getValue() {
 		LuaValue value = this.get(C_VALUE);
-		return value.isnil()?null:value.toString();
+		return value.isnil()?null:value.toint();
 	}
 	
-	public void setValue(String value) {
-		this.set(C_VALUE, LuaString.valueOf(value));
+	public void setValue(int value) {
+		this.set(C_VALUE, LuaInteger.valueOf(value));
 	}
 }

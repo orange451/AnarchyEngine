@@ -41,6 +41,7 @@ import engine.lua.type.object.AssetLoadable;
 import engine.lua.type.object.Instance;
 import engine.lua.type.object.InstancePropertySubscriber;
 import engine.lua.type.object.ScriptBase;
+import engine.lua.type.object.insts.ui.CSS;
 import ide.layout.IdePane;
 import lwjgui.LWJGUI;
 import lwjgui.font.FontStyle;
@@ -48,7 +49,6 @@ import lwjgui.geometry.Insets;
 import lwjgui.geometry.Pos;
 import lwjgui.paint.Color;
 import lwjgui.scene.Node;
-import lwjgui.scene.Region;
 import lwjgui.scene.control.Button;
 import lwjgui.scene.control.CheckBox;
 import lwjgui.scene.control.ColorPicker;
@@ -189,14 +189,16 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 			editable = false;
 		
 		// Display "Linked Source" instead of the actual source
-		if ( instance instanceof ScriptBase && field.equals("Source") ) {
+		if ( instance instanceof ScriptBase && field.equals("Source") )
 			return new StringPropertyModifier(instance, field, LuaValue.valueOf("[Linked Source]"), false);
-		}
+		
+		// Display "Linked Source" instead of the actual source
+		if ( instance instanceof CSS && field.equals("Source") )
+			return new StringPropertyModifier(instance, field, LuaValue.valueOf("[Linked Source]"), false);
 		
 		// Enum modifier
-		if ( luaField.getEnumType() != null ) {
+		if ( luaField.getEnumType() != null )
 			return new EnumPropertyModifier(instance, field, value, editable);
-		}
 		
 		// Edit a filepath
 		if ( field.equals("FilePath") )
@@ -211,15 +213,13 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 			return new ColorPropertyModifier(instance, field, value, editable, true);
 		
 		// Edit a boolean
-		if ( value.isboolean() ) {
+		if ( value.isboolean() )
 			return new BooleanPropertyModifier(instance, field, value, editable);
-		}
 		
 		// Clampable number value, use slider!
 		Clamp<?> clamp = luaField.getClamp();
-		if ( value.isnumber() && clamp != null && clamp instanceof NumberClamp ) {
+		if ( value.isnumber() && clamp != null && clamp instanceof NumberClamp )
 			return new SliderPropertyModifier(instance, field, value, editable);
-		}
 		
 		// Edit a string/number
 		if ( value.isstring() || value.isnumber() )
@@ -574,7 +574,10 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 
 		@Override
 		public void onValueSet(String text) {
-			setWithHistory(this.instance, LuaValue.valueOf(field), ((LuaValuetype)initialValue).clone().fromString(text));
+			LuaValuetype initial = (LuaValuetype)initialValue;
+			LuaValuetype initialClone = initial.clone();
+			LuaValuetype t = initialClone.fromString(text);
+			setWithHistory(this.instance, LuaValue.valueOf(field), t);
 		}
 	}
 	

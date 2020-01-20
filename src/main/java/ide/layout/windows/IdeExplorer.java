@@ -53,6 +53,7 @@ import engine.lua.type.object.insts.values.Matrix4Value;
 import engine.lua.type.object.insts.values.NumberValue;
 import engine.lua.type.object.insts.values.ObjectValue;
 import engine.lua.type.object.insts.values.StringValue;
+import engine.lua.type.object.insts.values.ValueBase;
 import engine.lua.type.object.insts.values.Vector2Value;
 import engine.lua.type.object.insts.values.Vector3Value;
 import engine.lua.type.object.services.RenderSettings;
@@ -113,16 +114,7 @@ public class IdeExplorer extends IdePane {
 		priority.put(PhysicsObject.class, 6);
 		priority.put(PlayerPhysics.class, 6);
 
-		priority.put(IntValue.class, 5);
-		priority.put(BoolValue.class, 5);
-		priority.put(StringValue.class, 5);
-		priority.put(NumberValue.class, 5);
-		priority.put(ObjectValue.class, 5);
-		priority.put(Color3Value.class, 5);
-		priority.put(Color4Value.class, 5);
-		priority.put(Vector2Value.class, 5);
-		priority.put(Vector3Value.class, 5);
-		priority.put(Matrix4Value.class, 5);
+		priority.put(ValueBase.class, 5);
 
 		priority.put(AudioSource.class, 4);
 		priority.put(AudioPlayer2D.class, 4);

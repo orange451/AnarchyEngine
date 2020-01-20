@@ -16,7 +16,7 @@ import engine.lua.type.object.Instance;
 import engine.lua.type.object.TreeViewable;
 import ide.layout.windows.icons.Icons;
 
-public class BoolValue extends Instance implements TreeViewable {
+public class BoolValue extends ValueBase implements TreeViewable {
 
 	protected static final LuaValue C_VALUE = LuaValue.valueOf("Value");
 	

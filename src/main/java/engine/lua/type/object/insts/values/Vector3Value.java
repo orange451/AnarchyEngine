@@ -22,7 +22,7 @@ import engine.util.AABBUtil;
 import engine.util.Pair;
 import ide.layout.windows.icons.Icons;
 
-public class Vector3Value extends Instance implements TreeViewable,Positionable {
+public class Vector3Value extends ValueBase implements TreeViewable,Positionable {
 
 	protected static final LuaValue C_VALUE = LuaValue.valueOf("Value");
 	
