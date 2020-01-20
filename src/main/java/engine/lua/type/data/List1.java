@@ -23,9 +23,8 @@ import org.luaj.vm2.lib.TwoArgFunction;
 import org.luaj.vm2.lib.VarArgFunction;
 import org.luaj.vm2.lib.ZeroArgFunction;
 
-import engine.lua.lib.LuaUtil;
+import engine.lua.network.internal.JSONUtil;
 import engine.lua.type.LuaValuetype;
-import engine.lua.type.object.Instance;
 
 public class List1 extends LuaValuetype {
 
@@ -38,6 +37,14 @@ public class List1 extends LuaValuetype {
 			@Override
 			public LuaValue call() {
 				return LuaValue.valueOf(size());
+			}
+		});
+		
+		this.getmetatable().set("Clear", new ZeroArgFunction() {
+			@Override
+			public LuaValue call() {
+				clear();
+				return LuaValue.NIL;
 			}
 		});
 		
@@ -146,6 +153,13 @@ public class List1 extends LuaValuetype {
 	}
 	
 	/**
+	 * Clears all elements from the list.
+	 */
+	public void clear() {
+		this.internal.clear();
+	}
+	
+	/**
 	 * Returns the element at a specific index.
 	 * @param index
 	 * @return
@@ -162,23 +176,14 @@ public class List1 extends LuaValuetype {
 		
 		for (int i = 0; i < internal.size(); i++) {
 			LuaValue luaValue = internal.get(i);
-			if ( luaValue instanceof LuaValuetype ) {
-				arr.add(((LuaValuetype)luaValue).toJSON());
-			} else if ( luaValue instanceof Instance ) {
-				// Don't save instance references to JSON.
-			} else {
-				if ( luaValue.isboolean() )
-					arr.add(luaValue.toboolean());
-				else if ( luaValue.isnumber() )
-					arr.add(luaValue.todouble());
-				else if ( luaValue.isstring() )
-					arr.add(luaValue.tojstring());
-				else if ( luaValue instanceof LuaTable )
-					arr.add(LuaUtil.tableToJson((LuaTable) luaValue));
-			}
+			Object val = JSONUtil.serializeField(luaValue);
+			if ( val == null )
+				continue;
+			
+			arr.add(val);
 		}
 		
-		ret.put("data", arr);
+		ret.put("ArrayData", arr);
 		return ret;
 	}
 
@@ -188,7 +193,7 @@ public class List1 extends LuaValuetype {
 		builder.append("[");
 		
 		for (int i = 0; i < internal.size(); i++) {
-			builder.append(internal.get(i).toString());
+			builder.append(internal.get(i).tostring());
 			if ( i < internal.size()-1 )
 				builder.append(", ");
 		}
@@ -203,7 +208,17 @@ public class List1 extends LuaValuetype {
 	}
 	
 	public static List1 fromJSON(JSONObject json) {
-		return new List1();
+		List1 ret = new List1();
+		List<JSONObject> values = (List<JSONObject>) json.get("ArrayData");
+		for (int i = 0; i < values.size(); i++) {
+			LuaValue val = JSONUtil.deserializeField(values.get(i));
+			if ( val == null )
+				continue;
+			
+			ret.addElement(val);
+		}
+		
+		return ret;
 	}
 
 	@Override

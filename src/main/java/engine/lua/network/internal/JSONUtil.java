@@ -13,19 +13,22 @@ package engine.lua.network.internal;
 import java.lang.reflect.Method;
 
 import org.json.simple.JSONObject;
+import org.luaj.vm2.LuaTable;
 import org.luaj.vm2.LuaValue;
 
 import engine.Game;
+import engine.lua.lib.LuaUtil;
 import engine.lua.type.LuaValuetype;
 import engine.lua.type.object.Instance;
 
 public class JSONUtil {
 	private static final String C_TYPE = "Type";
 	private static final String C_VALUE = "Value";
-	private static final String C_REFERENCE = "Reference";
 	private static final String C_CLASSNAME = "ClassName";
-	private static final String C_DATATYPE = "Datatype";
 	private static final String C_DATA = "Data";
+	private static final String C_TYPE_TABLE = "Table";
+	private static final String C_TYPE_REFERENCE = "Reference";
+	private static final String C_TYPE_DATATYPE = "Datatype";
 	
 	/**
 	 * Serializes a field value to JSON.
@@ -40,12 +43,20 @@ public class JSONUtil {
 			return luaValue.checkboolean();
 		if ( luaValue.isnumber() )
 			return luaValue.todouble();
+		
+		if ( luaValue instanceof LuaTable ) {
 
+			JSONObject j = new JSONObject();
+			j.put(C_TYPE, C_TYPE_TABLE);
+			j.put(C_VALUE, LuaUtil.tableToJson((LuaTable) luaValue));
+			return j;
+		}
+		
 		// Instances in the game
 		if ( luaValue instanceof Instance || luaValue.isnil() ) {
 			long refId = luaValue.isnil()?-1:((Instance)luaValue).getSID();			
 			JSONObject j = new JSONObject();
-			j.put(C_TYPE, C_REFERENCE);
+			j.put(C_TYPE, C_TYPE_REFERENCE);
 			j.put(C_VALUE, refId);
 			return j;
 		}
@@ -57,7 +68,7 @@ public class JSONUtil {
 			t.put(C_DATA, ((LuaValuetype)luaValue).toJSON());
 
 			JSONObject j = new JSONObject();
-			j.put(C_TYPE, C_DATATYPE);
+			j.put(C_TYPE, C_TYPE_DATATYPE);
 			j.put(C_VALUE, t);
 			return j;
 		}
@@ -89,12 +100,16 @@ public class JSONUtil {
 		if ( t instanceof JSONObject ) {
 			JSONObject j = (JSONObject)t;
 			
-			if ( j.get(C_TYPE).equals(C_REFERENCE) ) {
+			if ( j.get(C_TYPE).equals(C_TYPE_TABLE) ) {
+				return LuaUtil.jsonToTable((JSONObject) j.get(C_VALUE));
+			}
+			
+			if ( j.get(C_TYPE).equals(C_TYPE_REFERENCE) ) {
 				long v = Long.parseLong(j.get(C_VALUE).toString());
 				return Game.getInstanceFromSID(v);
 			}
 			
-			if ( j.get(C_TYPE).equals(C_DATATYPE) ) {
+			if ( j.get(C_TYPE).equals(C_TYPE_DATATYPE) ) {
 				JSONObject data = (JSONObject) j.get(C_VALUE);
 				String type = (String) data.get(C_CLASSNAME);
 				JSONObject temp = (JSONObject) data.get(C_DATA);

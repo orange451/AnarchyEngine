@@ -354,6 +354,7 @@ public class Load {
 			if ( fieldKey instanceof JSONObject ) {
 				JSONObject j = (JSONObject)fieldKey;
 				
+				// Match value to an object reference
 				if ( j.get("Type").equals("Reference") ) {
 					long v = Long.parseLong(j.get("Value").toString());
 					
@@ -370,6 +371,7 @@ public class Load {
 					return new PropertyValue<Long>(v, true);
 				}
 				
+				// Match value to datatype
 				if ( j.get("Type").equals("Datatype") ) {
 					JSONObject data = (JSONObject) j.get("Value");
 					String type = (String) data.get("ClassName");
