@@ -18,6 +18,7 @@ import lwjgui.style.Stylesheet;
 
 public abstract class GuiBase extends Instance implements TreeViewable {
 
+	protected static final LuaValue C_CLASSLIST = LuaValue.valueOf("ClassList");
 	protected static final LuaValue C_SIZE = LuaValue.valueOf("Size");
 	protected static final LuaValue C_ALIGNMENT = LuaValue.valueOf("Alignment");
 	protected static final LuaValue C_MOUSETRANSPARENT = LuaValue.valueOf("MouseTransparent");
@@ -27,6 +28,8 @@ public abstract class GuiBase extends Instance implements TreeViewable {
 
 	public GuiBase(String name) {
 		super(name);
+		
+		this.defineField(C_CLASSLIST.toString(), new engine.lua.type.data.List(), false);
 
 		this.defineField(C_SIZE.toString(), new Vector2(0, 0), false);
 		
@@ -150,7 +153,14 @@ public abstract class GuiBase extends Instance implements TreeViewable {
 	public abstract Node getUINode();
 	
 	protected void updateNodeInternal(Node node) {
+		// Mouse transparency
 		node.setMouseTransparent(this.isMouseTransparent());
+		
+		// Apply class list
+		engine.lua.type.data.List list = (engine.lua.type.data.List) this.get(C_CLASSLIST);
+		node.getClassList().clear();
+		for (int i = 0; i < list.size(); i++)
+			node.getClassList().add(list.getElement(i).toString());
 	}
 	
 	public abstract void updateNode(Node node);
