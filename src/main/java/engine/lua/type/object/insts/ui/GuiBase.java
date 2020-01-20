@@ -14,13 +14,13 @@ import engine.lua.type.object.Instance;
 import engine.lua.type.object.TreeViewable;
 import lwjgui.geometry.Pos;
 import lwjgui.scene.Node;
-import lwjgui.scene.layout.Pane;
 import lwjgui.style.Stylesheet;
 
 public abstract class GuiBase extends Instance implements TreeViewable {
 
 	protected static final LuaValue C_SIZE = LuaValue.valueOf("Size");
 	protected static final LuaValue C_ALIGNMENT = LuaValue.valueOf("Alignment");
+	protected static final LuaValue C_MOUSETRANSPARENT = LuaValue.valueOf("MouseTransparent");
 	protected static final LuaValue C_CSS = LuaValue.valueOf("CSS");
 	protected Map<Instance, LuaConnection> uiConnections = new HashMap<>();
 	protected Gui gui;
@@ -32,6 +32,8 @@ public abstract class GuiBase extends Instance implements TreeViewable {
 		
 		this.defineField(C_ALIGNMENT.toString(), LuaValue.valueOf("TopLeft"), false);
 		this.getField(C_ALIGNMENT).setEnum(new EnumType("GuiAlignment"));
+		
+		this.defineField(C_MOUSETRANSPARENT.toString(), LuaValue.FALSE, false);
 		
 		this.changedEvent().connect((args)->{
 			if ( args[0].eq_b(C_PARENT) ) {
@@ -129,7 +131,27 @@ public abstract class GuiBase extends Instance implements TreeViewable {
 		return alignment.isnil()?Pos.CENTER.toString():alignment.toString();
 	}
 	
+	/**
+	 * Returns whether the inner node will ignore mouse events.
+	 * @return
+	 */
+	public boolean isMouseTransparent() {
+		return this.get(C_MOUSETRANSPARENT).checkboolean();
+	}
+	
+	/**
+	 * Sets the mouse transparency variable. See {@link #isMouseTransparent()}.
+	 * @param transparent
+	 */
+	public void setMouseTransparent(boolean transparent) {
+		this.set(C_MOUSETRANSPARENT, LuaValue.valueOf(transparent));
+	}
+	
 	public abstract Node getUINode();
+	
+	protected void updateNodeInternal(Node node) {
+		node.setMouseTransparent(this.isMouseTransparent());
+	}
 	
 	public abstract void updateNode(Node node);
 }

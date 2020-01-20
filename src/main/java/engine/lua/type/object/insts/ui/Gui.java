@@ -114,6 +114,7 @@ public class Gui extends GuiBase {
 		
 		try {
 			// Update size
+			guiBase.updateNodeInternal(node);
 			guiBase.updateNode(node);
 			node.setElementId(guiBase.getName());
 			

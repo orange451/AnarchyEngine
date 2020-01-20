@@ -27,6 +27,8 @@ import ide.layout.windows.IdeCSSEditor;
 import ide.layout.windows.IdeLuaEditor;
 import lwjgui.LWJGUI;
 import lwjgui.scene.Group;
+import lwjgui.scene.Scene;
+import lwjgui.scene.Window;
 import lwjgui.theme.Theme;
 import lwjgui.theme.ThemeDark;
 
@@ -126,6 +128,10 @@ public class IDE extends AnarchyEngineClient {
 	public static void openCSS(CSS instance) {
 		IdeCSSEditor lua = new IdeCSSEditor(instance);
 		layout.getCenter().dock(lua);
+		
+		/*Window window = LWJGUI.initialize();
+		window.setScene(new Scene(new IdeCSSEditor(instance), 500, 400));
+		window.show();*/
 	}
 
 	public static void main(String[] args) throws IOException {
