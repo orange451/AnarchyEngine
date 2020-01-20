@@ -15,7 +15,7 @@ import java.util.List;
 
 import org.luaj.vm2.LuaValue;
 
-import engine.AnarchyEngineClient;
+import engine.ClientEngine;
 import engine.lua.type.object.Instance;
 import engine.lua.type.object.ScriptExecutor;
 import engine.lua.type.object.TreeViewable;
@@ -39,7 +39,7 @@ public class PlayerGui extends Instance implements TreeViewable,ScriptExecutor {
 			LuaValue arg = args[0];
 			if ( arg instanceof Gui ) {
 				Pane gui = ((Gui)arg).root;
-				AnarchyEngineClient.uiNode.getChildren().add(gui);
+				ClientEngine.renderThread.getClientUI().getChildren().add(gui);
 				guis.add(gui);
 			}
 		});
@@ -48,7 +48,7 @@ public class PlayerGui extends Instance implements TreeViewable,ScriptExecutor {
 			LuaValue arg = args[0];
 			if ( arg instanceof Gui ) {
 				Pane gui = ((Gui)arg).root;
-				AnarchyEngineClient.uiNode.getChildren().remove(gui);
+				ClientEngine.renderThread.getClientUI().getChildren().remove(gui);
 				guis.remove(gui);
 			}
 		});
@@ -72,7 +72,7 @@ public class PlayerGui extends Instance implements TreeViewable,ScriptExecutor {
 	@Override
 	public void onDestroy() {
 		for (Pane gui : guis ) {
-			AnarchyEngineClient.uiNode.getChildren().remove(gui);
+			ClientEngine.renderThread.getClientUI().getChildren().remove(gui);
 		}
 		
 		guis.clear();

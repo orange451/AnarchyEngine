@@ -8,13 +8,12 @@
  *
  */
 
-package engine.application.launchstrategy;
+package engine;
 
-import engine.InternalGameThread;
-import engine.application.Application;
+public interface IEngineThread {
 
-public abstract class ServerLauncher {
-	public static void launch(Application application) {
-		Application.gameThread = new InternalGameThread(application);
-	}
+	public void init();
+	
+	public void dispose();
+	
 }

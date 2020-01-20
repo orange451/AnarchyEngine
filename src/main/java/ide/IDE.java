@@ -10,12 +10,9 @@
 
 package ide;
 
-import java.io.IOException;
-
 import org.joml.Vector2f;
-import org.lwjgl.glfw.GLFW;
 
-import engine.AnarchyEngineClient;
+import engine.ClientEngine;
 import engine.Game;
 import engine.InternalGameThread;
 import engine.InternalRenderThread;
@@ -25,39 +22,23 @@ import engine.lua.type.object.insts.ui.CSS;
 import ide.layout.IdeLayout;
 import ide.layout.windows.IdeCSSEditor;
 import ide.layout.windows.IdeLuaEditor;
-import lwjgui.LWJGUI;
 import lwjgui.scene.Group;
-import lwjgui.scene.Scene;
-import lwjgui.scene.Window;
-import lwjgui.theme.Theme;
-import lwjgui.theme.ThemeDark;
 
-public class IDE extends AnarchyEngineClient {
+public class IDE extends ClientEngine {
 	public static IdeLayout layout;
 	
 	public static final String TITLE = "Anarchy Engine - Build " + Game.version();
 	
 	@Override
-	public void initialize(String[] args) {
-		// Window title
-		GLFW.glfwSetWindowTitle(window, TITLE);
-		
+	public void setupEngine() {
 		InternalRenderThread.desiredFPS = 60;
 		InternalGameThread.desiredTPS = 60;
 		
 		// Setup background pane
 		Group background = new Group();
-		win.getScene().setRoot(background);
+		renderThread.getWindow().getScene().setRoot(background);
 		
-		Theme.setTheme(new ThemeDark());
-		
-		// Redraw window if resized
-		win.addEventListener(new lwjgui.event.listener.WindowSizeListener() {
-			@Override
-			public void invoke(long arg0, int arg1, int arg2) {
-				renderThread.forceUpdate();
-			}
-		});
+		//Theme.setTheme(new ThemeDark());
 		
 		// Setup mane IDE layout
 		layout = new IdeLayout(background);
@@ -89,37 +70,18 @@ public class IDE extends AnarchyEngineClient {
 				});
 			}
 		}
+		
+		renderThread.getPipeline().setRenderableWorld(Game.workspace());
 	}
 	
-	@Override
 	protected boolean shouldLockMouse() {
 		return Game.isLoaded() && layout.getGamePane().isDescendentHovered();
 	}
 	
-	@Override
 	protected Vector2f getMouseOffset() {
 		return new Vector2f( (float)layout.getGamePane().getX(), (float)layout.getGamePane().getY() );
 	}
 	
-	@Override
-	public void render() {
-		if ( GLFW.glfwWindowShouldClose(window) )
-			return;
-		
-		// Pipeline needs to draw our workspace
-		pipeline.setRenderableWorld(Game.workspace());
-		
-		// Render UI:
-		//   (final 3d scene gets rendered as a component)
-		//   (3d scene is attached to render thread)
-		LWJGUI.render(false);
-	}
-
-	@Override
-	public void tick() {
-		// TODO Auto-generated method stub
-	}
-
 	public static void openScript(ScriptBase instance) {
 		IdeLuaEditor lua = new IdeLuaEditor((ScriptBase) instance);
 		layout.getCenter().dock(lua);
@@ -133,8 +95,21 @@ public class IDE extends AnarchyEngineClient {
 		window.setScene(new Scene(new IdeCSSEditor(instance), 500, 400));
 		window.show();*/
 	}
-
-	public static void main(String[] args) throws IOException {
-		launch(args);
+	
+	public static void main(String[] args) {
+		new IDE();
 	}
+
+	@Override
+	public void render() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void update() {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

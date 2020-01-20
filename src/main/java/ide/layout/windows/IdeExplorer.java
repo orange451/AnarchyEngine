@@ -58,6 +58,7 @@ import engine.lua.type.object.insts.values.Vector2Value;
 import engine.lua.type.object.insts.values.Vector3Value;
 import engine.lua.type.object.services.RenderSettings;
 import engine.lua.type.object.services.StarterPlayerScripts;
+import engine.tasks.TaskManager;
 import ide.IDE;
 import ide.layout.IdePane;
 import ide.layout.windows.icons.Icons;
@@ -156,21 +157,23 @@ public class IdeExplorer extends IdePane {
 		Game.game().descendantAddedEvent().connect((args)->{
 			if ( !Game.isLoaded() )
 				return;
-			buildNode((Instance) args[0], true);
+			TaskManager.addTaskRenderThread(() -> buildNode((Instance) args[0], true));
 		});
 		
 		// Object removed
 		Game.game().descendantRemovedEvent().connect((args)->{
-			destroyNode((Instance) args[0]);
+			TaskManager.addTaskRenderThread(() -> destroyNode((Instance) args[0]));
 		});
 		
 		// Game reset
 		Game.resetEvent().connect((args) -> {
-			rebuild();
+			TaskManager.addTaskRenderThread(() -> {
+				rebuild();
+			});
 		});
 		
 		// First (initial) load
-		InternalGameThread.runLater(() -> {
+		TaskManager.addTaskRenderThread(() -> {
 			rebuild();
 		});
 		
@@ -460,7 +463,7 @@ public class IdeExplorer extends IdePane {
 		// Cut
 		MenuItem insert = new MenuItem("Insert Object  \u25ba", Icons.icon_new.getView());
 		insert.setOnAction(event -> {
-			LWJGUI.runLater(() -> new InsertWindow());
+			new InsertWindow();
 		});
 		c.getItems().add(insert);
 		

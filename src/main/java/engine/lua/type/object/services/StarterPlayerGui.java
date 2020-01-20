@@ -15,16 +15,14 @@ import java.util.List;
 
 import org.luaj.vm2.LuaValue;
 
-import engine.AnarchyEngineClient;
+import engine.ClientEngine;
 import engine.Game;
 import engine.InternalGameThread;
 import engine.lua.type.object.Instance;
 import engine.lua.type.object.TreeViewable;
 import engine.lua.type.object.insts.ui.Gui;
-import ide.IDE;
 import ide.layout.windows.icons.Icons;
 import lwjgui.scene.layout.Pane;
-import lwjgui.scene.layout.StackPane;
 
 public class StarterPlayerGui extends Instance implements TreeViewable {
 	
@@ -51,7 +49,7 @@ public class StarterPlayerGui extends Instance implements TreeViewable {
 			LuaValue arg = args[0];
 			if ( arg instanceof Gui ) {
 				Pane gui = ((Gui)arg).root;
-				AnarchyEngineClient.uiNode.getChildren().add(gui);
+				ClientEngine.renderThread.getClientUI().getChildren().add(gui);
 				guis.add(gui);
 			}
 		});
@@ -60,7 +58,7 @@ public class StarterPlayerGui extends Instance implements TreeViewable {
 			LuaValue arg = args[0];
 			if ( arg instanceof Gui ) {
 				Pane gui = ((Gui)arg).root;
-				AnarchyEngineClient.uiNode.getChildren().remove(gui);
+				ClientEngine.renderThread.getClientUI().getChildren().remove(gui);
 				guis.remove(gui);
 			}
 		});
@@ -96,7 +94,7 @@ public class StarterPlayerGui extends Instance implements TreeViewable {
 	@Override
 	public void onDestroy() {
 		for (Pane gui : guis ) {
-			AnarchyEngineClient.uiNode.getChildren().remove(gui);
+			ClientEngine.renderThread.getClientUI().getChildren().remove(gui);
 		}
 		
 		guis.clear();

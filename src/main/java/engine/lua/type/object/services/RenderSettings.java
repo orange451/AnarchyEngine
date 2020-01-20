@@ -12,7 +12,7 @@ package engine.lua.type.object.services;
 
 import org.luaj.vm2.LuaValue;
 
-import engine.AnarchyEngineClient;
+import engine.ClientEngine;
 import engine.Game;
 import engine.InternalGameThread;
 import engine.InternalRenderThread;
@@ -68,7 +68,7 @@ public class RenderSettings extends Instance implements TreeViewable {
 		});
 		
 		InternalRenderThread.runLater(()->{
-			this.settings = AnarchyEngineClient.pipeline.getRenderSettings();
+			this.settings = ClientEngine.renderThread.getPipeline().getRenderSettings();
 		});
 	}
 	

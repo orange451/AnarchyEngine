@@ -10,21 +10,19 @@
 
 package engine.glv2.v2;
 
-import engine.Game;
-
 public class RenderingSettings {
 
-	public volatile boolean shadowsEnabled = Game.core().getRenderSettings().getShadowsEnabled();
+	public volatile boolean shadowsEnabled = true;
 	public volatile boolean volumetricLightEnabled = false;
 	public volatile boolean fxaaEnabled = true;
 	public volatile boolean taaEnabled = false;
 	public volatile boolean vsyncEnabled = false; // TODO: Implement vsync toggle
 	// TODO: Maximize and restore windows
-	public volatile boolean motionBlurEnabled = Game.core().getRenderSettings().getMotionBlurEnabled();
-	public volatile boolean depthOfFieldEnabled = Game.core().getRenderSettings().getDepthOfFieldEnabled();
-	public volatile boolean ssrEnabled = Game.core().getRenderSettings().getSSREnabled();
+	public volatile boolean motionBlurEnabled = false;
+	public volatile boolean depthOfFieldEnabled = false;
+	public volatile boolean ssrEnabled = false;
 	public volatile boolean parallaxEnabled = false;
-	public volatile boolean ambientOcclusionEnabled = Game.core().getRenderSettings().getAOEnabled();
+	public volatile boolean ambientOcclusionEnabled = true;
 	public volatile boolean chromaticAberrationEnabled = false;
 	public volatile boolean lensFlaresEnabled = false;
 

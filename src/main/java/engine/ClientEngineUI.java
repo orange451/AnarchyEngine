@@ -5,9 +5,9 @@ import lwjgui.event.ScrollEvent;
 import lwjgui.scene.Node;
 import lwjgui.scene.layout.StackPane;
 
-public class AnarchyEngineClientUIFrame extends StackPane {
+public class ClientEngineUI extends StackPane {
 	
-	public AnarchyEngineClientUIFrame() {
+	public ClientEngineUI() {
 		
 		this.setOnKeyPressed(event -> {
 			UserInputService uis = (UserInputService) Game.getService("UserInputService");
@@ -16,7 +16,6 @@ public class AnarchyEngineClientUIFrame extends StackPane {
 			
 			if ( !this.isDescendentSelected() )
 				return;
-			
 			uis.onKeyPressed(event.getKey());
 		});
 		this.setOnKeyReleased(event -> {
@@ -35,7 +34,7 @@ public class AnarchyEngineClientUIFrame extends StackPane {
 				return;
 			
 			uis.onMousePress(event.button);
-			cached_context.setSelected(this);
+			window.getContext().setSelected(this);
 		});
 		this.setOnMouseReleased(event -> {
 			UserInputService uis = (UserInputService) Game.getService("UserInputService");
@@ -49,7 +48,7 @@ public class AnarchyEngineClientUIFrame extends StackPane {
 			if ( uis == null )
 				return;
 			
-			if ( !this.isDescendentHovered() && !this.cached_context.isHovered(this) )
+			if ( !this.isDescendentHovered() && !this.window.getContext().isHovered(this) )
 				return;
 			
 			uis.onMouseScroll(((ScrollEvent)event).y > 0 ? 3 : 4 );

@@ -38,7 +38,6 @@ import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.ARBClipControl;
 import org.lwjgl.opengl.GL;
 
-import engine.AnarchyEngineClient;
 import engine.Game;
 import engine.gl.IPipeline;
 import engine.gl.LegacyPipeline;
@@ -73,6 +72,7 @@ import engine.lua.type.object.insts.Skybox;
 import engine.lua.type.object.services.Lighting;
 import engine.observer.RenderableWorld;
 import ide.layout.windows.ErrorWindow;
+import lwjgui.scene.Window;
 import lwjgui.scene.layout.StackPane;
 
 public class GLRenderer implements IPipeline {
@@ -114,11 +114,11 @@ public class GLRenderer implements IPipeline {
 	private boolean useARBClipControl = false;
 
 	private boolean initialized;
-	
-	private long nvg;
 
-	public GLRenderer(long nvg) {
-		this.nvg = nvg;
+	private Window window;
+	
+	public GLRenderer(Window window) {
+		this.window = window;
 		useARBClipControl = GL.getCapabilities().GL_ARB_clip_control;
 
 		rnd = new RendererData();
@@ -137,7 +137,10 @@ public class GLRenderer implements IPipeline {
 		ShaderIncludes.processIncludeFile("assets/shaders/includes/common.isl");
 		ShaderIncludes.processIncludeFile("assets/shaders/includes/global.isl");
 		ShaderIncludes.processIncludeFile("assets/shaders/includes/color.isl");
+	}
 
+	@Override
+	public void init() {
 		Game.userInputService().inputBeganEvent().connect((args) -> {
 			if (args[0].get("KeyCode").eq_b(LuaValue.valueOf(GLFW.GLFW_KEY_F5))) {
 				System.out.println("Reloading Shaders...");
@@ -145,14 +148,9 @@ public class GLRenderer implements IPipeline {
 				pp.reloadShaders();
 			}
 		});
-
-	}
-
-	@Override
-	public void init() {
 		try {
-			width = AnarchyEngineClient.windowWidth;
-			height = AnarchyEngineClient.windowHeight;
+			width = window.getWidth();
+			height = window.getHeight();
 
 			renderingManager = new RenderingManager();
 
@@ -168,7 +166,7 @@ public class GLRenderer implements IPipeline {
 			renderingManager.addRenderer(new AnimInstanceRenderer());
 			handlesRenderer = new HandlesRenderer();
 			dp = new MultiPass(width, height);
-			pp = new PostProcess(width, height, nvg);
+			pp = new PostProcess(width, height, window.getContext().getNVG());
 			projMatrix = Maths.createProjectionMatrix(width, height, 90, 0.1f, Float.POSITIVE_INFINITY, true);
 
 			rnd.exposure = Game.lighting().getExposure();

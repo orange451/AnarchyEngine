@@ -49,7 +49,7 @@ public abstract class SearchableCodeEditor extends HighlightableCodeEditor {
 							setSearchTerm(getSelectedText());
 						}
 
-						this.cached_context.setSelected(this.searchbar.input);
+						this.window.getContext().setSelected(this.searchbar.input);
 						this.searchbar.input.selectAll();
 					}
 				}
@@ -185,7 +185,7 @@ public abstract class SearchableCodeEditor extends HighlightableCodeEditor {
 			});
 
 			// Force our input to be selected
-			LWJGUI.getCurrentContext().setSelected(input);
+			window.getContext().setSelected(input);
 		}
 
 		@Override

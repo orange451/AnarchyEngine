@@ -144,7 +144,7 @@ public class JVMUtil {
 					BufferedReader br = new BufferedReader(isr);
 					String line;
 
-					while ((line = br.readLine()) != null && InternalGameThread.isRunning()) {
+					while ((line = br.readLine()) != null) {
 						Thread.sleep(10);
 						System.out.println(line);
 					}

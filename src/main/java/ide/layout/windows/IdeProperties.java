@@ -42,6 +42,7 @@ import engine.lua.type.object.Instance;
 import engine.lua.type.object.InstancePropertySubscriber;
 import engine.lua.type.object.ScriptBase;
 import engine.lua.type.object.insts.ui.CSS;
+import engine.tasks.TaskManager;
 import ide.layout.IdePane;
 import lwjgui.LWJGUI;
 import lwjgui.font.FontStyle;
@@ -140,7 +141,7 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 			currentInstance.attachPropertySubscriber(this);
 			grid.setInstance(currentInstance);
 			grid.updateChildren();
-			grid.render(LWJGUI.getCurrentContext());
+			grid.render(window.getContext());
 		});
 	}
 	
@@ -501,11 +502,8 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 					textField.setText(label.getText());
 					this.getChildren().add(textField);
 					editing = true;
-
-					LWJGUI.runLater(()-> {
-						cached_context.setSelected(textField);
-						textField.selectAll();
-					});
+					window.getContext().setSelected(textField);
+					textField.selectAll();
 				});
 			}
 			
@@ -678,7 +676,7 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 				return;
 			
 			// We clicked /something/
-			Node n = this.cached_context.getSelected();
+			Node n = this.window.getContext().getSelected();
 			if ( !n.isDescendentOf(this) ) {
 				List<Instance> temp = Game.selected();
 				if ( temp.size() != 1 ) {
@@ -766,7 +764,7 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 				MenuItem copyPath = new MenuItem("Copy Path");
 				copyPath.setOnAction((clickEvent)->{
 					LWJGUI.runLater(() -> {
-						GLFW.glfwSetClipboardString(cached_context.getWindowHandle(), inst.getFullName());
+						GLFW.glfwSetClipboardString(window.getID(), inst.getFullName());
 					});
 				});
 				menu.getItems().add(copyPath);
@@ -846,8 +844,8 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 			this.updateChildren();
 			this.position(this.getParent());
 			this.position(this.getParent());
-			this.render(this.cached_context);
-			this.render(this.cached_context);
+			//this.render(this.cached_context);
+			//this.render(this.cached_context);
 			this.updateChildrenLocalRecursive();
 			
 			this.internal.updateChildren();

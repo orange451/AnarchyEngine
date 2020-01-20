@@ -85,7 +85,7 @@ public class Load {
 		if ( reset ) {
 			Game.saveFile = path;
 			Game.saveDirectory = new File(path).getParent();
-			GLFW.glfwSetWindowTitle(IDE.window, IDE.TITLE + " [" + FileUtils.getFileDirectoryFromPath(path) + "]");
+			//GLFW.glfwSetWindowTitle(IDE.window, IDE.TITLE + " [" + FileUtils.getFileDirectoryFromPath(path) + "]");
 		}
 		
 		// Unload the current game

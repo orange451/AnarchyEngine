@@ -3,9 +3,8 @@ package test;
 import org.luaj.vm2.LuaValue;
 import org.lwjgl.glfw.GLFW;
 
+import engine.ClientRunner;
 import engine.Game;
-import engine.InternalRenderThread;
-import engine.application.impl.ClientApplication;
 import engine.lua.RunnableArgs;
 import engine.lua.type.data.Color3;
 import engine.lua.type.data.Matrix4;
@@ -18,14 +17,10 @@ import engine.lua.type.object.insts.Prefab;
 import engine.lua.type.object.insts.Skybox;
 import engine.lua.type.object.insts.Texture;
 
-public class TestPBR extends ClientApplication {
+public class TestPBR extends ClientRunner {
 	
 	@Override
 	public void loadScene(String[] args) {
-		super.loadScene(args);
-		
-		InternalRenderThread.desiredFPS = 1000;
-		
 		// Move camera script
 		Game.runService().renderSteppedEvent().connect( new RunnableArgs() {
 			final int CAMERA_DIST = 256;
@@ -170,6 +165,6 @@ public class TestPBR extends ClientApplication {
 	}
 
 	public static void main(String[] args) {
-		launch(args);
+		new TestPBR();
 	}
 }

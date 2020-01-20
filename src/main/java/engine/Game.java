@@ -344,8 +344,8 @@ public class Game implements Tickable {
 			public void run() {
 				saveDirectory = "";
 				saveFile = "";
-				if ( IDE.window > -1 )
-					GLFW.glfwSetWindowTitle(IDE.window, IDE.TITLE);
+				//if ( IDE.window > -1 )
+//					GLFW.glfwSetWindowTitle(IDE.window, IDE.TITLE);
 				
 				// Delete anything old
 				unload();

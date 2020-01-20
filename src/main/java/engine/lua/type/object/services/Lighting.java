@@ -12,10 +12,9 @@ package engine.lua.type.object.services;
 
 import org.luaj.vm2.LuaValue;
 
-import engine.AnarchyEngineClient;
+import engine.ClientEngine;
 import engine.InternalGameThread;
 import engine.gl.IPipeline;
-import engine.gl.LegacyPipeline;
 import engine.lua.type.LuaConnection;
 import engine.lua.type.NumberClampPreferred;
 import engine.lua.type.data.Color3;
@@ -98,15 +97,13 @@ public class Lighting extends Service implements TreeViewable {
 	}
 	
 	private LuaValue onSetSkybox(LuaValue value) {
-		IPipeline pp = AnarchyEngineClient.pipeline;
+		IPipeline pp = ClientEngine.renderThread.getPipeline();
 		
 		if ( value.isnil() ) {
-			if (AnarchyEngineClient.pipeline instanceof LegacyPipeline) {
-			} else {
+			TaskManager.addTaskRenderThread(() -> {
 				pp.setDyamicSkybox(null);
 				pp.setStaticSkybox(null);
-			}
-			
+			});
 			if ( skyboxDestroyed != null )
 				skyboxDestroyed.disconnect();
 			
@@ -123,8 +120,10 @@ public class Lighting extends Service implements TreeViewable {
 		} else {
 			if ( value instanceof DynamicSkybox ) {
 				DynamicSkybox skybox = (DynamicSkybox)value;
-				pp.setDyamicSkybox(skybox);
-				pp.setStaticSkybox(null);
+				TaskManager.addTaskRenderThread(() -> {
+					pp.setDyamicSkybox(skybox);
+					pp.setStaticSkybox(null);
+				});
 				
 				if ( skyboxDestroyed != null )
 					skyboxDestroyed.disconnect();
@@ -139,8 +138,10 @@ public class Lighting extends Service implements TreeViewable {
 				});
 			} else if ( value instanceof Skybox) {
 				Skybox skybox = (Skybox)value;
-				pp.setStaticSkybox(skybox);
-				pp.setDyamicSkybox(null);
+				TaskManager.addTaskRenderThread(() -> {
+					pp.setStaticSkybox(skybox);
+					pp.setDyamicSkybox(null);
+				});
 
 				if ( skyboxChanged != null )
 					skyboxChanged.disconnect();

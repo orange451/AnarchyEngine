@@ -12,15 +12,11 @@ package ide.layout;
 
 import org.json.simple.JSONObject;
 
-import engine.AnarchyEngine;
+import engine.ClientEngine;
 import engine.Game;
 import engine.InternalGameThread;
-import engine.application.impl.ClientApplication;
-import engine.application.impl.ServerApplication;
 import engine.io.Load;
 import engine.io.Save;
-import engine.util.JVMUtil;
-import ide.IDE;
 import ide.layout.windows.IdeConsole;
 import ide.layout.windows.IdeExplorer;
 import ide.layout.windows.IdeGameView;
@@ -98,7 +94,7 @@ public class IdeLayout {
 		//south.dock(new IdeMaterialViewer());
 		
 		LWJGUI.runLater(() -> {
-			south.select(south.getTabs().get(0));
+			/*south.select(south.getTabs().get(0));
 			
 			SplitPane.setResizableWithParent(split.getItems().get(0), false);
 			SplitPane.setResizableWithParent(split.getItems().get(2), false);
@@ -107,7 +103,7 @@ public class IdeLayout {
 			//split.setDividerPosition(0, (IdeMaterialViewer.NODE_SIZE + 15f)/(float)RenderableApplication.windowWidth);
 			split.setDividerPosition(0, 0);
 			split.setDividerPosition(1, 0.75);
-			middle.setDividerPosition(0, 0.725);
+			middle.setDividerPosition(0, 0.725);*/
 		});	
 	}
 	
@@ -121,7 +117,7 @@ public class IdeLayout {
 		
 		{
 			center = new IdeDockPane();
-			gameView = new IdeGameView(IDE.pipeline);
+			gameView = new IdeGameView(ClientEngine.renderThread.getPipeline());
 			center.dock(gameView);
 			mid.getItems().add(center);
 		}
@@ -175,7 +171,7 @@ public class IdeLayout {
 			if ( !saved )
 				return;
 			
-			JVMUtil.newJVM(ServerApplication.class, new String[] {Game.saveFile});
+			//JVMUtil.newJVM(ServerApplication.class, new String[] {Game.saveFile});
 		});
 		menuEdit.getItems().add(t2);
 		
@@ -190,7 +186,7 @@ public class IdeLayout {
 			if ( !saved )
 				return;
 			
-			JVMUtil.newJVM(IDE.class, new String[] {"server",Game.saveFile});
+			//JVMUtil.newJVM(IDE.class, new String[] {"server",Game.saveFile});
 		});
 		menuEdit.getItems().add(ts);
 		
@@ -207,7 +203,7 @@ public class IdeLayout {
 			if ( !saved )
 				return;
 			
-			JVMUtil.newJVM(ClientApplication.class, new String[] {Game.saveFile});
+			//JVMUtil.newJVM(ClientApplication.class, new String[] {Game.saveFile});
 		});
 		menuEdit.getItems().add(t);
 		
@@ -221,7 +217,7 @@ public class IdeLayout {
 			if ( !saved )
 				return;
 			
-			JVMUtil.newJVM(IDE.class, new String[] {"client",Game.saveFile});
+			//JVMUtil.newJVM(IDE.class, new String[] {"client",Game.saveFile});
 		});
 		menuEdit.getItems().add(tc);
 		
@@ -314,7 +310,7 @@ public class IdeLayout {
 			Runnable r = new Runnable() {
 				@Override
 				public void run() {
-					AnarchyEngine.instance.terminate();
+					ClientEngine.stop();
 				}
 			};
 			if ( Game.changes ) {

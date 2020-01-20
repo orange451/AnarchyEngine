@@ -29,8 +29,8 @@ public class StandardUserControls {
 	public static void bind(Node object) {
 		object.setOnKeyPressed((event)->{
 			// Node must be selected
-			if ( !LWJGUI.getCurrentContext().isSelected(object) && !object.isDescendentSelected() )
-				return;
+			//if ( !LWJGUI.getCurrentContext().isSelected(object) && !object.isDescendentSelected() )
+			//	return;
 			
 			// Delete Selection
 			if ( event.getKey() == GLFW.GLFW_KEY_DELETE ) {

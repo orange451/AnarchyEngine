@@ -121,7 +121,7 @@ public class IdeConsole extends IdePane {
 
 		this.setOnKeyPressed(event -> {
 			if (event.getKey() == GLFW.GLFW_KEY_UP) {
-				if (cached_context.getSelected().isDescendentOf(luaInput)) {
+				if (window.getContext().getSelected().isDescendentOf(luaInput)) {
 					if ( history.size() == 0 )
 						return;
 					
@@ -141,7 +141,7 @@ public class IdeConsole extends IdePane {
 			}
 
 			if (event.getKey() == GLFW.GLFW_KEY_DOWN) {
-				if (cached_context.getSelected().isDescendentOf(luaInput)) {
+				if (window.getContext().getSelected().isDescendentOf(luaInput)) {
 					if ( history.size() == 0 )
 						return;
 					
@@ -161,10 +161,10 @@ public class IdeConsole extends IdePane {
 			}
 
 			if (event.getKey() == GLFW.GLFW_KEY_ENTER) {
-				if (cached_context.getSelected() == null)
+				if (window.getContext().getSelected() == null)
 					return;
 
-				if (cached_context.getSelected().isDescendentOf(luaInput)) {
+				if (window.getContext().getSelected().isDescendentOf(luaInput)) {
 					String lua = luaInput.getText();
 					console.appendText("> " + lua + "\n");
 					LuaEngine.runLua(lua);

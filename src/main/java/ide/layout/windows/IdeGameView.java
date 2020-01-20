@@ -10,10 +10,9 @@
 
 package ide.layout.windows;
 
-import engine.AnarchyEngineClient;
+import engine.ClientEngine;
 import engine.InternalRenderThread;
 import engine.gl.IPipeline;
-import ide.IDE;
 import ide.layout.IdePane;
 import lwjgui.geometry.Insets;
 import lwjgui.geometry.Pos;
@@ -29,8 +28,8 @@ public class IdeGameView extends IdePane {
 	
 	public IdeGameView(IPipeline pipeline) {
 		super("Game", false);
-		
 		this.pipeline = pipeline;
+		
 		this.setAlignment(Pos.CENTER);
 		
 		gameView = pipeline.getDisplayPane();
@@ -43,30 +42,25 @@ public class IdeGameView extends IdePane {
 		this.gameView.setAlignment(Pos.TOP_LEFT);
 		this.gameView.setPadding(new Insets(2,2,2,2));
 		
-		this.gameView.getChildren().add(AnarchyEngineClient.uiNode);
+		this.gameView.getChildren().add(ClientEngine.renderThread.getClientUI());
 		
 		StandardUserControls.bind(this);
 	}
 
 	@Override
 	public void onOpen() {
-		IDE.pipeline.setEnabled(true);
+		pipeline.setEnabled(true);
 	}
 
 	@Override
 	public void onClose() {
-		IDE.pipeline.setEnabled(false);
+		pipeline.setEnabled(false);
 	}
 	
 	@Override
 	public void render(Context context) {
-		if ( !IdeGameView.this.pipeline.isInitialized() )
-			return;
-		
 		fps.setText(InternalRenderThread.fps + " fps");
-		
+		pipeline.setSize((int)gameView.getWidth(), (int)gameView.getHeight());
 		super.render(context);
-
-		IDE.pipeline.setSize((int)gameView.getWidth(), (int)gameView.getHeight());
 	}
 }

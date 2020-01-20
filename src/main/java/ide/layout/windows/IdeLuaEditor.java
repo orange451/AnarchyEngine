@@ -28,7 +28,6 @@ public class IdeLuaEditor extends IdePane {
 
 		code = new LuaEditor();
 		this.getChildren().add(code);
-
 		code.setText(script.getSource());
 		this.inst = script;
 	}
@@ -61,4 +60,5 @@ public class IdeLuaEditor extends IdePane {
 			return;
 		inst.setSource(code.getText());
 	}
+
 }

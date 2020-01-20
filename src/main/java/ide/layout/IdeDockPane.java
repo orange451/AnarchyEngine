@@ -79,9 +79,7 @@ public class IdeDockPane extends TabPane {
 		this.setPrefWidth(pane.getPrefWidth());
 		this.setMinSize(8, 24);
 		
-		LWJGUI.runLater(() -> {
-			select(tab);
-		});
+		select(tab);
 	}
 
 	public void undock(IdePane pane) {

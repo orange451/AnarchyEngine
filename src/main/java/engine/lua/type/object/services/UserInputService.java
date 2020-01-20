@@ -18,7 +18,7 @@ import org.luaj.vm2.lib.TwoArgFunction;
 import org.luaj.vm2.lib.ZeroArgFunction;
 import org.lwjgl.glfw.GLFW;
 
-import engine.AnarchyEngineClient;
+import engine.ClientEngine;
 import engine.Game;
 import engine.lua.lib.LuaTableReadOnly;
 import engine.lua.type.LuaEvent;
@@ -28,6 +28,8 @@ import engine.lua.type.object.Service;
 import engine.lua.type.object.TreeViewable;
 import engine.lua.type.object.insts.Camera;
 import ide.layout.windows.icons.Icons;
+import lwjgui.glfw.input.KeyboardHandler;
+import lwjgui.glfw.input.MouseHandler;
 
 public class UserInputService extends Service implements TreeViewable {
 
@@ -91,7 +93,8 @@ public class UserInputService extends Service implements TreeViewable {
 		this.getmetatable().set("GetMouseDelta", new ZeroArgFunction() {
 			@Override
 			public LuaValue call() {
-				return new Vector2((float)AnarchyEngineClient.mouseDeltaX, (float)AnarchyEngineClient.mouseDeltaY);
+				MouseHandler mh = ClientEngine.renderThread.getWindow().getMouseHandler();
+				return new Vector2(mh.getDX(), mh.getDY());
 			}
 		});
 		
@@ -171,7 +174,7 @@ public class UserInputService extends Service implements TreeViewable {
 	@Override
 	protected LuaValue onValueSet(LuaValue key, LuaValue value) {
 		if ( key.toString().equals("LockMouse") ) {
-			AnarchyEngineClient.lockMouse = value.toboolean();
+			//AnarchyEngineClient.lockMouse = value.toboolean();
 		}
 		return value;
 	}
@@ -187,7 +190,8 @@ public class UserInputService extends Service implements TreeViewable {
 	}
 	
 	public boolean isKeyDown(int key) {
-		boolean system = GLFW.glfwGetKey(AnarchyEngineClient.window, key) == GLFW.GLFW_PRESS;
+		KeyboardHandler kh = ClientEngine.renderThread.getWindow().getKeyboardHandler();
+		boolean system = kh.isKeyPressed(key);
 		if ( !system )
 			keysDown.remove(key);
 		
@@ -195,7 +199,8 @@ public class UserInputService extends Service implements TreeViewable {
 	}
 	
 	public boolean isMouseDown(int mouse) {
-		boolean system = GLFW.glfwGetMouseButton(AnarchyEngineClient.window, mouse) == GLFW.GLFW_PRESS;
+		MouseHandler mh = ClientEngine.renderThread.getWindow().getMouseHandler();
+		boolean system = mh.isButtonPressed(mouse);
 		if ( !system )
 			mouseDown.remove(mouse);
 		

@@ -40,12 +40,17 @@ import engine.lua.type.object.AssetLoadable;
 import engine.lua.type.object.Instance;
 import engine.lua.type.object.TreeInvisible;
 import engine.lua.type.object.insts.Mesh;
+import engine.tasks.TaskManager;
 import engine.util.FileUtils;
 import ide.IDE;
 import lwjgui.LWJGUI;
+import lwjgui.LWJGUIUtil;
+import lwjgui.ManagedThread;
 import lwjgui.geometry.Pos;
 import lwjgui.scene.Scene;
 import lwjgui.scene.Window;
+import lwjgui.scene.WindowHandle;
+import lwjgui.scene.WindowManager;
 import lwjgui.scene.control.Button;
 import lwjgui.scene.control.Label;
 import lwjgui.scene.layout.BorderPane;
@@ -60,64 +65,75 @@ public class Save {
 
 	public static void requestSave(Runnable after) {
 		//long win = LWJGUIUtil.createOpenGLCoreWindow("Save Dialog", 300, 100, false, true);
-		Window window = LWJGUI.initialize();
-		window.setCanUserClose(false);
-
-		// Create root pane
-		BorderPane root = new BorderPane();
-
-		// Create a label
-		Label l = new Label("Unsaved changes. Would you like to save?");
-		root.setCenter(l);
-
-		StackPane bottom = new StackPane();
-		bottom.setPrefHeight(32);
-		bottom.setAlignment(Pos.CENTER);
-		bottom.setFillToParentWidth(true);
-		bottom.setBackgroundLegacy(Theme.current().getControlAlt());
-		root.setBottom(bottom);
-		
-		HBox t = new HBox();
-		t.setAlignment(Pos.CENTER);
-		t.setBackground(null);
-		t.setSpacing(16);
-		bottom.getChildren().add(t);
-
-		// Create a button
-		Button b = new Button("Yes");
-		b.setMinWidth(64);
-		b.setOnAction(event -> {
-			window.close();
-			if ( save() ) {
-				InternalRenderThread.runLater(()->{
-					after.run();
-				});
-			}
+		WindowManager.runLater(() -> {
+			ManagedThread thread = new ManagedThread(300, 100, "Save") {
+				@Override
+				protected void setupHandle(WindowHandle handle) {
+					super.setupHandle(handle);
+					handle.canResize(false);
+				}
+				@Override
+				protected void init(Window window) {
+					super.init(window);
+					// Create root pane
+					BorderPane root = new BorderPane();
+	
+					// Create a label
+					Label l = new Label("Unsaved changes. Would you like to save?");
+					root.setCenter(l);
+	
+					StackPane bottom = new StackPane();
+					bottom.setPrefHeight(32);
+					bottom.setAlignment(Pos.CENTER);
+					bottom.setFillToParentWidth(true);
+					bottom.setBackgroundLegacy(Theme.current().getControlAlt());
+					root.setBottom(bottom);
+					
+					HBox t = new HBox();
+					t.setAlignment(Pos.CENTER);
+					t.setBackground(null);
+					t.setSpacing(16);
+					bottom.getChildren().add(t);
+	
+					// Create a button
+					Button b = new Button("Yes");
+					b.setMinWidth(64);
+					b.setOnAction(event -> {
+						window.close();
+						if ( save() ) {
+							InternalRenderThread.runLater(()->{
+								after.run();
+							});
+						}
+					});
+					t.getChildren().add(b);
+	
+					// Create a button
+					Button b2 = new Button("No");
+					b2.setMinWidth(64);
+					b2.setOnAction(event -> {
+						window.close();
+						InternalRenderThread.runLater(()->{
+							after.run();
+						});
+					});
+					t.getChildren().add(b2);
+	
+					// Create a button
+					Button b3 = new Button("Cancel");
+					b3.setMinWidth(64);
+					b3.setOnAction(event -> {
+						window.close();
+					});
+					t.getChildren().add(b3);
+					
+					// Show window
+					window.setScene(new Scene(root, 300, 100));
+					window.show();
+				}
+			};
+			thread.start();
 		});
-		t.getChildren().add(b);
-
-		// Create a button
-		Button b2 = new Button("No");
-		b2.setMinWidth(64);
-		b2.setOnAction(event -> {
-			window.close();
-			InternalRenderThread.runLater(()->{
-				after.run();
-			});
-		});
-		t.getChildren().add(b2);
-
-		// Create a button
-		Button b3 = new Button("Cancel");
-		b3.setMinWidth(64);
-		b3.setOnAction(event -> {
-			window.close();
-		});
-		t.getChildren().add(b3);
-		
-		// Show window
-		window.setScene(new Scene(root, 300, 100));
-		window.show();
 	}
 	
 	public static boolean save() {
@@ -197,7 +213,7 @@ public class Save {
 		// Update filepaths
 		Game.saveDirectory = gameDirectory.getAbsolutePath();
 		Game.saveFile = path;
-		GLFW.glfwSetWindowTitle(IDE.window, IDE.TITLE + " [" + FileUtils.getFileDirectoryFromPath(path) + "]");
+		//GLFW.glfwSetWindowTitle(IDE.window, IDE.TITLE + " [" + FileUtils.getFileDirectoryFromPath(path) + "]");
 		
 		// Write new resources
 		writeResources(resourcesFolder);

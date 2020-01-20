@@ -1,18 +1,16 @@
 package test;
 
-import engine.InternalRenderThread;
-import engine.application.impl.ClientApplication;
+import engine.ClientRunner;
+import engine.io.Load;
 
-public class RunnerTest extends ClientApplication {
-	
+public class RunnerTest extends ClientRunner {
+
 	@Override
 	public void loadScene(String[] args) {
-		super.loadScene(new String[] {"Projects/Fruit/Fruit.json"});
-		
-		InternalRenderThread.desiredFPS = 200;
+		Load.load("Projects/Fruit/Fruit.json");
 	}
 
 	public static void main(String[] args) {
-		launch(args);
+		new RunnerTest();
 	}
 }
