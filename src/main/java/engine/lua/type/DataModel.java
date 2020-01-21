@@ -155,6 +155,10 @@ public abstract class DataModel extends LuaDatatype {
 	}
 	
 	protected boolean checkEquals(LuaValue value1, LuaValue value2) {
+		// Quick check to filter out non-nil to nil comparisons
+		if ( (value1.isnil() && !value2.isnil()) || (!value1.isnil() && value2.isnil()) )
+			return false;
+		
 		boolean changed = !value2.equals(value1);
 		
 		// Hacked in double comparison... Since luaJ uses == for comparing doubles :(
@@ -166,6 +170,10 @@ public abstract class DataModel extends LuaDatatype {
 		}
 		
 		return !changed;
+	}
+	
+	public void set(LuaValue key, String value) {
+		this.set(key, LuaValue.valueOf(value));
 	}
 
 	@Override
@@ -183,7 +191,15 @@ public abstract class DataModel extends LuaDatatype {
 		
 		// Prevent setting parent to self
 		if ( key.eq_b(C_PARENT) && value == this ) {
-			throw new LuaError("Instance cannot be its own parent");
+			throw new LuaError("Instance cannot be its own parent.");
+		}
+		
+		// Prevent setting parent to its child
+		if ( key.eq_b(C_PARENT) && value instanceof DataModel ) {
+			DataModel t = (DataModel)value;
+			if ( this.descendents.contains(t) ) {
+				throw new LuaError("Instance cannot become its childs' child.");
+			}
 		}
 		
 		super.set( key, value );
