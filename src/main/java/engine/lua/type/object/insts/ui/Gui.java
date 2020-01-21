@@ -116,7 +116,6 @@ public class Gui extends GuiBase {
 			// Update size
 			guiBase.updateNodeInternal(node);
 			guiBase.updateNode(node);
-			node.setElementId(guiBase.getName());
 			
 			// If parent change, remove from old parent
 			Node parentPane = uiMap.get(guiBase.getParent());

@@ -153,6 +153,9 @@ public abstract class GuiBase extends Instance implements TreeViewable {
 	public abstract Node getUINode();
 	
 	protected void updateNodeInternal(Node node) {
+		// Update element Id
+		node.setElementId(getName());
+		
 		// Mouse transparency
 		node.setMouseTransparent(this.isMouseTransparent());
 		
