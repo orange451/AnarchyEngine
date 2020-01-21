@@ -237,7 +237,7 @@ public class List extends LuaValuetype {
 		
 		String[] str = input.split(",");
 		for (int i = 0; i < str.length; i++) {
-			addElement(LuaValue.valueOf(str[i]));
+			addElement(LuaValue.valueOf(str[i].trim()));
 		}
 		
 		return this;
