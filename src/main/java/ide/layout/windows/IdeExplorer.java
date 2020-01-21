@@ -76,7 +76,7 @@ import lwjgui.scene.control.TreeView;
 
 public class IdeExplorer extends IdePane {
 	private ScrollPane scroller;
-	private TreeView<Instance> tree;
+	private SortedTreeView<Instance> tree;
 
 	private static final LuaValue C_NAME = LuaValue.valueOf("Name");
 	private static final LuaValue C_PARENT = LuaValue.valueOf("Parent");
@@ -144,7 +144,7 @@ public class IdeExplorer extends IdePane {
 	}
 	
 	public IdeExplorer() {
-		super("Explorer New", true);
+		super("Explorer", true);
 
 		this.scroller = new ScrollPane();
 		this.scroller.setBorder(Insets.EMPTY);
@@ -383,6 +383,11 @@ public class IdeExplorer extends IdePane {
 					instanceToTreeItemMap.put(instance, newTreeItem);
 					treeItemToParentTreeItemMap.put(newTreeItem, parentTreeItem);
 					
+					LuaConnection previousConnection = treeItemToChangedConnectionMap.get(newTreeItem);
+					if ( previousConnection != null )
+						previousConnection.disconnect();
+					
+					// Track object changes
 					LuaConnection changedConnection = instance.changedEvent().connect((args)->{
 						LuaValue key = args[0];
 						LuaValue val = args[1];
@@ -392,9 +397,13 @@ public class IdeExplorer extends IdePane {
 						}
 						
 						if ( key.eq_b(C_PARENT) ) {
+							System.out.println("AAAAAA " + val);
 							destroyNode(instance);
-							buildNode(instance, true);
-							buildDescendents(instance, true);
+							if ( !val.isnil() ) {
+								buildNode(instance, true);
+								buildDescendents(instance, true);
+							}
+							tree.refresh();
 						}
 					});
 					treeItemToChangedConnectionMap.put(newTreeItem, changedConnection);
@@ -475,6 +484,10 @@ public class IdeExplorer extends IdePane {
 		@Override
 		public boolean isExpanded() {
 			return true;
+		}
+		
+		public void refresh() {
+			this.needsRefresh = true;
 		}
 	}
 	
