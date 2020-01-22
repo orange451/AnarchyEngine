@@ -19,10 +19,16 @@ import engine.InternalRenderThread;
 import engine.io.Load;
 import engine.lua.type.object.ScriptBase;
 import engine.lua.type.object.insts.ui.CSS;
+import engine.lua.type.object.services.UserInputService;
 import ide.layout.IdeLayout;
 import ide.layout.windows.IdeCSSEditor;
 import ide.layout.windows.IdeLuaEditor;
+import lwjgui.ManagedThread;
+import lwjgui.glfw.input.MouseHandler;
 import lwjgui.scene.Group;
+import lwjgui.scene.Scene;
+import lwjgui.scene.Window;
+import lwjgui.scene.WindowManager;
 
 public class IDE extends ClientEngine {
 	public static IdeLayout layout;
@@ -64,7 +70,6 @@ public class IDE extends ClientEngine {
 					InternalGameThread.runLater(() -> {
 						InternalRenderThread.runLater(()->{
 							Game.setRunning(true);
-							InternalGameThread.desiredTPS = 60;
 						});
 					});
 				});
@@ -88,22 +93,40 @@ public class IDE extends ClientEngine {
 	}
 
 	public static void openCSS(CSS instance) {
-		IdeCSSEditor lua = new IdeCSSEditor(instance);
-		layout.getCenter().dock(lua);
-		
+		//IdeCSSEditor lua = new IdeCSSEditor(instance);
+		//layout.getCenter().dock(lua);
+		WindowManager.runLater(() -> {
+			ManagedThread thread = new ManagedThread(300, 100, "Editor") {
+				@Override
+				protected void init(Window window) {
+					super.init(window);
+					window.setScene(new Scene(new IdeCSSEditor(instance), 500, 400));
+					window.show();
+				}
+			};
+			thread.start();
+		});
 		/*Window window = LWJGUI.initialize();
 		window.setScene(new Scene(new IdeCSSEditor(instance), 500, 400));
 		window.show();*/
 	}
 	
-	public static void main(String[] args) {
-		new IDE();
-	}
-
+	private boolean grabbed;
+	
 	@Override
 	public void render() {
-		// TODO Auto-generated method stub
-		
+		if (UserInputService.lockMouse) {
+			if (!grabbed) {
+				grabbed = true;
+				MouseHandler.setGrabbed(renderThread.getWindow().getID(), true);
+			}
+		} else {
+			if (grabbed) {
+				MouseHandler.setGrabbed(renderThread.getWindow().getID(), false);
+				grabbed = false;
+			}
+		}
+
 	}
 
 	@Override
@@ -112,4 +135,7 @@ public class IDE extends ClientEngine {
 		
 	}
 
+	public static void main(String[] args) {
+		new IDE();
+	}
 }

@@ -1,10 +1,9 @@
 package test;
 
 import org.luaj.vm2.LuaValue;
-import org.lwjgl.opengl.GL11;
 
+import engine.ClientRunner;
 import engine.Game;
-import engine.application.impl.ClientApplication;
 import engine.gl.LegacyPipeline;
 import engine.lua.type.data.Color3;
 import engine.lua.type.data.Vector3;
@@ -17,7 +16,7 @@ import engine.lua.type.object.insts.Prefab;
 import engine.lua.type.object.services.Workspace;
 import engine.observer.RenderableWorld;
 
-public class MultipleViewport extends ClientApplication {
+public class MultipleViewport extends ClientRunner {
 	private LegacyPipeline secondaryPipeline;
 
 	@Override
@@ -203,6 +202,6 @@ public class MultipleViewport extends ClientApplication {
 	}
 
 	public static void main(String[] args) {
-		launch(args);
+		new MultipleViewport();
 	}
 }

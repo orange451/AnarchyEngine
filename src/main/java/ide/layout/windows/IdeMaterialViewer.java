@@ -15,7 +15,6 @@ import java.util.List;
 
 import org.luaj.vm2.LuaValue;
 
-import engine.AnarchyEngineClient;
 import engine.Game;
 import engine.InternalRenderThread;
 import engine.gl.LegacyPipeline;
@@ -61,11 +60,11 @@ public class IdeMaterialViewer extends IdePane {
 		});
 		
 		// Increase allowence
-		AnarchyEngineClient.renderThread.attach(()->{
+		/*AnarchyEngineClient.renderThread.attach(()->{
 			renderAllowence = renderAllowence+1;
 			if ( renderAllowence > 10 )
 				renderAllowence = 10;
-		});
+		});*/
 		
 		// Add user controls
 		StandardUserControls.bind(this);
@@ -209,7 +208,7 @@ public class IdeMaterialViewer extends IdePane {
 				GenericShader shader;
 
 				@Override
-				public void render(Context context) {
+				public void render(Context context, int width, int height) {
 					
 					if ( shader == null ) {
 						shader = new GenericShader();

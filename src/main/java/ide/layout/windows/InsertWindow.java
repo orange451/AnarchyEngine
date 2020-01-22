@@ -22,8 +22,6 @@ import engine.InternalRenderThread;
 import engine.lua.type.object.Instance;
 import engine.lua.type.object.TreeViewable;
 import ide.layout.windows.icons.Icons;
-import lwjgui.LWJGUI;
-import lwjgui.LWJGUIUtil;
 import lwjgui.ManagedThread;
 import lwjgui.geometry.Insets;
 import lwjgui.scene.Context;
@@ -42,7 +40,7 @@ public class InsertWindow {
 	
 	public InsertWindow() {
 		WindowManager.runLater(() -> {
-			ManagedThread thread = new ManagedThread(300, 100, "Save") {
+			new ManagedThread(300, 100, "Save") {
 				@Override
 				protected void setupHandle(WindowHandle handle) {
 					super.setupHandle(handle);
@@ -130,8 +128,7 @@ public class InsertWindow {
 					window.setScene(new Scene( root, 300, 250 ));
 					window.show();
 				}
-			};
-			thread.start();
+			}.start();
 		});
 	}
 

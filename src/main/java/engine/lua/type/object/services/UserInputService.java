@@ -41,6 +41,8 @@ public class UserInputService extends Service implements TreeViewable {
 	public static final LuaValue C_MOUSEPRESSED = LuaValue.valueOf("MousePressed");
 	public static final LuaValue C_MOUSERELEASED = LuaValue.valueOf("MouseReleased");
 	
+	public static boolean lockMouse;
+	
 	public UserInputService() {
 		super("UserInputService");
 		
@@ -174,7 +176,7 @@ public class UserInputService extends Service implements TreeViewable {
 	@Override
 	protected LuaValue onValueSet(LuaValue key, LuaValue value) {
 		if ( key.toString().equals("LockMouse") ) {
-			//AnarchyEngineClient.lockMouse = value.toboolean();
+			lockMouse = value.toboolean();
 		}
 		return value;
 	}

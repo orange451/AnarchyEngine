@@ -25,25 +25,25 @@ public class IdeGameView extends IdePane {
 	private StackPane gameView;
 	private IPipeline pipeline;
 	private Label fps;
-	
+
 	public IdeGameView(IPipeline pipeline) {
 		super("Game", false);
 		this.pipeline = pipeline;
-		
+
 		this.setAlignment(Pos.CENTER);
-		
+
 		gameView = pipeline.getDisplayPane();
 		this.getChildren().add(gameView);
-		
+
 		this.fps = new Label("fps");
 		this.fps.setTextFill(Color.WHITE);
 		this.fps.setMouseTransparent(true);
 		this.gameView.getChildren().add(fps);
 		this.gameView.setAlignment(Pos.TOP_LEFT);
-		this.gameView.setPadding(new Insets(2,2,2,2));
-		
+		this.gameView.setPadding(new Insets(2, 2, 2, 2));
+
 		this.gameView.getChildren().add(ClientEngine.renderThread.getClientUI());
-		
+
 		StandardUserControls.bind(this);
 	}
 
@@ -56,11 +56,11 @@ public class IdeGameView extends IdePane {
 	public void onClose() {
 		pipeline.setEnabled(false);
 	}
-	
+
 	@Override
 	public void render(Context context) {
 		fps.setText(InternalRenderThread.fps + " fps");
-		pipeline.setSize((int)gameView.getWidth(), (int)gameView.getHeight());
 		super.render(context);
+		pipeline.setSize((int) gameView.getWidth(), (int) gameView.getHeight());
 	}
 }

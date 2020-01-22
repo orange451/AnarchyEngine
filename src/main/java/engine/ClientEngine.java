@@ -18,8 +18,9 @@ import org.lwjgl.glfw.GLFWErrorCallback;
 import engine.tasks.ThreadUtils;
 import engine.util.GLCompat;
 import ide.layout.windows.ErrorWindow;
-import lwjgui.LWJGUI;
 import lwjgui.glfw.ClientSync;
+import lwjgui.glfw.CustomCursor;
+import lwjgui.scene.Cursor;
 import lwjgui.scene.WindowManager;
 
 public abstract class ClientEngine {
@@ -42,7 +43,6 @@ public abstract class ClientEngine {
 
 	public void init() {
 		Thread.currentThread().setName("GLFWThread");
-		WindowManager.setMainThread(Thread.currentThread());
 
 		Thread initThread = new Thread(() -> {
 			while (true) {
@@ -61,6 +61,12 @@ public abstract class ClientEngine {
 			new ErrorWindow("Unable to initialize GLFW.", true);
 			return;
 		}
+		WindowManager.init();
+
+		WindowManager.addCursor(Cursor.NORMAL, new CustomCursor("assets/cursors/arrow.png", 0, 0));
+		WindowManager.addCursor(Cursor.VRESIZE, new CustomCursor("assets/cursors/vresize.png", 5, 9));
+		WindowManager.addCursor(Cursor.HRESIZE, new CustomCursor("assets/cursors/hresize.png", 9, 5));
+		WindowManager.addCursor(Cursor.IBEAM, new CustomCursor("assets/cursors/ibeam.png", 4, 9));
 
 		GLCompat.init(3, 3);
 
@@ -82,7 +88,7 @@ public abstract class ClientEngine {
 	}
 
 	public void dispose() {
-		LWJGUI.dispose();
+		WindowManager.dispose();
 		glfwTerminate();
 	}
 
