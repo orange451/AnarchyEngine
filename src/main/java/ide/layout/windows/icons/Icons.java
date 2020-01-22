@@ -75,6 +75,7 @@ public class Icons {
 	public static final Icons icon_vbox = new Icons("vbox.png");
 	public static final Icons icon_hbox = new Icons("hbox.png");
 	public static final Icons icon_text_field = new Icons("TextField.png");
+	public static final Icons icon_button = new Icons("TextButton.png");
 	
 	private final String image;
 	
