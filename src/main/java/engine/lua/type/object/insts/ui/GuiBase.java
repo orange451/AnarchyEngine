@@ -27,6 +27,8 @@ public abstract class GuiBase extends Instance implements TreeViewable {
 	protected static final LuaValue C_CLICKEDEVENT = LuaValue.valueOf("MouseClicked");
 	protected static final LuaValue C_MOUSEENTERED = LuaValue.valueOf("MouseEntered");
 	protected static final LuaValue C_MOUSEEXITED = LuaValue.valueOf("MouseExited");
+	protected static final LuaValue C_MOUSEPRESSED = LuaValue.valueOf("MousePressed");
+	protected static final LuaValue C_MOUSERELEASED = LuaValue.valueOf("MouseReleased");
 	protected static final LuaValue C_CSS = LuaValue.valueOf("CSS");
 	
 	
@@ -48,6 +50,8 @@ public abstract class GuiBase extends Instance implements TreeViewable {
 		this.rawset(C_CLICKEDEVENT, new LuaEvent());
 		this.rawset(C_MOUSEENTERED, new LuaEvent());
 		this.rawset(C_MOUSEEXITED, new LuaEvent());
+		this.rawset(C_MOUSEPRESSED, new LuaEvent());
+		this.rawset(C_MOUSERELEASED, new LuaEvent());
 		
 		this.changedEvent().connect((args)->{
 			if ( args[0].eq_b(C_PARENT) ) {
@@ -96,6 +100,14 @@ public abstract class GuiBase extends Instance implements TreeViewable {
 	
 	public LuaEvent getMouseExitedEvent() {
 		return (LuaEvent)this.get(C_MOUSEEXITED);
+	}
+	
+	public LuaEvent getMousePressedEvent() {
+		return (LuaEvent)this.get(C_MOUSEPRESSED);
+	}
+	
+	public LuaEvent getMouseReleasedEvent() {
+		return (LuaEvent)this.get(C_MOUSERELEASED);
 	}
 	
 	private void rebuildCSS() {
@@ -190,6 +202,14 @@ public abstract class GuiBase extends Instance implements TreeViewable {
 			node.setOnMouseExited((event)->{
 				if ( Game.isRunning() )
 					getMouseExitedEvent().fire();
+			});
+			node.setOnMousePressed((event)->{
+				if ( Game.isRunning() )
+					getMousePressedEvent().fire();
+			});
+			node.setOnMouseReleased((event)->{
+				if ( Game.isRunning() )
+					getMouseReleasedEvent().fire();
 			});
 		}
 		
