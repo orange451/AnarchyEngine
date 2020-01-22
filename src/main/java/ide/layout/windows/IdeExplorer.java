@@ -295,7 +295,9 @@ public class IdeExplorer extends IdePane {
 			if ( parentTreeItem == null )
 				return;
 			
-			parentTreeItem.getItems().remove(treeItem);
+			while(parentTreeItem.getItems().contains(treeItem))
+				parentTreeItem.getItems().remove(treeItem);
+			
 			instanceToTreeItemMap.remove(instance);
 			treeItemToParentTreeItemMap.remove(treeItem);
 			
@@ -383,10 +385,6 @@ public class IdeExplorer extends IdePane {
 					instanceToTreeItemMap.put(instance, newTreeItem);
 					treeItemToParentTreeItemMap.put(newTreeItem, parentTreeItem);
 					
-					LuaConnection previousConnection = treeItemToChangedConnectionMap.get(newTreeItem);
-					if ( previousConnection != null )
-						previousConnection.disconnect();
-					
 					// Track object changes
 					LuaConnection changedConnection = instance.changedEvent().connect((args)->{
 						LuaValue key = args[0];
@@ -397,7 +395,6 @@ public class IdeExplorer extends IdePane {
 						}
 						
 						if ( key.eq_b(C_PARENT) ) {
-							System.out.println("AAAAAA " + val);
 							destroyNode(instance);
 							if ( !val.isnil() ) {
 								buildNode(instance, true);

@@ -6,9 +6,11 @@ import java.util.Map;
 
 import org.luaj.vm2.LuaValue;
 
+import engine.Game;
 import engine.lua.lib.EnumType;
 import engine.lua.lib.Enums;
 import engine.lua.type.LuaConnection;
+import engine.lua.type.LuaEvent;
 import engine.lua.type.data.Vector2;
 import engine.lua.type.object.Instance;
 import engine.lua.type.object.TreeViewable;
@@ -22,7 +24,12 @@ public abstract class GuiBase extends Instance implements TreeViewable {
 	protected static final LuaValue C_SIZE = LuaValue.valueOf("Size");
 	protected static final LuaValue C_ALIGNMENT = LuaValue.valueOf("Alignment");
 	protected static final LuaValue C_MOUSETRANSPARENT = LuaValue.valueOf("MouseTransparent");
+	protected static final LuaValue C_CLICKEDEVENT = LuaValue.valueOf("MouseClicked");
+	protected static final LuaValue C_MOUSEENTERED = LuaValue.valueOf("MouseEntered");
+	protected static final LuaValue C_MOUSEEXITED = LuaValue.valueOf("MouseExited");
 	protected static final LuaValue C_CSS = LuaValue.valueOf("CSS");
+	
+	
 	protected Map<Instance, LuaConnection> uiConnections = new HashMap<>();
 	protected Gui gui;
 
@@ -37,6 +44,10 @@ public abstract class GuiBase extends Instance implements TreeViewable {
 		this.getField(C_ALIGNMENT).setEnum(new EnumType("GuiAlignment"));
 		
 		this.defineField(C_MOUSETRANSPARENT.toString(), LuaValue.FALSE, false);
+
+		this.rawset(C_CLICKEDEVENT, new LuaEvent());
+		this.rawset(C_MOUSEENTERED, new LuaEvent());
+		this.rawset(C_MOUSEEXITED, new LuaEvent());
 		
 		this.changedEvent().connect((args)->{
 			if ( args[0].eq_b(C_PARENT) ) {
@@ -73,6 +84,18 @@ public abstract class GuiBase extends Instance implements TreeViewable {
 				uiConnections.remove(arg);
 			}
 		});
+	}
+	
+	public LuaEvent getMouseClickedEvent() {
+		return (LuaEvent)this.get(C_CLICKEDEVENT);
+	}
+	
+	public LuaEvent getMouseEnteredEvent() {
+		return (LuaEvent)this.get(C_MOUSEENTERED);
+	}
+	
+	public LuaEvent getMouseExitedEvent() {
+		return (LuaEvent)this.get(C_MOUSEEXITED);
 	}
 	
 	private void rebuildCSS() {
@@ -153,6 +176,23 @@ public abstract class GuiBase extends Instance implements TreeViewable {
 	public abstract Node getUINode();
 	
 	protected void updateNodeInternal(Node node) {
+		
+		// Set click event
+		if ( node.getOnMouseClicked() == null ) {
+			node.setOnMouseClicked((event)->{
+				if ( Game.isRunning() )
+					getMouseClickedEvent().fire(LuaValue.valueOf(event.button));
+			});
+			node.setOnMouseEntered((event)->{
+				if ( Game.isRunning() )
+					getMouseEnteredEvent().fire();
+			});
+			node.setOnMouseExited((event)->{
+				if ( Game.isRunning() )
+					getMouseExitedEvent().fire();
+			});
+		}
+		
 		// Update element Id
 		node.setElementId(getName());
 		
