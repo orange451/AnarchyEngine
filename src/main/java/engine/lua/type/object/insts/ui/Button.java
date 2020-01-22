@@ -25,7 +25,7 @@ public class Button extends GuiBase {
 	protected static final LuaValue C_ACTION = LuaValue.valueOf("Action");
 	
 	public Button() {
-		super("TextField");
+		super("Button");
 
 		this.defineField(C_TEXT.toString(), LuaString.valueOf("Label"), false);
 		
