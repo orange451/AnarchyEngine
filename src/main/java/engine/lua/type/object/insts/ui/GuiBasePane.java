@@ -12,7 +12,6 @@ package engine.lua.type.object.insts.ui;
 
 import org.luaj.vm2.LuaValue;
 
-import engine.lua.type.data.Color3;
 import engine.lua.type.data.Color4;
 import lwjgui.geometry.Pos;
 import lwjgui.paint.Color;

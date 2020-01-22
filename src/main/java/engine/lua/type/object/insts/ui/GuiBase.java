@@ -90,22 +90,46 @@ public abstract class GuiBase extends Instance implements TreeViewable {
 		});
 	}
 	
+	/**
+	 * Mouse Clicked Event. Fires when the mouse is released when this node is hovered,
+	 * but only when the mouse was previously pressed while this node was hovered too.
+	 * The mouse button (integer) is passed as the first VARARG.
+	 * @return
+	 */
 	public LuaEvent getMouseClickedEvent() {
 		return (LuaEvent)this.get(C_CLICKEDEVENT);
 	}
 	
+	/**
+	 * Mouse Entered event. Fires when the mouse enters the rectangle bounds of this gui object.
+	 * @return
+	 */
 	public LuaEvent getMouseEnteredEvent() {
 		return (LuaEvent)this.get(C_MOUSEENTERED);
 	}
 	
+	/**
+	 * Mouse Exited Event. Fires when the mouse leaves the rectangle bounds of this gui object.
+	 * @return
+	 */
 	public LuaEvent getMouseExitedEvent() {
 		return (LuaEvent)this.get(C_MOUSEEXITED);
 	}
 	
+	/**
+	 * Mouse Pressed Event. Fires when the mouse presses down when this gui object is hovered.
+	 * The mouse button (integer) is passed as the first VARARG.
+	 * @return
+	 */
 	public LuaEvent getMousePressedEvent() {
 		return (LuaEvent)this.get(C_MOUSEPRESSED);
 	}
 	
+	/**
+	 * Mouse Released Event. Fires when the mouse is released when this gui object is hovered.
+	 * The mouse button (integer) is passed as the first VARARG.
+	 * @return
+	 */
 	public LuaEvent getMouseReleasedEvent() {
 		return (LuaEvent)this.get(C_MOUSERELEASED);
 	}
@@ -205,11 +229,11 @@ public abstract class GuiBase extends Instance implements TreeViewable {
 			});
 			node.setOnMousePressed((event)->{
 				if ( Game.isRunning() )
-					getMousePressedEvent().fire();
+					getMousePressedEvent().fire(LuaValue.valueOf(event.button));
 			});
 			node.setOnMouseReleased((event)->{
 				if ( Game.isRunning() )
-					getMouseReleasedEvent().fire();
+					getMouseReleasedEvent().fire(LuaValue.valueOf(event.button));
 			});
 		}
 		

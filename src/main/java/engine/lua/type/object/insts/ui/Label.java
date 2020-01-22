@@ -98,8 +98,8 @@ public class Label extends GuiBase {
 	 * Set the Text color for this frame.
 	 * @param color
 	 */
-	public void setTextColor(Color3 color) {
-		this.set(C_TEXTCOLOR, new Color3(color));
+	public void setTextColor(Color4 color) {
+		this.set(C_TEXTCOLOR, new Color4(color));
 	}
 
 	@Override
