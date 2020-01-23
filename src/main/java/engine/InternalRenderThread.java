@@ -41,6 +41,9 @@ public class InternalRenderThread extends Thread implements IEngineThread {
 
 	private ClientEngine client;
 
+	private int targetWidth, targetHeight;
+	private boolean resizePipeline;
+
 	public InternalRenderThread(ClientEngine client) {
 		this.client = client;
 		super.setName("Render Thread");
@@ -94,6 +97,11 @@ public class InternalRenderThread extends Thread implements IEngineThread {
 				if (runService == null)
 					return;
 
+				if (!window.wasResized() && resizePipeline) {
+					pipeline.setSize(targetWidth, targetHeight);
+					resizePipeline = false;
+				}
+
 				runService.renderPreEvent().fire(LuaValue.valueOf(delta));
 				runService.renderSteppedEvent().fire(LuaValue.valueOf(delta));
 				pipeline.render();
@@ -118,6 +126,14 @@ public class InternalRenderThread extends Thread implements IEngineThread {
 		TaskManager.runAndStopRenderThread();
 		window.dispose();
 		LWJGUI.removeThreadWindow();
+	}
+
+	public void resizedPipeline(int width, int height) {
+		if (this.targetWidth == width && this.targetHeight == height)
+			return;
+		this.targetWidth = width;
+		this.targetHeight = height;
+		this.resizePipeline = true;
 	}
 
 	public Window getWindow() {

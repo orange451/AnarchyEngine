@@ -61,6 +61,5 @@ public class IdeGameView extends IdePane {
 	public void render(Context context) {
 		fps.setText(InternalRenderThread.fps + " fps");
 		super.render(context);
-		pipeline.setSize((int) gameView.getWidth(), (int) gameView.getHeight());
 	}
 }

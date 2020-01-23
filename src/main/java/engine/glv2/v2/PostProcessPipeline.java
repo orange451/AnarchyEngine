@@ -41,12 +41,16 @@ import static org.lwjgl.opengl.GL30C.GL_RGBA16F;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.joml.Vector2i;
+
+import engine.ClientEngine;
 import engine.glv2.objects.Framebuffer;
 import engine.glv2.objects.FramebufferBuilder;
 import engine.glv2.objects.Texture;
 import engine.glv2.objects.TextureBuilder;
 import engine.glv2.objects.VAO;
 import engine.glv2.shaders.FinalShader;
+import lwjgui.scene.Context;
 import lwjgui.scene.layout.StackPane;
 import lwjgui.style.BackgroundNVGImage;
 
@@ -93,9 +97,30 @@ public abstract class PostProcessPipeline {
 			pass.init(width, height);
 		finalShader = new FinalShader("postprocess/Final");
 		finalShader.init();
-		displayPane = new StackPane();
+		displayPane = new StackPane() {
+			private Vector2i size = new Vector2i();
+			private boolean needsResize;
+
+			@Override
+			protected void resize() {
+				super.resize();
+				int width = (int) getWidth();
+				int height = (int) getHeight();
+				if (!needsResize)
+					needsResize = !size.equals(width, height);
+				size.set(width, height);
+			}
+
+			@Override
+			public void render(Context context) {
+				super.render(context);
+				if (!needsResize)
+					ClientEngine.renderThread.resizedPipeline(size.x, size.y);
+				needsResize = false;
+			}
+		};
 		displayPane.setBackground(image = new BackgroundNVGImage(nvgTexture));
-		displayPane.setMinSize(1, 1);
+		displayPane.setMinSize(2, 2);
 		displayPane.setFillToParentHeight(true);
 		displayPane.setFillToParentWidth(true);
 	}

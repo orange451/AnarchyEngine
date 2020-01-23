@@ -116,7 +116,7 @@ public class GLRenderer implements IPipeline {
 	private boolean initialized;
 
 	private Window window;
-	
+
 	public GLRenderer(Window window) {
 		this.window = window;
 		useARBClipControl = GL.getCapabilities().GL_ARB_clip_control;
@@ -390,6 +390,8 @@ public class GLRenderer implements IPipeline {
 
 	public void setSize(int width, int height) {
 		if (!enabled)
+			return;
+		if (width <= 2 || height <= 2)
 			return;
 		if (this.width == width && this.height == height)
 			return;

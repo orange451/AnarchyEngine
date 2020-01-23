@@ -10,16 +10,12 @@
 
 package engine;
 
-import lwjgui.scene.Window;
 import lwjgui.scene.layout.StackPane;
 
 public abstract class ClientRunner extends ClientEngine {
 
-	private Window window;
-
 	@Override
 	public void setupEngine() {
-		window = renderThread.getWindow();
 		StackPane displayPane = renderThread.getPipeline().getDisplayPane();
 		renderThread.getWindow().getScene().setRoot(displayPane);
 		displayPane.getChildren().add(renderThread.getClientUI());
@@ -37,7 +33,6 @@ public abstract class ClientRunner extends ClientEngine {
 
 	@Override
 	public void render() {
-		renderThread.getPipeline().setSize(window.getWidth(), window.getHeight());
 	}
 
 	@Override
