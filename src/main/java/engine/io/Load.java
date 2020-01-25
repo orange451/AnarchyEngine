@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.UUID;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -119,11 +120,11 @@ public class Load {
 		// Read in the objects from JSON
 		ArrayList<LoadedInstance> instances = new ArrayList<LoadedInstance>();
 		HashMap<Long, LoadedInstance> instancesMap = new HashMap<>();
-		HashMap<Long, Instance> unmodifiedInstances = null;
+		Map<Long, Instance> unmodifiedInstances = null;
 		readObjects(instances, instancesMap, obj);
 		
 		if ( removeUnusedInstances )
-			unmodifiedInstances = Game.game().getInstanceMap();
+			unmodifiedInstances = Game.game().getInstanceMapOld();
 		
 		try {
 			List<LoadedInstance> services = new ArrayList<LoadedInstance>();
@@ -245,27 +246,42 @@ public class Load {
 		root.Name = (String) obj.get("Name");
 		root.Reference = loadReference("Reference",obj);
 		root.Parent = loadReference("Parent",obj);
+		root.uuid = (String) obj.get("UUID");
 		
 		if ( root.ClassName.equals("Game") ) {
 			root.instance = Game.game();
 		} else {
+			// Search directly in game for instance...
 			LuaValue temp = Game.game().get(root.ClassName);
+			
+			// Not found
 			if ( temp.isnil() ) {
+				
+				// Check if SID is defined in properties
 				Object SIDRef = ((JSONObject)obj.get("Properties")).get("SID");
 				if ( SIDRef != null ) {
+					
+					// Match instance to server instance
 					Instance inGame = Game.getInstanceFromSID(Long.parseLong(SIDRef.toString()));
 					if ( inGame != null && !inGame.isDestroyed() && inGame.getClassName().eq_b(LuaValue.valueOf(root.ClassName)) ) {
 						root.instance = inGame;
 					} else {
+						// Create new
 						root.instance = (Instance) Instance.instance(root.ClassName);
 					}
 				} else {
+					// Create new
 					root.instance = (Instance) Instance.instance(root.ClassName);
 				}
 			} else {
+				// Found... probably a service.
 				root.instance = (Instance) temp;
 			}
 		}
+		
+		// Set UUID. Will be verified when added to GameECS later.
+		if ( root.uuid != null && root.uuid.length() > 0 )
+			root.instance.setUUID(UUID.fromString(root.uuid));
 		
 		if ( obj.get("Properties") != null ) {
 			JSONObject properties = (JSONObject) obj.get("Properties");
@@ -312,6 +328,7 @@ public class Load {
 		public long Reference;
 		public long Parent;
 		public Instance instance;
+		private String uuid;
 		
 		public HashMap<String,PropertyValue<?>> properties = new HashMap<String,PropertyValue<?>>();
 	}

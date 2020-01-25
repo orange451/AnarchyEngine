@@ -869,4 +869,16 @@ public class Game implements Tickable {
 		Game.copy(instances);
 		deleteSelection();
 	}
+
+	/**
+	 * Try to generate random UUID. First one generated SHOULD not have collisions, but wrap in a while loop to make sure!
+	 * @return
+	 */
+	public static UUID generateUUID() {
+		UUID tuid = null;
+		while ( tuid == null || Game.getInstanceFromUUID(tuid) != null )
+			tuid = UUID.randomUUID();
+		
+		return tuid;
+	}
 }

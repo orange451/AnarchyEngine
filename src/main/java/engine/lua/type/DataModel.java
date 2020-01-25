@@ -48,7 +48,7 @@ public abstract class DataModel extends LuaDatatype {
 	private static final LuaValue C_NAME = LuaValue.valueOf("Name");
 	private static final LuaValue C_PARENT = LuaValue.valueOf("Parent");
 	
-	protected final UUID uuid;
+	protected UUID uuid;
 	
 	protected boolean initialized;
 	protected boolean destroyed;
@@ -107,8 +107,6 @@ public abstract class DataModel extends LuaDatatype {
 
 		this.internalName = name;
 		this.initialized = true;
-		
-		this.uuid = UUID.randomUUID();
 	}
 	
 	public LuaValue setmetatable(LuaValue metatable) {
@@ -301,11 +299,19 @@ public abstract class DataModel extends LuaDatatype {
 	
 	/**
 	 * Returns the UUID for this DataModel. A UUID is unique to a specific DataModel/Instance in memory.
-	 * It will be different each time the game loads, but will remain constant for duration of the game.
+	 * It MAY be different each time the game loads, but will remain constant for duration of the game.
 	 * @return
 	 */
 	public UUID getUUID() {
 		return this.uuid;
+	}
+
+	/**
+	 * Sets the DataModel's UUID. See {@link #getUUID()}.
+	 * @param uuid
+	 */
+	public void setUUID(UUID uuid) {
+		this.uuid = uuid;
 	}
 	
 	private void onKeyChange(LuaValue key, LuaValue value, LuaValue oldValue) {

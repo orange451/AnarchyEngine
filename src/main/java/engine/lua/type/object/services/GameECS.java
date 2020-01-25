@@ -11,6 +11,7 @@
 package engine.lua.type.object.services;
 
 import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 import org.luaj.vm2.LuaValue;
@@ -24,8 +25,8 @@ import engine.lua.type.object.Service;
 
 public class GameECS extends Instance {
 	
-	public HashMap<Long,Instance> serverSidedInstances = new HashMap<Long,Instance>();
-	public HashMap<UUID,Instance> uniqueInstances = new HashMap<>();
+	public Map<Long,Instance> serverSidedInstances = new HashMap<>();
+	public Map<UUID,Instance> uniqueInstances = new HashMap<>();
 	
 	public GameECS() {
 		super("Game");
@@ -60,7 +61,11 @@ public class GameECS extends Instance {
 						Instance inst = (Instance) object;
 						long sid = inst.getSID();
 						
+						// Remove server sided instance
 						serverSidedInstances.remove(sid);
+						
+						// Remove unique reference
+						uniqueInstances.remove(inst.getUUID());
 					}
 				}
 				return LuaValue.NIL;
@@ -73,17 +78,29 @@ public class GameECS extends Instance {
 				synchronized(serverSidedInstances) {
 					if ( object instanceof Instance ) {
 						Instance inst = (Instance)object;
-						if ( Game.isServer() ) {
+						
+						// Generate UUID
+						if ( inst.getUUID() == null ) {
+							UUID tuid = Game.generateUUID();
+							inst.setUUID(tuid);
+							uniqueInstances.put(tuid, inst);
+						} else {
+							Instance t = uniqueInstances.get(inst.getUUID());
+							if ( t != inst ) {
+								UUID tuid = Game.generateUUID();
+								inst.setUUID(tuid);
+								uniqueInstances.put(tuid, inst);
+							}
+						}
+						
+						// Generate server sided id if server instance
+						if ( Game.isServer() )
 							inst.rawset(C_SID, LuaValue.valueOf(Game.generateSID()));
-						}
 						
+						// Get server id and store it
 						long sid = inst.getSID();
-						
-						if ( sid != -1 ) {
+						if ( sid != -1 )
 							serverSidedInstances.put(sid, inst);
-						}
-						
-						uniqueInstances.put(inst.getUUID(), inst);
 					}
 				}
 				return LuaValue.NIL;
@@ -95,9 +112,17 @@ public class GameECS extends Instance {
 		setInstanceable(false);
 	}
 	
-	@SuppressWarnings("unchecked")
-	public HashMap<Long, Instance> getInstanceMap() {
-		return (HashMap<Long, Instance>) serverSidedInstances.clone();
+	@Deprecated
+	public Map<Long, Instance> getInstanceMapOld() {
+		Map<Long, Instance> map = new HashMap<>();
+		map.putAll(this.serverSidedInstances);
+		return map;
+	}
+	
+	public Map<UUID, Instance> getInstanceMap() {
+		Map<UUID, Instance> map = new HashMap<>();
+		map.putAll(this.uniqueInstances);
+		return map;
 	}
 	
 	public String getName() {

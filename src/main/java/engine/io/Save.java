@@ -43,7 +43,6 @@ import engine.lua.type.object.insts.Mesh;
 import engine.util.FileUtils;
 import ide.IDE;
 import lwjgui.LWJGUI;
-import lwjgui.LWJGUIUtil;
 import lwjgui.geometry.Pos;
 import lwjgui.scene.Scene;
 import lwjgui.scene.Window;
@@ -205,7 +204,7 @@ public class Save {
 
 		// Start saving process
 		REFID = 0;		
-		JSONObject gameJSON = getInstanceJSONRecursive(false, true, Game.game());
+		JSONObject gameJSON = getInstanceJSONRecursive( true, true, Game.game());
 		Game.changes = false;
 
 		try {
@@ -231,7 +230,7 @@ public class Save {
 	 * @return
 	 */
 	public static JSONObject getGameJSON() {
-		return getInstanceJSONRecursive(true, true, Game.game());
+		return getInstanceJSONRecursive( true, false, Game.game());
 	}
 	
 	/**
@@ -239,12 +238,12 @@ public class Save {
 	 * @param instance
 	 * @return
 	 */
-	public static JSONObject getInstanceJSONRecursive(boolean saveArchivable, boolean saveSID, Instance instance) {
+	public static JSONObject getInstanceJSONRecursive(boolean saveSID, boolean savingLocally, Instance instance) {
 		JSONObject ret = null;
 		try {
 			instanceMap = new HashMap<>();
-			inst = getSavedInstances(saveArchivable, saveSID, instance);
-			ret = inst.getFirst().toJSON(saveArchivable, saveSID);
+			inst = getSavedInstances( saveSID, savingLocally, instance);
+			ret = inst.getFirst().toJSON(saveSID, savingLocally);
 		} catch(Exception e ) {
 			e.printStackTrace();
 		}
@@ -257,14 +256,14 @@ public class Save {
 	 * @param instance
 	 * @return
 	 */
-	public static JSONObject getInstanceJSON(boolean saveArchivable, boolean saveSID, Instance instance) {
+	public static JSONObject getInstanceJSON(boolean saveSID, boolean savingLocally, Instance instance) {
 		JSONObject ret = null;
 		try {
 			
-			if ( !instance.isArchivable() && !saveArchivable )
-				return ret;
+			if ( !instance.isArchivable() && savingLocally )
+				return null;
 
-			ret = new SavedInstance(saveSID, instance).toJSON(saveArchivable, saveSID);
+			ret = new SavedInstance(saveSID, instance).toJSON(saveSID, savingLocally);
 		} catch(Exception e ) {
 			e.printStackTrace();
 		}
@@ -272,10 +271,10 @@ public class Save {
 		return ret;
 	}
 
-	private static LinkedList<SavedInstance> getSavedInstances(boolean saveArchivable, boolean saveSID, Instance root) {
+	private static LinkedList<SavedInstance> getSavedInstances(boolean saveSID, boolean savingLocally, Instance root) {
 		LinkedList<SavedInstance> ret = new LinkedList<SavedInstance>();
 		
-		if ( !root.isArchivable() && !saveArchivable )
+		if ( !root.isArchivable() && savingLocally )
 			return ret;
 
 		SavedInstance savedRoot = new SavedInstance(saveSID, root);
@@ -285,7 +284,7 @@ public class Save {
 		List<Instance> children = root.getChildren();
 		for (int i = 0; i < children.size(); i++) {
 			Instance child = children.get(i);
-			List<SavedInstance> t = getSavedInstances(saveArchivable, saveSID, child);
+			List<SavedInstance> t = getSavedInstances(saveSID, savingLocally, child);
 			
 			ListIterator<SavedInstance> listIterator = t.listIterator();
 			while(listIterator.hasNext()) {
@@ -311,8 +310,8 @@ public class Save {
 		}
 
 		@SuppressWarnings("unchecked")
-		public JSONObject toJSON(boolean saveArchivable, boolean saveSID) {
-			if ( !instance.isArchivable() && !saveArchivable )
+		public JSONObject toJSON(boolean saveSID, boolean savingLocally) {
+			if ( !instance.isArchivable() && savingLocally )
 				return null;
 			
 			SavedInstance parent = null;
@@ -329,7 +328,7 @@ public class Save {
 
 				SavedInstance sinst = instanceMap.get(child);
 				if ( sinst != null ) {
-					JSONObject json = sinst.toJSON(saveArchivable, saveSID);
+					JSONObject json = sinst.toJSON(saveSID, savingLocally);
 					if ( json != null ) {
 						childArray.add(json);
 					}
@@ -340,21 +339,33 @@ public class Save {
 			LuaValue[] fields = instance.getFields();
 			for (int i = 0; i < fields.length; i++) {
 				String field = fields[i].toString();
+				// These are default params
 				if ( field.equals("Name") || field.equals("ClassName") || field.equals("Parent") )
 					continue;
 				
+				// Don't write SID if we're told not to!
 				if ( field.equals("SID") && !saveSID )
 					continue;
 
+				// Protect the fields of non replicatable objects being sent when running.
 				if ( !field.equals("SID") && Game.isRunning() && instance instanceof NonReplicatable ) {
-					// Protect the fields of non replicatable objects being sent when running.
 					p.put(field, fieldToJSONBlank(instance.get(field)));
 				} else {
 					p.put(field, fieldToJSON(instance.get(field)));
 				}
+				
+				// Special case to NOT write "Source" only when writing a project. Instead put write it externally...
+				if ( field.equals("Source") && savingLocally ) {
+					String source = instance.get(field).tojstring();
+					p.put(field, fieldToJSONBlank(instance.get(field)));
+					
+					//writeSourceToFile();
+				}
 			}
 
 			JSONObject j = new JSONObject();
+			if ( instance.getUUID() != null )
+				j.put("UUID", instance.getUUID().toString());
 			j.put("Reference", reference);
 			j.put("ClassName", instance.get("ClassName").toString());
 			j.put("Name", instance.getName());
