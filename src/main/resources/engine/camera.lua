@@ -77,7 +77,7 @@ RunService.RenderStepped:Connect(function(delta)
 		
 		-- Adjust Yaw and Pitch based on mouse delta
 		camera.Yaw = camera.Yaw - mouseDelta.X/CAMERA_SENSITIVITY
-		camera.Pitch = math.min( math.pi/2-EPSILON, math.max( -math.pi/2+EPSILON, camera.Pitch - mouseDelta.Y/CAMERA_SENSITIVITY ) )
+		camera.Pitch = math.min( math.pi/2-EPSILON, math.max( -math.pi/2+EPSILON, camera.Pitch + mouseDelta.Y/CAMERA_SENSITIVITY ) )
 	else
 		if ( UserInputService.LockMouse ) then
 			UserInputService.LockMouse = false
