@@ -17,6 +17,7 @@ import org.lwjgl.glfw.GLFWErrorCallback;
 
 import engine.tasks.ThreadUtils;
 import engine.util.GLCompat;
+import engine.util.JVMUtil;
 import ide.layout.windows.ErrorWindow;
 import lwjgui.glfw.ClientSync;
 import lwjgui.glfw.CustomCursor;
@@ -36,6 +37,7 @@ public abstract class ClientEngine {
 	protected String[] args;
 
 	public ClientEngine(String... args) {
+		JVMUtil.restartJVM(true, true, null);
 		this.args = args;
 		game = new Game();
 		init();

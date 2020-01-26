@@ -10,9 +10,19 @@
 
 package engine;
 
+import lwjgui.geometry.Insets;
+import lwjgui.geometry.Pos;
+import lwjgui.paint.Color;
+import lwjgui.scene.control.Label;
 import lwjgui.scene.layout.StackPane;
 
 public abstract class ClientRunner extends ClientEngine {
+
+	public ClientRunner(String... args) {
+		super(args);
+	}
+
+	private Label fps;
 
 	@Override
 	public void setupEngine() {
@@ -20,7 +30,14 @@ public abstract class ClientRunner extends ClientEngine {
 		renderThread.getWindow().getScene().setRoot(displayPane);
 		displayPane.getChildren().add(renderThread.getClientUI());
 
-		game.setServer(false);
+		fps = new Label("fps");
+		fps.setTextFill(Color.WHITE);
+		fps.setMouseTransparent(true);
+
+		displayPane.getChildren().add(fps);
+		displayPane.setAlignment(Pos.TOP_LEFT);
+		displayPane.setPadding(new Insets(2, 2, 2, 2));
+
 		// Tell the game to run
 		InternalGameThread.runLater(() -> {
 			loadScene(args);
@@ -33,6 +50,7 @@ public abstract class ClientRunner extends ClientEngine {
 
 	@Override
 	public void render() {
+		fps.setText(InternalRenderThread.fps + " fps");
 	}
 
 	@Override

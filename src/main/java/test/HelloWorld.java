@@ -14,7 +14,7 @@ import engine.lua.type.object.insts.Mesh;
 import engine.lua.type.object.insts.PointLight;
 import engine.lua.type.object.insts.Prefab;
 
-public class HelloWorld  extends ClientRunner  {
+public class HelloWorld extends ClientRunner  {
 	
 	@Override
 	public void loadScene(String[] args) {

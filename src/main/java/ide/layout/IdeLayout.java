@@ -13,10 +13,14 @@ package ide.layout;
 import org.json.simple.JSONObject;
 
 import engine.ClientEngine;
+import engine.ClientLocalRunner;
+import engine.ClientServerRunner;
 import engine.Game;
 import engine.InternalGameThread;
 import engine.io.Load;
 import engine.io.Save;
+import engine.util.JVMUtil;
+import ide.IDE;
 import ide.layout.windows.IdeConsole;
 import ide.layout.windows.IdeExplorer;
 import ide.layout.windows.IdeGameView;
@@ -171,7 +175,7 @@ public class IdeLayout {
 			if ( !saved )
 				return;
 			
-			//JVMUtil.newJVM(ServerApplication.class, new String[] {Game.saveFile});
+			JVMUtil.newJVM(ClientServerRunner.class, new String[] {Game.saveFile});
 		});
 		menuEdit.getItems().add(t2);
 		
@@ -186,7 +190,7 @@ public class IdeLayout {
 			if ( !saved )
 				return;
 			
-			//JVMUtil.newJVM(IDE.class, new String[] {"server",Game.saveFile});
+			JVMUtil.newJVM(IDE.class, new String[] {"server",Game.saveFile});
 		});
 		menuEdit.getItems().add(ts);
 		
@@ -203,7 +207,7 @@ public class IdeLayout {
 			if ( !saved )
 				return;
 			
-			//JVMUtil.newJVM(ClientApplication.class, new String[] {Game.saveFile});
+			JVMUtil.newJVM(ClientLocalRunner.class, new String[] {Game.saveFile});
 		});
 		menuEdit.getItems().add(t);
 		
@@ -217,7 +221,7 @@ public class IdeLayout {
 			if ( !saved )
 				return;
 			
-			//JVMUtil.newJVM(IDE.class, new String[] {"client",Game.saveFile});
+			JVMUtil.newJVM(IDE.class, new String[] {"client",Game.saveFile});
 		});
 		menuEdit.getItems().add(tc);
 		
