@@ -65,6 +65,7 @@ public class LuaEngine {
 			loadDataTypes("engine.lua.type.object.insts.animation");
 			loadDataTypes("engine.lua.type.object.insts.values");
 			loadDataTypes("engine.lua.type.object.insts.script");
+			loadDataTypes("engine.lua.type.object.insts.light");
 		}
 	}
 	
