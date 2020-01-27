@@ -18,6 +18,7 @@ import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.ThreeArgFunction;
 import engine.Game;
 import engine.GameSubscriber;
+import engine.InternalGameThread;
 import engine.InternalRenderThread;
 import engine.lua.lib.EnumType;
 import engine.lua.network.InternalClient;
@@ -114,24 +115,26 @@ public abstract class PhysicsBase extends Instance implements GameSubscriber {
 		Game.getGame().subscribe(this);
 		
 		// Update matrices
-		InternalRenderThread.runLater(()->{
-			Game.runService().renderPreEvent().connect((args)->{
-				PhysicsObjectInternal tempPhys = this.physics;
-				GameObject tempLink = this.linked;
-				
-				if ( tempPhys != null ) {
-					Matrix4f worldMat = lastWorldMatrix;//tempPhys.getWorldMatrix();
+		InternalGameThread.runLater(()->{
+			InternalRenderThread.runLater(()->{
+				Game.runService().renderPreEvent().connect((args)->{
+					PhysicsObjectInternal tempPhys = this.physics;
+					GameObject tempLink = this.linked;
 					
-					if ( tempLink != null ) {
-						linked.rawset(C_WORLDMATRIX, new Matrix4(worldMat) );
-						//((Matrix4)linked.rawget(C_WORLDMATRIX)).setInternal(worldMat);
+					if ( tempPhys != null ) {
+						Matrix4f worldMat = lastWorldMatrix;//tempPhys.getWorldMatrix();
+						
+						if ( tempLink != null ) {
+							linked.rawset(C_WORLDMATRIX, new Matrix4(worldMat) );
+							//((Matrix4)linked.rawget(C_WORLDMATRIX)).setInternal(worldMat);
+						}
+						//((Matrix4)this.rawget(C_WORLDMATRIX)).setInternal(worldMat);
+						this.rawset(C_WORLDMATRIX, new Matrix4(worldMat) );
+					} else if ( tempLink != null ) {
+						this.rawset(C_WORLDMATRIX, new Matrix4((Matrix4)linked.get(C_WORLDMATRIX)) );
+						//this.rawset(C_WORLDMATRIX, linked.get(C_WORLDMATRIX));
 					}
-					//((Matrix4)this.rawget(C_WORLDMATRIX)).setInternal(worldMat);
-					this.rawset(C_WORLDMATRIX, new Matrix4(worldMat) );
-				} else if ( tempLink != null ) {
-					this.rawset(C_WORLDMATRIX, new Matrix4((Matrix4)linked.get(C_WORLDMATRIX)) );
-					//this.rawset(C_WORLDMATRIX, linked.get(C_WORLDMATRIX));
-				}
+				});
 			});
 		});
 		

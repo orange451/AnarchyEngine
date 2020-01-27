@@ -139,33 +139,35 @@ public class Load {
 		
 		// Load external stuff
 		File scripts = new File(new File(path).getParent() + File.separator + "Resources" + File.separator + "Scripts");
-		try (Stream<Path> walk = Files.walk(Paths.get(scripts.getAbsolutePath()))) {
-			List<Path> result = walk.filter(Files::isRegularFile).map(x -> x).collect(Collectors.toList());
-			
-			for (int i = 0; i < result.size(); i++) {
-				File f = result.get(i).toFile();
-				// Get uuid
-				String uuidString = FileUtils.getFileNameWithoutExtension(FileUtils.getFileNameFromPath(f.getAbsolutePath()));
-				UUID uuid = UUID.fromString(uuidString);
-				System.out.println("Attempting to read in source data for instance: " + uuidString);
+		if ( scripts.exists() ) {
+			try (Stream<Path> walk = Files.walk(Paths.get(scripts.getAbsolutePath()))) {
+				List<Path> result = walk.filter(Files::isRegularFile).map(x -> x).collect(Collectors.toList());
 				
-				// Read in source
-				JSONParser parser = new JSONParser();
-				JSONObject externalJSON = (JSONObject) parser.parse(new FileReader(f));
-				String source = externalJSON.get("Source").toString();
-				
-				// Make sure proper instance exists
-				Instance inst = Game.getInstanceFromUUID(uuid);
-				System.out.println(inst);
-				if ( inst != null && inst.containsField(LuaValue.valueOf("Source")) ) {
-					System.out.println(source);
+				for (int i = 0; i < result.size(); i++) {
+					File f = result.get(i).toFile();
+					// Get uuid
+					String uuidString = FileUtils.getFileNameWithoutExtension(FileUtils.getFileNameFromPath(f.getAbsolutePath()));
+					UUID uuid = UUID.fromString(uuidString);
+					System.out.println("Attempting to read in source data for instance: " + uuidString);
 					
-					// Set the source!
-					inst.set(LuaValue.valueOf("Source"), source);
+					// Read in source
+					JSONParser parser = new JSONParser();
+					JSONObject externalJSON = (JSONObject) parser.parse(new FileReader(f));
+					String source = externalJSON.get("Source").toString();
+					
+					// Make sure proper instance exists
+					Instance inst = Game.getInstanceFromUUID(uuid);
+					System.out.println(inst);
+					if ( inst != null && inst.containsField(LuaValue.valueOf("Source")) ) {
+						System.out.println(source);
+						
+						// Set the source!
+						inst.set(LuaValue.valueOf("Source"), source);
+					}
 				}
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
-		} catch (Exception e) {
-			e.printStackTrace();
 		}
 		
 		// Tell game we're loaded
