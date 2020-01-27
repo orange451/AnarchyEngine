@@ -17,6 +17,7 @@ For support, see: http://manta.games/
 - [luaj (JSE)](https://github.com/luaj/luaj/releases)
 
 # Screenshots
+![bouncy](https://i.imgur.com/q3RHHt1.gif)
 ![pong](https://i.imgur.com/EBIDL8M.gif)
 ![editor1](https://i.imgur.com/fx1bRnx.png)
 ![editor2](https://i.imgur.com/lt9aq8a.png)
