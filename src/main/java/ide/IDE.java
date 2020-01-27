@@ -46,9 +46,6 @@ public class IDE extends ClientEngine {
 		
 		//Theme.setTheme(new ThemeDark());
 		
-		// Setup mane IDE layout
-		layout = new IdeLayout(background);
-		
 		// If someone wants to load a game directly
 		if ( args != null && args.length > 0 ) {
 			
@@ -77,6 +74,9 @@ public class IDE extends ClientEngine {
 		}
 		
 		renderThread.getPipeline().setRenderableWorld(Game.workspace());
+		
+		// Setup mane IDE layout
+		layout = new IdeLayout(background);
 	}
 	
 	protected boolean shouldLockMouse() {

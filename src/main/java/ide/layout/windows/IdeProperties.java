@@ -93,19 +93,20 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 		update(true);
 		
 		AtomicLong last = new AtomicLong();
-		Game.runService().renderSteppedEvent().connect((args)->{
-			long now = System.currentTimeMillis();
-			long then = last.get();
-			long elapsed = now-then;
-			
-			if ( elapsed > 20 ) {
-				if ( requiresUpdate ) {
-					update(true);
+		LWJGUI.runLater(()->{
+			Game.runService().renderSteppedEvent().connect((args)->{
+				long now = System.currentTimeMillis();
+				long then = last.get();
+				long elapsed = now-then;
+				
+				if ( elapsed > 20 ) {
+					if ( requiresUpdate ) {
+						update(true);
+					}
+					last.set(System.currentTimeMillis());
 				}
-				last.set(System.currentTimeMillis());
-			}
+			});
 		});
-		
 		// Add user controls
 		StandardUserControls.bind(this);
 	}
