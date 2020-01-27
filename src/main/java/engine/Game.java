@@ -26,8 +26,6 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.luaj.vm2.LuaValue;
-import org.lwjgl.glfw.GLFW;
-
 import engine.io.Load;
 import engine.io.Save;
 import engine.lua.LuaEngine;
@@ -42,7 +40,6 @@ import engine.lua.type.object.insts.Player;
 import engine.lua.type.object.insts.PlayerGui;
 import engine.lua.type.object.insts.PlayerScripts;
 import engine.lua.type.object.insts.script.GlobalScript;
-import engine.lua.type.object.insts.ui.Gui;
 import engine.lua.type.object.services.Assets;
 import engine.lua.type.object.services.Connections;
 import engine.lua.type.object.services.Core;
@@ -62,7 +59,6 @@ import engine.lua.type.object.services.Storage;
 import engine.lua.type.object.services.UserInputService;
 import engine.lua.type.object.services.Workspace;
 import engine.observer.Tickable;
-import ide.IDE;
 
 public class Game implements Tickable {
 	private static Game game;

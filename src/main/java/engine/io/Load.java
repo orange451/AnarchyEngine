@@ -10,9 +10,14 @@
 
 package engine.io;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.io.IOException;
 import java.lang.reflect.Method;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -21,6 +26,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -28,20 +35,41 @@ import org.json.simple.parser.JSONParser;
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.jse.CoerceJavaToLua;
 import org.lwjgl.PointerBuffer;
-import org.lwjgl.glfw.GLFW;
 import org.lwjgl.system.MemoryStack;
 import org.lwjgl.util.nfd.NativeFileDialog;
 
 import engine.Game;
+import engine.InternalGameThread;
 import engine.lua.type.LuaValuetype;
 import engine.lua.type.object.Instance;
 import engine.lua.type.object.Service;
+import engine.util.FileIO;
 import engine.util.FileUtils;
-import ide.IDE;
 import ide.layout.windows.ErrorWindow;
+import lwjgui.scene.WindowManager;
 
 public class Load {
 	
+	/**
+	 * Load project without losing any changes. POTENTIALLY OPENS FILE WINDOW -- THREAD SAFE!
+	 */
+	public static void loadSafe() {
+		Runnable r = () -> {
+			WindowManager.runLater(() -> {
+				Load.load();
+			});
+		};
+		
+		if ( Game.changes ) {
+			Save.requestSave(r);
+		} else {
+			r.run();
+		}
+	}
+	
+	/**
+	 * Force load project. OPENS FILE WINDOW -- NOT THREAD SAFE.
+	 */
 	public static void load() {
 		String path = "";
 		MemoryStack stack = MemoryStack.stackPush();
@@ -56,14 +84,27 @@ public class Load {
 		}
 		stack.pop();
 		
+		final String finalPath = path;
+		
 		// Load the desired path
-		load(path);
+		InternalGameThread.runLater(()->{
+			load(finalPath);
+		});
 	}
 	
+	/**
+	 * Force load a specified path.
+	 * @param path
+	 */
 	public static void load(String path) {
 		load(path, true);
 	}
 	
+	/**
+	 * Force load a specified path. Reset flag used to unload currently loaded resources (if true)
+	 * @param path
+	 * @param reset
+	 */
 	public static void load(String path, boolean reset) {
 		// Load from JSON file
 		boolean loadedJSON = false;
@@ -95,6 +136,37 @@ public class Load {
 		// Load the json
 		if ( parseJSON(obj) == null )
 			return;
+		
+		// Load external stuff
+		File scripts = new File(new File(path).getParent() + File.separator + "Resources" + File.separator + "Scripts");
+		try (Stream<Path> walk = Files.walk(Paths.get(scripts.getAbsolutePath()))) {
+			List<Path> result = walk.filter(Files::isRegularFile).map(x -> x).collect(Collectors.toList());
+			
+			for (int i = 0; i < result.size(); i++) {
+				File f = result.get(i).toFile();
+				// Get uuid
+				String uuidString = FileUtils.getFileNameWithoutExtension(FileUtils.getFileNameFromPath(f.getAbsolutePath()));
+				UUID uuid = UUID.fromString(uuidString);
+				System.out.println("Attempting to read in source data for instance: " + uuidString);
+				
+				// Read in source
+				JSONParser parser = new JSONParser();
+				JSONObject externalJSON = (JSONObject) parser.parse(new FileReader(f));
+				String source = externalJSON.get("Source").toString();
+				
+				// Make sure proper instance exists
+				Instance inst = Game.getInstanceFromUUID(uuid);
+				System.out.println(inst);
+				if ( inst != null && inst.containsField(LuaValue.valueOf("Source")) ) {
+					System.out.println(source);
+					
+					// Set the source!
+					inst.set(LuaValue.valueOf("Source"), source);
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		
 		// Tell game we're loaded
 		if ( reset )

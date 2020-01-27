@@ -11,6 +11,7 @@
 package engine.io;
 
 import java.io.BufferedOutputStream;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -41,6 +42,7 @@ import engine.lua.type.object.Instance;
 import engine.lua.type.object.TreeInvisible;
 import engine.lua.type.object.insts.Mesh;
 import engine.tasks.TaskManager;
+import engine.util.FileIO;
 import engine.util.FileUtils;
 import ide.IDE;
 import lwjgui.LWJGUI;
@@ -136,6 +138,12 @@ public class Save {
 		});
 	}
 	
+	public static void saveAsSafe() {
+		WindowManager.runLater(()->{
+			save(true);
+		});
+	}
+	
 	public static boolean save() {
 		return save(false);
 	}
@@ -217,6 +225,9 @@ public class Save {
 		
 		// Write new resources
 		writeResources(resourcesFolder);
+		
+		// Write scripts
+		writeScripts(resourcesFolder);
 
 		// Start saving process
 		REFID = 0;		
@@ -374,8 +385,6 @@ public class Save {
 				if ( field.equals("Source") && savingLocally ) {
 					String source = instance.get(field).tojstring();
 					p.put(field, fieldToJSONBlank(instance.get(field)));
-					
-					//writeSourceToFile();
 				}
 			}
 
@@ -525,7 +534,48 @@ public class Save {
         }
 	}
 
-	protected static void writeResources(File resourcesFolder) {
+	@SuppressWarnings("unchecked")
+	private static void writeScripts(File resourcesFolder) {
+		// Find all scripts
+		List<Instance> descendents = Game.game().getDescendants();
+		List<Instance> scripts = new ArrayList<>();
+		for (int i = 0; i < descendents.size(); i++) {
+			Instance t = descendents.get(i);
+			if ( !t.isArchivable() )
+				continue;
+			
+			if ( t.getField(LuaValue.valueOf("Source")) != null )
+				scripts.add(t);
+		}
+		
+		// Get absolte path
+		String resourcesPath = resourcesFolder.getAbsolutePath();
+		if ( !Game.isLoaded() )
+			return;
+		
+		// Get scripts folder
+		File f = new File(resourcesPath + File.separator + "Scripts");
+		if ( !f.exists() )
+			f.mkdirs();
+		
+		// Write to file
+		for (int i = 0; i < scripts.size(); i++) {
+			Instance inst = scripts.get(i);
+			if ( inst.containsField(LuaValue.valueOf("Source")) ) {
+				String source = inst.get(LuaValue.valueOf("Source")).toString();
+				if ( source.length() <= 0 )
+					continue;
+				
+				BufferedWriter writer = FileIO.file_text_open_write(f.getAbsolutePath() + File.separator + inst.getUUID().toString());
+				JSONObject obj = new JSONObject();
+				obj.put("Source", source);
+				FileIO.file_text_write_line(writer, obj.toJSONString());
+				FileIO.file_text_close(writer);
+			}
+		}
+	}
+
+	private static void writeResources(File resourcesFolder) {
 		String resourcesPath = resourcesFolder.getAbsolutePath();
 		if ( !Game.isLoaded() )
 			return;
@@ -548,7 +598,7 @@ public class Save {
 	private static void copyAssets(String path, List<AssetLoadable> assets) {
 		File p = new File(path);
 		if ( !p.exists() )
-				p.mkdirs();
+			p.mkdirs();
 		
 		ArrayList<String> writtenTo = new ArrayList<String>();
 		

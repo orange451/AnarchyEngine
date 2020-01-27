@@ -86,10 +86,14 @@ public class GameECS extends Instance {
 							uniqueInstances.put(tuid, inst);
 						} else {
 							Instance t = uniqueInstances.get(inst.getUUID());
-							if ( t != inst ) {
-								UUID tuid = Game.generateUUID();
-								inst.setUUID(tuid);
-								uniqueInstances.put(tuid, inst);
+							if ( t == null ) {
+								uniqueInstances.put(inst.getUUID(),inst);
+							} else {
+								if ( t != inst ) {
+									UUID tuid = Game.generateUUID();
+									inst.setUUID(tuid);
+									uniqueInstances.put(tuid, inst);
+								}
 							}
 						}
 						

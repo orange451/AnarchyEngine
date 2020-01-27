@@ -31,6 +31,7 @@ import lwjgui.collections.ObservableList;
 import lwjgui.geometry.Orientation;
 import lwjgui.geometry.Pos;
 import lwjgui.scene.Group;
+import lwjgui.scene.WindowManager;
 import lwjgui.scene.control.Menu;
 import lwjgui.scene.control.MenuBar;
 import lwjgui.scene.control.MenuItem;
@@ -279,17 +280,7 @@ public class IdeLayout {
 		
 		MenuItem mload = new MenuItem("Open", Icons.icon_folder.getView());
 		mload.setOnAction(event -> {
-			Runnable r = new Runnable() {
-				@Override
-				public void run() {
-					Load.load();
-				}
-			};
-			if ( Game.changes ) {
-				Save.requestSave(r);
-			} else {
-				r.run();
-			}
+			Load.loadSafe();
 		});
 		menuFile.getItems().add(mload);
 		//mload.setAccelerator(KeyCombination.valueOf("SHORTCUT+O"));
@@ -303,7 +294,7 @@ public class IdeLayout {
 
 		MenuItem msave2 = new MenuItem("Save As...", Icons.icon_saveas.getView());
 		msave2.setOnAction(event -> {
-			Save.save(true);
+			Save.saveAsSafe();
 		});
 		menuFile.getItems().add(msave2);
 		//msave2.setAccelerator(KeyCombination.valueOf("SHORTCUT+SHIFT+S"));
