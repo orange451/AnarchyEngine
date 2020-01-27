@@ -23,7 +23,10 @@ import org.luaj.vm2.lib.VarArgFunction;
 import org.luaj.vm2.lib.ZeroArgFunction;
 
 import engine.lua.network.internal.JSONUtil;
+import engine.lua.type.DataModel;
+import engine.lua.type.LuaDatatype;
 import engine.lua.type.LuaValuetype;
+import engine.lua.type.object.Instance;
 
 public class List extends LuaValuetype {
 
@@ -83,15 +86,17 @@ public class List extends LuaValuetype {
 			if ( element instanceof LuaValuetype )
 				newElement = ((LuaValuetype)element).clone();
 			
-			try {
-				Method m = element.getClass().getDeclaredMethod("clone");
-				newElement = (LuaValue) m.invoke(element);
-			} catch(Exception e) {
-				e.printStackTrace();
+			if ( newElement == null ) {
+				try {
+					newElement = JSONUtil.deserializeObject(JSONUtil.serializeObject(element));
+				} catch(Exception e) {
+					//
+				}
 			}
 			
 			if ( newElement == null )
 				continue;
+			
 			this.addElement( newElement );
 		}
 	}
@@ -175,7 +180,7 @@ public class List extends LuaValuetype {
 		
 		for (int i = 0; i < internal.size(); i++) {
 			LuaValue luaValue = internal.get(i);
-			Object val = JSONUtil.serializeField(luaValue);
+			Object val = JSONUtil.serializeObject(luaValue);
 			if ( val == null )
 				continue;
 			
@@ -211,7 +216,7 @@ public class List extends LuaValuetype {
 		List ret = new List();
 		java.util.List<JSONObject> values = (java.util.List<JSONObject>) json.get("ArrayData");
 		for (int i = 0; i < values.size(); i++) {
-			LuaValue val = JSONUtil.deserializeField(values.get(i));
+			LuaValue val = JSONUtil.deserializeObject(values.get(i));
 			if ( val == null )
 				continue;
 			

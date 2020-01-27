@@ -58,7 +58,7 @@ public class InstanceCreateTCP implements ClientProcessable {
 				}
 			}
 			
-			j.put(field, JSONUtil.serializeField(instance.get(field)));
+			j.put(field, JSONUtil.serializeObject(instance.get(field)));
 		}
 		
 		this.instanceData = j.toJSONString();
@@ -81,7 +81,7 @@ public class InstanceCreateTCP implements ClientProcessable {
 			for (int i = 0; i < keyArray.length; i++) {
 				String field = (String) keyArray[i];
 				Object jsonValue = obj.get(field);
-				LuaValue value = JSONUtil.deserializeField(jsonValue);
+				LuaValue value = JSONUtil.deserializeObject(jsonValue);
 				//System.out.println(internalInstance + " :: " + field + " / " + value + " / " + jsonValue);
 				if ( value != null ) {
 					if ( field.equals(C_PARENTs) ) {

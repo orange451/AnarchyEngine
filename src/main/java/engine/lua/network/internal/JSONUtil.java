@@ -31,12 +31,12 @@ public class JSONUtil {
 	private static final String C_TYPE_DATATYPE = "Datatype";
 	
 	/**
-	 * Serializes a field value to JSON.
+	 * Serializes a lua based object value to JSON.
 	 * @param luaValue
 	 * @return
 	 */
 	@SuppressWarnings("unchecked")
-	public static Object serializeField(LuaValue luaValue) {
+	public static Object serializeObject(LuaValue luaValue) {
 		if ( luaValue.isstring() )
 			return luaValue.toString();
 		if ( luaValue.isboolean() )
@@ -77,11 +77,11 @@ public class JSONUtil {
 	}
 	
 	/**
-	 * Deserializes JSON into a field value.
+	 * Deserializes JSON into a lua value.
 	 * @param t
 	 * @return
 	 */
-	public static LuaValue deserializeField(Object t) {
+	public static LuaValue deserializeObject(Object t) {
 		if ( t == null ) {
 			return LuaValue.NIL;
 		}
