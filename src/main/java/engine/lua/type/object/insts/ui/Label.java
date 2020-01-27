@@ -13,7 +13,6 @@ package engine.lua.type.object.insts.ui;
 import org.luaj.vm2.LuaString;
 import org.luaj.vm2.LuaValue;
 
-import engine.lua.type.data.Color3;
 import engine.lua.type.data.Color4;
 import ide.layout.windows.icons.Icons;
 import lwjgui.paint.Color;

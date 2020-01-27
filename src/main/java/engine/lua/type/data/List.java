@@ -10,7 +10,6 @@
 
 package engine.lua.type.data;
 
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 
 import org.json.simple.JSONArray;
@@ -23,10 +22,7 @@ import org.luaj.vm2.lib.VarArgFunction;
 import org.luaj.vm2.lib.ZeroArgFunction;
 
 import engine.lua.network.internal.JSONUtil;
-import engine.lua.type.DataModel;
-import engine.lua.type.LuaDatatype;
 import engine.lua.type.LuaValuetype;
-import engine.lua.type.object.Instance;
 
 public class List extends LuaValuetype {
 

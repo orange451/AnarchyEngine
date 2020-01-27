@@ -88,15 +88,28 @@ public class IDE extends ClientEngine {
 	}
 	
 	public static void openScript(ScriptBase instance) {
-		IdeLuaEditor lua = new IdeLuaEditor((ScriptBase) instance);
-		layout.getCenter().dock(lua);
+		//IdeLuaEditor lua = new IdeLuaEditor((ScriptBase) instance);
+		//layout.getCenter().dock(lua);
+		
+		WindowManager.runLater(() -> {
+			ManagedThread thread = new ManagedThread(300, 100, "Lua Editor - " + instance.getFullName()) {
+				@Override
+				protected void init(Window window) {
+					super.init(window);
+					window.setScene(new Scene(new IdeLuaEditor(instance), 500, 400));
+					window.show();
+				}
+			};
+			thread.start();
+		});
 	}
 
 	public static void openCSS(CSS instance) {
 		//IdeCSSEditor lua = new IdeCSSEditor(instance);
 		//layout.getCenter().dock(lua);
+		
 		WindowManager.runLater(() -> {
-			ManagedThread thread = new ManagedThread(300, 100, "Editor") {
+			ManagedThread thread = new ManagedThread(300, 100, "CSS Editor - " + instance.getFullName()) {
 				@Override
 				protected void init(Window window) {
 					super.init(window);
@@ -106,9 +119,6 @@ public class IDE extends ClientEngine {
 			};
 			thread.start();
 		});
-		/*Window window = LWJGUI.initialize();
-		window.setScene(new Scene(new IdeCSSEditor(instance), 500, 400));
-		window.show();*/
 	}
 	
 	private boolean grabbed;

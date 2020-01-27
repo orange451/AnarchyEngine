@@ -13,7 +13,6 @@ package engine.lua.type.object;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.UUID;
 
 import org.luaj.vm2.LuaTable;
 import org.luaj.vm2.LuaValue;
