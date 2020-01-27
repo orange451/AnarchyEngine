@@ -10,9 +10,9 @@ import engine.lua.type.object.insts.Camera;
 import engine.lua.type.object.insts.GameObject;
 import engine.lua.type.object.insts.Material;
 import engine.lua.type.object.insts.Mesh;
-import engine.lua.type.object.insts.PointLight;
 import engine.lua.type.object.insts.Prefab;
 import engine.lua.type.object.insts.Texture;
+import engine.lua.type.object.insts.light.PointLight;
 
 public class TestSimple extends ClientRunner {
 	

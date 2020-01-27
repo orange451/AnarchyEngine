@@ -100,7 +100,9 @@ public abstract class SearchableCodeEditor extends HighlightableCodeEditor {
 			this.setBorderWidth(1);
 			this.setBorderStyle(BorderStyle.SOLID);
 
-			this.getBoxShadowList().add(new BoxShadow(0, 2, 8, -4));
+			// Drop shadow!
+			this.setStyle("box-shadow: 0px 2px 8px -4px");
+			
 			this.setPadding(new Insets(5));
 
 			this.internalBox = new HBox();
