@@ -88,9 +88,8 @@ public class InternalRenderThread extends Thread implements IEngineThread {
 			}
 			delta = window.getDelta();
 
-			TaskManager.updateRenderThread();
-
 			client.render();
+			
 			// Draw event
 			if (Game.isLoaded()) {
 				RunService runService = Game.runService();
@@ -107,6 +106,10 @@ public class InternalRenderThread extends Thread implements IEngineThread {
 				pipeline.render();
 				runService.renderPostEvent().fire(LuaValue.valueOf(delta));
 			}
+
+			// Run Runnables
+			TaskManager.updateRenderThread();
+			
 			window.render();
 			window.updateDisplay(0);
 			if (window.isCloseRequested()) {

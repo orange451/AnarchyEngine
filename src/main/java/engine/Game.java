@@ -237,51 +237,51 @@ public class Game implements Tickable {
 	}
 
 	public static Workspace workspace() {
-		return (Workspace) Game.waitForService(C_WORKSPACE);
+		return (Workspace) Game.getService(C_WORKSPACE);
 	}
 
 	public static Lighting lighting() {
-		return (Lighting) Game.waitForService(C_LIGHTING);
+		return (Lighting) Game.getService(C_LIGHTING);
 	}
 	
 	public static RunService runService() {
-		return (RunService) Game.waitForService(C_RUNSERVICE);
+		return (RunService) Game.getService(C_RUNSERVICE);
 	}
 	
 	public static UserInputService userInputService() {
-		return (UserInputService) Game.waitForService(C_USERINPUTSERVICE);
+		return (UserInputService) Game.getService(C_USERINPUTSERVICE);
 	}
 	
 	public static ScriptService scriptService() {
-		return (ScriptService) Game.waitForService(C_SCRIPTSERVICE);
+		return (ScriptService) Game.getService(C_SCRIPTSERVICE);
 	}
 	
 	public static StarterPlayer starterPlayer() {
-		return (StarterPlayer) Game.waitForService(C_STARTERPLAYER);
+		return (StarterPlayer) Game.getService(C_STARTERPLAYER);
 	}
 	
 	public static Players players() {
-		return (Players) Game.waitForService(C_PLAYERS);
+		return (Players) Game.getService(C_PLAYERS);
 	}
 	
 	public static SoundService soundService() {
-		return (SoundService) Game.waitForService(C_SOUNDSERVICE);
+		return (SoundService) Game.getService(C_SOUNDSERVICE);
 	}
 	
 	public static Connections connections() {
-		return (Connections) Game.waitForService(C_CONNECTIONS);
+		return (Connections) Game.getService(C_CONNECTIONS);
 	}
 	
 	public static Assets assets() {
-		return (Assets) Game.waitForService(C_ASSETS);
+		return (Assets) Game.getService(C_ASSETS);
 	}
 	
 	public static Core core() {
-		return (Core) Game.waitForService(C_CORE);
+		return (Core) Game.getService(C_CORE);
 	}
 	
 	public static HistoryService historyService() {
-		return (HistoryService) Game.waitForService(C_HISTORYSERVICE);
+		return (HistoryService) Game.getService(C_HISTORYSERVICE);
 	}
 
 	public static Game getGame() {

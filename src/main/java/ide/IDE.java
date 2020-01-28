@@ -29,6 +29,8 @@ import lwjgui.scene.Group;
 import lwjgui.scene.Scene;
 import lwjgui.scene.Window;
 import lwjgui.scene.WindowManager;
+import lwjgui.theme.Theme;
+import lwjgui.theme.ThemeDark;
 
 public class IDE extends ClientEngine {
 	public static IdeLayout layout;
@@ -44,7 +46,7 @@ public class IDE extends ClientEngine {
 		Group background = new Group();
 		renderThread.getWindow().getScene().setRoot(background);
 		
-		//Theme.setTheme(new ThemeDark());
+		Theme.setTheme(new ThemeDark());
 		
 		// If someone wants to load a game directly
 		if ( args != null && args.length > 0 ) {
