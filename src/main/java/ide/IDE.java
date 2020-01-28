@@ -92,7 +92,7 @@ public class IDE extends ClientEngine {
 		//layout.getCenter().dock(lua);
 		
 		WindowManager.runLater(() -> {
-			ManagedThread thread = new ManagedThread(300, 100, "Lua Editor - " + instance.getFullName()) {
+			ManagedThread thread = new ManagedThread(300, 100, instance.getName() + ".lua [" + instance.getFullName() + "]") {
 				@Override
 				protected void init(Window window) {
 					super.init(window);
@@ -109,7 +109,7 @@ public class IDE extends ClientEngine {
 		//layout.getCenter().dock(lua);
 		
 		WindowManager.runLater(() -> {
-			ManagedThread thread = new ManagedThread(300, 100, "CSS Editor - " + instance.getFullName()) {
+			ManagedThread thread = new ManagedThread(300, 100, instance.getName() + ".css [" + instance.getFullName() + "]") {
 				@Override
 				protected void init(Window window) {
 					super.init(window);

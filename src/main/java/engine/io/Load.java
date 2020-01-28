@@ -32,6 +32,7 @@ import java.util.stream.Stream;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
+import org.luaj.vm2.LuaString;
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.jse.CoerceJavaToLua;
 import org.lwjgl.PointerBuffer;
@@ -158,7 +159,7 @@ public class Load {
 					// Make sure proper instance exists
 					Instance inst = Game.getInstanceFromUUID(uuid);
 					System.out.println(inst);
-					if ( inst != null && inst.containsField(LuaValue.valueOf("Source")) ) {
+					if ( inst != null && inst.containsField(LuaValue.valueOf("Source")) && inst.getField(LuaValue.valueOf("Source")).getType() == LuaString.class ) {
 						System.out.println(source);
 						
 						// Set the source!
