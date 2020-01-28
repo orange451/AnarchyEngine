@@ -10,8 +10,8 @@
 
 package engine.glv2.v2.lights;
 
-import static org.lwjgl.opengl.GL11.GL_FRONT;
-import static org.lwjgl.opengl.GL11.glCullFace;
+import static org.lwjgl.opengl.GL11C.GL_FRONT;
+import static org.lwjgl.opengl.GL11C.glCullFace;
 import static org.lwjgl.opengl.GL11C.GL_BACK;
 import static org.lwjgl.opengl.GL11C.GL_BLEND;
 import static org.lwjgl.opengl.GL11C.GL_COLOR_BUFFER_BIT;

@@ -14,6 +14,7 @@ import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
 import engine.glv2.objects.Texture;
+import engine.glv2.v2.lights.AreaLightHandler;
 import engine.glv2.v2.lights.DirectionalLightHandler;
 import engine.glv2.v2.lights.PointLightHandler;
 import engine.glv2.v2.lights.SpotLightHandler;
@@ -31,6 +32,7 @@ public class RendererData {
 	public PointLightHandler plh;
 	public DirectionalLightHandler dlh;
 	public SpotLightHandler slh;
+	public AreaLightHandler alh;
 	public RenderingSettings rs;
 
 }

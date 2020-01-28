@@ -124,7 +124,9 @@ public abstract class LightBase<T extends Light> extends Instance implements Pos
 		return true;
 	}
 	
-	public abstract Light getLightInternal();
+	public T getLightInternal() {
+		return light;
+	}
 	
 	public void setVisible( boolean visible ) {
 		this.set(C_VISIBLE, LuaValue.valueOf(visible));

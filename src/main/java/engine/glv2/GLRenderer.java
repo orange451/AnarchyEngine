@@ -59,6 +59,8 @@ import engine.glv2.v2.RenderingManager;
 import engine.glv2.v2.RenderingSettings;
 import engine.glv2.v2.SkyRenderer;
 import engine.glv2.v2.Sun;
+import engine.glv2.v2.lights.AreaLightHandler;
+import engine.glv2.v2.lights.AreaLightInternal;
 import engine.glv2.v2.lights.DirectionalLightHandler;
 import engine.glv2.v2.lights.DirectionalLightInternal;
 import engine.glv2.v2.lights.ILightHandler;
@@ -90,6 +92,8 @@ public class GLRenderer implements IPipeline {
 	private PointLightHandler pointLightHandler;
 	private DirectionalLightHandler directionalLightHandler;
 	private SpotLightHandler spotLightHandler;
+	private AreaLightHandler areaLightHandler;
+
 	private RenderingManager renderingManager;
 
 	private HandlesRenderer handlesRenderer;
@@ -166,9 +170,11 @@ public class GLRenderer implements IPipeline {
 			directionalLightHandler = new DirectionalLightHandler(width, height);
 			pointLightHandler = new PointLightHandler(width, height);
 			spotLightHandler = new SpotLightHandler(width, height);
+			areaLightHandler =  new AreaLightHandler(width, height);
 			rnd.plh = pointLightHandler;
 			rnd.dlh = directionalLightHandler;
 			rnd.slh = spotLightHandler;
+			rnd.alh = areaLightHandler;
 			rnd.rs = renderingSettings;
 			size.set(width, height);
 			enabled = true;
@@ -290,6 +296,9 @@ public class GLRenderer implements IPipeline {
 		GPUProfiler.start("Spot");
 		spotLightHandler.render(currentCamera, projMatrix, dp, renderingSettings);
 		GPUProfiler.end();
+		GPUProfiler.start("Area");
+		areaLightHandler.render(currentCamera, projMatrix, dp, renderingSettings);
+		GPUProfiler.end();
 		GPUProfiler.end();
 		GPUProfiler.start("Deferred Pass");
 		dp.process(rnd, rd);
@@ -403,6 +412,7 @@ public class GLRenderer implements IPipeline {
 		directionalLightHandler.resize(width, height);
 		pointLightHandler.resize(width, height);
 		spotLightHandler.resize(width, height);
+		areaLightHandler.resize(width, height);
 	}
 
 	@Override
@@ -414,6 +424,7 @@ public class GLRenderer implements IPipeline {
 		directionalLightHandler.dispose();
 		pointLightHandler.dispose();
 		spotLightHandler.dispose();
+		areaLightHandler.dispose();
 		skyRenderer.dispose();
 		irradianceCapture.dispose();
 		preFilteredEnvironment.dispose();
@@ -455,6 +466,11 @@ public class GLRenderer implements IPipeline {
 	@Override
 	public ILightHandler<SpotLightInternal> getSpotLightHandler() {
 		return spotLightHandler;
+	}
+
+	@Override
+	public ILightHandler<AreaLightInternal> getAreaLightHandler() {
+		return areaLightHandler;
 	}
 
 	@Override

@@ -33,6 +33,7 @@ uniform mat4 inverseViewMatrix;
 uniform sampler2D directionalLightData;
 uniform sampler2D pointLightData;
 uniform sampler2D spotLightData;
+uniform sampler2D areaLightData;
 
 uniform bool useAmbientOcclusion;
 
@@ -158,6 +159,7 @@ void main() {
 		vec3 N = normalize(normal);
 		vec3 V = normalize(cameraPosition - position);
 		vec3 R = reflect(-V, N);
+		float ndotv = max(dot(N, V), 0.0);
 
 		vec3 F0 = vec3(0.04);
 		F0 = mix(F0, image.rgb, metallic);
@@ -166,8 +168,9 @@ void main() {
 		Lo += texture(directionalLightData, textureCoords).rgb;
 		Lo += texture(pointLightData, textureCoords).rgb;
 		Lo += lightData.rgb;
+		Lo += texture(areaLightData, textureCoords).rgb;
 
-		vec3 F = fresnelSchlickRoughness(max(dot(N, V), 0.0), F0, roughness);
+		vec3 F = fresnelSchlickRoughness(ndotv, F0, roughness);
 
 		vec3 kS = F;
 		vec3 kD = vec3(1.0) - kS;
@@ -179,7 +182,7 @@ void main() {
 		vec3 ambient = kD * diffuse;
 
 		vec3 prefilteredColor = textureLod(environmentCube, R, roughness * MAX_REFLECTION_LOD).rgb;
-		vec2 envBRDF = texture(brdfLUT, vec2(max(dot(N, V), 0.0), roughness)).rg;
+		vec2 envBRDF = texture(brdfLUT, vec2(ndotv, roughness)).rg;
 		vec3 specular = prefilteredColor * (F * envBRDF.x + envBRDF.y);
 
 		ambient += specular;
@@ -193,7 +196,7 @@ void main() {
 			float ao = computeAmbientOcclusion(textureCoords, position, N, gDepth, projectionMatrix,
 											   inverseProjectionMatrix, inverseViewMatrix);
 			auxData.a = ao; // Store AO for use in SSR pass
-			light *= ao;	// Apply AO, operation will be reverse in SSR pass
+			light *= ao;	// Apply AO, operation will be reversed in SSR pass
 		}
 
 		vec3 emissive = texture(gMask, textureCoords).rgb;

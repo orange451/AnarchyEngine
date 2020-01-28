@@ -13,10 +13,8 @@ package engine.lua.type.object.insts.light;
 import org.joml.Vector3f;
 import org.luaj.vm2.LuaValue;
 
-import engine.InternalRenderThread;
 import engine.gl.IPipeline;
 import engine.glv2.v2.lights.DirectionalLightInternal;
-import engine.glv2.v2.lights.Light;
 import engine.lua.lib.EnumType;
 import engine.lua.type.data.Color3;
 import engine.lua.type.data.Vector3;
@@ -71,58 +69,49 @@ public class DirectionalLight extends LightBase<DirectionalLightInternal> implem
 	}
 
 	@Override
-	public Light getLightInternal() {
-		return light;
-	}
-
-	@Override
 	protected void destroyLight(IPipeline pipeline) {
-		InternalRenderThread.runLater(() -> {
-			if (light == null || pipeline == null)
-				return;
+		if (light == null || pipeline == null)
+			return;
 
-			if ( pipeline.getDirectionalLightHandler() != null )
-				pipeline.getDirectionalLightHandler().removeLight(light);
-			
-			light = null;
-			this.pipeline = null;
+		if ( pipeline.getDirectionalLightHandler() != null )
+			pipeline.getDirectionalLightHandler().removeLight(light);
+		
+		light = null;
+		this.pipeline = null;
 
-			System.out.println("Destroyed light");
-		});
+		System.out.println("Destroyed light");
 	}
 
 	@Override
 	protected void makeLight(IPipeline pipeline) {
 		// Add it to pipeline
-		InternalRenderThread.runLater(() -> {
-			this.pipeline = pipeline;
-			
-			if (pipeline == null)
-				return;
+		this.pipeline = pipeline;
+		
+		if (pipeline == null)
+			return;
 
-			if (light != null)
-				return;
+		if (light != null)
+			return;
 
-			// Create light
-			Vector3f direction = ((Vector3) this.get(C_DIRECTION)).toJoml();
-			float intensity = this.get(C_INTENSITY).tofloat();
-			light = new DirectionalLightInternal(direction, intensity);
-			light.distance = this.get(C_SHADOWDISTANCE).toint();
+		// Create light
+		Vector3f direction = ((Vector3) this.get(C_DIRECTION)).toJoml();
+		float intensity = this.get(C_INTENSITY).tofloat();
+		light = new DirectionalLightInternal(direction, intensity);
+		light.distance = this.get(C_SHADOWDISTANCE).toint();
 
-			// Color it
-			Color color = ((Color3) this.get("Color")).toColor();
-			light.color = new Vector3f(Math.max(color.getRed(), 1) / 255f, Math.max(color.getGreen(), 1) / 255f,
-					Math.max(color.getBlue(), 1) / 255f);
-			
-			light.visible = this.get(C_VISIBLE).toboolean();
+		// Color it
+		Color color = ((Color3) this.get("Color")).toColor();
+		light.color = new Vector3f(Math.max(color.getRed(), 1) / 255f, Math.max(color.getGreen(), 1) / 255f,
+				Math.max(color.getBlue(), 1) / 255f);
+		
+		light.visible = this.get(C_VISIBLE).toboolean();
 
-			light.shadowResolution = this.get(C_SHADOWMAPSIZE).toint();
+		light.shadowResolution = this.get(C_SHADOWMAPSIZE).toint();
 
-			light.shadows = this.get(C_SHADOWS).toboolean();
+		light.shadows = this.get(C_SHADOWS).toboolean();
 
-			if ( pipeline.getDirectionalLightHandler() != null )
-				pipeline.getDirectionalLightHandler().addLight(light);
-		});
+		if ( pipeline.getDirectionalLightHandler() != null )
+			pipeline.getDirectionalLightHandler().addLight(light);
 	}
 
 	@Override

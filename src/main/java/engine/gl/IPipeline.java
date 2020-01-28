@@ -11,6 +11,7 @@
 package engine.gl;
 
 import engine.glv2.v2.RenderingSettings;
+import engine.glv2.v2.lights.AreaLightInternal;
 import engine.glv2.v2.lights.DirectionalLightInternal;
 import engine.glv2.v2.lights.ILightHandler;
 import engine.glv2.v2.lights.PointLightInternal;
@@ -38,6 +39,8 @@ public interface IPipeline extends Renderable {
 	public ILightHandler<DirectionalLightInternal> getDirectionalLightHandler();
 
 	public ILightHandler<SpotLightInternal> getSpotLightHandler();
+
+	public ILightHandler<AreaLightInternal> getAreaLightHandler();
 
 	public void setDyamicSkybox(DynamicSkybox dynamicSkybox);
 

@@ -59,16 +59,17 @@ void main(void) {
 		vec3 N = normalize(normal);
 		vec3 V = normalize(cameraPosition - position);
 		vec3 R = reflect(-V, N);
+		float ndotv = max(dot(N, V), 0.0);
 
 		float roughness = pbr.r;
 		float metallic = pbr.g;
 
 		vec3 F0 = vec3(0.04);
 		F0 = mix(F0, diffuse.rgb, metallic);
-		vec3 F = fresnelSchlickRoughness(max(dot(N, V), 0.0), F0, roughness);
+		vec3 F = fresnelSchlickRoughness(ndotv, F0, roughness);
 
 		vec3 prefilteredColor = textureLod(environmentCube, R, roughness * MAX_REFLECTION_LOD).rgb;
-		vec2 envBRDF = texture(brdfLUT, vec2(max(dot(N, V), 0.0), roughness)).rg;
+		vec2 envBRDF = texture(brdfLUT, vec2(ndotv, roughness)).rg;
 		vec3 specular = prefilteredColor * (F * envBRDF.x + envBRDF.y);
 
 		vec3 light = auxData.rgb;

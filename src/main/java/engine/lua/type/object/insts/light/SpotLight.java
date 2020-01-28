@@ -13,9 +13,7 @@ package engine.lua.type.object.insts.light;
 import org.joml.Vector3f;
 import org.luaj.vm2.LuaValue;
 
-import engine.InternalRenderThread;
 import engine.gl.IPipeline;
-import engine.glv2.v2.lights.Light;
 import engine.glv2.v2.lights.SpotLightInternal;
 import engine.lua.lib.EnumType;
 import engine.lua.type.NumberClamp;
@@ -90,56 +88,47 @@ public class SpotLight extends LightBase<SpotLightInternal> implements TreeViewa
 	}
 
 	@Override
-	public Light getLightInternal() {
-		return light;
-	}
-
-	@Override
 	protected void destroyLight(IPipeline pipeline) {
-		InternalRenderThread.runLater(()->{
-			if ( light == null || pipeline == null )
-				return;
+		if ( light == null || pipeline == null )
+			return;
 
-			pipeline.getSpotLightHandler().removeLight(light);
-			light = null;
-			this.pipeline = null;
+		pipeline.getSpotLightHandler().removeLight(light);
+		light = null;
+		this.pipeline = null;
 
-			System.out.println("Destroyed light");
-		});
+		System.out.println("Destroyed light");
 	}
 
 	@Override
 	protected void makeLight(IPipeline pipeline) {		
 		// Add it to pipeline
-		InternalRenderThread.runLater(()->{
-			this.pipeline = pipeline;
-			
-			if ( pipeline == null )
-				return;
+		this.pipeline = pipeline;
+		
+		if ( pipeline == null )
+			return;
 
-			if ( light != null )
-				return;
+		if ( light != null )
+			return;
 
-			// Create light
-			Vector3f pos = ((Vector3)this.get("Position")).toJoml();
-			float radius = this.get(C_RADIUS).tofloat();
-			float outerFOV = this.get(C_OUTERFOV).tofloat();
-			float innerFOV = this.get(C_INNERFOVSCALE).tofloat();
-			float intensity = this.get(C_INTENSITY).tofloat();
-			Vector3f direction = ((Vector3) this.get(C_DIRECTION)).toJoml();
-			light = new SpotLightInternal(direction, pos, outerFOV, innerFOV, radius, intensity);
+		// Create light
+		Vector3f pos = ((Vector3)this.get("Position")).toJoml();
+		float radius = this.get(C_RADIUS).tofloat();
+		float outerFOV = this.get(C_OUTERFOV).tofloat();
+		float innerFOV = this.get(C_INNERFOVSCALE).tofloat();
+		float intensity = this.get(C_INTENSITY).tofloat();
+		Vector3f direction = ((Vector3) this.get(C_DIRECTION)).toJoml();
+		light = new SpotLightInternal(direction, pos, outerFOV, innerFOV, radius, intensity);
 
-			// Color it
-			Color color = ((Color3)this.get("Color")).toColor();
-			light.color = new Vector3f( Math.max( color.getRed(),1 )/255f, Math.max( color.getGreen(),1 )/255f, Math.max( color.getBlue(),1 )/255f );
+		// Color it
+		Color color = ((Color3)this.get("Color")).toColor();
+		light.color = new Vector3f( Math.max( color.getRed(),1 )/255f, Math.max( color.getGreen(),1 )/255f, Math.max( color.getBlue(),1 )/255f );
 
-			light.visible = this.get(C_VISIBLE).toboolean();
+		light.visible = this.get(C_VISIBLE).toboolean();
 
-			light.shadowResolution = this.get(C_SHADOWMAPSIZE).toint();
+		light.shadowResolution = this.get(C_SHADOWMAPSIZE).toint();
 
-			if ( pipeline.getSpotLightHandler() != null )
-				pipeline.getSpotLightHandler().addLight(light);
-		});
+		if ( pipeline.getSpotLightHandler() != null )
+			pipeline.getSpotLightHandler().addLight(light);
 	}
 	
 	@Override

@@ -63,6 +63,16 @@ struct DirectionalLight {
 };
 #end
 
+#struct AreaLight
+struct AreaLight {
+	vec3 position;
+	vec3 direction;
+	vec3 color;
+	float intensity;
+	bool visible;
+};
+#end
+
 #struct DynamicSky
 struct DynamicSky {
 	float brightness;
@@ -272,27 +282,28 @@ vec3 calcPointLight(PointLight light, vec3 position, vec3 diffuse, vec3 N, vec3 
 					float roughness, float metallic) {
 	if (!light.visible)
 		return vec3(0.0);
-	vec3 L = normalize(light.position - position);
-	vec3 H = normalize(V + L);
 	float distance = length(light.position - position);
 	float attenuation = max(1.0 - distance / light.radius, 0.0) / distance;
 	vec3 radiance = light.color * attenuation * light.intensity;
 	if (radiance.r <= 0.0 && radiance.g <= 0.0 && radiance.b <= 0.0)
 		return vec3(0.0);
 
+	vec3 L = normalize(light.position - position);
+	vec3 H = normalize(V + L);
+	float NdotL = max(dot(N, L), 0.0);
+
 	float NDF = DistributionGGX(N, H, roughness);
 	float G = GeometrySmith(N, V, L, roughness);
 	vec3 F = fresnelSchlick(max(dot(H, V), 0.0), F0);
 
 	vec3 nominator = NDF * G * F;
-	float denominator = max(dot(N, V), 0.0) * max(dot(N, L), 0.0) + 0.001;
+	float denominator = max(dot(N, V), 0.0) * NdotL + 0.001;
 	vec3 brdf = nominator / denominator;
 
 	vec3 kS = F;
 	vec3 kD = vec3(1.0) - kS;
 	kD *= 1.0 - metallic;
 
-	float NdotL = max(dot(N, L), 0.0);
 	if (light.shadows) {
 		vec3 samplePos = position - light.position;
 
@@ -322,26 +333,27 @@ vec3 calcSpotLight(SpotLight light, vec3 position, vec3 diffuse, vec3 N, vec3 V,
 	if (intensity <= 0.0)
 		return vec3(0.0);
 
-	vec3 H = normalize(V + L);
 	float distance = length(light.position - position);
 	float attenuation = max(1.0 - distance / light.radius, 0.0) / distance;
-	vec3 radiance = light.color * attenuation * light.intensity;
+	vec3 radiance = light.color * attenuation * light.intensity * intensity;
 	if (radiance.r <= 0.0 && radiance.g <= 0.0 && radiance.b <= 0.0)
 		return vec3(0.0);
+
+	vec3 H = normalize(V + L);
+	float NdotL = max(dot(N, L), 0.0);
 
 	float NDF = DistributionGGX(N, H, roughness);
 	float G = GeometrySmith(N, V, L, roughness);
 	vec3 F = fresnelSchlick(max(dot(H, V), 0.0), F0);
 
 	vec3 nominator = NDF * G * F;
-	float denominator = max(dot(N, V), 0.0) * max(dot(N, L), 0.0) + 0.001;
+	float denominator = max(dot(N, V), 0.0) * NdotL + 0.001;
 	vec3 brdf = nominator / denominator;
 
 	vec3 kS = F;
 	vec3 kD = vec3(1.0) - kS;
 	kD *= 1.0 - metallic;
 
-	float NdotL = max(dot(N, L), 0.0) * intensity;
 	if (light.shadows) {
 		vec4 posLight = light.viewMatrix * vec4(position, 1.0);
 		vec4 shadowCoord = biasMatrix * (light.projectionMatrix * posLight);
@@ -367,6 +379,7 @@ vec3 calcDirectionalLight(DirectionalLight light, vec3 position, vec3 diffuse, v
 		return vec3(0.0);
 	vec3 L = normalize(light.direction);
 	vec3 H = normalize(V + L);
+	float NdotL = max(dot(N, L), 0.0);
 
 	vec3 radiance = light.color * light.intensity;
 
@@ -375,14 +388,13 @@ vec3 calcDirectionalLight(DirectionalLight light, vec3 position, vec3 diffuse, v
 	vec3 F = fresnelSchlick(max(dot(H, V), 0.0), F0);
 
 	vec3 nominator = NDF * G * F;
-	float denominator = max(dot(N, V), 0.0) * max(dot(N, L), 0.0) + 0.001;
+	float denominator = max(dot(N, V), 0.0) * NdotL + 0.001;
 	vec3 brdf = nominator / denominator;
 
 	vec3 kS = F;
 	vec3 kD = vec3(1.0) - kS;
 	kD *= 1.0 - metallic;
 
-	float NdotL = max(dot(N, L), 0.0);
 	if (light.shadows)
 		NdotL *= computeShadowV2(position, light);
 	return (kD * diffuse / PI + brdf) * radiance * NdotL;

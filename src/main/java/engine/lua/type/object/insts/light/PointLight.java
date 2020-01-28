@@ -13,9 +13,7 @@ package engine.lua.type.object.insts.light;
 import org.joml.Vector3f;
 import org.luaj.vm2.LuaValue;
 
-import engine.InternalRenderThread;
 import engine.gl.IPipeline;
-import engine.glv2.v2.lights.Light;
 import engine.glv2.v2.lights.PointLightInternal;
 import engine.lua.lib.EnumType;
 import engine.lua.type.NumberClampPreferred;
@@ -68,56 +66,47 @@ public class PointLight extends LightBase<PointLightInternal> implements TreeVie
 	}
 
 	@Override
-	public Light getLightInternal() {
-		return light;
-	}
-	
-	@Override
 	protected void destroyLight(IPipeline pipeline) {
-		InternalRenderThread.runLater(()->{
-			if ( light == null || pipeline == null )
-				return;
-			
-			pipeline.getPointLightHandler().removeLight(light);
-			this.light = null;
-			this.pipeline = null;
+		if ( light == null || pipeline == null )
+			return;
+		
+		pipeline.getPointLightHandler().removeLight(light);
+		this.light = null;
+		this.pipeline = null;
 
-			System.out.println("Destroyed light");
-		});
+		System.out.println("Destroyed light");
 	}
 
 	@Override
 	protected void makeLight(IPipeline pipeline) {		
 		// Add it to pipeline
-		InternalRenderThread.runLater(()->{
 			
-			System.out.println("Creating pointlight! " + pipeline + " / " + light);
-			if ( pipeline == null )
-				return;
-			
-			if ( light != null )
-				return;
-			
-			this.pipeline = pipeline;
-			
-			// Create light
-			Vector3f pos = ((Vector3)this.get("Position")).toJoml();
-			float radius = this.get(C_RADIUS).tofloat();
-			float intensity = this.get("Intensity").tofloat();
-			light = new PointLightInternal(pos, radius, intensity);
-			
-			// Color it
-			Color color = ((Color3)this.get("Color")).toColor();
-			light.color = new Vector3f( Math.max( color.getRed(),1 )/255f, Math.max( color.getGreen(),1 )/255f, Math.max( color.getBlue(),1 )/255f );
-			
-			light.visible = this.get(C_VISIBLE).toboolean();
-			
-			light.shadowResolution = this.get(C_SHADOWMAPSIZE).toint();
+		System.out.println("Creating pointlight! " + pipeline + " / " + light);
+		if ( pipeline == null )
+			return;
+		
+		if ( light != null )
+			return;
+		
+		this.pipeline = pipeline;
+		
+		// Create light
+		Vector3f pos = ((Vector3)this.get("Position")).toJoml();
+		float radius = this.get(C_RADIUS).tofloat();
+		float intensity = this.get("Intensity").tofloat();
+		light = new PointLightInternal(pos, radius, intensity);
+		
+		// Color it
+		Color color = ((Color3)this.get("Color")).toColor();
+		light.color = new Vector3f( Math.max( color.getRed(),1 )/255f, Math.max( color.getGreen(),1 )/255f, Math.max( color.getBlue(),1 )/255f );
+		
+		light.visible = this.get(C_VISIBLE).toboolean();
+		
+		light.shadowResolution = this.get(C_SHADOWMAPSIZE).toint();
 
-			light.shadows = this.get(C_SHADOWS).toboolean();
+		light.shadows = this.get(C_SHADOWS).toboolean();
 
-			pipeline.getPointLightHandler().addLight(light);
-		});
+		pipeline.getPointLightHandler().addLight(light);
 	}
 	
 	@Override

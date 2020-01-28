@@ -22,6 +22,7 @@ import static org.lwjgl.opengl.GL12C.GL_CLAMP_TO_EDGE;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE0;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE1;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE10;
+import static org.lwjgl.opengl.GL13C.GL_TEXTURE11;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE2;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE3;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE4;
@@ -74,6 +75,7 @@ public class Lighting extends DeferredPass<LightingShader> {
 		rnd.dlh.getMainTex().active(GL_TEXTURE8);
 		rnd.plh.getMainTex().active(GL_TEXTURE9);
 		rnd.slh.getMainTex().active(GL_TEXTURE10);
+		rnd.alh.getMainTex().active(GL_TEXTURE11);
 	}
 
 	@Override
@@ -115,6 +117,11 @@ public class Lighting extends DeferredPass<LightingShader> {
 	protected void disposeFramebuffer() {
 		super.disposeFramebuffer();
 		auxTex.dispose();
+	}
+
+	@Override
+	public void dispose() {
+		super.dispose();
 	}
 
 }
