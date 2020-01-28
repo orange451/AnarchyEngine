@@ -44,14 +44,6 @@ public class JSONUtil {
 		if ( luaValue.isnumber() )
 			return luaValue.todouble();
 		
-		if ( luaValue instanceof LuaTable ) {
-
-			JSONObject j = new JSONObject();
-			j.put(C_TYPE, C_TYPE_TABLE);
-			j.put(C_VALUE, LuaUtil.tableToJson((LuaTable) luaValue));
-			return j;
-		}
-		
 		// Instances in the game
 		if ( luaValue instanceof Instance || luaValue.isnil() ) {
 			long refId = luaValue.isnil()?-1:((Instance)luaValue).getSID();			
@@ -70,6 +62,15 @@ public class JSONUtil {
 			JSONObject j = new JSONObject();
 			j.put(C_TYPE, C_TYPE_DATATYPE);
 			j.put(C_VALUE, t);
+			return j;
+		}
+		
+		// Lastly check for table. Both Instance and valuetype extend table so check them first!
+		if ( luaValue instanceof LuaTable ) {
+
+			JSONObject j = new JSONObject();
+			j.put(C_TYPE, C_TYPE_TABLE);
+			j.put(C_VALUE, LuaUtil.tableToJson((LuaTable) luaValue));
 			return j;
 		}
 

@@ -16,6 +16,7 @@ import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.ThreeArgFunction;
+
 import engine.Game;
 import engine.GameSubscriber;
 import engine.InternalGameThread;
@@ -34,7 +35,6 @@ import engine.lua.type.object.insts.Mesh;
 import engine.lua.type.object.insts.Player;
 import engine.lua.type.object.insts.Prefab;
 import engine.lua.type.object.services.Players;
-import engine.lua.type.object.services.RunService;
 import engine.physics.PhysicsObjectInternal;
 import engine.util.Pair;
 
@@ -118,7 +118,7 @@ public abstract class PhysicsBase extends Instance implements GameSubscriber {
 		// Update matrices
 		InternalGameThread.runLater(()->{
 			InternalRenderThread.runLater(()->{
-				((RunService)Game.waitForService(LuaValue.valueOf("RunService"))).renderPreEvent().connect((args)->{
+				Game.runService().renderPreEvent().connect((args)->{
 					PhysicsObjectInternal tempPhys = this.physics;
 					GameObject tempLink = this.linked;
 					
