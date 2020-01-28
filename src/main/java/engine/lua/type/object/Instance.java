@@ -94,22 +94,8 @@ public abstract class Instance extends DataModel {
 		this.getmetatable().set("WaitForChild", new ThreeArgFunction() {
 			@Override
 			public LuaValue call(LuaValue root, LuaValue child, LuaValue time) {
-				long start = System.currentTimeMillis();
-				int t = (int) (time.isnil()?5000:(time.checkdouble()*1000));
-				while ( System.currentTimeMillis()-start < t ) {
-					Instance c = findFirstChild(child.toString());
-					if ( c == null ) {
-						try {
-							Thread.sleep(1);
-						} catch (InterruptedException e) {
-							//
-						}
-					} else {
-						return c;
-					}
-				}
-				LuaEngine.error("Cancelling wait for child loop. Time not specified & taking too long.");
-				return LuaValue.NIL;
+				Instance c = waitForChild(child, time);
+				return c==null?LuaValue.NIL:c;
 			}
 		});
 		
@@ -448,6 +434,25 @@ public abstract class Instance extends DataModel {
 		return this.children.size();
 	}
 
+	public Instance waitForChild(LuaValue child, LuaValue time) {
+		long start = System.currentTimeMillis();
+		int t = (int) (time.isnil()?5000:(time.checkdouble()*1000));
+		while ( System.currentTimeMillis()-start < t ) {
+			Instance c = findFirstChild(child.toString());
+			if ( c == null ) {
+				try {
+					Thread.sleep(1);
+				} catch (InterruptedException e) {
+					//
+				}
+			} else {
+				return c;
+			}
+		}
+		LuaEngine.error("Cancelling wait for child loop. Time not specified & taking too long.");
+		return null;
+	}
+	
 	/**
 	 * Returns the first child with the matching name.
 	 * <br>

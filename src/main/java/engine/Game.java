@@ -153,7 +153,33 @@ public class Game implements Tickable {
 	public static Service getService(String string) {
 		return getService(LuaValue.valueOf(string));
 	}
+	
 
+	/**
+	 * Get a service by name. If it does not exist, wait until it does.
+	 * @param serviceName
+	 * @return
+	 */
+	public static Service waitForService(LuaValue serviceName) {
+		Service s = getService(serviceName);
+		if ( s != null )
+			return s;
+		
+		LuaValue t = Game.game().waitForChild(serviceName, LuaValue.NIL);
+		if ( t.isnil() )
+			return null;
+		
+		if ( !(t instanceof Service) )
+			return null;
+		
+		return (Service)t;
+	}
+
+	/**
+	 * Get a service by name.
+	 * @param name
+	 * @return
+	 */
 	public static Service getService(LuaValue name) {
 		if ( !loaded )
 			return null;
@@ -211,51 +237,51 @@ public class Game implements Tickable {
 	}
 
 	public static Workspace workspace() {
-		return (Workspace) Game.getService(C_WORKSPACE);
+		return (Workspace) Game.waitForService(C_WORKSPACE);
 	}
 
 	public static Lighting lighting() {
-		return (Lighting) Game.getService(C_LIGHTING);
+		return (Lighting) Game.waitForService(C_LIGHTING);
 	}
 	
 	public static RunService runService() {
-		return (RunService) Game.getService(C_RUNSERVICE);
+		return (RunService) Game.waitForService(C_RUNSERVICE);
 	}
 	
 	public static UserInputService userInputService() {
-		return (UserInputService) Game.getService(C_USERINPUTSERVICE);
+		return (UserInputService) Game.waitForService(C_USERINPUTSERVICE);
 	}
 	
 	public static ScriptService scriptService() {
-		return (ScriptService) Game.getService(C_SCRIPTSERVICE);
+		return (ScriptService) Game.waitForService(C_SCRIPTSERVICE);
 	}
 	
 	public static StarterPlayer starterPlayer() {
-		return (StarterPlayer) Game.getService(C_STARTERPLAYER);
+		return (StarterPlayer) Game.waitForService(C_STARTERPLAYER);
 	}
 	
 	public static Players players() {
-		return (Players) Game.getService(C_PLAYERS);
+		return (Players) Game.waitForService(C_PLAYERS);
 	}
 	
 	public static SoundService soundService() {
-		return (SoundService) Game.getService(C_SOUNDSERVICE);
+		return (SoundService) Game.waitForService(C_SOUNDSERVICE);
 	}
 	
 	public static Connections connections() {
-		return (Connections) Game.getService(C_CONNECTIONS);
+		return (Connections) Game.waitForService(C_CONNECTIONS);
 	}
 	
 	public static Assets assets() {
-		return (Assets) Game.getService(C_ASSETS);
+		return (Assets) Game.waitForService(C_ASSETS);
 	}
 	
 	public static Core core() {
-		return (Core) Game.getService(C_CORE);
+		return (Core) Game.waitForService(C_CORE);
 	}
 	
 	public static HistoryService historyService() {
-		return (HistoryService) Game.getService(C_HISTORYSERVICE);
+		return (HistoryService) Game.waitForService(C_HISTORYSERVICE);
 	}
 
 	public static Game getGame() {

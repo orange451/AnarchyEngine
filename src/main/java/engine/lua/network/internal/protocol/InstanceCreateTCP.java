@@ -93,6 +93,7 @@ public class InstanceCreateTCP implements ClientProcessable {
 				}
 			}
 		} catch (ParseException e) {
+			System.err.println(instanceData);
 			e.printStackTrace();
 		}
 		

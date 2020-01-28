@@ -34,6 +34,7 @@ import engine.lua.type.object.insts.Mesh;
 import engine.lua.type.object.insts.Player;
 import engine.lua.type.object.insts.Prefab;
 import engine.lua.type.object.services.Players;
+import engine.lua.type.object.services.RunService;
 import engine.physics.PhysicsObjectInternal;
 import engine.util.Pair;
 
@@ -117,7 +118,7 @@ public abstract class PhysicsBase extends Instance implements GameSubscriber {
 		// Update matrices
 		InternalGameThread.runLater(()->{
 			InternalRenderThread.runLater(()->{
-				Game.runService().renderPreEvent().connect((args)->{
+				((RunService)Game.waitForService(LuaValue.valueOf("RunService"))).renderPreEvent().connect((args)->{
 					PhysicsObjectInternal tempPhys = this.physics;
 					GameObject tempLink = this.linked;
 					
