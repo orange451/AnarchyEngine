@@ -19,12 +19,12 @@ import java.util.ArrayList;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
-import engine.gl.MaterialGL;
 import engine.gl.Resources;
 import engine.gl.mesh.BufferedMesh;
 import engine.gl.mesh.BufferedPrefab;
 import engine.gl.mesh.Triangle;
 import engine.gl.mesh.Vertex;
+import engine.gl.objects.MaterialGL;
 import engine.util.FileIO;
 import lwjgui.paint.Color;
 

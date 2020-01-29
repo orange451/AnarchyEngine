@@ -13,15 +13,14 @@ package engine.lua.type.object;
 import org.joml.Vector3f;
 import org.luaj.vm2.LuaValue;
 
+import engine.ClientEngine;
 import engine.Game;
 import engine.gl.IPipeline;
-import engine.gl.LegacyPipeline;
-import engine.glv2.v2.lights.Light;
+import engine.gl.lights.Light;
 import engine.lua.type.NumberClampPreferred;
 import engine.lua.type.data.Color3;
 import engine.lua.type.data.Matrix4;
 import engine.lua.type.data.Vector3;
-import engine.lua.type.object.Instance;
 import engine.lua.type.object.services.Lighting;
 import engine.observer.RenderableWorld;
 import engine.util.AABBUtil;
@@ -89,7 +88,7 @@ public abstract class LightBase<T extends Light> extends Instance implements Pos
 					t = Game.workspace();
 				
 				if ( t instanceof RenderableWorld )
-					tempPipeline = LegacyPipeline.get((RenderableWorld) t);
+					tempPipeline = ClientEngine.renderThread.getPipeline();
 
 				if (tempPipeline == null)
 					break;

@@ -12,7 +12,7 @@ package engine.gl.mesh.mm3d;
 
 import org.joml.Vector4f;
 
-import engine.gl.MaterialGL;
+import engine.gl.objects.MaterialGL;
 import lwjgui.paint.Color;
 
 public class Mm3dMaterial {

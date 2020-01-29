@@ -24,9 +24,9 @@ import java.nio.IntBuffer;
 
 import org.lwjgl.system.MemoryStack;
 
-import engine.glv2.exceptions.DecodeTextureException;
-import engine.glv2.objects.RawTexture;
-import engine.glv2.objects.Texture;
+import engine.gl.exceptions.DecodeTextureException;
+import engine.gl.objects.RawTexture;
+import engine.gl.objects.Texture;
 import engine.tasks.Task;
 
 public class LoadTextureTask extends Task<Texture> {

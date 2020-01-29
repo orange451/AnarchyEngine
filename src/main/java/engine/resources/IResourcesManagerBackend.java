@@ -10,7 +10,7 @@
 
 package engine.resources;
 
-import engine.glv2.objects.RawTexture;
+import engine.gl.objects.RawTexture;
 
 public interface IResourcesManagerBackend {
 

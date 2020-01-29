@@ -14,7 +14,7 @@ import org.joml.Vector3f;
 import org.luaj.vm2.LuaValue;
 
 import engine.gl.IPipeline;
-import engine.glv2.v2.lights.DirectionalLightInternal;
+import engine.gl.lights.DirectionalLightInternal;
 import engine.lua.lib.EnumType;
 import engine.lua.type.data.Color3;
 import engine.lua.type.data.Vector3;

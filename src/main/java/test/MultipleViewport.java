@@ -4,7 +4,6 @@ import org.luaj.vm2.LuaValue;
 
 import engine.ClientRunner;
 import engine.Game;
-import engine.gl.LegacyPipeline;
 import engine.lua.type.data.Color3;
 import engine.lua.type.data.Vector3;
 import engine.lua.type.object.insts.Camera;
@@ -17,14 +16,14 @@ import engine.lua.type.object.services.Workspace;
 import engine.observer.RenderableWorld;
 
 public class MultipleViewport extends ClientRunner {
-	private LegacyPipeline secondaryPipeline;
+	//private LegacyPipeline secondaryPipeline;
 
 	@Override
 	public void render() {
 		super.render();
 		
-		if ( secondaryPipeline == null )
-			return;
+	//	if ( secondaryPipeline == null )
+		//	return;
 
 		// Render secondary Buffer
 		//secondaryPipeline.render();
@@ -47,7 +46,7 @@ public class MultipleViewport extends ClientRunner {
 		RenderableWorld renderableWorld = new Workspace();
 
 		// Create secondary pipeline
-		secondaryPipeline = new LegacyPipeline();
+		//secondaryPipeline = new LegacyPipeline();
 		//secondaryPipeline.setRenderableWorld(renderableWorld);
 		//secondaryPipeline.setSize(400, 400);
 

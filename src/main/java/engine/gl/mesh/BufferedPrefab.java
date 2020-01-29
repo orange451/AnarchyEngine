@@ -16,7 +16,7 @@ import java.util.List;
 
 import org.joml.Matrix4f;
 
-import engine.gl.MaterialGL;
+import engine.gl.objects.MaterialGL;
 import engine.util.Pair;
 
 public class BufferedPrefab {

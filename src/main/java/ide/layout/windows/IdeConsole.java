@@ -17,8 +17,8 @@ import java.util.ArrayList;
 
 import org.lwjgl.glfw.GLFW;
 
-import engine.glv2.v2.GPUProfiler;
-import engine.glv2.v2.GPUTaskProfile;
+import engine.gl.GPUProfiler;
+import engine.gl.GPUTaskProfile;
 import engine.lua.LuaEngine;
 import ide.layout.IdePane;
 import ide.layout.windows.icons.Icons;

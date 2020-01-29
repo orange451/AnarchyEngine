@@ -10,12 +10,11 @@
 
 package engine.gl;
 
-import engine.glv2.v2.RenderingSettings;
-import engine.glv2.v2.lights.AreaLightInternal;
-import engine.glv2.v2.lights.DirectionalLightInternal;
-import engine.glv2.v2.lights.ILightHandler;
-import engine.glv2.v2.lights.PointLightInternal;
-import engine.glv2.v2.lights.SpotLightInternal;
+import engine.gl.lights.AreaLightInternal;
+import engine.gl.lights.DirectionalLightInternal;
+import engine.gl.lights.ILightHandler;
+import engine.gl.lights.PointLightInternal;
+import engine.gl.lights.SpotLightInternal;
 import engine.lua.type.object.insts.DynamicSkybox;
 import engine.lua.type.object.insts.Skybox;
 import engine.observer.Renderable;

@@ -26,7 +26,7 @@ import ide.layout.windows.icons.Icons;
 import lwjgui.paint.Color;
 
 public class Material extends Asset implements TreeViewable {	
-	private engine.gl.MaterialGL material;
+	private engine.gl.objects.MaterialGL material;
 	private boolean changed = true;
 
 	private HashMap<String,LuaConnection> textureLoadsConnections = new HashMap<String,LuaConnection>();
@@ -74,7 +74,7 @@ public class Material extends Asset implements TreeViewable {
 		
 		this.rawset(C_MATERIALUPDATEEVENT, new LuaEvent());
 		
-		this.material = new engine.gl.MaterialGL();
+		this.material = new engine.gl.objects.MaterialGL();
 	}
 	
 	public LuaEvent materialUpdateEvent() {
@@ -211,7 +211,7 @@ public class Material extends Asset implements TreeViewable {
 	}
 
 	private long lastUpdate = System.currentTimeMillis();
-	public engine.gl.MaterialGL getMaterial() {
+	public engine.gl.objects.MaterialGL getMaterial() {
 		if ( changed || (System.currentTimeMillis()-lastUpdate > 500)) {
 			lastUpdate = System.currentTimeMillis();
 			if ( changed ) {
@@ -219,24 +219,24 @@ public class Material extends Asset implements TreeViewable {
 			}
 			changed = false;
 			
-			engine.glv2.objects.Texture dt = null;
+			engine.gl.objects.Texture dt = null;
 			if ( !this.rawget(C_DIFFUSETEXTURE).isnil() ) {
 				dt = ((Texture)this.rawget(C_DIFFUSETEXTURE)).getTexture();
 			}
 			material.setDiffuseTexture(dt);
 
-			engine.glv2.objects.Texture nt = null;
+			engine.gl.objects.Texture nt = null;
 			if ( !this.rawget(C_NORMALTEXTURE).isnil() ) {
 				nt = ((Texture)this.rawget(C_NORMALTEXTURE)).getTexture();
 			}
 			material.setNormalTexture(nt);
 			
-			engine.glv2.objects.Texture mt = null;
+			engine.gl.objects.Texture mt = null;
 			if ( !this.rawget(C_METALLICTEXTURE).isnil() )
 				mt = ((Texture)this.rawget(C_METALLICTEXTURE)).getTexture();
 			material.setMetalnessTexture(mt);
 			
-			engine.glv2.objects.Texture rt = null;
+			engine.gl.objects.Texture rt = null;
 			if ( !this.rawget(C_ROUGHNESSTEXTURE).isnil() )
 				rt = ((Texture)this.rawget(C_ROUGHNESSTEXTURE)).getTexture();
 			material.setRoughnessTexture(rt);

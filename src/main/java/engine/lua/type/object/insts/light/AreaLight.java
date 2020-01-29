@@ -14,7 +14,7 @@ import org.joml.Vector3f;
 import org.luaj.vm2.LuaValue;
 
 import engine.gl.IPipeline;
-import engine.glv2.v2.lights.AreaLightInternal;
+import engine.gl.lights.AreaLightInternal;
 import engine.lua.type.NumberClampPreferred;
 import engine.lua.type.data.Color3;
 import engine.lua.type.data.Vector3;

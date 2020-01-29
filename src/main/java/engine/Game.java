@@ -137,7 +137,7 @@ public class Game implements Tickable {
 		if ( Game.core().findFirstChild("CameraController") == null ) {
 			GlobalScript camera = new GlobalScript();
 			camera.setName("CameraController");
-			camera.setSourceFromFile("engine/camera.lua");
+			camera.setSourceFromFile("assets/scripts/camera.lua");
 			camera.setArchivable(false);
 			camera.setParent(Game.getService("Core"));
 			camera.setLocked(true);

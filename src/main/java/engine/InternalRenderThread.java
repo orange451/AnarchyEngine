@@ -13,9 +13,9 @@ package engine;
 import org.luaj.vm2.LuaValue;
 import org.lwjgl.glfw.GLFW;
 
+import engine.gl.GLRenderer;
 import engine.gl.IPipeline;
 import engine.gl.Resources;
-import engine.glv2.GLRenderer;
 import engine.lua.type.object.services.RunService;
 import engine.tasks.TaskManager;
 import engine.tasks.ThreadUtils;

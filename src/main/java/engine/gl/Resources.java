@@ -17,7 +17,8 @@ import static org.lwjgl.assimp.Assimp.aiSetImportPropertyFloat;
 import org.lwjgl.assimp.AIPropertyStore;
 
 import engine.gl.mesh.BufferedMesh;
-import engine.glv2.objects.Texture;
+import engine.gl.objects.MaterialGL;
+import engine.gl.objects.Texture;
 import engine.resources.ResourcesManager;
 import engine.tasks.TaskManager;
 import engine.util.MeshUtils;

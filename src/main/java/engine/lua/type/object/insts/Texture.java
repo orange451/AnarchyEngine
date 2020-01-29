@@ -24,7 +24,7 @@ import engine.tasks.TaskManager;
 import ide.layout.windows.icons.Icons;
 
 public class Texture extends AssetLoadable implements TreeViewable, FileResource {
-	private engine.glv2.objects.Texture texture;
+	private engine.gl.objects.Texture texture;
 	private boolean loaded;
 	private String path;
 
@@ -66,12 +66,12 @@ public class Texture extends AssetLoadable implements TreeViewable, FileResource
 		this.set(C_SRGB, LuaValue.valueOf(b));
 	}
 
-	public void setTexture(engine.glv2.objects.Texture force) {
+	public void setTexture(engine.gl.objects.Texture force) {
 		this.texture = force;
 		this.loaded = true;
 	}
 
-	public engine.glv2.objects.Texture getTexture() {
+	public engine.gl.objects.Texture getTexture() {
 		return this.texture;
 	}
 
@@ -84,7 +84,7 @@ public class Texture extends AssetLoadable implements TreeViewable, FileResource
 			ResourcesManager.loadTextureMisc(realPath, this.rawget(C_FLIPY).toboolean(), this::loaded);
 	}
 
-	private void loaded(engine.glv2.objects.Texture texture) {
+	private void loaded(engine.gl.objects.Texture texture) {
 		if (this.texture != null)
 			ResourcesManager.disposeTexture(this.texture);
 		this.texture = texture;

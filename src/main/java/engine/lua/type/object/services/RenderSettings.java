@@ -16,7 +16,7 @@ import engine.ClientEngine;
 import engine.Game;
 import engine.InternalGameThread;
 import engine.InternalRenderThread;
-import engine.glv2.v2.RenderingSettings;
+import engine.gl.RenderingSettings;
 import engine.lua.lib.EnumType;
 import engine.lua.type.object.Instance;
 import engine.lua.type.object.TreeViewable;

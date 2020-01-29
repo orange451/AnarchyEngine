@@ -33,8 +33,8 @@ import org.lwjgl.system.MemoryUtil;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.ObjectMap.Entry;
 
-import engine.glv2.GLResourcesManagerBackend;
-import engine.glv2.objects.Texture;
+import engine.gl.GLResourcesManagerBackend;
+import engine.gl.objects.Texture;
 import engine.tasks.OnFinished;
 import engine.tasks.Task;
 import engine.tasks.TaskManager;

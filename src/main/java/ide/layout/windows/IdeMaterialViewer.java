@@ -17,8 +17,6 @@ import org.luaj.vm2.LuaValue;
 
 import engine.Game;
 import engine.InternalRenderThread;
-import engine.gl.LegacyPipeline;
-import engine.gl.Resources;
 import engine.lua.type.data.Vector3;
 import engine.lua.type.object.Instance;
 import engine.lua.type.object.insts.Camera;
@@ -27,7 +25,6 @@ import engine.lua.type.object.insts.Material;
 import engine.lua.type.object.insts.Mesh;
 import engine.lua.type.object.insts.Prefab;
 import engine.lua.type.object.insts.Texture;
-import engine.lua.type.object.insts.light.PointLight;
 import engine.lua.type.object.services.Workspace;
 import engine.observer.RenderableWorld;
 import ide.layout.IdePane;
@@ -142,7 +139,7 @@ public class IdeMaterialViewer extends IdePane {
 	
 	static class MaterialNode extends VBox {
 		private OpenGLPane oglPane;
-		private LegacyPipeline materialPipeline;
+		//private LegacyPipeline materialPipeline;
 		
 		public MaterialNode(Material material) {
 			this.setAlignment(Pos.CENTER);
@@ -296,8 +293,8 @@ public class IdeMaterialViewer extends IdePane {
 
 		private void renderMaterial() {
 			InternalRenderThread.runLater(()->{
-				if ( materialPipeline == null )
-					return;
+				//if ( materialPipeline == null )
+				//	return;
 				//materialPipeline.render();
 			});
 		}
