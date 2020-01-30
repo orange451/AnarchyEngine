@@ -119,9 +119,4 @@ public class Lighting extends DeferredPass<LightingShader> {
 		auxTex.dispose();
 	}
 
-	@Override
-	public void dispose() {
-		super.dispose();
-	}
-
 }

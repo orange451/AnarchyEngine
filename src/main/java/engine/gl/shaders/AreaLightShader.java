@@ -14,6 +14,7 @@ import static org.lwjgl.opengl.GL20C.GL_FRAGMENT_SHADER;
 import static org.lwjgl.opengl.GL20C.GL_VERTEX_SHADER;
 
 import org.joml.Matrix4f;
+import org.joml.Vector4f;
 
 import engine.gl.lights.AreaLightInternal;
 import engine.gl.shaders.data.Attribute;
@@ -41,19 +42,24 @@ public class AreaLightShader extends ShaderProgram {
 	private UniformSampler ltcMag = new UniformSampler("ltcMag");
 	private UniformSampler ltcMat = new UniformSampler("ltcMat");
 
-	private UniformMatrix4 transformationMatrix = new UniformMatrix4("transformationMatrix");
+	private UniformVec3[] points = new UniformVec3[4];
 
 	private UniformAreaLight light = new UniformAreaLight("light");
 
 	private Matrix4f projInv = new Matrix4f(), viewInv = new Matrix4f();
+
+	private static final Vector4f temp = new Vector4f();
 
 	@Override
 	protected void setupShader() {
 		super.addShader(new Shader("assets/shaders/AreaLight.vs", GL_VERTEX_SHADER));
 		super.addShader(new Shader("assets/shaders/AreaLight.fs", GL_FRAGMENT_SHADER));
 		super.setAttributes(new Attribute(0, "position"));
+		for (int x = 0; x < 4; x++)
+			points[x] = new UniformVec3("points[" + x + "]");
+		super.storeUniforms(points);
 		super.storeUniforms(projectionMatrix, viewMatrix, cameraPosition, gDiffuse, gNormal, gDepth, gPBR, gMask, light,
-				inverseProjectionMatrix, inverseViewMatrix, transformationMatrix, ltcMag, ltcMat);
+				inverseProjectionMatrix, inverseViewMatrix, ltcMag, ltcMat);
 	}
 
 	@Override
@@ -73,8 +79,11 @@ public class AreaLightShader extends ShaderProgram {
 		light.loadLight(l);
 	}
 
-	public void loadTransformationMatrix(Matrix4f mat) {
-		transformationMatrix.loadMatrix(mat);
+	public void loadPoints(Vector4f[] points, Matrix4f matrix) {
+		for (int x = 0; x < 4; x++) {
+			Vector4f vec = points[x].mul(matrix, temp);
+			this.points[x].loadVec3(vec.x, vec.y, vec.z);
+		}
 	}
 
 	public void loadCameraData(Camera camera, Matrix4f projection) {

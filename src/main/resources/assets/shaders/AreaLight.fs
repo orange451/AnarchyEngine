@@ -27,6 +27,7 @@ uniform mat4 inverseViewMatrix;
 uniform sampler2D ltcMag;
 uniform sampler2D ltcMat;
 uniform mat4 transformationMatrix;
+uniform vec3 points[4];
 
 uniform AreaLight light;
 
@@ -212,12 +213,6 @@ void main() {
 
 		vec3 F0 = vec3(0.04);
 		F0 = mix(F0, image.rgb, metallic);
-
-		vec3 points[4];
-		points[0] = (transformationMatrix * vec4(-0.5, -0.5, 0, 1)).xyz;
-		points[1] = (transformationMatrix * vec4(-0.5, 0.5, 0, 1)).xyz;
-		points[2] = (transformationMatrix * vec4(0.5, 0.5, 0, 1)).xyz;
-		points[3] = (transformationMatrix * vec4(0.5, -0.5, 0, 1)).xyz;
 
 		vec3 planeDiffuseDir = ltcAreaLight(N, V, position, diffuseMatrix, points);
 

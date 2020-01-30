@@ -10,7 +10,6 @@
 
 package engine.gl.lights;
 
-import static org.lwjgl.opengl.GL11C.glCullFace;
 import static org.lwjgl.opengl.GL11C.GL_BACK;
 import static org.lwjgl.opengl.GL11C.GL_BLEND;
 import static org.lwjgl.opengl.GL11C.GL_COLOR_BUFFER_BIT;
@@ -28,17 +27,18 @@ import static org.lwjgl.opengl.GL11C.GL_TEXTURE_WRAP_T;
 import static org.lwjgl.opengl.GL11C.GL_TRIANGLE_STRIP;
 import static org.lwjgl.opengl.GL11C.glBlendFunc;
 import static org.lwjgl.opengl.GL11C.glClear;
+import static org.lwjgl.opengl.GL11C.glCullFace;
 import static org.lwjgl.opengl.GL11C.glDisable;
 import static org.lwjgl.opengl.GL11C.glDrawArrays;
 import static org.lwjgl.opengl.GL11C.glEnable;
 import static org.lwjgl.opengl.GL12C.GL_CLAMP_TO_EDGE;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE0;
-import static org.lwjgl.opengl.GL13C.GL_TEXTURE11;
-import static org.lwjgl.opengl.GL13C.GL_TEXTURE12;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE2;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE3;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE4;
-import static org.lwjgl.opengl.GL13C.*;
+import static org.lwjgl.opengl.GL13C.GL_TEXTURE5;
+import static org.lwjgl.opengl.GL13C.GL_TEXTURE6;
+import static org.lwjgl.opengl.GL13C.GL_TEXTURE7;
 import static org.lwjgl.opengl.GL15C.GL_STATIC_DRAW;
 import static org.lwjgl.opengl.GL30C.GL_COLOR_ATTACHMENT0;
 import static org.lwjgl.opengl.GL30C.GL_RGB16F;
@@ -48,6 +48,7 @@ import java.util.List;
 
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
+import org.joml.Vector4f;
 import org.luaj.vm2.LuaValue;
 import org.lwjgl.glfw.GLFW;
 
@@ -83,6 +84,9 @@ public class AreaLightHandler implements ILightHandler<AreaLightInternal> {
 	private Texture ltcMag, ltcMat;
 
 	private static final Vector3f UP = new Vector3f(0, 1, 0);
+
+	private static final Vector4f[] POINTS = { new Vector4f(-0.5f, -0.5f, 0, 1), new Vector4f(-0.5f, 0.5f, 0, 1),
+			new Vector4f(0.5f, 0.5f, 0, 1), new Vector4f(0.5f, -0.5f, 0, 1) };
 
 	public AreaLightHandler(int width, int height) {
 		this.width = width;
@@ -133,7 +137,7 @@ public class AreaLightHandler implements ILightHandler<AreaLightInternal> {
 			temp.translate(l.position);
 			temp.rotateTowards(l.direction, UP);
 			temp.scale(l.sizeY, l.sizeX, 1.0f);
-			shader.loadTransformationMatrix(temp);
+			shader.loadPoints(POINTS, temp);
 			shader.loadAreaLight(l);
 			glDrawArrays(GL_TRIANGLE_STRIP, 0, quad.getVertexCount());
 		}
