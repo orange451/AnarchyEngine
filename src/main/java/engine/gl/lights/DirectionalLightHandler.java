@@ -95,7 +95,7 @@ public class DirectionalLightHandler implements ILightHandler<DirectionalLightIn
 		shader.start();
 		shader.loadCameraData(camera, projectionMatrix);
 		shader.loadUseShadows(rs.shadowsEnabled);
-		quad.bind(0);
+		quad.bind();
 		dp.getDiffuseTex().active(GL_TEXTURE0);
 		dp.getNormalTex().active(GL_TEXTURE2);
 		dp.getDepthTex().active(GL_TEXTURE3);
@@ -108,7 +108,7 @@ public class DirectionalLightHandler implements ILightHandler<DirectionalLightIn
 			l.getShadowMap().getTexture().active(GL_TEXTURE6);
 			glDrawArrays(GL_TRIANGLE_STRIP, 0, quad.getVertexCount());
 		}
-		quad.unbind(0);
+		quad.unbind();
 		shader.stop();
 		glDisable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);

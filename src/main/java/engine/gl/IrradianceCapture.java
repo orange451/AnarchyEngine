@@ -92,12 +92,12 @@ public class IrradianceCapture {
 		shader.start();
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_CUBE_MAP, envMap.getTexture());
-		cubeMesh.bind(0);
+		cubeMesh.bind();
 		camera.switchToFace(i);
 		shader.loadviewMatrix(camera);
 		glClear(GL_COLOR_BUFFER_BIT);
 		glDrawArrays(GL_TRIANGLES, 0, cubeMesh.getVertexCount());
-		cubeMesh.unbind(0);
+		cubeMesh.unbind();
 		shader.stop();
 		framebuffer.unbind();
 		i += 1;

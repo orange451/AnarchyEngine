@@ -118,9 +118,9 @@ public class PreFilteredEnvironment {
 
 		lutFB.bind();
 		brdfIntegrationMapShader.start();
-		quad.bind(0);
+		quad.bind();
 		glDrawArrays(GL_TRIANGLE_STRIP, 0, quad.getVertexCount());
-		quad.unbind(0);
+		quad.unbind();
 		brdfIntegrationMapShader.stop();
 		lutFB.unbind();
 
@@ -132,7 +132,7 @@ public class PreFilteredEnvironment {
 	public void render(Texture envMap) {
 		framebuffer.bind();
 		shader.start();
-		cube.bind(0);
+		cube.bind();
 		envMap.active(GL_TEXTURE0);
 		shader.loadResolution(envMap.getWidth());
 		shader.loadProjectionMatrix(camera.getProjectionMatrix());
@@ -152,7 +152,7 @@ public class PreFilteredEnvironment {
 				glDrawArrays(GL_TRIANGLES, 0, cube.getVertexCount());
 			}
 		}
-		cube.unbind(0);
+		cube.unbind();
 		shader.stop();
 		framebuffer.unbind();
 	}

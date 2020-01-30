@@ -109,7 +109,7 @@ public class SpotLightHandler implements ILightHandler<SpotLightInternal> {
 		dp.getDepthTex().active(GL_TEXTURE3);
 		dp.getPbrTex().active(GL_TEXTURE4);
 		dp.getMaskTex().active(GL_TEXTURE5);
-		cone.bind(0);
+		cone.bind();
 		for (SpotLightInternal l : lights) {
 			if (!l.visible)
 				continue;
@@ -124,7 +124,7 @@ public class SpotLightHandler implements ILightHandler<SpotLightInternal> {
 			l.getShadowMap().getTexture().active(GL_TEXTURE6);
 			glDrawElements(GL_TRIANGLES, cone.getIndexCount(), GL_UNSIGNED_INT, 0);
 		}
-		cone.unbind(0);
+		cone.unbind();
 		shader.stop();
 		glCullFace(GL_BACK);
 		glDisable(GL_BLEND);

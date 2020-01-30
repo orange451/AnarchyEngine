@@ -14,7 +14,6 @@ import static org.lwjgl.opengl.GL11.GL_FLOAT;
 import static org.lwjgl.opengl.GL11.GL_INT;
 import static org.lwjgl.opengl.GL15.GL_ARRAY_BUFFER;
 import static org.lwjgl.opengl.GL15.GL_ELEMENT_ARRAY_BUFFER;
-import static org.lwjgl.opengl.GL20.glDisableVertexAttribArray;
 import static org.lwjgl.opengl.GL20.glEnableVertexAttribArray;
 import static org.lwjgl.opengl.GL20.glVertexAttribPointer;
 import static org.lwjgl.opengl.GL30.glBindVertexArray;
@@ -51,18 +50,6 @@ public class VAO {
 		return indexCount;
 	}
 
-	public void bind(int... attributes) {
-		bind();
-		for (int i : attributes)
-			glEnableVertexAttribArray(i);
-	}
-
-	public void unbind(int... attributes) {
-		for (int i : attributes)
-			glDisableVertexAttribArray(i);
-		unbind();
-	}
-
 	public void createIndexBuffer(int[] indices, int param) {
 		this.indexVbo = VBO.create(GL_ELEMENT_ARRAY_BUFFER);
 		indexVbo.bind();
@@ -74,6 +61,7 @@ public class VAO {
 		VBO dataVbo = VBO.create(GL_ARRAY_BUFFER);
 		dataVbo.bind();
 		dataVbo.storeData(data, param);
+		glEnableVertexAttribArray(attribute);
 		glVertexAttribIPointer(attribute, attrSize, GL_INT, attrSize * BYTES_PER_INT, 0);
 		dataVbo.unbind();
 		dataVbos.add(dataVbo);
@@ -83,6 +71,7 @@ public class VAO {
 		VBO dataVbo = VBO.create(GL_ARRAY_BUFFER);
 		dataVbo.bind();
 		dataVbo.storeData(data, param);
+		glEnableVertexAttribArray(attribute);
 		glVertexAttribIPointer(attribute, attrSize, GL_INT, attrSize * BYTES_PER_INT, 0);
 		dataVbo.unbind();
 		dataVbos.add(dataVbo);
@@ -92,6 +81,7 @@ public class VAO {
 		VBO dataVbo = VBO.create(GL_ARRAY_BUFFER);
 		dataVbo.bind();
 		dataVbo.storeData(data, param);
+		glEnableVertexAttribArray(attribute);
 		glVertexAttribPointer(attribute, attrSize, GL_FLOAT, false, attrSize * BYTES_PER_FLOAT, 0);
 		dataVbo.unbind();
 		dataVbos.add(dataVbo);
@@ -101,6 +91,7 @@ public class VAO {
 		VBO dataVbo = VBO.create(GL_ARRAY_BUFFER);
 		dataVbo.bind();
 		dataVbo.storeData(data, param);
+		glEnableVertexAttribArray(attribute);
 		glVertexAttribPointer(attribute, attrSize, GL_FLOAT, false, attrSize * BYTES_PER_FLOAT, 0);
 		dataVbo.unbind();
 		dataVbos.add(dataVbo);

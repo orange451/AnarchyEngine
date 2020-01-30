@@ -111,21 +111,21 @@ public abstract class DeferredPipeline {
 
 	public void process(RendererData rnd, IRenderingData rd) {
 		glDisable(GL_DEPTH_TEST);
-		quad.bind(0);
+		quad.bind();
 		for (DeferredPass<?> pass : passes)
 			pass.process(rnd, rd, this, auxTex, quad);
-		quad.unbind(0);
+		quad.unbind();
 		glEnable(GL_DEPTH_TEST);
 	}
 
 	public void render(Framebuffer fb) {
 		previousFrame.bind();
 		finalShader.start();
-		quad.bind(0);
+		quad.bind();
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, auxTex[0].getTexture());
 		glDrawArrays(GL_TRIANGLE_STRIP, 0, quad.getVertexCount());
-		quad.unbind(0);
+		quad.unbind();
 		finalShader.stop();
 		previousFrame.unbind();
 		// Blit depth

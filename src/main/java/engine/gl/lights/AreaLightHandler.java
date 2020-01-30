@@ -129,7 +129,7 @@ public class AreaLightHandler implements ILightHandler<AreaLightInternal> {
 		dp.getMaskTex().active(GL_TEXTURE5);
 		ltcMag.active(GL_TEXTURE6);
 		ltcMat.active(GL_TEXTURE7);
-		quad.bind(0);
+		quad.bind();
 		for (AreaLightInternal l : lights) {
 			if (!l.visible)
 				continue;
@@ -141,7 +141,7 @@ public class AreaLightHandler implements ILightHandler<AreaLightInternal> {
 			shader.loadAreaLight(l);
 			glDrawArrays(GL_TRIANGLE_STRIP, 0, quad.getVertexCount());
 		}
-		quad.unbind(0);
+		quad.unbind();
 		shader.stop();
 		glCullFace(GL_BACK);
 		glDisable(GL_BLEND);

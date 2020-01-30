@@ -137,10 +137,10 @@ public abstract class PostProcessPipeline {
 
 	public void process(RendererData rnd, IRenderingData rd) {
 		glDisable(GL_DEPTH_TEST);
-		quad.bind(0);
+		quad.bind();
 		for (PostProcesPass<?> pass : passes)
 			pass.process(rnd, rd, this, auxTex, quad);
-		quad.unbind(0);
+		quad.unbind();
 		glEnable(GL_DEPTH_TEST);
 	}
 
@@ -149,11 +149,11 @@ public abstract class PostProcessPipeline {
 		glDisable(GL_DEPTH_TEST);
 		main.bind();
 		finalShader.start();
-		quad.bind(0);
+		quad.bind();
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, auxTex[0].getTexture());
 		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-		quad.unbind(0);
+		quad.unbind();
 		finalShader.stop();
 		main.unbind();
 		glEnable(GL_DEPTH_TEST);

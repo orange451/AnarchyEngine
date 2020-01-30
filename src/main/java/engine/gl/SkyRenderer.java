@@ -145,9 +145,9 @@ public class SkyRenderer {
 				dynamicSkyShader.loadTransformationMatrix(infMat);
 			else
 				dynamicSkyShader.loadTransformationMatrix(regMat);
-			dome.bind(0, 1, 2);
+			dome.bind();
 			glDrawElements(GL_TRIANGLES, dome.getIndexCount(), GL_UNSIGNED_INT, 0);
-			dome.unbind(0, 1, 2);
+			dome.unbind();
 			dynamicSkyShader.stop();
 			glCullFace(GL_BACK);
 		} else if (staticSky != null) {
@@ -162,11 +162,11 @@ public class SkyRenderer {
 						staticSkyShader.loadTransformationMatrix(infMat);
 					else
 						staticSkyShader.loadTransformationMatrix(regMat);
-					cube.bind(0);
+					cube.bind();
 					glActiveTexture(GL_TEXTURE0);
 					glBindTexture(GL_TEXTURE_CUBE_MAP, cubeTex.getTexture());
 					glDrawArrays(GL_TRIANGLES, 0, cube.getVertexCount());
-					cube.unbind(0);
+					cube.unbind();
 					staticSkyShader.stop();
 				}
 			}
@@ -179,9 +179,9 @@ public class SkyRenderer {
 				ambientSkyShader.loadTransformationMatrix(infMat);
 			else
 				ambientSkyShader.loadTransformationMatrix(regMat);
-			cube.bind(0);
+			cube.bind();
 			glDrawArrays(GL_TRIANGLES, 0, cube.getVertexCount());
-			cube.unbind(0);
+			cube.unbind();
 			ambientSkyShader.stop();
 		}
 	}
@@ -203,9 +203,9 @@ public class SkyRenderer {
 				dynamicSkyCubeShader.loadTransformationMatrix(infMat);
 			else
 				dynamicSkyCubeShader.loadTransformationMatrix(regMat);
-			dome.bind(0, 1, 2);
+			dome.bind();
 			glDrawElements(GL_TRIANGLES, dome.getIndexCount(), GL_UNSIGNED_INT, 0);
-			dome.unbind(0, 1, 2);
+			dome.unbind();
 			dynamicSkyCubeShader.stop();
 			glCullFace(GL_BACK);
 
@@ -223,11 +223,11 @@ public class SkyRenderer {
 						staticSkyCubeShader.loadTransformationMatrix(infMat);
 					else
 						staticSkyCubeShader.loadTransformationMatrix(regMat);
-					cube.bind(0);
+					cube.bind();
 					glActiveTexture(GL_TEXTURE0);
 					glBindTexture(GL_TEXTURE_CUBE_MAP, cubeTex.getTexture());
 					glDrawArrays(GL_TRIANGLES, 0, cube.getVertexCount());
-					cube.unbind(0);
+					cube.unbind();
 					staticSkyCubeShader.stop();
 				}
 			}
@@ -239,9 +239,9 @@ public class SkyRenderer {
 				ambientSkyCubeShader.loadTransformationMatrix(infMat);
 			else
 				ambientSkyCubeShader.loadTransformationMatrix(regMat);
-			cube.bind(0);
+			cube.bind();
 			glDrawArrays(GL_TRIANGLES, 0, cube.getVertexCount());
-			cube.unbind(0);
+			cube.unbind();
 			ambientSkyCubeShader.stop();
 		}
 	}
@@ -310,7 +310,7 @@ public class SkyRenderer {
 		
 		framebuffer.bind();
 		stc.start();
-		cube.bind(0);
+		cube.bind();
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, staticSky.getImage().getTexture().getTexture());
 		stc.loadProjectionMatrix(camera.getProjectionMatrix());
@@ -322,7 +322,7 @@ public class SkyRenderer {
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			glDrawArrays(GL_TRIANGLES, 0, cube.getVertexCount());
 		}
-		cube.unbind(0);
+		cube.unbind();
 		stc.stop();
 		framebuffer.unbind();
 
