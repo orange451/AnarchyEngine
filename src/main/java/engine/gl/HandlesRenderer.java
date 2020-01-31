@@ -307,11 +307,11 @@ public class HandlesRenderer {
 	private Vector3f projectMouseTo3D(Vector3f origin, Vector3f moveDirection, Camera camera, Matrix4f projection,
 			Vector2f size) {
 		// Get 2d line
-		Vector2f p1 = MatrixUtils.project3Dto2D(origin, projection, camera.getViewMatrix().getInternal(), size);
+		Vector2f p1 = MatrixUtils.project3Dto2D(origin, projection, camera.getViewMatrixInverse(), size);
 		Vector2f p2 = MatrixUtils.project3Dto2D(origin.add(moveDirection, new Vector3f()), projection,
-				camera.getViewMatrix().getInternal(), size);
+				camera.getViewMatrixInverse(), size);
 		Vector2f p3 = MatrixUtils.project3Dto2D(origin.sub(moveDirection, new Vector3f()), projection,
-				camera.getViewMatrix().getInternal(), size);
+				camera.getViewMatrixInverse(), size);
 		p2.sub(p1).normalize().mul(256).add(p1);
 		p3.sub(p1).normalize().mul(256).add(p1);
 
@@ -449,7 +449,7 @@ public class HandlesRenderer {
 		Resources.MESH_CONE.unbind();
 
 		Vector3f arrowPos = headMat.getTranslation(new Vector3f());
-		Vector2f pos = MatrixUtils.project3Dto2D(arrowPos, projection, camera.getViewMatrix().getInternal(), size);
+		Vector2f pos = MatrixUtils.project3Dto2D(arrowPos, projection, camera.getViewMatrixInverse(), size);
 		MouseHandler mh = ClientEngine.renderThread.getWindow().getMouseHandler();
 		Vector2f mou = new Vector2f(mh.getX(), mh.getY());
 		boolean closer = true;

@@ -47,7 +47,7 @@ public class AmbientSkyShader extends ShaderProgram {
 
 	public void loadCamera(Camera camera, Matrix4f projection) {
 		projectionMatrix.loadMatrix(projection);
-		temp.set(camera.getViewMatrix().getInternal());
+		temp.set(camera.getViewMatrixInverse());
 		temp._m30(0);
 		temp._m31(0);
 		temp._m32(0);

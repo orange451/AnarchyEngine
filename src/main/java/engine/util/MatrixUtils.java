@@ -44,7 +44,7 @@ public class MatrixUtils {
 	public static Vector3f project2Dto3D(Vector2f screenSpaceCoordinates, Matrix4f projection, Camera camera,
 			Vector2f size) {
 		Matrix4f iProjMat = projection.invert(new Matrix4f());
-		Matrix4f iViewMat = camera.getViewMatrix().getInternal().invert(new Matrix4f());
+		Matrix4f iViewMat = camera.getViewMatrixInverse();
 
 		// Put in Normalized Device Coordinate space [-1 to 1] Currently in Screen space
 		// [0 to screen size]

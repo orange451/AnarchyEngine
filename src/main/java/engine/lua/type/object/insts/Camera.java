@@ -40,6 +40,8 @@ public class Camera extends Instance implements TreeViewable,Positionable {
 
 	private static final LuaValue C_CAMERATYPE = LuaValue.valueOf("CameraType");
 	
+	private Matrix4f inverseViewMatrix;
+	
 	public Camera() {
 		super("Camera");
 
@@ -158,6 +160,10 @@ public class Camera extends Instance implements TreeViewable,Positionable {
 		this.set(C_VIEWMATRIX, matrix);
 	}
 	
+	public Matrix4f getViewMatrixInverse() {
+		return this.inverseViewMatrix;
+	}
+	
 	public Matrix4 getViewMatrix() {
 		LuaValue viewMat = this.get(C_VIEWMATRIX);
 		if ( viewMat.isnil() )
@@ -229,6 +235,8 @@ public class Camera extends Instance implements TreeViewable,Positionable {
 
 			this.rawset(C_POSITION, new Vector3(t));
 			this.set(C_LOOKAT, new Vector3(l));
+			
+			this.inverseViewMatrix = view.invert(new Matrix4f());
 		}
 		
 		// If lookat/position is changed, recalculate view matrix
@@ -268,7 +276,9 @@ public class Camera extends Instance implements TreeViewable,Positionable {
 	private void updateMatrix() {
 		Matrix4f mat = new Matrix4f();
 		mat.lookAt(((Vector3)this.rawget(C_POSITION)).toJoml(), ((Vector3)this.rawget(C_LOOKAT)).toJoml(), new Vector3f(0,0,1));
-		this.rawset(C_VIEWMATRIX, new Matrix4(mat));
+		
+		this.inverseViewMatrix = new Matrix4f(mat);
+		this.rawset(C_VIEWMATRIX, new Matrix4(mat.invert()));
 	}
 
 	@Override

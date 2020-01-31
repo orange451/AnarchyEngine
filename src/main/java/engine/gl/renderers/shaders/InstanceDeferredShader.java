@@ -79,7 +79,7 @@ public class InstanceDeferredShader extends ShaderProgram {
 
 	public void loadCamera(Camera camera, Matrix4f projection, Vector2f resolution, boolean taa) {
 		projectionMatrix.loadMatrix(projection);
-		viewMatrix.loadMatrix(camera.getViewMatrix().getInternal());
+		viewMatrix.loadMatrix(camera.getViewMatrixInverse());
 		useTAA.loadBoolean(taa);
 		if (taa) {
 			Vector2f texSize = new Vector2f(1.0f / resolution.x, 1.0f / resolution.y);

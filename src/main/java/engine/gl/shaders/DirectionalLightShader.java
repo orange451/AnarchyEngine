@@ -85,9 +85,9 @@ public class DirectionalLightShader extends ShaderProgram {
 
 	public void loadCameraData(Camera camera, Matrix4f projection) {
 		this.projectionMatrix.loadMatrix(projection);
-		this.viewMatrix.loadMatrix(camera.getViewMatrix().getInternal());
+		this.viewMatrix.loadMatrix(camera.getViewMatrixInverse());
 		this.cameraPosition.loadVec3(camera.getPosition().getInternal());
 		this.inverseProjectionMatrix.loadMatrix(projection.invert(projInv));
-		this.inverseViewMatrix.loadMatrix(camera.getViewMatrix().getInternal().invert(viewInv));
+		this.inverseViewMatrix.loadMatrix(camera.getViewMatrixInverse().invert(viewInv));
 	}
 }
