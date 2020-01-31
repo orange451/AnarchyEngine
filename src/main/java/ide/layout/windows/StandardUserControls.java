@@ -23,22 +23,30 @@ import engine.lua.type.object.Instance;
 import engine.lua.type.object.insts.Folder;
 import lwjgui.LWJGUI;
 import lwjgui.scene.Node;
+import lwjgui.scene.control.TextInputControl;
 
 public class StandardUserControls {
 
 	public static void bind(Node object) {
 		object.setOnKeyPressed((event)->{
+			
 			// Node must be selected
 			//if ( !LWJGUI.getCurrentContext().isSelected(object) && !object.isDescendentSelected() )
 			//	return;
 			
 			// Delete Selection
 			if ( event.getKey() == GLFW.GLFW_KEY_DELETE ) {
+				if ( object.getWindow().getContext().getSelected() instanceof TextInputControl )
+					return;
+				
 				Game.deleteSelection();
 			}
 			
 			// Group objects
 			if ( event.isCtrlDown && event.getKey() == GLFW.GLFW_KEY_G ) {
+				if ( object.getWindow().getContext().getSelected() instanceof TextInputControl )
+					return;
+				
 				List<Instance> selected = Game.selected();
 				List<Instance> root = Game.getRootInstances(selected);
 				if ( root.size() == 0 )
@@ -78,21 +86,33 @@ public class StandardUserControls {
 			
 			// Duplicate object
 			if ( event.isCtrlDown && event.getKey() == GLFW.GLFW_KEY_D ) {
+				if ( object.getWindow().getContext().getSelected() instanceof TextInputControl )
+					return;
+				
 				Game.duplicateSelection();
 			}
 			
 			// Cut object
 			if ( event.isCtrlDown && event.getKey() == GLFW.GLFW_KEY_X ) {
+				if ( object.getWindow().getContext().getSelected() instanceof TextInputControl )
+					return;
+				
 				Game.cutSelection();
 			}
 			
 			// Copy object
 			if ( event.isCtrlDown && event.getKey() == GLFW.GLFW_KEY_C ) {
+				if ( object.getWindow().getContext().getSelected() instanceof TextInputControl )
+					return;
+				
 				Game.copySelection();
 			}
 			
 			// Paste object
 			if ( event.isCtrlDown && event.getKey() == GLFW.GLFW_KEY_V ) {
+				if ( object.getWindow().getContext().getSelected() instanceof TextInputControl )
+					return;
+				
 				Instance pasteInto = Game.workspace();
 				List<Instance> t = Game.selected();
 				if ( t.size() == 1 ) {
@@ -110,11 +130,17 @@ public class StandardUserControls {
 			
 			// Undo control
 			if ( event.isCtrlDown && event.getKey() == GLFW.GLFW_KEY_Z ) {
+				if ( object.getWindow().getContext().getSelected() instanceof TextInputControl )
+					return;
+				
 				Game.historyService().undo();
 			}
 			
 			// Redo control
 			if ( event.isCtrlDown && event.getKey() == GLFW.GLFW_KEY_Y ) {
+				if ( object.getWindow().getContext().getSelected() instanceof TextInputControl )
+					return;
+				
 				Game.historyService().redo();
 			}
 			

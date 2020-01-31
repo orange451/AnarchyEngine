@@ -574,7 +574,8 @@ public class Game implements Tickable {
 		if ( Game.running == running )
 			return;
 		
-		stoppingEvent().fire();
+		if ( !running )
+			stoppingEvent().fire();
 		
 		Game.running = running;
 		Game.game().rawset(C_RUNNING, LuaValue.valueOf(running));

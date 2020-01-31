@@ -502,8 +502,11 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 					textField.setText(label.getText());
 					this.getChildren().add(textField);
 					editing = true;
-					window.getContext().setSelected(textField);
 					textField.selectAll();
+					window.getContext().setSelected(textField);
+					LWJGUI.runLater(()->{
+						window.getContext().setSelected(textField);
+					});
 				});
 			}
 			
@@ -669,8 +672,8 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 		}
 		
 		@Override
-		public void position(Node node) {
-			super.position(node);
+		public void dispose() {
+			super.dispose();
 			
 			if ( !selected )
 				return;
@@ -694,7 +697,7 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 			}
 		}
 		
-		public void set(LuaValue instance) {	
+		public void set(LuaValue instance) {
 			
 			// Stop selection
 			this.cancel();

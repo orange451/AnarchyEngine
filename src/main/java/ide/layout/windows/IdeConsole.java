@@ -17,6 +17,7 @@ import java.util.ArrayList;
 
 import org.lwjgl.glfw.GLFW;
 
+import engine.InternalRenderThread;
 import engine.gl.GPUProfiler;
 import engine.gl.GPUTaskProfile;
 import engine.lua.LuaEngine;
@@ -185,8 +186,10 @@ public class IdeConsole extends IdePane {
 			@Override
 			public void write(int b) throws IOException {
 				String letter = "" + (char) b;
-				LWJGUI.runLater(() -> {
-					console.appendText(letter);
+				InternalRenderThread.runLater(()->{
+					LWJGUI.runLater(() -> {
+						console.appendText(letter);
+					});
 				});
 			}
 		}, true);
@@ -196,8 +199,10 @@ public class IdeConsole extends IdePane {
 			@Override
 			public void write(int b) throws IOException {
 				String letter = "" + (char) b;
-				LWJGUI.runLater(() -> {
-					console.appendText(letter);
+				InternalRenderThread.runLater(()->{
+					LWJGUI.runLater(() -> {
+						console.appendText(letter);
+					});
 				});
 			}
 		}, true);

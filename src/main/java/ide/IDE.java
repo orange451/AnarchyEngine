@@ -64,12 +64,10 @@ public class IDE extends ClientEngine {
 			
 			// Load project
 			if ( tempArgs.length > 0 ) {
-				Load.load(tempArgs[0]);
 				InternalRenderThread.runLater(()->{
+					Load.load(tempArgs[0]);
 					InternalGameThread.runLater(() -> {
-						InternalRenderThread.runLater(()->{
-							Game.setRunning(true);
-						});
+						Game.setRunning(true);
 					});
 				});
 			}
