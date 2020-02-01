@@ -37,6 +37,10 @@ public class IDE extends ClientEngine {
 	
 	public static final String TITLE = "Anarchy Engine - Build " + Game.version();
 	
+	public IDE(String[] args) {
+		super(args);
+	}
+
 	@Override
 	public void setupEngine() {
 		InternalRenderThread.desiredFPS = 60;
@@ -65,8 +69,8 @@ public class IDE extends ClientEngine {
 			// Load project
 			if ( tempArgs.length > 0 ) {
 				InternalRenderThread.runLater(()->{
-					Load.load(tempArgs[0]);
 					InternalGameThread.runLater(() -> {
+						Load.load(tempArgs[0]);
 						Game.setRunning(true);
 					});
 				});
@@ -146,6 +150,6 @@ public class IDE extends ClientEngine {
 	}
 
 	public static void main(String[] args) {
-		new IDE();
+		IDE engine = new IDE(args);
 	}
 }

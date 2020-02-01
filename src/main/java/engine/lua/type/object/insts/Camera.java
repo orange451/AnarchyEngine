@@ -40,7 +40,7 @@ public class Camera extends Instance implements TreeViewable,Positionable {
 
 	private static final LuaValue C_CAMERATYPE = LuaValue.valueOf("CameraType");
 	
-	private Matrix4f inverseViewMatrix;
+	private Matrix4f inverseViewMatrix; // Gets updated whenever the viewmatrix changes
 	
 	public Camera() {
 		super("Camera");
@@ -92,6 +92,61 @@ public class Camera extends Instance implements TreeViewable,Positionable {
 				return null;
 			}
 		});
+		
+		this.changedEvent().connect((args)->{
+			LuaValue key = args[0];
+			LuaValue value = args[1];
+			
+			// If viewmatrix is directly changed, change sub variables
+			// Directly updates position and lookat
+			// Indirectly updates pitch and yaw
+			if ( key.eq_b(C_VIEWMATRIX) ) {
+				float dist = ((Vector3)this.get(C_LOOKAT)).getInternal().distance(((Vector3)this.get(C_POSITION)).getInternal());
+				
+				Matrix4f view = ((Matrix4)this.get(C_VIEWMATRIX)).getInternal();
+				Vector3f t = view.invert(new Matrix4f()).getTranslation(new Vector3f());
+				Vector3f l = new Vector3f(0,0,dist).mulProject(view);
+
+				this.rawset(C_POSITION, new Vector3(t));
+				this.set(C_LOOKAT, new Vector3(l));
+				
+				this.inverseViewMatrix = view.invert(new Matrix4f());
+			}
+			
+			// If lookat/position is changed, recalculate view matrix
+			if ( key.eq_b(C_LOOKAT) || key.eq_b(C_POSITION) ) {
+				Vector3f eye = ((Vector3)this.get(C_POSITION)).toJoml();
+				Vector3f look = ((Vector3)this.get(C_LOOKAT)).toJoml();
+				look = eye.sub(look, look);
+				look.normalize();
+
+				float pitch = (float) Math.asin(-look.z);
+				if ( pitch == 0 )
+					pitch = 0.000001f;
+				float yaw = (float) (-Math.atan2(look.x, look.y));
+
+				this.rawset(C_PITCH, LuaValue.valueOf(pitch));
+				this.rawset(C_YAW, LuaValue.valueOf(yaw));
+				updateMatrix();
+			}
+
+			// Recalculate Look At Matrix if yaw/pitch are changed.
+			if ( key.eq_b(C_YAW) || key.eq_b(C_PITCH) ) {
+				float dist = ((Vector3)this.get(C_LOOKAT)).getInternal().distance(((Vector3)this.get(C_POSITION)).getInternal());
+				
+				float yaw = (float) this.get(C_YAW).checkdouble() - (float)Math.PI/2f;
+				float pitch = (float) this.get(C_PITCH).checkdouble();
+				Vector3f position = ((Vector3)this.get(C_POSITION)).toJoml();
+
+				float lookX = position.x + (float) (Math.cos(yaw) * Math.cos(pitch)) * dist;
+				float lookY = position.y + (float) (Math.sin(yaw) * Math.cos(pitch)) * dist;
+				float lookZ = position.z + (float) Math.sin(pitch) * dist;
+
+				this.rawset(C_LOOKAT, new Vector3(lookX, lookY, lookZ));
+				updateMatrix();
+			}
+		});
+		
 		updateMatrix();
 	}
 	
@@ -221,64 +276,12 @@ public class Camera extends Instance implements TreeViewable,Positionable {
 		return (Vector3) this.getLookAt().sub(this.getPosition());
 	}
 
-	@Override
-	public void onValueUpdated( LuaValue key, LuaValue value ) {
-		// If viewmatrix is directly changed, change sub variables
-		// Directly updates position and lookat
-		// Indirectly updates pitch and yaw
-		if ( key.eq_b(C_VIEWMATRIX) ) {
-			float dist = ((Vector3)this.get(C_LOOKAT)).getInternal().distance(((Vector3)this.get(C_POSITION)).getInternal());
-			
-			Matrix4f view = ((Matrix4)this.get(C_VIEWMATRIX)).getInternal();
-			Vector3f t = view.invert(new Matrix4f()).getTranslation(new Vector3f());
-			Vector3f l = new Vector3f(0,0,dist).mulProject(view);
-
-			this.rawset(C_POSITION, new Vector3(t));
-			this.set(C_LOOKAT, new Vector3(l));
-			
-			this.inverseViewMatrix = view.invert(new Matrix4f());
-		}
-		
-		// If lookat/position is changed, recalculate view matrix
-		if ( key.eq_b(C_LOOKAT) || key.eq_b(C_POSITION) ) {
-			Vector3f eye = ((Vector3)this.get(C_POSITION)).toJoml();
-			Vector3f look = ((Vector3)this.get(C_LOOKAT)).toJoml();
-			look = eye.sub(look, look);
-			look.normalize();
-
-			float pitch = (float) Math.asin(-look.z);
-			if ( pitch == 0 )
-				pitch = 0.000001f;
-			float yaw = (float) (-Math.atan2(look.x, look.y));
-
-			this.rawset(C_PITCH, LuaValue.valueOf(pitch));
-			this.rawset(C_YAW, LuaValue.valueOf(yaw));
-			updateMatrix();
-		}
-
-		// Recalculate Look At Matrix if yaw/pitch are changed.
-		if ( key.eq_b(C_YAW) || key.eq_b(C_PITCH) ) {
-			float dist = ((Vector3)this.get(C_LOOKAT)).getInternal().distance(((Vector3)this.get(C_POSITION)).getInternal());
-			
-			float yaw = (float) this.get(C_YAW).checkdouble() - (float)Math.PI/2f;
-			float pitch = (float) this.get(C_PITCH).checkdouble();
-			Vector3f position = ((Vector3)this.get(C_POSITION)).toJoml();
-
-			float lookX = position.x + (float) (Math.cos(yaw) * Math.cos(pitch)) * dist;
-			float lookY = position.y + (float) (Math.sin(yaw) * Math.cos(pitch)) * dist;
-			float lookZ = position.z + (float) Math.sin(pitch) * dist;
-
-			this.rawset(C_LOOKAT, new Vector3(lookX, lookY, lookZ));
-			updateMatrix();
-		}
-	}
-
 	private void updateMatrix() {
 		Matrix4f mat = new Matrix4f();
-		mat.lookAt(((Vector3)this.rawget(C_POSITION)).toJoml(), ((Vector3)this.rawget(C_LOOKAT)).toJoml(), new Vector3f(0,0,1));
+		mat.lookAt(this.getPosition().getInternal(), this.getLookAt().getInternal(), new Vector3f(0,0,1));
 		
-		this.inverseViewMatrix = new Matrix4f(mat);
-		this.rawset(C_VIEWMATRIX, new Matrix4(mat.invert()));
+		this.inverseViewMatrix = mat;
+		this.rawset(C_VIEWMATRIX, new Matrix4(mat.invert(new Matrix4f())));
 	}
 
 	@Override

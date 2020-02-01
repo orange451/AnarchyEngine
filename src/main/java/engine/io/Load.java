@@ -308,7 +308,8 @@ public class Load {
 			if ( value != null ) {
 				LuaValue lv = (value instanceof LuaValue)?(LuaValue)value:CoerceJavaToLua.coerce(value);
 				if ( !inst.instance.get(key).equals(lv) ) {
-					inst.instance.rawset(key, lv);
+					//inst.instance.rawset(key, lv);
+					inst.instance.forceset(key, lv);
 					try{ inst.instance.set(key, lv); } catch(Exception e) {};
 				}
 			}
