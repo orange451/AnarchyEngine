@@ -46,6 +46,11 @@ public class Pane extends GuiBasePane {
 
 	@Override
 	public lwjgui.scene.layout.Pane getUINode() {
-		return new StackPane();
+		return new StackPane() {
+			@Override
+			public String getElementType() {
+				return "pane";
+			}
+		};
 	}
 }

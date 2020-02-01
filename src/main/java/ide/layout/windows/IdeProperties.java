@@ -128,20 +128,22 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 		
 		List<Instance> selected = Game.selected();
 		
-		LWJGUI.runLater(() -> {
-			if ( selected.size() != 1 )
-				return;
-			
-			Instance temp = selected.get(0);
-			if ( temp == grid.inst )
-				return;
-			
-			clear();
-			currentInstance = temp;
-			currentInstance.attachPropertySubscriber(this);
-			grid.setInstance(currentInstance);
-			grid.updateChildren();
-			grid.render(window.getContext());
+		InternalRenderThread.runLater(()->{
+			LWJGUI.runLater(() -> {
+				if ( selected.size() != 1 )
+					return;
+				
+				Instance temp = selected.get(0);
+				if ( temp == grid.inst )
+					return;
+				
+				clear();
+				currentInstance = temp;
+				currentInstance.attachPropertySubscriber(this);
+				grid.setInstance(currentInstance);
+				grid.updateChildren();
+				grid.render(window.getContext());
+			});
 		});
 	}
 	

@@ -63,14 +63,36 @@ public class TextField extends GuiBase {
 	public void setText(String text) {
 		this.set(C_TEXT, LuaValue.valueOf(text));
 	}
+	
+	/**
+	 * Return the Prompt for the label.
+	 * @return
+	 */
+	public String getPrompt() {
+		return this.get(C_PROMPT).toString();
+	}
+	
+	/**
+	 * Set the Prompt for the label.
+	 * @param text
+	 */
+	public void setPrompt(String text) {
+		this.set(C_PROMPT, LuaValue.valueOf(text));
+	}
 
 	@Override
 	public Node getUINode() {
-		return new lwjgui.scene.control.TextField();
+		lwjgui.scene.control.TextField field = new lwjgui.scene.control.TextField();
+		
+		field.setOnTextChange((event)->{
+			TextField.this.setText(field.getText());
+		});
+		return field;
 	}
 
 	@Override
 	public void updateNode(Node node) {
 		((lwjgui.scene.control.TextField)node).setText(this.getText());
+		((lwjgui.scene.control.TextField)node).setPrompt(this.getPrompt());
 	}
 }
