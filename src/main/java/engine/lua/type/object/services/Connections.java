@@ -22,6 +22,7 @@ import org.luaj.vm2.lib.VarArgFunction;
 
 import engine.Game;
 import engine.GameSubscriber;
+import engine.lua.lib.LuaUtil;
 import engine.lua.network.InternalClient;
 import engine.lua.network.InternalServer;
 import engine.lua.type.LuaEvent;
@@ -78,14 +79,11 @@ public class Connections extends Service implements TreeViewable,GameSubscriber 
 			}
 		});
 		
-		this.getmetatable().set("GetConnectionFromIP", new TwoArgFunction() {
+		this.getmetatable().set("GetConnectionsFromIP", new TwoArgFunction() {
 			@Override
 			public LuaValue call(LuaValue myself, LuaValue ip) {
-				Connection c = getConnectionFromIP(ip.toString());
-				if ( c == null )
-					return LuaValue.NIL;
-				
-				return c;
+				List<Connection> c = getConnectionsFromIP(ip.toString());
+				return LuaUtil.listToTable(c);
 			}
 		});
 		
@@ -167,7 +165,9 @@ public class Connections extends Service implements TreeViewable,GameSubscriber 
 		}
 	}
 
-	public Connection getConnectionFromIP(String hostAddress) {
+	public List<Connection> getConnectionsFromIP(String hostAddress) {
+		List<Connection> ret = new ArrayList<>();
+		
 		List<Instance> instances = this.getChildren();
 		for (int i = 0; i < instances.size(); i++) {
 			Instance inst = instances.get(i);
@@ -175,10 +175,10 @@ public class Connections extends Service implements TreeViewable,GameSubscriber 
 				continue;
 			
 			if ( ((Connection)inst).getAddress().equals(hostAddress) )
-				return (Connection) inst;
+				ret.add((Connection) inst);
 		}
 		
-		return null;
+		return ret;
 	}
 
 	public Connection getConnectionFromKryo(com.esotericsoftware.kryonet.Connection connection) {
