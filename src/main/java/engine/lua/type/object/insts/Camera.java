@@ -73,7 +73,7 @@ public class Camera extends Instance implements TreeViewable,Positionable {
 			@Override
 			public LuaValue call(LuaValue myself, LuaValue arg2) {
 				Camera.this.translate((Vector3)arg2);
-				return null;
+				return LuaValue.NIL;
 			}
 		});
 		
@@ -81,15 +81,19 @@ public class Camera extends Instance implements TreeViewable,Positionable {
 			@Override
 			public LuaValue call(LuaValue myself, LuaValue arg2) {
 				moveTo((Vector3)arg2);
-				return null;
+				return LuaValue.NIL;
 			}
 		});
 		
 		this.getmetatable().set("Orbit", new VarArgFunction() {
 			@Override
 			public LuaValue invoke(Varargs args) {
+				try {
 				Camera.this.orbit((Vector3)args.arg(2), (float)args.arg(3).checkdouble(), (float)args.arg(4).checkdouble(), (float)args.arg(5).checkdouble());
-				return null;
+				} catch(Exception e) {
+					e.printStackTrace();
+				}
+				return LuaValue.NIL;
 			}
 		});
 		

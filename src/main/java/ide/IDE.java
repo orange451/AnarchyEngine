@@ -24,6 +24,7 @@ import ide.layout.IdeLayout;
 import ide.layout.windows.IdeCSSEditor;
 import ide.layout.windows.IdeLuaEditor;
 import lwjgui.ManagedThread;
+import lwjgui.event.listener.EventListener;
 import lwjgui.glfw.input.MouseHandler;
 import lwjgui.scene.Group;
 import lwjgui.scene.Scene;
