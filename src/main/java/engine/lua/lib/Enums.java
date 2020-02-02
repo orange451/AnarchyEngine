@@ -211,4 +211,14 @@ public class Enums extends TwoArgFunction {
 	public static LuaValue matchEnum(String enumType, String enumName) {
 		return Enums.matchEnum(LuaValue.valueOf(enumType), LuaValue.valueOf(enumName));
 	}
+
+	/**
+	 * Matches an enum. Returns nil if enum is not found.
+	 * @param enumType
+	 * @param enumName
+	 * @return
+	 */
+	public static LuaValue matchEnum(LuaValue enumType, String enumName) {
+		return Enums.matchEnum(enumType, LuaValue.valueOf(enumName));
+	}
 }

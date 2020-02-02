@@ -16,7 +16,6 @@ import java.util.Set;
 
 import org.luaj.vm2.LuaTable;
 import org.luaj.vm2.LuaValue;
-import org.luaj.vm2.lib.jse.CoerceJavaToLua;
 
 import engine.Game;
 import engine.lua.LuaEngine;
@@ -28,26 +27,26 @@ public abstract class LuaDatatype extends LuaTable {
 	
 	protected boolean locked = false;
 
-	public void defineField(String fieldName, Object fieldValue, boolean isFinal) {
-		if ( !this.containsField(LuaValue.valueOf(fieldName)) ) {
+	@Deprecated
+	public LuaField defineField(String fieldName, LuaValue fieldValue, boolean isFinal) {
+		return defineField(LuaValue.valueOf(fieldName), fieldValue, isFinal);
+	}
+
+	public LuaField defineField(LuaValue fieldName, LuaValue fieldValue, boolean isFinal) {
+		LuaField ret = this.getField(fieldName);
+		if ( ret == null ) {
 			// Create new field
-			LuaField lf = new LuaField(fieldName, fieldValue.getClass(), isFinal);
-			fields.put(LuaValue.valueOf(fieldName), lf);
-			fieldsOrdered.add(lf);
+			ret = new LuaField(fieldName.toString(), fieldValue.getClass(), isFinal);
+			fields.put(fieldName, ret);
+			fieldsOrdered.add(ret);
 			
-			if ( fieldValue.equals(LuaValue.NIL) || fieldValue instanceof Instance ) {
-				lf.isInstance = true;
-			}
+			if ( fieldValue.equals(LuaValue.NIL) || fieldValue instanceof Instance )
+				ret.isInstance = true;
 		}
 
 		// Set its value in the table
-		LuaValue luaValue = null;
-		if ( fieldValue instanceof LuaValue ) {
-			luaValue = (LuaValue)fieldValue;
-		} else {
-			luaValue = CoerceJavaToLua.coerce(fieldValue);
-		}
-		this.rawset(fieldName, luaValue);
+		this.rawset(fieldName, fieldValue);
+		return ret;
 	}
 	
 	public void undefineField(LuaValue fieldName) {

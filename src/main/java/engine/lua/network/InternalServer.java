@@ -41,6 +41,8 @@ import engine.lua.type.object.insts.Player;
 import engine.lua.type.object.services.Connections;
 
 public class InternalServer extends Server {
+	public static Connection syncConnectionException;
+	
 	public InternalServer(int port) {
 		this.start();
 		try {
@@ -211,8 +213,13 @@ public class InternalServer extends Server {
 					return;
 				}
 			}
+			
 			InstanceUpdateUDP updateObject = new InstanceUpdateUDP(instance, key);
-			sendAllUDP(updateObject);
+			
+			if ( syncConnectionException == null )
+				sendAllUDP(updateObject);
+			else
+				sendAllUDPExcept(updateObject, Game.connections().getConnectionFromKryo(syncConnectionException));
 		});
 	}
 	

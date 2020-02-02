@@ -97,7 +97,8 @@ public abstract class GuiBase extends Instance implements TreeViewable {
 	 * @return
 	 */
 	public LuaEvent getMouseClickedEvent() {
-		return (LuaEvent)this.get(C_CLICKEDEVENT);
+		LuaValue t = this.get(C_CLICKEDEVENT);
+		return t.isnil()?null:(LuaEvent)t;
 	}
 	
 	/**
@@ -105,7 +106,8 @@ public abstract class GuiBase extends Instance implements TreeViewable {
 	 * @return
 	 */
 	public LuaEvent getMouseEnteredEvent() {
-		return (LuaEvent)this.get(C_MOUSEENTERED);
+		LuaValue t = this.get(C_MOUSEENTERED);
+		return t.isnil()?null:(LuaEvent)t;
 	}
 	
 	/**
@@ -113,7 +115,8 @@ public abstract class GuiBase extends Instance implements TreeViewable {
 	 * @return
 	 */
 	public LuaEvent getMouseExitedEvent() {
-		return (LuaEvent)this.get(C_MOUSEEXITED);
+		LuaValue t = this.get(C_MOUSEEXITED);
+		return t.isnil()?null:(LuaEvent)t;
 	}
 	
 	/**
@@ -122,7 +125,8 @@ public abstract class GuiBase extends Instance implements TreeViewable {
 	 * @return
 	 */
 	public LuaEvent getMousePressedEvent() {
-		return (LuaEvent)this.get(C_MOUSEPRESSED);
+		LuaValue t = this.get(C_MOUSEPRESSED);
+		return t.isnil()?null:(LuaEvent)t;
 	}
 	
 	/**
@@ -131,7 +135,8 @@ public abstract class GuiBase extends Instance implements TreeViewable {
 	 * @return
 	 */
 	public LuaEvent getMouseReleasedEvent() {
-		return (LuaEvent)this.get(C_MOUSERELEASED);
+		LuaValue t = this.get(C_MOUSERELEASED);
+		return t.isnil()?null:(LuaEvent)t;
 	}
 	
 	private void rebuildCSS() {

@@ -26,6 +26,7 @@ public class LuaField {
 	protected boolean isInstance;
 	private Clamp<?> clamp;
 	private EnumType enumType;
+	private int flags;
 
 	public LuaField(String fieldName, Class<?> fieldType, boolean isFinal) {
 		this.fieldName = fieldName;
@@ -83,8 +84,9 @@ public class LuaField {
 		return this.fieldType;
 	}
 
-	public void setLocked(boolean b) {
+	public LuaField setLocked(boolean b) {
 		this.canModify = !b;
+		return this;
 	}
 
 	public boolean isInstance() {
@@ -96,19 +98,35 @@ public class LuaField {
 		fieldType = null;
 	}
 
-	public void setClamp(Clamp<?> clamp) {
+	public LuaField setClamp(Clamp<?> clamp) {
 		this.clamp = clamp;
+		return this;
 	}
 	
 	public Clamp<?> getClamp() {
 		return this.clamp;
 	}
 
-	public void setEnum(EnumType enumType) {
+	public LuaField setEnum(EnumType enumType) {
 		this.enumType = enumType;
+		return this;
 	}
 	
 	public EnumType getEnumType() {
 		return this.enumType;
+	}
+
+	public LuaField addFlag(int flag) {
+		flags |= flag;
+		return this;
+	}
+	
+	public LuaField removeFlag(int flag) {
+		flags &= ~flag;
+		return this;
+	}
+	
+	public boolean hasFlag(int flag) {
+		return ((flags & flag) == flag);
 	}
 }
