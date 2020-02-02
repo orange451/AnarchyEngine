@@ -175,8 +175,10 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 	public void onPropertyChange(Instance instance, LuaValue property, LuaValue value) {
 		//System.out.println(instance.getFullName() + " :: " + property + " => " + value);
 		
-		LWJGUI.runLater(()-> {
-			grid.update(instance, property, value);
+		InternalRenderThread.runLater(()->{
+			LWJGUI.runLater(()-> {
+				grid.update(instance, property, value);
+			});
 		});
 	}
 	

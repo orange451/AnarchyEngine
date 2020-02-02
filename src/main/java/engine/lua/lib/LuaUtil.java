@@ -20,6 +20,8 @@ import org.json.simple.JSONObject;
 import org.luaj.vm2.LuaTable;
 import org.luaj.vm2.LuaValue;
 
+import engine.lua.network.internal.JSONUtil;
+
 public class LuaUtil {
 
 	/**
@@ -102,7 +104,7 @@ public class LuaUtil {
 		LuaValue[] keys = data.keys();
 		for (int i = 0; i < keys.length; i++) {
 			LuaValue key = keys[i];
-			json.put(key.toString(), data.get(key));
+			json.put(key.toString(), JSONUtil.serializeObject(data.get(key)));
 		}
 		
 		return json;
@@ -121,7 +123,11 @@ public class LuaUtil {
 		while(iterator.hasNext()) {
 			@SuppressWarnings("rawtypes")
 			Map.Entry entry = (Map.Entry)iterator.next();
-			table.set(LuaValue.valueOf(entry.getKey().toString()), (LuaValue)entry.getValue());
+			LuaValue val = (LuaValue)JSONUtil.deserializeObject(entry.getValue());
+			if ( val == null )
+				continue;
+			
+			table.set(LuaValue.valueOf(entry.getKey().toString()), val);
 		}
 		
 		

@@ -146,6 +146,19 @@ public abstract class PhysicsBase extends Instance implements GameSubscriber {
 				playerOwns = null;
 				checkNetworkOwnership();
 			}
+			
+			// Client tells server when his player-owned physics changed (Server can still refuse these updates)
+			if ( !args[0].eq_b(C_PARENT) && !args[0].eq_b(C_NAME) && !args[0].eq_b(C_CLASSNAME) && !args[0].eq_b(C_NAME) ) {
+				boolean isClient = !Game.isServer();
+				if ( isClient && Game.players().getLocalPlayer() != null ) {
+					if (Game.players().getLocalPlayer().equals(playerOwns)) {
+						InternalClient.sendServerUDP(new InstanceUpdateUDP(this, args[0], true));
+						//InternalClient.sendServerUDP(new InstanceUpdateUDP(this, C_WORLDMATRIX, true));
+						//InternalClient.sendServerUDP(new InstanceUpdateUDP(this, C_VELOCITY, true));
+						//InternalClient.sendServerUDP(new InstanceUpdateUDP(this, C_ANGULARVELOCITY, true));
+					}
+				}
+			}
 		});
 	}
 	
@@ -181,7 +194,7 @@ public abstract class PhysicsBase extends Instance implements GameSubscriber {
 		// Ownership stuff
 		checkNetworkOwnership();
 		
-		// Send update packets
+		// Send update packets over internet!
 		if ( internalPhys.getBody() != null && !internalPhys.getBody().isDisposed() ) {
 			
 			// Server sends physics updates to the clients (except for client-owned physics)
@@ -197,7 +210,7 @@ public abstract class PhysicsBase extends Instance implements GameSubscriber {
 				}
 			}
 			
-			// Client tells server where his player-owned physics are (Server can still refuse these updates)
+			// Send our position/velocity to server every tick
 			boolean isClient = !Game.isServer();
 			if ( isClient && Game.players().getLocalPlayer() != null ) {
 				if (Game.players().getLocalPlayer().equals(playerOwns)) {

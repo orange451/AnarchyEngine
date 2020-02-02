@@ -18,6 +18,7 @@ import org.luaj.vm2.LuaValue;
 import com.esotericsoftware.kryonet.Connection;
 
 import engine.Game;
+import engine.InternalGameThread;
 import engine.lua.network.internal.ClientProcessable;
 import engine.lua.network.internal.JSONUtil;
 import engine.lua.network.internal.ServerProcessable;
@@ -122,8 +123,8 @@ public class InstanceUpdateUDP implements ClientProcessable,ServerProcessable {
 	private static final String C_SID = "SID";
 	
 	private void process(Instance instance) {
-		JSONParser parser = new JSONParser();
 		try {
+			JSONParser parser = new JSONParser();
 			JSONObject obj = (JSONObject) parser.parse(instanceData);
 			String field = (String) obj.keySet().iterator().next();
 			LuaValue value = JSONUtil.deserializeObject( obj.get(field) );
@@ -145,6 +146,8 @@ public class InstanceUpdateUDP implements ClientProcessable,ServerProcessable {
 							try { instance.set(field, value); } catch(Exception e) {}
 						}
 					}
+					
+					// THIS IS IMPORTANT. This rawset breaks OOP and will not fire changed event...
 					instance.rawset(field, value);
 				}
 			}

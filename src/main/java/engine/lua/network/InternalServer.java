@@ -82,6 +82,7 @@ public class InternalServer extends Server {
 					// Load in data
 					try {
 						JSONParser parser = new JSONParser();
+						System.out.println("Attempting to read data: " + ((ClientConnectTCP)object).data);
 						JSONObject obj = (JSONObject) parser.parse(((ClientConnectTCP)object).data);
 						conInst.forceset(LuaValue.valueOf("Data"), LuaUtil.jsonToTable(obj));
 					} catch (ParseException e1) {

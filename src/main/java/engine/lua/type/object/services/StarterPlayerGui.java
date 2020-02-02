@@ -51,6 +51,9 @@ public class StarterPlayerGui extends Instance implements TreeViewable {
 				Pane gui = ((Gui)arg).root;
 				ClientEngine.renderThread.getClientUI().getChildren().add(gui);
 				guis.add(gui);
+				
+				if ( Game.isRunning() )
+					gui.setVisible(false);
 			}
 		});
 		

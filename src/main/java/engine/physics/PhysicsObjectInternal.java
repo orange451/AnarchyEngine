@@ -31,6 +31,7 @@ import engine.lua.type.object.PhysicsBase;
 import engine.lua.type.object.insts.Mesh;
 import engine.lua.type.object.insts.Prefab;
 import engine.lua.type.object.services.Workspace;
+import engine.tasks.TaskManager;
 import engine.util.Pair;
 import engine.util.PhysicsUtils;
 
