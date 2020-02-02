@@ -20,7 +20,9 @@ import com.badlogic.gdx.physics.bullet.dynamics.btRigidBody;
 import engine.Game;
 import engine.InternalGameThread;
 import engine.lua.lib.Enums;
+import engine.lua.type.LuaFieldFlag;
 import engine.lua.type.NumberClamp;
+import engine.lua.type.NumberClampPreferred;
 import engine.lua.type.object.PhysicsBase;
 import engine.lua.type.object.TreeViewable;
 import engine.physics.PhysicsWorld;
@@ -43,26 +45,30 @@ public class PlayerPhysics extends PhysicsBase implements TreeViewable {
 		
 		this.FLAG_REQUIRE_PREFAB = false;
 
-		this.defineField(C_ONGROUND.toString(), LuaValue.valueOf(false), true);
+		this.defineField(C_ONGROUND, LuaValue.valueOf(false), true)
+								.addFlag(LuaFieldFlag.CLIENT_SIDE_REPLICATE);
 		
-		this.defineField(C_RADIUS.toString(), LuaValue.valueOf(0.3f), false);
-		this.getField(C_RADIUS).setClamp(new NumberClamp(0.1f, 512));
+		this.defineField(C_RADIUS, LuaValue.valueOf(0.3f), false)
+								.setClamp(new NumberClampPreferred(0.1f, 512, 0.1f, 1f))
+								.addFlag(LuaFieldFlag.CLIENT_SIDE_REPLICATE);
 		
-		this.defineField(C_HEIGHT.toString(), LuaValue.valueOf(1.0f), false);
-		this.getField(C_HEIGHT).setClamp(new NumberClamp(0.1f, 512));
+		this.defineField(C_HEIGHT, LuaValue.valueOf(1.0f), false)
+								.setClamp(new NumberClampPreferred(0.1f, 512, 0.1f, 4f))
+								.addFlag(LuaFieldFlag.CLIENT_SIDE_REPLICATE);
 		
-		this.defineField(C_STEPHEIGHT.toString(), LuaValue.valueOf(0.1f), false);
-		this.getField(C_STEPHEIGHT).setClamp(new NumberClamp(0.1f, 512));
+		this.defineField(C_STEPHEIGHT, LuaValue.valueOf(0.1f), false)
+								.setClamp(new NumberClampPreferred(0, 512, 0, 1))
+								.addFlag(LuaFieldFlag.CLIENT_SIDE_REPLICATE);
 		
 		// No bounciness by default
 		this.rawset(C_BOUNCINESS, LuaValue.valueOf(0));
 		
 		// Force to capsule
-		this.set(C_SHAPE.toString(), Enums.matchEnum(C_SHAPE, LuaValue.valueOf("Capsule")));
+		this.set(C_SHAPE, Enums.matchEnum(C_SHAPE, "Capsule"));
 		this.getField(C_SHAPE).setLocked(true);
 		
 		// Use shape
-		this.getField(C_USECUSTOMMESH.tostring()).setLocked(true);
+		this.getField(C_USECUSTOMMESH).setLocked(true);
 		this.rawset(C_USECUSTOMMESH, LuaValue.valueOf(false));
 		
 		// Force it straight up
@@ -105,7 +111,10 @@ public class PlayerPhysics extends PhysicsBase implements TreeViewable {
 			if ( this.isOnGround() ) {
 				float scale = (float)Math.pow(1f - this.getFriction(), InternalGameThread.delta);
 				Vector3f newVel = this.physics.getVelocity().mul(scale, scale, 1);
-				this.setVelocity(newVel);
+				//this.setVelocity(newVel)
+				engine.lua.type.data.Vector3 vv = new engine.lua.type.data.Vector3(newVel);
+				this.rawset(C_VELOCITY, vv);
+				this.notifyPropertySubscribers(C_VELOCITY, vv);
 			}
 		}
 	}
@@ -126,7 +135,7 @@ public class PlayerPhysics extends PhysicsBase implements TreeViewable {
 		int rings = 4;
 	
 		// Calculate distance between rings
-		float margin = 0.001f;
+		float margin = 1e-2f;
 		float radius = this.getRadius();
 		float march = (float) ((radius - margin) / rings); 
 	
@@ -200,7 +209,6 @@ public class PlayerPhysics extends PhysicsBase implements TreeViewable {
 			// Mark that we're on ground
 			onGround = true;
 		}
-		
 		this.forceset(C_ONGROUND, LuaValue.valueOf(onGround));
 	}
 	

@@ -19,13 +19,14 @@ import org.luaj.vm2.lib.ThreeArgFunction;
 
 import engine.Game;
 import engine.GameSubscriber;
-import engine.InternalGameThread;
 import engine.InternalRenderThread;
 import engine.lua.lib.EnumType;
 import engine.lua.network.InternalClient;
 import engine.lua.network.InternalServer;
 import engine.lua.network.internal.protocol.InstanceUpdateUDP;
 import engine.lua.type.LuaConnection;
+import engine.lua.type.LuaField;
+import engine.lua.type.LuaFieldFlag;
 import engine.lua.type.NumberClamp;
 import engine.lua.type.NumberClampPreferred;
 import engine.lua.type.data.Matrix4;
@@ -71,31 +72,43 @@ public abstract class PhysicsBase extends Instance implements GameSubscriber {
 	public PhysicsBase(String typename) {
 		super(typename);
 		
-		this.defineField(C_LINKED.toString(), LuaValue.NIL, true);
+		this.defineField(C_LINKED, LuaValue.NIL, true);
 		
-		this.defineField(C_VELOCITY.toString(), new Vector3(), false);
-		this.defineField(C_ANGULARVELOCITY.toString(), new Vector3(), false);
-		this.defineField(C_WORLDMATRIX.toString(), new Matrix4(), false);
+		this.defineField(C_VELOCITY, new Vector3(), false)
+							.addFlag(LuaFieldFlag.CLIENT_SIDE_REPLICATE)
+							.addFlag(LuaFieldFlag.CLIENT_SIDE_REPLICATE_MANUAL);
 		
-		this.defineField(C_MASS.toString(), LuaValue.valueOf(0.5f), false);
-		this.getField(C_MASS).setClamp(new NumberClamp(0, 1));
+		this.defineField(C_ANGULARVELOCITY, new Vector3(), false)
+							.addFlag(LuaFieldFlag.CLIENT_SIDE_REPLICATE)
+							.addFlag(LuaFieldFlag.CLIENT_SIDE_REPLICATE_MANUAL);
 		
-		this.defineField(C_FRICTION.toString(), LuaValue.valueOf(0.1f), false);
-		this.getField(C_FRICTION).setClamp(new NumberClampPreferred(0, 10, 0, 1));
+		this.defineField(C_WORLDMATRIX, new Matrix4(), false)
+							.addFlag(LuaFieldFlag.CLIENT_SIDE_REPLICATE)
+							.addFlag(LuaFieldFlag.CLIENT_SIDE_REPLICATE_MANUAL);
 		
-		this.defineField(C_BOUNCINESS.toString(), LuaValue.valueOf(0.5f), false);
-		this.getField(C_BOUNCINESS).setClamp(new NumberClampPreferred(0, 2, 0, 1));
+		this.defineField(C_MASS, LuaValue.valueOf(0.5f), false)
+							.setClamp(new NumberClamp(0, 1));
 		
-		this.defineField(C_LINEARDAMPING.toString(), LuaValue.valueOf(0.0f), false);
-		this.getField(C_LINEARDAMPING).setClamp(new NumberClamp(0, 1));
+		this.defineField(C_FRICTION, LuaValue.valueOf(0.1f), false)
+							.setClamp(new NumberClampPreferred(0, 10, 0, 1))
+							.addFlag(LuaFieldFlag.CLIENT_SIDE_REPLICATE);
 		
-		this.defineField(C_ANGULARFACTOR.toString(), LuaValue.valueOf(1.0f), false);
-		this.getField(C_ANGULARFACTOR).setClamp(new NumberClamp(0, 1));
+		this.defineField(C_BOUNCINESS, LuaValue.valueOf(0.5f), false)
+							.setClamp(new NumberClampPreferred(0, 2, 0, 1))
+							.addFlag(LuaFieldFlag.CLIENT_SIDE_REPLICATE);
 		
-		this.defineField(C_SHAPE.toString(), LuaValue.valueOf("Box"), false);
-		this.getField(C_SHAPE).setEnum(new EnumType("Shape"));
+		this.defineField(C_LINEARDAMPING, LuaValue.valueOf(0.0f), false)
+							.setClamp(new NumberClamp(0, 1))
+							.addFlag(LuaFieldFlag.CLIENT_SIDE_REPLICATE);
 		
-		this.defineField(C_USECUSTOMMESH.toString(), LuaValue.valueOf(false), false);
+		this.defineField(C_ANGULARFACTOR, LuaValue.valueOf(1.0f), false)
+							.setClamp(new NumberClamp(0, 1));
+		
+		this.defineField(C_SHAPE, LuaValue.valueOf("Box"), false)
+							.setEnum(new EnumType("Shape"))
+							.addFlag(LuaFieldFlag.CLIENT_SIDE_REPLICATE);
+		
+		this.defineField(C_USECUSTOMMESH, LuaValue.valueOf(false), false);
 		
 		// Apply Force (FORCE, IMPULSE)
 		this.getmetatable().set("ApplyForce", new ThreeArgFunction() {
@@ -148,15 +161,20 @@ public abstract class PhysicsBase extends Instance implements GameSubscriber {
 			}
 			
 			// Client tells server when his player-owned physics changed (Server can still refuse these updates)
-			if ( !args[0].eq_b(C_PARENT) && !args[0].eq_b(C_NAME) && !args[0].eq_b(C_CLASSNAME) && !args[0].eq_b(C_NAME) ) {
-				boolean isClient = !Game.isServer();
-				if ( isClient && Game.players().getLocalPlayer() != null ) {
-					if (Game.players().getLocalPlayer().equals(playerOwns)) {
-						InternalClient.sendServerUDP(new InstanceUpdateUDP(this, args[0], true));
-						//InternalClient.sendServerUDP(new InstanceUpdateUDP(this, C_WORLDMATRIX, true));
-						//InternalClient.sendServerUDP(new InstanceUpdateUDP(this, C_VELOCITY, true));
-						//InternalClient.sendServerUDP(new InstanceUpdateUDP(this, C_ANGULARVELOCITY, true));
-					}
+			boolean isClient = !Game.isServer();
+			if ( isClient && Game.players().getLocalPlayer() != null ) {
+				if (Game.players().getLocalPlayer().equals(playerOwns)) {
+					LuaField field = this.getField(args[0]);
+					if ( field == null )
+						return;
+					
+					if ( !field.hasFlag(LuaFieldFlag.CLIENT_SIDE_REPLICATE) )
+						return;
+					
+					if ( field.hasFlag(LuaFieldFlag.CLIENT_SIDE_REPLICATE_MANUAL) )
+						return;
+					
+					InternalClient.sendServerUDP(new InstanceUpdateUDP(this, args[0], true));
 				}
 			}
 		});

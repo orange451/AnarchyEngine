@@ -19,9 +19,12 @@ import com.esotericsoftware.kryonet.Connection;
 
 import engine.Game;
 import engine.InternalGameThread;
+import engine.lua.network.InternalServer;
 import engine.lua.network.internal.ClientProcessable;
 import engine.lua.network.internal.JSONUtil;
 import engine.lua.network.internal.ServerProcessable;
+import engine.lua.type.LuaField;
+import engine.lua.type.LuaFieldFlag;
 import engine.lua.type.object.Instance;
 import engine.lua.type.object.PhysicsBase;
 import engine.lua.type.object.insts.Player;
@@ -100,21 +103,25 @@ public class InstanceUpdateUDP implements ClientProcessable,ServerProcessable {
 			
 			if ( field.equals(C_NAME) || field.equals(C_PARENT) || field.equals(C_CLASSNAME) || field.equals(C_SID) )
 				return;
+			
+			LuaField lField = instance.getField(LuaValue.valueOf(field));
+			if ( !lField.hasFlag(LuaFieldFlag.CLIENT_SIDE_REPLICATE) && !lField.hasFlag(LuaFieldFlag.CLIENT_SIDE_REPLICATE_MANUAL) )
+				return;
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}
 		
 		// Process it
-		process( instance );
+		process( instance, connection );
 	}
 
 	@Override
-	public void clientProcess(Connection Connection) {
+	public void clientProcess(Connection connection) {
 		Instance instance = Game.getInstanceFromSID(instanceId);
 		if ( instance == null )
 			return;
 		
-		process( instance );
+		process( instance, connection );
 	}
 	
 	private static final String C_NAME = "Name";
@@ -122,7 +129,7 @@ public class InstanceUpdateUDP implements ClientProcessable,ServerProcessable {
 	private static final String C_CLASSNAME = "ClassName";
 	private static final String C_SID = "SID";
 	
-	private void process(Instance instance) {
+	private void process(Instance instance, Connection connection) {
 		try {
 			JSONParser parser = new JSONParser();
 			JSONObject obj = (JSONObject) parser.parse(instanceData);
@@ -135,20 +142,24 @@ public class InstanceUpdateUDP implements ClientProcessable,ServerProcessable {
 				else if ( field.equals(C_PARENT) )
 					instance.forceSetParent(value);
 				else {
-					if ( !rawOnly ) {
-						try { instance.set(field, value); } catch(Exception e) {}
-					} else {
-						if ( Game.isServer() ) {
-							if ( instance instanceof PhysicsBase ) {
-								((PhysicsBase)instance).updatePhysics(LuaValue.valueOf(field), value);
-							}
-						} else {
-							try { instance.set(field, value); } catch(Exception e) {}
+					/*if ( Game.isServer() ) {
+						if ( instance instanceof PhysicsBase ) {
+							((PhysicsBase)instance).updatePhysics(LuaValue.valueOf(field), value);
 						}
+					} else {
+						try { instance.set(field, value); } catch(Exception e) {}
+					}*/
+					if ( Game.isServer() ) {
+						InternalServer.syncConnectionException = connection;
+						try { instance.set(field, value); } catch(Exception e) {}
+						InternalServer.syncConnectionException = null;
+					} else {
+						try { instance.set(field, value); } catch(Exception e) {}
 					}
 					
 					// THIS IS IMPORTANT. This rawset breaks OOP and will not fire changed event...
-					instance.rawset(field, value);
+					if ( rawOnly )
+						instance.rawset(field, value);
 				}
 			}
 		} catch (ParseException e) {
