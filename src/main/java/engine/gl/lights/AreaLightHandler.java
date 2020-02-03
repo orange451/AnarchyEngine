@@ -101,9 +101,9 @@ public class AreaLightHandler implements ILightHandler<AreaLightInternal> {
 
 	public void init() {
 		Task<Texture> ltcMagTask = TaskManager
-				.submitRenderBackgroundThread(new LoadLTCTask("assets/textures/amp.ltc", 32));
+				.submitRenderBackgroundThread(new LoadLTCTask("assets/textures/amp.ltc"));
 		Task<Texture> ltcMatTask = TaskManager
-				.submitRenderBackgroundThread(new LoadLTCTask("assets/textures/mat.ltc", 64));
+				.submitRenderBackgroundThread(new LoadLTCTask("assets/textures/mat.ltc"));
 		float[] positions = { -1, 1, -1, -1, 1, 1, 1, -1 };
 		quad = VAO.create();
 		quad.bind();

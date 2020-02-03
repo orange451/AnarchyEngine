@@ -10,23 +10,17 @@
 
 package engine.resources;
 
+import static org.lwjgl.opengl.GL11C.GL_FLOAT;
 import static org.lwjgl.opengl.GL11C.GL_LINEAR;
 import static org.lwjgl.opengl.GL11C.GL_REPEAT;
 import static org.lwjgl.opengl.GL11C.GL_TEXTURE_2D;
-import static org.lwjgl.opengl.GL11C.GL_FLOAT;
 import static org.lwjgl.opengl.GL30C.GL_RGBA32F;
-import static org.lwjgl.stb.STBImage.stbi_failure_reason;
-import static org.lwjgl.stb.STBImage.stbi_info_from_memory;
-import static org.lwjgl.stb.STBImage.stbi_load_from_memory;
-import static org.lwjgl.stb.STBImage.stbi_set_flip_vertically_on_load;
-import static org.lwjgl.system.MemoryStack.stackPush;
-import static org.lwjgl.system.MemoryUtil.*;
+import static org.lwjgl.system.MemoryUtil.memAlloc;
+import static org.lwjgl.system.MemoryUtil.memCopy;
+import static org.lwjgl.system.MemoryUtil.memFree;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.nio.IntBuffer;
-
-import org.lwjgl.system.MemoryStack;
 
 import engine.gl.exceptions.DecodeTextureException;
 import engine.gl.objects.RawLTC;
@@ -38,16 +32,18 @@ public class LoadLTCTask extends Task<Texture> {
 	private static final int READ_HEADER = 0;
 	private static final int READ_VERSION = 1;
 	private static final int READ_TYPE = 2;
-	private static final int READ_SIZE = 3;
-	private static final int READ_DATA = 4;
-	private static final int READ_DONE = 5;
+	private static final int READ_TEXUTRE_SIZE = 3;
+	private static final int READ_TEXUTRE_COMPONENTS = 4;
+	private static final int READ_DATA_SIZE = 5;
+	private static final int READ_DATA = 6;
+	private static final int READ_DONE = 7;
+
+	private static final int VERSION = 2;
 
 	private String file;
-	private int size;
 
-	public LoadLTCTask(String file, int size) {
+	public LoadLTCTask(String file) {
 		this.file = file;
-		this.size = size;
 	}
 
 	@Override
@@ -66,7 +62,7 @@ public class LoadLTCTask extends Task<Texture> {
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
-		int version = -1, type = -1, bufferSize = -1;
+		int version = -1, type = -1, dataSize = -1, textureSize = -1, textureComponents = -1;
 		ByteBuffer image = null;
 		int status = READ_HEADER;
 		LOOP: while (ltc.hasRemaining()) {
@@ -83,20 +79,32 @@ public class LoadLTCTask extends Task<Texture> {
 			case READ_VERSION:
 				version = ltc.getInt();
 				System.out.println("Version: " + version);
+				if (version != VERSION)
+					throw new DecodeTextureException("Incorrect Version " + version + " != " + VERSION);
 				status = READ_TYPE;
 				break;
 			case READ_TYPE:
 				type = ltc.getInt();
 				System.out.println("Type: " + type);
-				status = READ_SIZE;
+				status = READ_TEXUTRE_SIZE;
 				break;
-			case READ_SIZE:
-				bufferSize = ltc.getInt();
-				System.out.println("Size: " + bufferSize);
+			case READ_TEXUTRE_SIZE:
+				textureSize = ltc.getInt();
+				System.out.println("Texture Size: " + textureSize);
+				status = READ_TEXUTRE_COMPONENTS;
+				break;
+			case READ_TEXUTRE_COMPONENTS:
+				textureComponents = ltc.getInt();
+				System.out.println("Texture Components: " + textureComponents);
+				status = READ_DATA_SIZE;
+				break;
+			case READ_DATA_SIZE:
+				dataSize = ltc.getInt();
+				System.out.println("Data Size: " + dataSize);
 				status = READ_DATA;
 				break;
 			case READ_DATA:
-				image = memAlloc(bufferSize * 4 + 1);
+				image = memAlloc(dataSize * 4 + 1);
 				memCopy(ltc, image);
 				status = READ_DONE;
 				break;
@@ -105,8 +113,8 @@ public class LoadLTCTask extends Task<Texture> {
 			}
 		}
 		memFree(ltc);
-		
-		return new RawLTC(image, size, size, type == 1 ? 2 : 4);
+
+		return new RawLTC(image, textureSize, textureSize, textureComponents);
 	}
 
 }
