@@ -14,6 +14,6 @@ import engine.gl.objects.RawTexture;
 
 public interface IResourcesManagerBackend {
 
-	public int loadTexture(int filter, int textureWarp, int format, boolean textureMipMapAF, RawTexture data);
+	public int loadTexture(int filter, int textureWarp, int format, int type, boolean textureMipMapAF, RawTexture data);
 
 }

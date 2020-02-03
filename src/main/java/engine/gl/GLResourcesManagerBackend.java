@@ -20,7 +20,6 @@ import static org.lwjgl.opengl.GL11.GL_TEXTURE_MIN_FILTER;
 import static org.lwjgl.opengl.GL11.GL_TEXTURE_WRAP_S;
 import static org.lwjgl.opengl.GL11.GL_TEXTURE_WRAP_T;
 import static org.lwjgl.opengl.GL11.GL_UNPACK_ALIGNMENT;
-import static org.lwjgl.opengl.GL11.GL_UNSIGNED_BYTE;
 import static org.lwjgl.opengl.GL11.glBindTexture;
 import static org.lwjgl.opengl.GL11.glGenTextures;
 import static org.lwjgl.opengl.GL11.glPixelStorei;
@@ -43,7 +42,7 @@ import engine.resources.IResourcesManagerBackend;
 
 public class GLResourcesManagerBackend implements IResourcesManagerBackend {
 
-	public int loadTexture(int filter, int textureWarp, int format, boolean af, RawTexture data) {
+	public int loadTexture(int filter, int textureWarp, int format, int type, boolean af, RawTexture data) {
 		int textureID = glGenTextures();
 		glBindTexture(GL_TEXTURE_2D, textureID);
 		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, textureWarp);
@@ -59,16 +58,15 @@ public class GLResourcesManagerBackend implements IResourcesManagerBackend {
 		if (data.getComp() == 3) {
 			if ((data.getWidth() & 3) != 0)
 				glPixelStorei(GL_UNPACK_ALIGNMENT, 2 - (data.getWidth() & 1));
-			glTexImage2D(GL_TEXTURE_2D, 0, format, data.getWidth(), data.getHeight(), 0, GL_RGB, GL_UNSIGNED_BYTE,
+			glTexImage2D(GL_TEXTURE_2D, 0, format, data.getWidth(), data.getHeight(), 0, GL_RGB, type,
 					data.getBuffer());
 		} else if (data.getComp() == 2)
-			glTexImage2D(GL_TEXTURE_2D, 0, format, data.getWidth(), data.getHeight(), 0, GL_RG, GL_UNSIGNED_BYTE,
-					data.getBuffer());
+			glTexImage2D(GL_TEXTURE_2D, 0, format, data.getWidth(), data.getHeight(), 0, GL_RG, type, data.getBuffer());
 		else if (data.getComp() == 1)
-			glTexImage2D(GL_TEXTURE_2D, 0, format, data.getWidth(), data.getHeight(), 0, GL_RED, GL_UNSIGNED_BYTE,
+			glTexImage2D(GL_TEXTURE_2D, 0, format, data.getWidth(), data.getHeight(), 0, GL_RED, type,
 					data.getBuffer());
 		else
-			glTexImage2D(GL_TEXTURE_2D, 0, format, data.getWidth(), data.getHeight(), 0, GL_RGBA, GL_UNSIGNED_BYTE,
+			glTexImage2D(GL_TEXTURE_2D, 0, format, data.getWidth(), data.getHeight(), 0, GL_RGBA, type,
 					data.getBuffer());
 		glGenerateMipmap(GL_TEXTURE_2D);
 		glBindTexture(GL_TEXTURE_2D, 0);

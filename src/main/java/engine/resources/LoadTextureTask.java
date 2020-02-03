@@ -11,6 +11,7 @@
 package engine.resources;
 
 import static org.lwjgl.opengl.GL11C.GL_TEXTURE_2D;
+import static org.lwjgl.opengl.GL11C.GL_UNSIGNED_BYTE;
 import static org.lwjgl.stb.STBImage.stbi_failure_reason;
 import static org.lwjgl.stb.STBImage.stbi_info_from_memory;
 import static org.lwjgl.stb.STBImage.stbi_load_from_memory;
@@ -37,7 +38,8 @@ public class LoadTextureTask extends Task<Texture> {
 	private int format;
 	private boolean textureMipMapAF, flipY;
 
-	public LoadTextureTask(String file, int filter, int textureWarp, int format, boolean textureMipMapAF, boolean flipY) {
+	public LoadTextureTask(String file, int filter, int textureWarp, int format, boolean textureMipMapAF,
+			boolean flipY) {
 		this.file = file;
 		this.filter = filter;
 		this.textureWarp = textureWarp;
@@ -50,7 +52,8 @@ public class LoadTextureTask extends Task<Texture> {
 	protected Texture call() {
 		System.out.println("Loading: " + file);
 		RawTexture data = decodeTextureFile(file, flipY);
-		int id = ResourcesManager.backend.loadTexture(filter, textureWarp, format, textureMipMapAF, data);
+		int id = ResourcesManager.backend.loadTexture(filter, textureWarp, format, GL_UNSIGNED_BYTE, textureMipMapAF,
+				data);
 		data.dispose();
 		return new Texture(id, GL_TEXTURE_2D, data.getWidth(), data.getHeight());
 	}

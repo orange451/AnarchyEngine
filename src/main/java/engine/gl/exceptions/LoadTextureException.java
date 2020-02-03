@@ -22,4 +22,8 @@ public class LoadTextureException extends RuntimeException {
 		super(cause);
 	}
 
+	public LoadTextureException(String string) {
+		super(string);
+	}
+
 }

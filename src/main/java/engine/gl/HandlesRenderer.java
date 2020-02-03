@@ -211,11 +211,9 @@ public class HandlesRenderer {
 		}
 
 		// Handle clicking/dragging
-		// TODO: Use callbacks
-		boolean holdLeft = GLFW.glfwGetMouseButton(GLFW.glfwGetCurrentContext(),
-				GLFW.GLFW_MOUSE_BUTTON_LEFT) == GLFW.GLFW_PRESS;
-		boolean holdRight = GLFW.glfwGetMouseButton(GLFW.glfwGetCurrentContext(),
-				GLFW.GLFW_MOUSE_BUTTON_RIGHT) == GLFW.GLFW_PRESS;
+		MouseHandler mh = ClientEngine.renderThread.getWindow().getMouseHandler();
+		boolean holdLeft = mh.isButtonPressed(0);
+		boolean holdRight = mh.isButtonPressed(1);
 
 		if (holdLeft) {
 			if (!holdRight) {

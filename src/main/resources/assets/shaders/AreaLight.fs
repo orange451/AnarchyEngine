@@ -216,8 +216,10 @@ void main() {
 
 		vec3 planeDiffuseDir = ltcAreaLight(N, V, position, diffuseMatrix, points);
 
+		roughness = max(roughness, 0.02);
+
 		float theta = acos(dot(N, V));
-		vec2 uv = vec2(max(roughness, 0.020), theta / (0.5 * PI));
+		vec2 uv = vec2(roughness, theta / (0.5 * PI));
 		uv = uv * LUT_SCALE + LUT_BIAS;
 
 		vec4 t = texture(ltcMat, uv);
@@ -226,24 +228,24 @@ void main() {
 		vec3 planeSpecularDir = ltcAreaLight(N, V, position, minv, points);
 
 		float NdotL = max(dot(N, planeDiffuseDir), 0.0);
-		NdotL /= 2.0 * PI;
 
-		vec3 L = normalize(planeSpecularDir);
+		vec3 L = planeSpecularDir;
 		vec3 H = normalize(V + L);
 		float specularNdotL = max(dot(N, L), 0.0);
-		specularNdotL /= 2.0 * PI;
 
 		vec3 radiance = vec3(light.color * light.intensity);
 
-		float NDF = max(dot(N, planeSpecularDir), 0.0) * texture(ltcMag, uv).r / 2.0 * PI;
-		float G = GeometrySmith(N, V, L, roughness) / 2.0 * PI;
+		vec2 schlick = texture(ltcMag, uv).rg;
+
+		float NDF = DistributionGGX(N, normalize(V + normalize(L)), roughness);
+		float G = GeometrySmith(N, V, L, roughness);
 		vec3 F = fresnelSchlick(max(dot(H, V), 0.0), F0);
 
-		vec3 nominator = NDF * G * F;
+		vec3 nominator = max(NDF, 0.0) * G * max(F, 0.0);
 		float denominator = max(dot(N, V), 0.0) * specularNdotL + 0.001;
 		vec3 brdf = nominator / denominator;
 
-		vec3 kS = F;
+		vec3 kS = max(F, 0.0);
 		vec3 kD = vec3(1.0) - kS;
 		kD *= 1.0 - metallic;
 

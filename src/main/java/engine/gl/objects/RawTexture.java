@@ -18,7 +18,7 @@ public class RawTexture {
 	private int width;
 	private int height;
 	private int comp;
-	private ByteBuffer buffer;
+	protected ByteBuffer buffer;
 
 	public RawTexture(ByteBuffer buffer, int width, int height, int comp) {
 		this.buffer = buffer;

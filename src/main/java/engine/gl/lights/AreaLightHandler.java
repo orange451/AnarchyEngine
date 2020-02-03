@@ -62,7 +62,7 @@ import engine.gl.objects.TextureBuilder;
 import engine.gl.objects.VAO;
 import engine.gl.shaders.AreaLightShader;
 import engine.lua.type.object.insts.Camera;
-import engine.resources.ResourcesManager;
+import engine.resources.LoadLTCTask;
 import engine.tasks.Task;
 import engine.tasks.TaskManager;
 
@@ -100,8 +100,10 @@ public class AreaLightHandler implements ILightHandler<AreaLightInternal> {
 	}
 
 	public void init() {
-		Task<Texture> ltcMagTask = ResourcesManager.loadTextureMisc("assets/textures/ltc_mag.png", null);
-		Task<Texture> ltcMatTask = ResourcesManager.loadTextureMisc("assets/textures/ltc_mat.png", null);
+		Task<Texture> ltcMagTask = TaskManager
+				.submitRenderBackgroundThread(new LoadLTCTask("assets/textures/amp.ltc", 32));
+		Task<Texture> ltcMatTask = TaskManager
+				.submitRenderBackgroundThread(new LoadLTCTask("assets/textures/mat.ltc", 64));
 		float[] positions = { -1, 1, -1, -1, 1, 1, 1, -1 };
 		quad = VAO.create();
 		quad.bind();
