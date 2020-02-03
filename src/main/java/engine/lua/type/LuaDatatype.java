@@ -27,11 +27,25 @@ public abstract class LuaDatatype extends LuaTable {
 	
 	protected boolean locked = false;
 
+	/**
+	 * Define a field for this Datatype. Deprecated. See {@link #defineField(LuaValue, LuaValue, boolean)}.
+	 * @param fieldName
+	 * @param fieldValue
+	 * @param isFinal
+	 * @return
+	 */
 	@Deprecated
 	public LuaField defineField(String fieldName, LuaValue fieldValue, boolean isFinal) {
 		return defineField(LuaValue.valueOf(fieldName), fieldValue, isFinal);
 	}
 
+	/**
+	 * Define a field for this Datatype.
+	 * @param fieldName
+	 * @param fieldValue
+	 * @param isFinal
+	 * @return
+	 */
 	public LuaField defineField(LuaValue fieldName, LuaValue fieldValue, boolean isFinal) {
 		LuaField ret = this.getField(fieldName);
 		if ( ret == null ) {
@@ -49,6 +63,10 @@ public abstract class LuaDatatype extends LuaTable {
 		return ret;
 	}
 	
+	/**
+	 * Undefines a filed in the Datatype.
+	 * @param fieldName
+	 */
 	public void undefineField(LuaValue fieldName) {
 		if ( !this.containsField(fieldName) )
 			return;
@@ -62,20 +80,38 @@ public abstract class LuaDatatype extends LuaTable {
 		try{ this.set(fieldName, LuaValue.NIL); }catch(Exception e) {}
 	}
 
+	/**
+	 * Returns whether a field is defined in this Datatype.
+	 * @param key
+	 * @return
+	 */
 	public boolean containsField(LuaValue key) {
 		return fields.containsKey(key);
 	}
 	
+	/**
+	 * Gets the field object for the specified field name.
+	 * @param key
+	 * @return
+	 */
 	public LuaField getField(LuaValue key) {
 		return fields.get(key);
 	}
 	
+	/**
+	 * Returns list of fields in the order they are defined.
+	 * @return
+	 */
 	public LuaValue[] getFields() {
 		Set<LuaValue> keys = fields.keySet();
 		LuaValue[] f = keys.toArray(new LuaValue[keys.size()]);
 		return f;
 	}
 	
+	/**
+	 * Returns list of fields ordered.
+	 * @return
+	 */
 	public LuaValue[] getFieldsOrdered() {
 		LuaValue[] t = new LuaValue[fieldsOrdered.size()];
 		synchronized(fieldsOrdered) {
@@ -108,7 +144,10 @@ public abstract class LuaDatatype extends LuaTable {
 		this.locked = locked;
 	}
 	
-
+	/**
+	 * Returns whether or not the instance is locked internally. See {@link #setLocked(boolean)}.
+	 * @return
+	 */
 	public boolean isLocked() {
 		return this.locked;
 	}

@@ -11,6 +11,7 @@
 package ide.layout.windows;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -87,6 +88,8 @@ public class IdeExplorer extends IdePane {
 	private Map<TreeItem<Instance>, LuaConnection> treeItemToChangedConnectionMap;
 	private List<Instance> selectedCache;
 	
+	private Instance rootECS;
+	
 	private static HashMap<Class<? extends Instance>, Integer> priority = new HashMap<>();
 	
 	static {
@@ -144,8 +147,10 @@ public class IdeExplorer extends IdePane {
 		return ret;
 	}
 	
-	public IdeExplorer() {
+	public IdeExplorer(Instance root) {
 		super("Explorer", true);
+		
+		this.rootECS = root;
 
 		this.scroller = new ScrollPane();
 		this.scroller.setBorder(Insets.EMPTY);
@@ -154,27 +159,27 @@ public class IdeExplorer extends IdePane {
 		this.getChildren().add(scroller);
 		
 		// Object Added
-		Game.game().descendantAddedEvent().connect((args)->{
+		root.descendantAddedEvent().connect((args)->{
 			if ( !Game.isLoaded() )
 				return;
 			TaskManager.addTaskRenderThread(() -> buildNode((Instance) args[0], true));
 		});
 		
 		// Object removed
-		Game.game().descendantRemovedEvent().connect((args)->{
+		root.descendantRemovedEvent().connect((args)->{
 			TaskManager.addTaskRenderThread(() -> destroyNode((Instance) args[0]));
 		});
 		
 		// Game reset
 		Game.resetEvent().connect((args) -> {
 			TaskManager.addTaskRenderThread(() -> {
-				rebuild();
+				rebuild(root);
 			});
 		});
 		
 		// First (initial) load
 		TaskManager.addTaskRenderThread(() -> {
-			rebuild();
+			rebuild(root);
 		});
 		
 		// Selection change
@@ -183,14 +188,14 @@ public class IdeExplorer extends IdePane {
 			List<Instance> toSelect = new ArrayList<Instance>();
 			List<Instance> toUnselect = new ArrayList<Instance>();
 			
-			// Prune left
+			// Prune left (unselect those that were previously selected but no longer selected)
 			for (int i = 0; i < selectedCache.size(); i++) {
 				Instance alreadySelected = selectedCache.get(i);
 				if ( !selected.contains(alreadySelected) )
 					toUnselect.add(alreadySelected);
 			}
 			
-			// Prune right
+			// Prune right (Select those that were NOT previously selected but are now).
 			for (int i = 0; i < selected.size(); i++) {
 				Instance potentialNotYetSelected = selected.get(i);
 				if ( !selectedCache.contains(potentialNotYetSelected) )
@@ -259,6 +264,13 @@ public class IdeExplorer extends IdePane {
 		tree.setOnSelectItem(event -> {
 			TreeItem<Instance> item = event.object;
 			Instance inst = item.getRoot();
+			
+			if ( Game.selected().size() > 0 ) {
+				if ( !Game.selected().get(Game.selected().size()-1).isDescendantOf(rootECS) ) {
+					Game.deselectAll();
+				}
+			}
+			
 			Game.select(inst);
 		});
 		tree.setOnDeselectItem(event -> {
@@ -268,10 +280,12 @@ public class IdeExplorer extends IdePane {
 		});
 	}
 	
-	private void rebuild() {
+	private void rebuild(Instance root) {
 		clear();
 		
-		buildDescendents(Game.game(), true);
+		System.out.println("REBUILDING EXPLORER TREE FOR ROOT OBJECT: " + root + " / " + Arrays.toString(root.getDescendants().toArray()));
+		
+		buildDescendents(root, true);
 	}
 	
 	private void buildDescendents(Instance parent, boolean sort) {
@@ -322,15 +336,15 @@ public class IdeExplorer extends IdePane {
 			// Get Parent node
 			LuaValue parInst = instance.getParent();
 			if ( parInst.isnil() )
-				parInst = Game.game();
+				parInst = rootECS;
 			TreeBase<Instance> parentTreeItem = instanceToTreeItemMap.get(parInst);
-			if ( parInst.isnil() || parInst.eq_b(Game.game()) )
+			if ( parInst.isnil() || parInst.eq_b(rootECS) )
 				parentTreeItem = tree;
 			if ( parentTreeItem == null )
 				return;
 			
 			// Get grandparent node
-			LuaValue grandparInst = Game.game();
+			LuaValue grandparInst = rootECS;
 			if ( parentTreeItem instanceof TreeItem )
 				grandparInst = ((TreeItem<Instance>)parentTreeItem).getRoot().getParent();
 			TreeBase<Instance> grandparentTreeItem = instanceToTreeItemMap.get(grandparInst);

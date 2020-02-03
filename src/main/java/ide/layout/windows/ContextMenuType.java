@@ -25,6 +25,7 @@ import engine.Game;
 import engine.lua.type.object.Instance;
 import engine.lua.type.object.ScriptBase;
 import engine.lua.type.object.insts.*;
+import engine.lua.type.object.services.*;
 import engine.lua.type.object.insts.script.GlobalScript;
 import engine.lua.type.object.insts.script.LocalScript;
 import engine.lua.type.object.insts.script.Script;
@@ -169,6 +170,28 @@ public abstract class ContextMenuType {
 		@Override
 		public void onClick(Instance instance) {
 			Instance p = new Texture();
+			p.forceSetParent(instance);
+			Game.historyService().pushChange(p, LuaValue.valueOf("Parent"), LuaValue.NIL, p.getParent());
+		}
+	};
+	public static final ContextMenuType NEW_SCENE = new ContextMenuType(Scenes.class) {
+		{
+			this.setMustMatchName("Scenes");
+		}
+
+		@Override
+		public String getMenuName() {
+			return "New Scene";
+		}
+
+		@Override
+		public ImageView getMenuGraphic() {
+			return Icons.icon_world.getViewWithIcon(Icons.icon_plus);
+		}
+
+		@Override
+		public void onClick(Instance instance) {
+			Instance p = new Scene();
 			p.forceSetParent(instance);
 			Game.historyService().pushChange(p, LuaValue.valueOf("Parent"), LuaValue.NIL, p.getParent());
 		}

@@ -39,6 +39,7 @@ import engine.lua.type.object.insts.Camera;
 import engine.lua.type.object.insts.Player;
 import engine.lua.type.object.insts.PlayerGui;
 import engine.lua.type.object.insts.PlayerScripts;
+import engine.lua.type.object.insts.Scene;
 import engine.lua.type.object.insts.script.GlobalScript;
 import engine.lua.type.object.services.Assets;
 import engine.lua.type.object.services.Connections;
@@ -48,8 +49,10 @@ import engine.lua.type.object.services.GameECS;
 import engine.lua.type.object.services.HistoryService;
 import engine.lua.type.object.services.Lighting;
 import engine.lua.type.object.services.Players;
+import engine.lua.type.object.services.ProjectECS;
 import engine.lua.type.object.services.RenderSettings;
 import engine.lua.type.object.services.RunService;
+import engine.lua.type.object.services.Scenes;
 import engine.lua.type.object.services.ScriptService;
 import engine.lua.type.object.services.SoundService;
 import engine.lua.type.object.services.StarterPlayer;
@@ -79,6 +82,7 @@ public class Game implements Tickable {
 	public static final String VERSION = "0.7a";
 
 	protected boolean isServer = true;
+	private Scene currentModifyingScene;
 	
 	public Game() {
 		game = this;
@@ -88,6 +92,17 @@ public class Game implements Tickable {
 	//local j = game.Workspace.Cubes:GetChildren() local k = 1 local t = 6 for i=1,t do t = t-1 for a=-t/2,t/2 do local o = j[k] o.PhysicsObject.Velocity = Vector3.new() o.WorldMatrix = Matrix4.new( Vector3.new( 0, a * 1.2, i ) ) k = k + 1 end end
 
 	private static void services() {
+		if ( Game.project().scenes() == null ) {
+			Scenes scene = new Scenes();
+			scene.forceSetParent(Game.project());
+			
+			Scene s = new Scene();
+			s.forceSetParent(scene);
+			
+			scene.setStartingScene(s);
+			Game.getGame().currentModifyingScene = s;
+		}
+		
 		if ( Game.workspace() == null )
 			new Workspace().forceSetParent(Game.game());
 		
@@ -148,6 +163,15 @@ public class Game implements Tickable {
 		
 		if ( Game.starterPlayer().starterPlayerGui() == null)
 			new StarterPlayerGui().forceSetParent(Game.starterPlayer());
+		
+		if ( Game.project().assets() == null )
+			Instance.instanceLuaForce(Assets.class.getSimpleName()).forceSetParent(Game.project());
+
+		if ( Game.project().storage() == null )
+			new Storage().forceSetParent(Game.project());
+		
+		if ( Game.project().scriptService() == null )
+			new ScriptService().forceSetParent(Game.project());
 	}
 
 	public static Service getService(String string) {
@@ -212,8 +236,9 @@ public class Game implements Tickable {
 		
 		return servs;
 	}
-	
+
 	private static final LuaValue C_GAME = LuaValue.valueOf("game");
+	private static final LuaValue C_PROJECT = LuaValue.valueOf("project");
 	private static final LuaValue C_WORKSPACE = LuaValue.valueOf("Workspace");
 	private static final LuaValue C_LIGHTING = LuaValue.valueOf("Lighting");
 	private static final LuaValue C_RUNSERVICE = LuaValue.valueOf("RunService");
@@ -232,8 +257,17 @@ public class Game implements Tickable {
 		return game.isnil()?null:(GameECS) game;
 	}
 	
+	public static ProjectECS project() {
+		LuaValue project = LuaEngine.globals.get(C_PROJECT);
+		return project.isnil()?null:(ProjectECS)project;
+	}
+	
 	public static void setGame(GameECS game) {
 		LuaEngine.globals.set(C_GAME, game);
+	}
+	
+	public static void setProject(ProjectECS project) {
+		LuaEngine.globals.set(C_PROJECT, project);
 	}
 
 	public static Workspace workspace() {

@@ -18,6 +18,7 @@ import engine.lua.LuaEngine;
 import engine.lua.type.ScriptRunner;
 import engine.lua.type.object.Service;
 import engine.lua.type.object.services.GameECS;
+import engine.lua.type.object.services.ProjectECS;
 import engine.lua.type.object.services.RunService;
 import engine.tasks.TaskManager;
 import engine.tasks.ThreadUtils;
@@ -50,7 +51,8 @@ public class InternalGameThread extends Thread implements IEngineThread {
 
 		// Create the game instance
 		Game.setGame(new GameECS());
-
+		Game.setProject(new ProjectECS());
+		
 		// Start a new project
 		Game.changes = false;
 		Game.newProject();
