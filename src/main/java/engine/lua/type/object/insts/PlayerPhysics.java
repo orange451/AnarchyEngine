@@ -21,7 +21,6 @@ import engine.Game;
 import engine.InternalGameThread;
 import engine.lua.lib.Enums;
 import engine.lua.type.LuaFieldFlag;
-import engine.lua.type.NumberClamp;
 import engine.lua.type.NumberClampPreferred;
 import engine.lua.type.object.PhysicsBase;
 import engine.lua.type.object.TreeViewable;
@@ -65,7 +64,8 @@ public class PlayerPhysics extends PhysicsBase implements TreeViewable {
 		
 		// Force to capsule
 		this.set(C_SHAPE, Enums.matchEnum(C_SHAPE, "Capsule"));
-		this.getField(C_SHAPE).setLocked(true);
+		this.getField(C_SHAPE).setLocked(true)
+							.removeFlag(LuaFieldFlag.CLIENT_SIDE_REPLICATE);
 		
 		// Use shape
 		this.getField(C_USECUSTOMMESH).setLocked(true);

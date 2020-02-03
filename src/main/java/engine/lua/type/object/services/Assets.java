@@ -129,6 +129,24 @@ public class Assets extends Service implements TreeViewable {
 			}
 		});
 	}
+
+	@Override
+	protected void onLuaCreate() {
+		if ( this.findFirstChild(Assets.C_PREFABS) == null )
+			Assets.newPackage(Assets.C_PREFABS, this);
+
+		if ( this.findFirstChild(Assets.C_MESHES) == null )
+			Assets.newPackage(Assets.C_MESHES, this);
+
+		if ( this.findFirstChild(Assets.C_MATERIALS) == null )
+			Assets.newPackage(Assets.C_MATERIALS, this);
+
+		if ( this.findFirstChild(Assets.C_TEXTURES) == null )
+			Assets.newPackage(Assets.C_TEXTURES, this);
+
+		if ( this.findFirstChild(Assets.C_AUDIO) == null )
+			Assets.newPackage(Assets.C_AUDIO, this);		
+	}
 	
 	public AudioSource importSound(String filepath, Instance parent) {
 		AudioSource t = new AudioSource();

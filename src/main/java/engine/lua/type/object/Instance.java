@@ -281,6 +281,24 @@ public abstract class Instance extends DataModel {
 	}
 	
 	/**
+	 * Instantiate an Instance as if it was created in lua via script. This means that non-instanceable objects will get blocked.
+	 * @param type
+	 * @return
+	 */
+	public static Instance instanceLuaForce(String type) {
+		LuaInstancetypeData c = TYPES.get(type);
+		if ( c == null )
+			return null;
+		
+		Instance instance = instance(type);
+		if ( instance == null )
+			return null;
+		
+		instance.onLuaCreate();
+		return instance;
+	}
+	
+	/**
 	 * Function that gets ran when a instance is created via Instance.new() through lua.
 	 */
 	protected void onLuaCreate() {

@@ -39,6 +39,7 @@ public class Icons {
 	public static final Icons icon_script_local = new Icons("ScriptLocal.png");
 	public static final Icons icon_script_global = new Icons("ScriptGlobal.png");
 	public static final Icons icon_script_css = new Icons("CSS.png");
+	public static final Icons icon_scenes = new Icons("Scenes.png");
 	public static final Icons icon_player_scripts = new Icons("PlayerScripts.png");
 	public static final Icons icon_player_gui = new Icons("PlayerGui.png");
 	public static final Icons icon_starter_player = new Icons("StarterPlayer.png");

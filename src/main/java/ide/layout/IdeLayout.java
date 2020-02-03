@@ -83,6 +83,7 @@ public class IdeLayout {
 		
 		// Add left
 		west = new IdeVerticalDock();
+		west.dockNorth(new IdeExplorer(Game.project()));
 		split.getItems().add(west);
 		
 		// Add middle
@@ -90,7 +91,7 @@ public class IdeLayout {
 		
 		// Add right
 		east = new IdeVerticalDock();
-		east.dockNorth(new IdeExplorer());
+		east.dockNorth(new IdeExplorer(Game.game()));
 		east.dockSouth(new IdeProperties());
 		split.getItems().add(east);
 		
