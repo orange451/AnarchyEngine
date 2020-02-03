@@ -14,6 +14,9 @@ import static org.lwjgl.opengl.GL11C.GL_FLOAT;
 import static org.lwjgl.opengl.GL11C.GL_LINEAR;
 import static org.lwjgl.opengl.GL11C.GL_REPEAT;
 import static org.lwjgl.opengl.GL11C.GL_TEXTURE_2D;
+import static org.lwjgl.opengl.GL30C.GL_R32F;
+import static org.lwjgl.opengl.GL30C.GL_RG32F;
+import static org.lwjgl.opengl.GL30C.GL_RGB32F;
 import static org.lwjgl.opengl.GL30C.GL_RGBA32F;
 import static org.lwjgl.system.MemoryUtil.memAlloc;
 import static org.lwjgl.system.MemoryUtil.memCopy;
@@ -42,6 +45,8 @@ public class LoadLTCTask extends Task<Texture> {
 
 	private String file;
 
+	private int textureComponents;
+
 	public LoadLTCTask(String file) {
 		this.file = file;
 	}
@@ -50,7 +55,23 @@ public class LoadLTCTask extends Task<Texture> {
 	protected Texture call() {
 		System.out.println("Loading: " + file);
 		RawLTC data = decodeTextureFile(file);
-		int id = ResourcesManager.backend.loadTexture(GL_LINEAR, GL_REPEAT, GL_RGBA32F, GL_FLOAT, false, data);
+		int glFormat = -1;
+		switch (textureComponents) {
+		case 1:
+			glFormat = GL_R32F;
+			break;
+		case 2:
+			glFormat = GL_RG32F;
+			break;
+		case 3:
+			glFormat = GL_RGB32F;
+			break;
+		case 4:
+			glFormat = GL_RGBA32F;
+			break;
+		}
+
+		int id = ResourcesManager.backend.loadTexture(GL_LINEAR, GL_REPEAT, glFormat, GL_FLOAT, false, data);
 		data.dispose();
 		return new Texture(id, GL_TEXTURE_2D, data.getWidth(), data.getHeight());
 	}
@@ -62,7 +83,7 @@ public class LoadLTCTask extends Task<Texture> {
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
-		int version = -1, type = -1, dataSize = -1, textureSize = -1, textureComponents = -1;
+		int version = -1, type = -1, dataSize = -1, textureSize = -1;
 		ByteBuffer image = null;
 		int status = READ_HEADER;
 		LOOP: while (ltc.hasRemaining()) {
