@@ -10,13 +10,17 @@
 
 package engine;
 
+import engine.lua.type.object.services.UserInputService;
 import lwjgui.geometry.Insets;
 import lwjgui.geometry.Pos;
+import lwjgui.glfw.input.MouseHandler;
 import lwjgui.paint.Color;
 import lwjgui.scene.control.Label;
 import lwjgui.scene.layout.StackPane;
 
 public abstract class ClientRunner extends ClientEngine {
+
+	public static final String TITLE = "Anarchy Engine - Client Runner Build " + Game.version();
 
 	public ClientRunner(String... args) {
 		super(args);
@@ -26,6 +30,7 @@ public abstract class ClientRunner extends ClientEngine {
 
 	@Override
 	public void setupEngine() {
+		renderThread.getWindow().setTitle(TITLE);
 		StackPane displayPane = renderThread.getPipeline().getDisplayPane();
 		renderThread.getWindow().getScene().setRoot(displayPane);
 		displayPane.getChildren().add(renderThread.getClientUI());
@@ -53,10 +58,21 @@ public abstract class ClientRunner extends ClientEngine {
 		fps.setText(InternalRenderThread.fps + " fps");
 	}
 
+	private boolean grabbed;
+
 	@Override
 	public void update() {
-		// TODO Auto-generated method stub
-
+		if (UserInputService.lockMouse) {
+			if (!grabbed) {
+				grabbed = true;
+				MouseHandler.setGrabbed(renderThread.getWindow().getID(), true);
+			}
+		} else {
+			if (grabbed) {
+				MouseHandler.setGrabbed(renderThread.getWindow().getID(), false);
+				grabbed = false;
+			}
+		}
 	}
 
 	public abstract void loadScene(String[] args);

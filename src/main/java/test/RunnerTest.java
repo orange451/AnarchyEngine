@@ -1,9 +1,9 @@
 package test;
 
-import engine.ClientRunner;
+import engine.ClientLocalRunner;
 import engine.io.Load;
 
-public class RunnerTest extends ClientRunner {
+public class RunnerTest extends ClientLocalRunner {
 
 	@Override
 	public void loadScene(String[] args) {

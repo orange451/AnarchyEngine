@@ -13,19 +13,24 @@ package engine;
 import engine.io.Load;
 
 public class ClientLocalRunner extends ClientRunner {
-	
-	public ClientLocalRunner(String[] args) {
+
+	public ClientLocalRunner(String... args) {
 		super(args);
 	}
 
 	@Override
-	public void loadScene(String[] args) {
+	public void setupEngine() {
+		super.setupEngine();
 		game.setServer(false);
+	}
+
+	@Override
+	public void loadScene(String[] args) {
 		if (args.length == 1) {
 			Load.load(args[0]);
 		}
 	}
-	
+
 	public static void main(String[] args) {
 		new ClientLocalRunner(args);
 	}

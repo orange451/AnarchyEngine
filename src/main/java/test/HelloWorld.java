@@ -2,7 +2,7 @@ package test;
 
 import org.lwjgl.glfw.GLFW;
 
-import engine.ClientRunner;
+import engine.ClientLocalRunner;
 import engine.Game;
 import engine.lua.type.data.Color3;
 import engine.lua.type.data.Vector3;
@@ -14,7 +14,7 @@ import engine.lua.type.object.insts.Mesh;
 import engine.lua.type.object.insts.Prefab;
 import engine.lua.type.object.insts.light.PointLight;
 
-public class HelloWorld extends ClientRunner  {
+public class HelloWorld extends ClientLocalRunner  {
 	
 	@Override
 	public void loadScene(String[] args) {

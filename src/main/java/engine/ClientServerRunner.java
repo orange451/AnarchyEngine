@@ -14,7 +14,7 @@ import engine.io.Load;
 
 public class ClientServerRunner extends ClientRunner {
 
-	public ClientServerRunner(String[] args) {
+	public ClientServerRunner(String... args) {
 		super(args);
 	}
 
@@ -24,7 +24,7 @@ public class ClientServerRunner extends ClientRunner {
 			Load.load(args[0]);
 		}
 	}
-	
+
 	public static void main(String[] args) {
 		new ClientServerRunner(args);
 	}

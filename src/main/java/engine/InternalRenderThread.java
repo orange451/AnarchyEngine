@@ -47,7 +47,7 @@ public class InternalRenderThread extends Thread implements IEngineThread {
 	public InternalRenderThread(ClientEngine client) {
 		this.client = client;
 		super.setName("Render Thread");
-		handle = WindowManager.generateHandle(1024, 600, "Anarchy Engine - IDE");
+		handle = WindowManager.generateHandle(1024, 600, "Anarchy Engine -");
 		handle.isVisible(false);
 		handle.setWindowHint(GLFW.GLFW_CONTEXT_VERSION_MAJOR, GLCompat.GL_MAJOR);
 		handle.setWindowHint(GLFW.GLFW_CONTEXT_VERSION_MINOR, GLCompat.GL_MINOR);

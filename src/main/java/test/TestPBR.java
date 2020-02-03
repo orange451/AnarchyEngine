@@ -3,7 +3,7 @@ package test;
 import org.luaj.vm2.LuaValue;
 import org.lwjgl.glfw.GLFW;
 
-import engine.ClientRunner;
+import engine.ClientLocalRunner;
 import engine.Game;
 import engine.lua.RunnableArgs;
 import engine.lua.type.data.Color3;
@@ -17,7 +17,7 @@ import engine.lua.type.object.insts.Skybox;
 import engine.lua.type.object.insts.Texture;
 import engine.lua.type.object.insts.light.PointLight;
 
-public class TestPBR extends ClientRunner {
+public class TestPBR extends ClientLocalRunner {
 	
 	@Override
 	public void loadScene(String[] args) {
