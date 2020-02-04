@@ -84,10 +84,6 @@ public class IDE extends ClientEngine {
 		layout = new IdeLayout(background);
 	}
 
-	protected Vector2f getMouseOffset() {
-		return new Vector2f((float) layout.getGamePane().getX(), (float) layout.getGamePane().getY());
-	}
-
 	public static void openScript(ScriptBase instance) {
 		WindowManager.runLater(() -> {
 			new ManagedThread(300, 100,

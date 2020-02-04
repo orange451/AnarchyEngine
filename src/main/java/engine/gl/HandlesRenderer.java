@@ -315,7 +315,7 @@ public class HandlesRenderer {
 
 		// Get closest point to the line from the mouses position
 		MouseHandler mh = ClientEngine.renderThread.getWindow().getMouseHandler();
-		Vector2f mouse = new Vector2f(mh.getX(), mh.getY());
+		Vector2f mouse = new Vector2f(mh.getX(), mh.getY()).sub(ClientEngine.renderThread.getClientUI().getMouseOffset());
 		Vector2f closest = getProjectedPointLine(p2, p3, mouse);
 
 		// Reproject the closest point to 3d ray
@@ -449,7 +449,7 @@ public class HandlesRenderer {
 		Vector3f arrowPos = headMat.getTranslation(new Vector3f());
 		Vector2f pos = MatrixUtils.project3Dto2D(arrowPos, projection, camera.getViewMatrixInternal(), size);
 		MouseHandler mh = ClientEngine.renderThread.getWindow().getMouseHandler();
-		Vector2f mou = new Vector2f(mh.getX(), mh.getY());
+		Vector2f mou = new Vector2f(mh.getX(), mh.getY()).sub(ClientEngine.renderThread.getClientUI().getMouseOffset());
 		boolean closer = true;
 		float d1 = arrowPos.distance(camera.getPosition().toJoml());
 		if (tempPos != null) {
