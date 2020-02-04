@@ -32,10 +32,10 @@ public class PointLight extends LightBase<PointLightInternal> implements TreeVie
 	public PointLight() {
 		super("PointLight");
 		
-		this.defineField(C_RADIUS.toString(), LuaValue.valueOf(8), false);
+		this.defineField(C_RADIUS, LuaValue.valueOf(8), false);
 		this.getField(C_RADIUS).setClamp(new NumberClampPreferred(0, 1024, 0, 64));
 
-		this.defineField(C_SHADOWMAPSIZE.toString(), LuaValue.valueOf(512), false);
+		this.defineField(C_SHADOWMAPSIZE, LuaValue.valueOf(512), false);
 		this.getField(C_SHADOWMAPSIZE).setEnum(new EnumType("TextureSize"));
 		
 		this.changedEvent().connect((args)->{

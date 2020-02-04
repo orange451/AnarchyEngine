@@ -71,7 +71,7 @@ public class VolumetricLightShader extends BasePipelineShader {
 
 	public void loadCameraData(Camera camera, Matrix4f projection) {
 		this.projectionMatrix.loadMatrix(projection);
-		this.viewMatrix.loadMatrix(camera.getViewMatrixInverse());
+		this.viewMatrix.loadMatrix(camera.getViewMatrixInternal());
 		this.cameraPosition.loadVec3(camera.getPosition().getInternal());
 	}
 

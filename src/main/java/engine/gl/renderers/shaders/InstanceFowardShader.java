@@ -109,7 +109,7 @@ public class InstanceFowardShader extends ShaderProgram {
 
 	public void loadCamera(Camera camera, Matrix4f projection) {
 		projectionMatrix.loadMatrix(projection);
-		viewMatrix.loadMatrix(camera.getViewMatrixInverse());
+		viewMatrix.loadMatrix(camera.getViewMatrixInternal());
 		cameraPosition.loadVec3(camera.getPosition().getInternal());
 	}
 

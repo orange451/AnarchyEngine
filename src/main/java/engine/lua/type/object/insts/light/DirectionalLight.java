@@ -36,12 +36,12 @@ public class DirectionalLight extends LightBase<DirectionalLightInternal> implem
 		this.getField(C_POSITION).setLocked(true);
 
 		// Define direction field
-		this.defineField(C_DIRECTION.toString(), new Vector3(1, 1, 1), false);
+		this.defineField(C_DIRECTION, new Vector3(1, 1, 1), false);
 
 		// Shadow distance
-		this.defineField(C_SHADOWDISTANCE.toString(), LuaValue.valueOf(50), false);
+		this.defineField(C_SHADOWDISTANCE, LuaValue.valueOf(50), false);
 
-		this.defineField(C_SHADOWMAPSIZE.toString(), LuaValue.valueOf(1024), false);
+		this.defineField(C_SHADOWMAPSIZE, LuaValue.valueOf(1024), false);
 		this.getField(C_SHADOWMAPSIZE).setEnum(new EnumType("TextureSize"));
 
 		this.changedEvent().connect((args) -> {

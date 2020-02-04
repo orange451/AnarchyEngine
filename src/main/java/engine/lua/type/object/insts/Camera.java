@@ -32,6 +32,7 @@ import ide.layout.windows.icons.Icons;
 public class Camera extends Instance implements TreeViewable,Positionable {
 
 	private static final LuaValue C_VIEWMATRIX = LuaValue.valueOf("ViewMatrix");
+	private static final LuaValue C_VIEWMATRIXINVERSE = LuaValue.valueOf("ViewMatrixInverse");
 	private static final LuaValue C_FOV = LuaValue.valueOf("Fov");
 	private static final LuaValue C_YAW = LuaValue.valueOf("Yaw");
 	private static final LuaValue C_PITCH = LuaValue.valueOf("Pitch");
@@ -40,7 +41,8 @@ public class Camera extends Instance implements TreeViewable,Positionable {
 
 	private static final LuaValue C_CAMERATYPE = LuaValue.valueOf("CameraType");
 	
-	private Matrix4f inverseViewMatrix; // Gets updated whenever the viewmatrix changes
+	private Matrix4f viewMatrix = new Matrix4f();
+	private Matrix4f viewMatrixInverse = new Matrix4f();
 	
 	public Camera() {
 		super("Camera");
@@ -57,6 +59,7 @@ public class Camera extends Instance implements TreeViewable,Positionable {
 		this.getField(C_FOV).setClamp(new NumberClamp(1, 120));
 		
 		this.defineField(C_VIEWMATRIX.toString(),	new Matrix4(), false);
+		this.defineField(C_VIEWMATRIXINVERSE.toString(),	new Matrix4(), false);
 		
 		// Default override
 		this.set(C_LOOKAT, new Vector3(0, 0, 0));
@@ -113,8 +116,9 @@ public class Camera extends Instance implements TreeViewable,Positionable {
 
 				this.rawset(C_POSITION, new Vector3(t));
 				this.set(C_LOOKAT, new Vector3(l));
-				
-				this.inverseViewMatrix = view.invert(new Matrix4f());
+				this.viewMatrix = view;
+				view.invert(this.viewMatrixInverse);
+				this.rawset(C_VIEWMATRIXINVERSE, new Matrix4(this.viewMatrixInverse));
 			}
 			
 			// If lookat/position is changed, recalculate view matrix
@@ -218,17 +222,29 @@ public class Camera extends Instance implements TreeViewable,Positionable {
 		
 		this.set(C_VIEWMATRIX, matrix);
 	}
-	
-	public Matrix4f getViewMatrixInverse() {
-		return this.inverseViewMatrix;
+
+	public Matrix4f getViewMatrixInternal() {
+		return this.viewMatrix;
 	}
-	
+
+	public Matrix4f getViewMatrixInverseInternal() {
+		return this.viewMatrixInverse;
+	}
+
 	public Matrix4 getViewMatrix() {
 		LuaValue viewMat = this.get(C_VIEWMATRIX);
 		if ( viewMat.isnil() )
 			return new Matrix4();
-		
+
 		return (Matrix4)viewMat;
+	}
+
+	public Matrix4 getViewMatrixInverse() {
+		LuaValue viewMatInv = this.get(C_VIEWMATRIXINVERSE);
+		if ( viewMatInv.isnil() )
+			return new Matrix4();
+
+		return (Matrix4)viewMatInv;
 	}
 
 	public void setYaw( float yaw ) {
@@ -281,11 +297,10 @@ public class Camera extends Instance implements TreeViewable,Positionable {
 	}
 
 	private void updateMatrix() {
-		Matrix4f mat = new Matrix4f();
-		mat.lookAt(this.getPosition().getInternal(), this.getLookAt().getInternal(), new Vector3f(0,0,1));
-		
-		this.inverseViewMatrix = mat;
-		this.rawset(C_VIEWMATRIX, new Matrix4(mat.invert(new Matrix4f())));
+		this.viewMatrix.setLookAt(this.getPosition().getInternal(), this.getLookAt().getInternal(), new Vector3f(0,0,1));
+		this.viewMatrix.invert(viewMatrixInverse);
+		this.rawset(C_VIEWMATRIX, new Matrix4(this.viewMatrix));
+		this.rawset(C_VIEWMATRIXINVERSE, new Matrix4(this.viewMatrixInverse));
 	}
 
 	@Override

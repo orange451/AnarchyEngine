@@ -46,7 +46,7 @@ public class AreaLightShader extends ShaderProgram {
 
 	private UniformAreaLight light = new UniformAreaLight("light");
 
-	private Matrix4f projInv = new Matrix4f(), viewInv = new Matrix4f();
+	private Matrix4f projInv = new Matrix4f();
 
 	private static final Vector4f temp = new Vector4f();
 
@@ -88,9 +88,9 @@ public class AreaLightShader extends ShaderProgram {
 
 	public void loadCameraData(Camera camera, Matrix4f projection) {
 		this.projectionMatrix.loadMatrix(projection);
-		this.viewMatrix.loadMatrix(camera.getViewMatrixInverse());
+		this.viewMatrix.loadMatrix(camera.getViewMatrixInternal());
 		this.cameraPosition.loadVec3(camera.getPosition().getInternal());
 		this.inverseProjectionMatrix.loadMatrix(projection.invert(projInv));
-		this.inverseViewMatrix.loadMatrix(camera.getViewMatrixInverse().invert(viewInv));
+		this.inverseViewMatrix.loadMatrix(camera.getViewMatrixInverseInternal());
 	}
 }

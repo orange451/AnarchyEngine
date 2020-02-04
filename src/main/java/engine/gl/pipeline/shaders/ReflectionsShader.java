@@ -39,7 +39,7 @@ public class ReflectionsShader extends BasePipelineShader {
 	private UniformSampler pass = new UniformSampler("pass");
 	private UniformSampler aux = new UniformSampler("aux");
 
-	private Matrix4f projInv = new Matrix4f(), viewInv = new Matrix4f();
+	private Matrix4f projInv = new Matrix4f();
 
 	@Override
 	protected void setupShader() {
@@ -66,10 +66,10 @@ public class ReflectionsShader extends BasePipelineShader {
 
 	public void loadCameraData(Camera camera, Matrix4f projection) {
 		this.projectionMatrix.loadMatrix(projection);
-		this.viewMatrix.loadMatrix(camera.getViewMatrixInverse());
+		this.viewMatrix.loadMatrix(camera.getViewMatrixInternal());
 		this.cameraPosition.loadVec3(camera.getPosition().getInternal());
 		this.inverseProjectionMatrix.loadMatrix(projection.invert(projInv));
-		this.inverseViewMatrix.loadMatrix(camera.getViewMatrixInverse().invert(viewInv));
+		this.inverseViewMatrix.loadMatrix(camera.getViewMatrixInverseInternal());
 	}
 
 }

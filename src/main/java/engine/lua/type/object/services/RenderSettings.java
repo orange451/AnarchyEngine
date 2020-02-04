@@ -14,8 +14,6 @@ import org.luaj.vm2.LuaValue;
 
 import engine.ClientEngine;
 import engine.Game;
-import engine.InternalGameThread;
-import engine.InternalRenderThread;
 import engine.gl.RenderingSettings;
 import engine.lua.lib.EnumType;
 import engine.lua.type.object.Instance;
@@ -26,7 +24,7 @@ public class RenderSettings extends Instance implements TreeViewable {
 
 	private static final LuaValue C_SHADOWMAPSIZE = LuaValue.valueOf("ShadowMapSize");
 	private static final LuaValue C_TEXTURESIZE = LuaValue.valueOf("TextureSize");
-	private static final LuaValue C_ALIASING = LuaValue.valueOf("AntiAliasing");
+	private static final LuaValue C_ANTIALIASING = LuaValue.valueOf("AntiAliasing");
 	private static final LuaValue C_SHADOWSENABLED = LuaValue.valueOf("ShadowsEnabled");
 	private static final LuaValue C_MOTIONBLUR = LuaValue.valueOf("MotionBlur");
 	private static final LuaValue C_DEPTHOFFIELD = LuaValue.valueOf("DepthOfField");
@@ -38,37 +36,48 @@ public class RenderSettings extends Instance implements TreeViewable {
 	public RenderSettings() {
 		super("RenderSettings");
 
-		this.defineField(C_SHADOWSENABLED.toString(), LuaValue.valueOf(true), false);
+		this.defineField(C_SHADOWSENABLED, LuaValue.valueOf(true), false);
 		
-		this.defineField(C_SHADOWMAPSIZE.toString(), LuaValue.valueOf(1024), false);
+		this.defineField(C_SHADOWMAPSIZE, LuaValue.valueOf(1024), false);
 		this.getField(C_SHADOWMAPSIZE).setEnum(new EnumType("TextureSize"));
 		
-		this.defineField(C_TEXTURESIZE.toString(), LuaValue.valueOf(1024), false);
+		this.defineField(C_TEXTURESIZE, LuaValue.valueOf(1024), false);
 		this.getField(C_TEXTURESIZE).setEnum(new EnumType("TextureSize"));
 		
-		this.defineField(C_ALIASING.toString(), LuaValue.valueOf("FXAA"), false);
-		this.getField(C_ALIASING).setEnum(new EnumType("AntiAliasingType"));
+		this.defineField(C_ANTIALIASING, LuaValue.valueOf("FXAA"), false);
+		this.getField(C_ANTIALIASING).setEnum(new EnumType("AntiAliasingType"));
 
-		this.defineField(C_MOTIONBLUR.toString(), LuaValue.valueOf(false), false);
-		this.defineField(C_DEPTHOFFIELD.toString(), LuaValue.valueOf(false), false);
-		this.defineField(C_SSRENABLED.toString(), LuaValue.valueOf(false), false);
-		this.defineField(C_AOENABLED.toString(), LuaValue.valueOf(false), false);
+		this.defineField(C_MOTIONBLUR, LuaValue.valueOf(false), false);
+		this.defineField(C_DEPTHOFFIELD, LuaValue.valueOf(false), false);
+		this.defineField(C_SSRENABLED, LuaValue.valueOf(false), false);
+		this.defineField(C_AOENABLED, LuaValue.valueOf(false), false);
 
 		this.setInstanceable(false);
 		this.setLocked(true);
 		
-		// Make sure it's in CORE
-		InternalGameThread.runLater(()->{
+		this.createdEvent().connect((args) -> {
 			if ( destroyed )
 				return;
 			
 			Instance ss = Game.core();
 			if ( !this.getParent().eq_b(ss) )
 				this.forceSetParent(ss);
-		});
-		
-		InternalRenderThread.runLater(()->{
 			this.settings = ClientEngine.renderThread.getPipeline().getRenderSettings();
+			this.settings.shadowsEnabled = this.getShadowsEnabled();
+			this.settings.ssrEnabled = this.getSSREnabled();
+			this.settings.ambientOcclusionEnabled = this.getAOEnabled();
+			this.settings.depthOfFieldEnabled = this.getDepthOfFieldEnabled();
+			this.settings.motionBlurEnabled = this.getMotionBlurEnabled();
+			if (this.get(C_ANTIALIASING).eq_b(LuaValue.valueOf("FXAA"))) {
+				settings.fxaaEnabled = true;
+				settings.taaEnabled = false;
+			} else if (this.get(C_ANTIALIASING).eq_b(LuaValue.valueOf("TAA"))) {
+				settings.fxaaEnabled = true;
+				settings.taaEnabled = true;
+			} else {
+				settings.fxaaEnabled = false;
+				settings.taaEnabled = false;
+			}
 		});
 	}
 	
@@ -116,7 +125,7 @@ public class RenderSettings extends Instance implements TreeViewable {
 		if ( key.eq_b(C_MOTIONBLUR) )
 			settings.motionBlurEnabled = value.toboolean();
 
-		if ( key.eq_b(C_ALIASING) ) {
+		if ( key.eq_b(C_ANTIALIASING) ) {
 			if ( value.eq_b(LuaValue.valueOf("FXAA")) ) {
 				settings.fxaaEnabled = true;
 				settings.taaEnabled = false;

@@ -36,12 +36,12 @@ public class AreaLight extends LightBase<AreaLightInternal> implements TreeViewa
 
 		this.getField(C_INTENSITY).setClamp(new NumberClampPreferred(0, 100, 0, 100));
 
-		this.defineField(C_DIRECTION.toString(), new Vector3(1, 1, 1), false);
+		this.defineField(C_DIRECTION, new Vector3(1, 1, 1), false);
 
-		this.defineField(C_SIZEX.toString(), LuaValue.valueOf(1), false);
+		this.defineField(C_SIZEX, LuaValue.valueOf(1), false);
 		this.getField(C_SIZEX).setClamp(new NumberClampPreferred(0, 100, 0, 100));
 
-		this.defineField(C_SIZEY.toString(), LuaValue.valueOf(1), false);
+		this.defineField(C_SIZEY, LuaValue.valueOf(1), false);
 		this.getField(C_SIZEY).setClamp(new NumberClampPreferred(0, 100, 0, 100));
 
 		this.changedEvent().connect((args) -> {

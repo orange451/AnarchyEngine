@@ -45,7 +45,7 @@ public class DirectionalLightShader extends ShaderProgram {
 
 	private UniformBoolean useShadows = new UniformBoolean("useShadows");;
 
-	private Matrix4f projInv = new Matrix4f(), viewInv = new Matrix4f();
+	private Matrix4f projInv = new Matrix4f();
 
 	@Override
 	protected void setupShader() {
@@ -85,9 +85,9 @@ public class DirectionalLightShader extends ShaderProgram {
 
 	public void loadCameraData(Camera camera, Matrix4f projection) {
 		this.projectionMatrix.loadMatrix(projection);
-		this.viewMatrix.loadMatrix(camera.getViewMatrixInverse());
+		this.viewMatrix.loadMatrix(camera.getViewMatrixInternal());
 		this.cameraPosition.loadVec3(camera.getPosition().getInternal());
 		this.inverseProjectionMatrix.loadMatrix(projection.invert(projInv));
-		this.inverseViewMatrix.loadMatrix(camera.getViewMatrixInverse().invert(viewInv));
+		this.inverseViewMatrix.loadMatrix(camera.getViewMatrixInverseInternal());
 	}
 }

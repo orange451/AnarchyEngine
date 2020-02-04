@@ -378,7 +378,7 @@ public class GLRenderer implements IPipeline {
 
 		GPUProfiler.endFrame();
 
-		rnd.previousViewMatrix.set(currentCamera.getViewMatrixInverse());
+		rnd.previousViewMatrix.set(currentCamera.getViewMatrixInternal());
 		rnd.previousProjectionMatrix.set(projMatrix);
 	}
 

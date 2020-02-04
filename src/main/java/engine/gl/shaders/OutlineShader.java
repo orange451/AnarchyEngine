@@ -46,6 +46,6 @@ public class OutlineShader extends ShaderProgram {
 
 	public void loadCamera(Camera camera, Matrix4f projection) {
 		projectionMatrix.loadMatrix(projection);
-		viewMatrix.loadMatrix(camera.getViewMatrixInverse());
+		viewMatrix.loadMatrix(camera.getViewMatrixInternal());
 	}
 }

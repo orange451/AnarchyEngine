@@ -36,18 +36,18 @@ public class SpotLight extends LightBase<SpotLightInternal> implements TreeViewa
 	public SpotLight() {
 		super("SpotLight");
 		
-		this.defineField(C_DIRECTION.toString(), new Vector3(1, 1, -1), false);
+		this.defineField(C_DIRECTION, new Vector3(1, 1, -1), false);
 		
-		this.defineField(C_RADIUS.toString(), LuaValue.valueOf(8), false);
+		this.defineField(C_RADIUS, LuaValue.valueOf(8), false);
 		this.getField(C_RADIUS).setClamp(new NumberClampPreferred(0, 1024, 0, 64));
 		
-		this.defineField(C_OUTERFOV.toString(), LuaValue.valueOf(80), false);
+		this.defineField(C_OUTERFOV, LuaValue.valueOf(80), false);
 		this.getField(C_OUTERFOV).setClamp(new NumberClampPreferred(0, 180, 0, 120));
 		
-		this.defineField(C_INNERFOVSCALE.toString(), LuaValue.valueOf(0.1), false);
+		this.defineField(C_INNERFOVSCALE, LuaValue.valueOf(0.1), false);
 		this.getField(C_INNERFOVSCALE).setClamp(new NumberClamp(0, 1));
 
-		this.defineField(C_SHADOWMAPSIZE.toString(), LuaValue.valueOf(1024), false);
+		this.defineField(C_SHADOWMAPSIZE, LuaValue.valueOf(1024), false);
 		this.getField(C_SHADOWMAPSIZE).setEnum(new EnumType("TextureSize"));
 
 		this.changedEvent().connect((args)->{
