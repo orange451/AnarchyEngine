@@ -27,7 +27,6 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.luaj.vm2.LuaValue;
 import org.lwjgl.PointerBuffer;
-import org.lwjgl.glfw.GLFW;
 import org.lwjgl.system.MemoryStack;
 import org.lwjgl.util.nfd.NativeFileDialog;
 
@@ -43,12 +42,8 @@ import engine.lua.type.object.TreeInvisible;
 import engine.lua.type.object.insts.Mesh;
 import engine.lua.type.object.insts.Scene;
 import engine.lua.type.object.insts.SceneInternal;
-import engine.tasks.TaskManager;
 import engine.util.FileIO;
 import engine.util.FileUtils;
-import ide.IDE;
-import lwjgui.LWJGUI;
-import lwjgui.LWJGUIUtil;
 import lwjgui.ManagedThread;
 import lwjgui.geometry.Pos;
 import lwjgui.scene.Window;
@@ -247,18 +242,29 @@ public class Save {
 			t.mkdirs();
 		List<SceneInternal> unsavedScenes = Game.getUnsavedScenes();
 		for (int i = 0; i < unsavedScenes.size(); i++) {
+			SceneInternal internalScene = unsavedScenes.get(i);
 			Scene linkedScene = unsavedScenes.get(i).getScene();
 			if ( linkedScene == null )
 				continue;
 			
+			// Write what's currently in game to the scene
+			if ( linkedScene == Game.project().scenes().getCurrentScene() )
+				internalScene.storeGame();
+			
 			// Write this scene to file
 			String sPath = scenePath + linkedScene.getUUID().toString();
-			JSONObject sceneJSON = getInstanceJSONRecursive(true, true, linkedScene);
+			JSONObject sceneJSON = getInstanceJSONRecursive(true, true, internalScene);
+			System.out.println("WRITING SCENE TO FILE! " + linkedScene.getFullName());
 			writeJSONToFile(sPath, sceneJSON);
 			
 			// Remove this unsaved scene if it's no longer loaded
 			if ( linkedScene != Game.project().scenes().getCurrentScene() )
 				unsavedScenes.remove(i--);
+			else {
+				unsavedScenes.remove(i--);
+				Game.project().scenes().rawset("CurrentScene", LuaValue.NIL);
+				Game.game().extractScene(internalScene);
+			}
 		}
 		unsavedScenes.clear();
 
@@ -371,8 +377,9 @@ public class Save {
 		public SavedInstance(boolean saveSID, Instance child) {
 			this.instance = child;
 			long refId = saveSID?child.getSID():-1;
-			if ( refId == -1 )
+			while ( refId == -1 || Game.getInstanceFromSID(refId) != null ) {
 				refId = REFID++;
+			}
 			
 			this.reference = new SavedReference(refId);
 		}
@@ -404,7 +411,7 @@ public class Save {
 			}
 
 			JSONObject p = new JSONObject();
-			LuaValue[] fields = instance.getFields();
+			LuaValue[] fields = instance.getFieldNames();
 			for (int i = 0; i < fields.length; i++) {
 				String field = fields[i].toString();
 				// These are default params

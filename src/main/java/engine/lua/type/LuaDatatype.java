@@ -11,6 +11,7 @@
 package engine.lua.type;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Set;
 
@@ -102,7 +103,17 @@ public abstract class LuaDatatype extends LuaTable {
 	 * Returns list of fields in the order they are defined.
 	 * @return
 	 */
-	public LuaValue[] getFields() {
+	public LuaField[] getFields() {
+		Collection<LuaField> keys = fields.values();
+		LuaField[] f = keys.toArray(new LuaField[keys.size()]);
+		return f;
+	}
+	
+	/**
+	 * Returns list of fields in the order they are defined.
+	 * @return
+	 */
+	public LuaValue[] getFieldNames() {
 		Set<LuaValue> keys = fields.keySet();
 		LuaValue[] f = keys.toArray(new LuaValue[keys.size()]);
 		return f;
@@ -112,11 +123,11 @@ public abstract class LuaDatatype extends LuaTable {
 	 * Returns list of fields ordered.
 	 * @return
 	 */
-	public LuaValue[] getFieldsOrdered() {
+	public LuaValue[] getFieldNamesOrdered() {
 		LuaValue[] t = new LuaValue[fieldsOrdered.size()];
 		synchronized(fieldsOrdered) {
 			for (int i = 0; i < t.length; i++) {
-				t[i] = LuaValue.valueOf(fieldsOrdered.get(i).getName());
+				t[i] = fieldsOrdered.get(i).getName();
 			}
 		}
 		

@@ -10,6 +10,7 @@
 
 package engine.lua.type.object.services;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,6 +23,8 @@ import org.luaj.vm2.lib.TwoArgFunction;
 import engine.Game;
 import engine.io.Load;
 import engine.lua.type.LuaEvent;
+import engine.lua.type.LuaField;
+import engine.lua.type.LuaFieldFlag;
 import engine.lua.type.object.Instance;
 import engine.lua.type.object.Service;
 import engine.lua.type.object.insts.Scene;
@@ -156,13 +159,13 @@ public class GameECS extends Instance {
 		if ( scene == null )
 			return;
 		
-		if ( scene == Game.project().scenes().getCurrentScene() )
-			return;
-		
 		// Store current scene
 		Scene currentScene = Game.project().scenes().getCurrentScene();
-		if ( currentScene != null )
-			Game.getGame().getUnsavedScene(currentScene).storeGame();
+		if ( currentScene != null ) {
+			SceneInternal unsaved = Game.getGame().getUnsavedScene(currentScene);
+			if ( unsaved != null )
+				unsaved.storeGame();
+		}
 		
 		// Get the internal scene (data)
 		SceneInternal internal = Game.getGame().getUnsavedScene(scene);
@@ -173,28 +176,43 @@ public class GameECS extends Instance {
 		
 		// Set it as loaded
 		Game.project().scenes().setCurrentScene(scene);
-		Game.getGame().unsavedScenes.add(internal);
-		Game.getGame().currentModifyingScene = scene;
+		if ( !Game.getGame().unsavedScenes.contains(internal) )
+			Game.getGame().unsavedScenes.add(internal);
 		
 		// Load it into game
-		List<Instance> services = internal.getChildrenSafe();
-		for (int i = 0; i < services.size(); i++) {
-			Instance service = services.get(i);
-			Instance toParent = Game.getService(service.getName());
-			if ( toParent == null )
-				continue;
-			
-			List<Instance> servChild = service.getChildrenSafe();
-			for (int j = 0; j < servChild.size(); j++) {
-				Instance child = servChild.get(j);
-				child.forceSetParent(toParent);
-				System.out.println("Restoring " + child + " " + child.getUUID() + " to " + toParent.getFullName());
-			}
-		}
+		extractScene(internal);
 		
 		// Make sure we have all the services...
 		Game.services();
-		
-		
+	}
+	
+	public void extractScene(SceneInternal internal) {
+		List<Instance> services = internal.getChildrenSafe();
+		for (int i = 0; i < services.size(); i++) {
+			Instance service = services.get(i);
+			Instance toService = Game.getService(service.getName());
+			if ( toService == null )
+				continue;
+			
+			// Move children into service
+			List<Instance> servChild = service.getChildrenSafe();
+			System.out.println("LOOKING AT: " + service + " " + Arrays.toString(servChild.toArray()));
+			for (int j = 0; j < servChild.size(); j++) {
+				Instance child = servChild.get(j);
+				child.forceSetParent(toService);
+				System.out.println("Restoring " + child + " " + child.getUUID() + " to " + toService.getFullName());
+			}
+			
+			// Copy fields over
+			LuaField[] fields = service.getFields();
+			for (int j = 0; j < fields.length; j++) {
+				LuaField field = fields[j];
+				if ( field.hasFlag(LuaFieldFlag.BASE_FIELD) )
+					continue;
+				
+				System.out.println("SETTING " + field.getName() + " to " + service.get(field.getName()));
+				toService.rawset(field.getName(), service.get(field.getName()));
+			}
+		}
 	}
 }

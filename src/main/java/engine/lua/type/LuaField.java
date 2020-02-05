@@ -20,7 +20,7 @@ import engine.lua.lib.EnumType;
 import engine.lua.type.object.Instance;
 
 public class LuaField {
-	private String fieldName;
+	private LuaValue fieldName;
 	private Class<?> fieldType;
 	private boolean canModify;
 	protected boolean isInstance;
@@ -29,7 +29,7 @@ public class LuaField {
 	private int flags;
 
 	public LuaField(String fieldName, Class<?> fieldType, boolean isFinal) {
-		this.fieldName = fieldName;
+		this.fieldName = LuaValue.valueOf(fieldName);
 		this.fieldType = fieldType;
 		this.canModify = !isFinal;
 	}
@@ -73,7 +73,7 @@ public class LuaField {
 		return canModify;
 	}
 
-	public String getName() {
+	public LuaValue getName() {
 		return this.fieldName;
 	}
 

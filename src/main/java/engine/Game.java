@@ -83,7 +83,6 @@ public class Game implements Tickable {
 	public static final String VERSION = "0.7a";
 
 	protected boolean isServer = true;
-	public Scene currentModifyingScene;
 	public List<SceneInternal> unsavedScenes = new ArrayList<>();
 	
 	public Game() {
@@ -182,6 +181,7 @@ public class Game implements Tickable {
 			
 			if ( Game.project().scenes().getChildren().size() == 0 ) {
 				Scene s = new Scene();
+				s.forceSetName("Primary Scene");
 				s.forceSetParent(Game.project().scenes());
 				
 				Game.project().scenes().setStartingScene(s);
@@ -254,8 +254,8 @@ public class Game implements Tickable {
 	 * @return
 	 */
 	public static Service getService(LuaValue name) {
-		if ( !loaded )
-			return null;
+		/*if ( !loaded )
+			return null;*/
 		if ( Game.game().isnil() )
 			return null;
 		

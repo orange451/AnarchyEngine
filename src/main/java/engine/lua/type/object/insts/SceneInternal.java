@@ -11,9 +11,14 @@ import engine.lua.type.object.SceneStorable;
 public class SceneInternal extends Instance {
 	private Scene scene;
 	
-	public SceneInternal(Scene scene) {
+	public SceneInternal() {
 		super("SceneInternal");
 		this.setInstanceable(false);
+	}
+	
+	public SceneInternal(Scene scene) {
+		this();
+		
 		this.scene = scene;
 	}
 	

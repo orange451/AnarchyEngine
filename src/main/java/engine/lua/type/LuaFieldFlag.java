@@ -11,7 +11,9 @@ public class LuaFieldFlag {
 	 */
 	public static final int CLIENT_SIDE_REPLICATE_MANUAL = 0x00000002;
 	
-
-	public static final int HSHRINK = 0x00000004;
+	/**
+	 * Flag that represents a field that are common among ALL datamodels.
+	 */
+	public static final int BASE_FIELD = 0x00000004;
 	public static final int VSHRINK					= 0x00000008;
 }

@@ -809,7 +809,7 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 		
 		private void fill() {
 			// Fill grid
-			LuaValue[] fields = inst.getFieldsOrdered();
+			LuaValue[] fields = inst.getFieldNamesOrdered();
 			for (int i = 0; i < fields.length; i++) {
 				LuaValue field = fields[i];
 				LuaValue value = inst.get(field);
@@ -865,7 +865,7 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 			if ( inst != null && !instance.equals(inst))
 				return;
 			
-			if ( instance.getFields().length != props.size() ) {
+			if ( instance.getFieldNames().length != props.size() ) {
 				this.inst = null;
 				setInstance(instance);
 				return;

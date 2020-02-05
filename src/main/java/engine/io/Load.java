@@ -20,6 +20,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -130,6 +131,13 @@ public class Load {
 		if ( obj.containsKey("Version") ) {
 			System.out.println("USING NEW LOAD SYSTEM");
 			parseInternalJSON((JSONObject)obj.get("ProjectData"), Game.project());
+			
+			// Force load starting scene...
+			Game.game().rawset(LuaValue.valueOf("CurrentScene"), LuaValue.NIL);
+			Game.game().loadScene(Game.project().scenes().getStartingScene());
+			
+			SceneInternal internal = Game.getGame().getUnsavedScene(Game.project().scenes().getStartingScene());
+			System.out.println(internal + " / " + Arrays.toString(internal.getChildren().toArray()));
 		} else {
 			System.out.println("USING OLD LOAD SYSTEM");
 			if ( parseJSON(obj) == null )
@@ -174,18 +182,18 @@ public class Load {
 	}
 	
 	/**
-	 * Attempt to load a scene from file.
+	 * Attempt to load a scene from file (into Game)
 	 * @param scene
 	 * @return
 	 */
 	public static SceneInternal loadScene(Scene scene) {
-		if ( scene == null )
+		if ( scene == null ) 
 			return null;
 		
-		if ( scene.getUUID() == null )
+		if (  scene.getUUID() == null ) 
 			return null;
 		
-		if ( Game.saveDirectory == null || Game.saveDirectory.length() == 0 )
+		if ( Game.saveDirectory == null || Game.saveDirectory.length() == 0 ) 
 			return null;
 		
 		String scenePath = Game.saveDirectory + File.separator + "Scenes" + File.separator;
@@ -194,7 +202,7 @@ public class Load {
 			return null;
 		
 		File t2 = new File(scenePath + File.separator + scene.getUUID().toString());
-		if ( !t2.exists() )
+		if ( !t2.exists() ) 
 			return null;
 		
 		JSONParser parser = new JSONParser();
@@ -331,6 +339,7 @@ public class Load {
 
 			if ( parent != -1 && inst.loaded ) {
 				Instance p = getInstanceFromReference(instancesMap, parent);
+				System.out.println("READING OBJECT " + inst.instance + " / " + inst.uuid + " / " + inst.Reference + " / " + inst.Parent + " / " + inst.loaded + "    ::    " + p);
 				if ( !inst.instance.equals(p) ) {
 					inst.instance.forceSetParent(p);
 				}
@@ -396,20 +405,20 @@ public class Load {
 	}
 
 	private static void readObjects(ArrayList<LoadedInstance> instances, HashMap<Long, LoadedInstance> instancesMap, JSONObject obj, Instance rootInstance) {
-		LoadedInstance root = new LoadedInstance();
-		root.ClassName = (String) obj.get("ClassName");
-		root.Name = (String) obj.get("Name");
-		root.Reference = loadReference("Reference",obj);
-		root.Parent = loadReference("Parent",obj);
-		root.uuid = (String) obj.get("UUID");
+		LoadedInstance loadedInstance = new LoadedInstance();
+		loadedInstance.ClassName = (String) obj.get("ClassName");
+		loadedInstance.Name = (String) obj.get("Name");
+		loadedInstance.Reference = loadReference("Reference",obj);
+		loadedInstance.Parent = loadReference("Parent",obj);
+		loadedInstance.uuid = (String) obj.get("UUID");
 		
-		if ( root.ClassName.equals("Game") ) {
-			root.instance = Game.game();
-		} else if ( root.ClassName.equals("project") ) {
-			root.instance = Game.project();
+		if ( loadedInstance.ClassName.equals("Game") ) {
+			loadedInstance.instance = Game.game();
+		} else if ( loadedInstance.ClassName.equals("project") ) {
+			loadedInstance.instance = Game.project();
 		} else {
 			// Search directly in game for instance...
-			LuaValue temp = rootInstance.get(root.ClassName);
+			LuaValue temp = rootInstance.get(loadedInstance.ClassName);
 			
 			// Not found
 			if ( temp.isnil() ) {
@@ -420,33 +429,33 @@ public class Load {
 					
 					// Match instance to server instance
 					Instance inGame = Game.getInstanceFromSID(Long.parseLong(SIDRef.toString()));
-					if ( inGame != null && !inGame.isDestroyed() && inGame.getClassName().eq_b(LuaValue.valueOf(root.ClassName)) ) {
-						root.instance = inGame;
+					if ( inGame != null && !inGame.isDestroyed() && inGame.getClassName().eq_b(LuaValue.valueOf(loadedInstance.ClassName)) ) {
+						loadedInstance.instance = inGame;
 					} else {
 						// Create new
-						root.instance = (Instance) Instance.instance(root.ClassName);
+						loadedInstance.instance = (Instance) Instance.instance(loadedInstance.ClassName);
 					}
 				} else {
-					if ( root.uuid.length() > 0 ) {
-						Instance uuidMatch = Game.getInstanceFromUUID(UUID.fromString(root.uuid));
-						if ( uuidMatch != null ) {
-							root.instance = uuidMatch;
+					if ( loadedInstance.uuid != null && loadedInstance.uuid.length() > 0 ) {
+						Instance uuidMatch = Game.getInstanceFromUUID(UUID.fromString(loadedInstance.uuid));
+						if ( uuidMatch != null && !uuidMatch.isDestroyed() && uuidMatch.getClassName().eq_b(LuaValue.valueOf(loadedInstance.ClassName)) ) {
+							loadedInstance.instance = uuidMatch;
 						} else {
-							root.instance = (Instance) Instance.instance(root.ClassName);
+							loadedInstance.instance = (Instance) Instance.instance(loadedInstance.ClassName);
 						}
 					} else {
-						root.instance = (Instance) Instance.instance(root.ClassName);
+						loadedInstance.instance = (Instance) Instance.instance(loadedInstance.ClassName);
 					}
 				}
 			} else {
 				// Found... probably a service.
-				root.instance = (Instance) temp;
+				loadedInstance.instance = (Instance) temp;
 			}
 		}
 		
 		// Set UUID. Will be verified when added to GameECS later.
-		if ( root.uuid != null && root.uuid.length() > 0 )
-			root.instance.setUUID(UUID.fromString(root.uuid));
+		if ( loadedInstance.uuid != null && loadedInstance.uuid.length() > 0 )
+			loadedInstance.instance.setUUID(UUID.fromString(loadedInstance.uuid));
 		
 		if ( obj.get("Properties") != null ) {
 			JSONObject properties = (JSONObject) obj.get("Properties");
@@ -456,12 +465,13 @@ public class Load {
 				String key = entry2.getKey().toString();
 				Object t = entry2.getValue();
 				PropertyValue<?> v = PropertyValue.parse(t);
-				root.properties.put(key, v);
+				loadedInstance.properties.put(key, v);
 			}
 		}
 		
-		instances.add(root);
-		instancesMap.put(root.Reference, root);
+		instances.add(loadedInstance);
+		if ( !instancesMap.containsKey(loadedInstance.Reference))
+			instancesMap.put(loadedInstance.Reference, loadedInstance);
 		
 		JSONArray children = (JSONArray) obj.get("Children");
 		for (int i = 0; i < children.size(); i++) {

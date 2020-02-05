@@ -56,7 +56,7 @@ public class HistoryObjectReference {
 		if ( object.isDestroyed() )
 			return;
 		
-		LuaValue[] fields = object.getFields();
+		LuaValue[] fields = object.getFieldNames();
 		for (int i = 0; i < fields.length; i++) {
 			fieldData.put(fields[i], object.get(fields[i]));
 		}

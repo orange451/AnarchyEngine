@@ -43,7 +43,7 @@ public class InstanceCreateTCP implements ClientProcessable {
 	public InstanceCreateTCP(Instance instance) {
 		this.instanceType = instance.get(C_CLASSNAME).toString();
 		
-		LuaValue[] fields = instance.getFields();
+		LuaValue[] fields = instance.getFieldNames();
 		
 		JSONObject j = new JSONObject();
 		for (int i = 0; i < fields.length; i++) {

@@ -91,11 +91,11 @@ public abstract class DataModel extends LuaDatatype {
 		table.set(LuaValue.INDEX, table);
 		this.setmetatable(table);
 
-		this.defineField(C_NAME.toString(),			LuaValue.valueOf(name), false);
-		this.defineField(C_CLASSNAME.toString(),	LuaValue.valueOf(name), true);
-		this.defineField(C_PARENT.toString(),		LuaValue.NIL,			false);
-		this.defineField(C_SID.toString(), 			LuaValue.valueOf(-1),   true);
-		this.defineField(C_ARCHIVABLE.toString(),	LuaValue.valueOf(true), false);
+		this.defineField(C_NAME,			LuaValue.valueOf(name), false).addFlag(LuaFieldFlag.BASE_FIELD);
+		this.defineField(C_CLASSNAME,	LuaValue.valueOf(name), true).addFlag(LuaFieldFlag.BASE_FIELD);
+		this.defineField(C_PARENT,		LuaValue.NIL,			false).addFlag(LuaFieldFlag.BASE_FIELD);
+		this.defineField(C_SID, 			LuaValue.valueOf(-1),   true).addFlag(LuaFieldFlag.BASE_FIELD);
+		this.defineField(C_ARCHIVABLE,	LuaValue.valueOf(true), false).addFlag(LuaFieldFlag.BASE_FIELD);
 
 		this.rawset(C_CHANGED,		new LuaEvent());
 		this.rawset(C_DESTROYED,	new LuaEvent());
