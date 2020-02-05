@@ -40,6 +40,7 @@ import engine.lua.type.object.insts.Player;
 import engine.lua.type.object.insts.PlayerGui;
 import engine.lua.type.object.insts.PlayerScripts;
 import engine.lua.type.object.insts.Scene;
+import engine.lua.type.object.insts.SceneInternal;
 import engine.lua.type.object.insts.script.GlobalScript;
 import engine.lua.type.object.services.Assets;
 import engine.lua.type.object.services.Connections;
@@ -82,7 +83,8 @@ public class Game implements Tickable {
 	public static final String VERSION = "0.7a";
 
 	protected boolean isServer = true;
-	private Scene currentModifyingScene;
+	public Scene currentModifyingScene;
+	public List<SceneInternal> unsavedScenes = new ArrayList<>();
 	
 	public Game() {
 		game = this;
@@ -91,18 +93,7 @@ public class Game implements Tickable {
 	//local j = game.Workspace.GameObject local t = 6  for i=1,t do t = t-1 for a=-t/2,t/2 do local k = j:Clone() k.WorldMatrix = Matrix4.new( Vector3.new( 0, a * 1.2, i ) ) k.Parent = game.Workspace.Cubes end end
 	//local j = game.Workspace.Cubes:GetChildren() local k = 1 local t = 6 for i=1,t do t = t-1 for a=-t/2,t/2 do local o = j[k] o.PhysicsObject.Velocity = Vector3.new() o.WorldMatrix = Matrix4.new( Vector3.new( 0, a * 1.2, i ) ) k = k + 1 end end
 
-	private static void services() {
-		if ( Game.project().scenes() == null ) {
-			Scenes scene = new Scenes();
-			scene.forceSetParent(Game.project());
-			
-			Scene s = new Scene();
-			s.forceSetParent(scene);
-			
-			scene.setStartingScene(s);
-			Game.getGame().currentModifyingScene = s;
-		}
-		
+	public static void services() {
 		if ( Game.workspace() == null )
 			new Workspace().forceSetParent(Game.game());
 		
@@ -115,7 +106,7 @@ public class Game implements Tickable {
 		if ( Game.connections() == null )
 			new Connections().forceSetParent(Game.game());
 		
-		if ( Game.getService("Storage") == null )
+		if ( Game.storage() == null )
 			new Storage().forceSetParent(Game.game());
 		
 		if ( Game.scriptService() == null )
@@ -128,6 +119,24 @@ public class Game implements Tickable {
 		if ( Game.assets() == null )
 			new Assets().forceSetParent(Game.game());
 
+		// Asset stuff
+		{
+			if ( Game.assets().findFirstChild(Assets.C_PREFABS) == null )
+				Assets.newPackage(Assets.C_PREFABS, Game.assets());
+	
+			if ( Game.assets().findFirstChild(Assets.C_MESHES) == null )
+				Assets.newPackage(Assets.C_MESHES, Game.assets());
+	
+			if ( Game.assets().findFirstChild(Assets.C_MATERIALS) == null )
+				Assets.newPackage(Assets.C_MATERIALS, Game.assets());
+	
+			if ( Game.assets().findFirstChild(Assets.C_TEXTURES) == null )
+				Assets.newPackage(Assets.C_TEXTURES, Game.assets());
+	
+			if ( Game.assets().findFirstChild(Assets.C_AUDIO) == null )
+				Assets.newPackage(Assets.C_AUDIO, Game.assets());
+		}
+		
 		if ( Game.userInputService() == null )
 			new UserInputService().forceSetParent(Game.game());
 		
@@ -154,7 +163,7 @@ public class Game implements Tickable {
 			camera.setName("CameraController");
 			camera.setSourceFromFile("assets/scripts/camera.lua");
 			camera.setArchivable(false);
-			camera.setParent(Game.getService("Core"));
+			camera.setParent(Game.core());
 			camera.setLocked(true);
 		}
 
@@ -164,18 +173,49 @@ public class Game implements Tickable {
 		if ( Game.starterPlayer().starterPlayerGui() == null)
 			new StarterPlayerGui().forceSetParent(Game.starterPlayer());
 		
-		if ( Game.project().assets() == null )
-			Instance.instanceLuaForce(Assets.class.getSimpleName()).forceSetParent(Game.project());
-
-		if ( Game.project().storage() == null )
-			new Storage().forceSetParent(Game.project());
+		// SETUP PROJECT BELOW
+		{
+			if ( Game.project().scenes() == null ) {
+				Scenes scene = new Scenes();
+				scene.forceSetParent(Game.project());
+			}
+			
+			if ( Game.project().scenes().getChildren().size() == 0 ) {
+				Scene s = new Scene();
+				s.forceSetParent(Game.project().scenes());
+				
+				Game.project().scenes().setStartingScene(s);
+				Game.game().loadScene(s);
+			}
+			
+			if ( Game.project().assets() == null ) {
+				Instance.instanceLuaForce(Assets.class.getSimpleName()).forceSetParent(Game.project());
+			}
+			
+			// Asset stuff
+			{
+				if ( Game.project().assets().findFirstChild(Assets.C_PREFABS) == null )
+					Assets.newPackage(Assets.C_PREFABS, Game.project().assets());
 		
-		if ( Game.project().scriptService() == null )
-			new ScriptService().forceSetParent(Game.project());
-	}
-
-	public static Service getService(String string) {
-		return getService(LuaValue.valueOf(string));
+				if ( Game.project().assets().findFirstChild(Assets.C_MESHES) == null )
+					Assets.newPackage(Assets.C_MESHES, Game.project().assets());
+		
+				if ( Game.project().assets().findFirstChild(Assets.C_MATERIALS) == null )
+					Assets.newPackage(Assets.C_MATERIALS, Game.project().assets());
+		
+				if ( Game.project().assets().findFirstChild(Assets.C_TEXTURES) == null )
+					Assets.newPackage(Assets.C_TEXTURES, Game.project().assets());
+		
+				if ( Game.project().assets().findFirstChild(Assets.C_AUDIO) == null )
+					Assets.newPackage(Assets.C_AUDIO, Game.project().assets());
+			}
+	
+			if ( Game.project().storage() == null )
+				new Storage().forceSetParent(Game.project());
+			
+			if ( Game.project().scriptService() == null )
+				new ScriptService().forceSetParent(Game.project());
+		}
 	}
 	
 
@@ -199,6 +239,15 @@ public class Game implements Tickable {
 		return (Service)t;
 	}
 
+	/**
+	 * Convenience method to get a service by name via java String.
+	 * @param string
+	 * @return
+	 */
+	public static Service getService(String string) {
+		return getService(LuaValue.valueOf(string));
+	}
+	
 	/**
 	 * Get a service by name.
 	 * @param name
@@ -247,6 +296,7 @@ public class Game implements Tickable {
 	private static final LuaValue C_STARTERPLAYER = LuaValue.valueOf("StarterPlayer");
 	private static final LuaValue C_PLAYERS = LuaValue.valueOf("Players");
 	private static final LuaValue C_CONNECTIONS = LuaValue.valueOf("Connections");
+	private static final LuaValue C_STORAGE = LuaValue.valueOf("Storage");
 	private static final LuaValue C_SOUNDSERVICE = LuaValue.valueOf("SoundService");
 	private static final LuaValue C_CORE = LuaValue.valueOf("Core");
 	private static final LuaValue C_HISTORYSERVICE = LuaValue.valueOf("HistoryService");
@@ -304,6 +354,10 @@ public class Game implements Tickable {
 	
 	public static Connections connections() {
 		return (Connections) Game.getService(C_CONNECTIONS);
+	}
+	
+	public static Storage storage() {
+		return (Storage) Game.getService(C_STORAGE);
 	}
 	
 	public static Assets assets() {
@@ -379,6 +433,8 @@ public class Game implements Tickable {
 		clearServices();
 		ScriptRunner.cleanup();
 		
+		game.unsavedScenes.clear();
+		
 		loaded = false;
 	}
 	
@@ -392,6 +448,17 @@ public class Game implements Tickable {
 				inst.cleanup();
 			}
 			services.get(i).clearAllChildren();
+		}
+		
+		List<Instance> moreServices = Game.project().getChildren();
+		for (int i = 0; i < moreServices.size(); i++) {
+			List<Instance> desc = moreServices.get(i).getDescendants();
+			for (int j = 0; j < desc.size(); j++) {
+				Instance inst = desc.get(j);
+				inst.onDestroy();
+				inst.cleanup();
+			}
+			moreServices.get(i).clearAllChildren();
 		}
 	}
 	
@@ -409,21 +476,6 @@ public class Game implements Tickable {
 				
 				// Register services (new blank project)
 				Game.services();
-				
-				if ( Game.assets().findFirstChild(Assets.C_PREFABS) == null )
-					Assets.newPackage(Assets.C_PREFABS, Game.assets());
-
-				if ( Game.assets().findFirstChild(Assets.C_MESHES) == null )
-					Assets.newPackage(Assets.C_MESHES, Game.assets());
-
-				if ( Game.assets().findFirstChild(Assets.C_MATERIALS) == null )
-					Assets.newPackage(Assets.C_MATERIALS, Game.assets());
-
-				if ( Game.assets().findFirstChild(Assets.C_TEXTURES) == null )
-					Assets.newPackage(Assets.C_TEXTURES, Game.assets());
-
-				if ( Game.assets().findFirstChild(Assets.C_AUDIO) == null )
-					Assets.newPackage(Assets.C_AUDIO, Game.assets());
 				
 				// Set changes to false, so we're not prompted with save dialog later.
 				InternalGameThread.runLater(()-> {
@@ -472,6 +524,19 @@ public class Game implements Tickable {
 		synchronized(runnables) {
 			runnables.add(object);
 		}
+	}
+
+	public static List<SceneInternal> getUnsavedScenes() {
+		return game.unsavedScenes;
+	}
+
+	public SceneInternal getUnsavedScene(Scene currentScene) {
+		for (int i = 0; i < game.unsavedScenes.size(); i++) {
+			if ( game.unsavedScenes.get(i).getScene().equals(currentScene) )
+				return game.unsavedScenes.get(i);
+		}
+		
+		return null;
 	}
 	
 	private static final LuaValue C_RUNNING = LuaValue.valueOf("Running");

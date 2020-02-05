@@ -12,11 +12,12 @@ package engine.lua.type.object.services;
 
 import org.luaj.vm2.LuaValue;
 
+import engine.lua.type.object.SceneStorable;
 import engine.lua.type.object.Service;
 import engine.lua.type.object.TreeViewable;
 import ide.layout.windows.icons.Icons;
 
-public class Storage extends Service implements TreeViewable {
+public class Storage extends Service implements TreeViewable,SceneStorable {
 
 	public Storage() {
 		super("Storage");

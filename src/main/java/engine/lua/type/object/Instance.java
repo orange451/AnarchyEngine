@@ -13,6 +13,7 @@ package engine.lua.type.object;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.UUID;
 
 import org.luaj.vm2.LuaTable;
 import org.luaj.vm2.LuaValue;
@@ -54,6 +55,17 @@ public abstract class Instance extends DataModel {
 
 	public Instance(String name) {
 		super(name);
+		
+		this.getmetatable().set("GetUUID", new ZeroArgFunction() {
+			@Override
+			public LuaValue call() {
+				UUID uuid = getUUID();
+				if ( uuid == null )
+					return LuaValue.NIL;
+				
+				return LuaValue.valueOf(uuid.toString());
+			}
+		});
 		
 		this.getmetatable().set("GetChildren", new ZeroArgFunction() {
 			@Override
@@ -442,6 +454,10 @@ public abstract class Instance extends DataModel {
 	 */
 	public List<Instance> getChildren() {
 		return children;
+	}
+	
+	public List<Instance> getChildrenSafe() {
+		return new ArrayList<>(children);
 	}
 	
 	/**

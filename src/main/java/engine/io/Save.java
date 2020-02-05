@@ -41,6 +41,8 @@ import engine.lua.type.object.AssetLoadable;
 import engine.lua.type.object.Instance;
 import engine.lua.type.object.TreeInvisible;
 import engine.lua.type.object.insts.Mesh;
+import engine.lua.type.object.insts.Scene;
+import engine.lua.type.object.insts.SceneInternal;
 import engine.tasks.TaskManager;
 import engine.util.FileIO;
 import engine.util.FileUtils;
@@ -49,7 +51,6 @@ import lwjgui.LWJGUI;
 import lwjgui.LWJGUIUtil;
 import lwjgui.ManagedThread;
 import lwjgui.geometry.Pos;
-import lwjgui.scene.Scene;
 import lwjgui.scene.Window;
 import lwjgui.scene.WindowHandle;
 import lwjgui.scene.WindowManager;
@@ -130,7 +131,7 @@ public class Save {
 					t.getChildren().add(b3);
 					
 					// Show window
-					window.setScene(new Scene(root, 300, 100));
+					window.setScene(new lwjgui.scene.Scene(root, 300, 100));
 					window.show();
 				}
 			};
@@ -231,12 +232,43 @@ public class Save {
 
 		// Start saving process
 		REFID = 0;		
+		JSONObject projectJSONInternal = getProjectJSON();
 		JSONObject gameJSON = getInstanceJSONRecursive( true, true, Game.game());
+		JSONObject saveJSON = new JSONObject();
+		saveJSON.put("Version", 1.0f);
+		saveJSON.put("ProjectData", projectJSONInternal);
+		saveJSON.put("GameData", gameJSON);
 		Game.changes = false;
+		
+		// Save scenes!
+		String scenePath = Game.saveDirectory + File.separator + "Scenes" + File.separator;
+		File t = new File(scenePath);
+		if ( !t.exists() )
+			t.mkdirs();
+		List<SceneInternal> unsavedScenes = Game.getUnsavedScenes();
+		for (int i = 0; i < unsavedScenes.size(); i++) {
+			Scene linkedScene = unsavedScenes.get(i).getScene();
+			if ( linkedScene == null )
+				continue;
+			
+			// Write this scene to file
+			String sPath = scenePath + linkedScene.getUUID().toString();
+			JSONObject sceneJSON = getInstanceJSONRecursive(true, true, linkedScene);
+			writeJSONToFile(sPath, sceneJSON);
+			
+			// Remove this unsaved scene if it's no longer loaded
+			if ( linkedScene != Game.project().scenes().getCurrentScene() )
+				unsavedScenes.remove(i--);
+		}
+		unsavedScenes.clear();
 
+		return writeJSONToFile(path, saveJSON);
+	}
+	
+	private static boolean writeJSONToFile(String path, JSONObject jsonData) {
 		try {
 			// Get scene as JSON string
-			String text = gameJSON.toJSONString();
+			String text = jsonData.toJSONString();
 
 			// Write to file
 			File file=new File(path);
@@ -248,12 +280,21 @@ public class Save {
 			e.printStackTrace();
 			return false;
 		}
-
+		
 		return true;
 	}
 
 	/**
-	 * Returns the entire game represented as a JSON Object.
+	 * Returns the PROJECT represented as a JSON Object. The project is a little different than the game JSON.
+	 * Project JSON contains JSON as it will save to your computer. Game JSON is used for streaming what's currently loaded in Game.
+	 * @return
+	 */
+	public static JSONObject getProjectJSON() {
+		return getInstanceJSONRecursive( true, true, Game.project());
+	}
+
+	/**
+	 * Returns the game represented as a JSON Object.
 	 * @return
 	 */
 	public static JSONObject getGameJSON() {

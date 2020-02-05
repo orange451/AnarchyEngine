@@ -43,6 +43,7 @@ import engine.gl.mesh.Vertex;
 import engine.lua.type.data.Color3;
 import engine.lua.type.object.AssetLoadable;
 import engine.lua.type.object.Instance;
+import engine.lua.type.object.SceneStorable;
 import engine.lua.type.object.Service;
 import engine.lua.type.object.TreeViewable;
 import engine.lua.type.object.insts.AssetFolder;
@@ -58,7 +59,7 @@ import engine.util.IOUtil;
 import engine.util.MeshUtils;
 import ide.layout.windows.icons.Icons;
 
-public class Assets extends Service implements TreeViewable {
+public class Assets extends Service implements TreeViewable,SceneStorable {
 
 	public static final LuaValue C_MATERIALS = LuaValue.valueOf("Materials");
 	public static final LuaValue C_MESHES = LuaValue.valueOf("Meshes");

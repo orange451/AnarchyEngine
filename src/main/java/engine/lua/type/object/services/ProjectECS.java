@@ -10,7 +10,12 @@
 
 package engine.lua.type.object.services;
 
+import java.util.UUID;
+
 import org.luaj.vm2.LuaValue;
+import org.luaj.vm2.lib.OneArgFunction;
+
+import engine.Game;
 import engine.lua.type.object.Instance;
 
 public class ProjectECS extends Instance {
@@ -21,6 +26,34 @@ public class ProjectECS extends Instance {
 		// LOCK HER UP
 		setLocked(true);
 		setInstanceable(false);
+		
+		this.descendantAddedEvent().connectLua(new OneArgFunction() {
+			@Override
+			public LuaValue call(LuaValue object) {
+				if ( object instanceof Instance ) {
+					Instance inst = (Instance)object;
+					
+					// Generate UUID
+					if ( inst.getUUID() == null ) {
+						UUID tuid = Game.generateUUID();
+						inst.setUUID(tuid);
+						Game.game().uniqueInstances.put(tuid, inst);
+					} else {
+						Instance t = Game.game().uniqueInstances.get(inst.getUUID());
+						if ( t == null ) {
+							Game.game().uniqueInstances.put(inst.getUUID(),inst);
+						} else {
+							if ( t != inst ) {
+								UUID tuid = Game.generateUUID();
+								inst.setUUID(tuid);
+								Game.game().uniqueInstances.put(tuid, inst);
+							}
+						}
+					}
+				}
+				return LuaValue.NIL;
+			}
+		});
 	}
 
 	@Override

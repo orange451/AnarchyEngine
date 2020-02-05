@@ -20,6 +20,9 @@ public class Scene extends Instance implements TreeViewable {
 
 	public Scene() {
 		super("Scene");
+		
+		this.setArchivable(true);
+		this.getField(C_ARCHIVABLE).setLocked(true);
 	}
 
 	@Override

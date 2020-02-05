@@ -12,6 +12,7 @@ package engine.io;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.lang.reflect.Method;
@@ -32,6 +33,7 @@ import java.util.stream.Stream;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 import org.luaj.vm2.LuaString;
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.jse.CoerceJavaToLua;
@@ -44,6 +46,8 @@ import engine.InternalGameThread;
 import engine.lua.type.LuaValuetype;
 import engine.lua.type.object.Instance;
 import engine.lua.type.object.Service;
+import engine.lua.type.object.insts.Scene;
+import engine.lua.type.object.insts.SceneInternal;
 import engine.util.FileIO;
 import engine.util.FileUtils;
 import ide.layout.windows.ErrorWindow;
@@ -94,19 +98,10 @@ public class Load {
 	}
 	
 	/**
-	 * Force load a specified path.
+	 * Force load a specified path. Will unload currently loaded resources
 	 * @param path
 	 */
 	public static void load(String path) {
-		load(path, true);
-	}
-	
-	/**
-	 * Force load a specified path. Reset flag used to unload currently loaded resources (if true)
-	 * @param path
-	 * @param reset
-	 */
-	public static void load(String path, boolean reset) {
 		// Load from JSON file
 		boolean loadedJSON = false;
 		JSONObject obj = null;
@@ -124,19 +119,22 @@ public class Load {
 			return;
 		
 		// Set title
-		if ( reset ) {
-			Game.saveFile = path;
-			Game.saveDirectory = new File(path).getParent();
-			//GLFW.glfwSetWindowTitle(IDE.window, IDE.TITLE + " [" + FileUtils.getFileDirectoryFromPath(path) + "]");
-		}
+		Game.saveFile = path;
+		Game.saveDirectory = new File(path).getParent();
+		//GLFW.glfwSetWindowTitle(IDE.window, IDE.TITLE + " [" + FileUtils.getFileDirectoryFromPath(path) + "]");
 		
 		// Unload the current game
-		if ( reset )
-			Game.unload();
+		Game.unload();
 		
 		// Load the json
-		if ( parseJSON(obj) == null )
-			return;
+		if ( obj.containsKey("Version") ) {
+			System.out.println("USING NEW LOAD SYSTEM");
+			parseInternalJSON((JSONObject)obj.get("ProjectData"), Game.project());
+		} else {
+			System.out.println("USING OLD LOAD SYSTEM");
+			if ( parseJSON(obj) == null )
+				return;
+		}
 		
 		// Load external stuff
 		File scripts = new File(new File(path).getParent() + File.separator + "Resources" + File.separator + "Scripts");
@@ -172,8 +170,44 @@ public class Load {
 		}
 		
 		// Tell game we're loaded
-		if ( reset )
-			Game.load();
+		Game.load();
+	}
+	
+	/**
+	 * Attempt to load a scene from file.
+	 * @param scene
+	 * @return
+	 */
+	public static SceneInternal loadScene(Scene scene) {
+		if ( scene == null )
+			return null;
+		
+		if ( scene.getUUID() == null )
+			return null;
+		
+		if ( Game.saveDirectory == null || Game.saveDirectory.length() == 0 )
+			return null;
+		
+		String scenePath = Game.saveDirectory + File.separator + "Scenes" + File.separator;
+		File t = new File(scenePath);
+		if ( !t.exists() )
+			return null;
+		
+		File t2 = new File(scenePath + File.separator + scene.getUUID().toString());
+		if ( !t2.exists() )
+			return null;
+		
+		JSONParser parser = new JSONParser();
+		try {
+			JSONObject externalJSON = (JSONObject) parser.parse(new FileReader(t2));
+			SceneInternal internal = new SceneInternal(scene);
+			parseInternalJSON(externalJSON, internal);
+			return internal;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		return null;
 	}
 
 	/**
@@ -191,17 +225,19 @@ public class Load {
 	 * @return
 	 */
 	public static Instance parseJSON(boolean removeUnusedInstances, JSONObject obj) {
-		
-		// Read in the objects from JSON
 		ArrayList<LoadedInstance> instances = new ArrayList<LoadedInstance>();
 		HashMap<Long, LoadedInstance> instancesMap = new HashMap<>();
 		Map<Long, Instance> unmodifiedInstances = null;
-		readObjects(instances, instancesMap, obj);
 		
+		// Read in the objects from JSON
+		readObjects(instances, instancesMap, obj, Game.game());
+		
+		// Setup instancemap
 		if ( removeUnusedInstances )
 			unmodifiedInstances = Game.game().getInstanceMapOld();
 		
 		try {
+			
 			List<LoadedInstance> services = new ArrayList<LoadedInstance>();
 			
 			// Load in services first
@@ -265,6 +301,49 @@ public class Load {
 		return null;
 	}
 
+	private static void parseInternalJSON(JSONObject obj, Instance rootInstance) {
+		// Read in the objects from JSON
+		ArrayList<LoadedInstance> instances = new ArrayList<LoadedInstance>();
+		HashMap<Long, LoadedInstance> instancesMap = new HashMap<>();
+		readObjects(instances, instancesMap, obj, rootInstance);
+		
+		List<LoadedInstance> services = new ArrayList<LoadedInstance>();
+		
+		// Load in services first
+		for (int i = 0; i < instances.size(); i++) {
+			LoadedInstance inst = instances.get(i);
+			if ( inst.instance instanceof Service ) {
+				loadObject(instancesMap, inst);
+				services.add(inst);
+			}
+		}
+		
+		// Correct instances (properties and such)
+		for (int i = 0; i < instances.size(); i++) {
+			LoadedInstance inst = instances.get(i);
+			loadObject(instancesMap, inst);
+		}
+		
+		// Force set parents (of non services)
+		for (int i = 0; i < instances.size(); i++) {
+			LoadedInstance inst = instances.get(i);
+			long parent = inst.Parent;
+
+			if ( parent != -1 && inst.loaded ) {
+				Instance p = getInstanceFromReference(instancesMap, parent);
+				if ( !inst.instance.equals(p) ) {
+					inst.instance.forceSetParent(p);
+				}
+			}
+		}
+		
+		// Parent services
+		for (int i = 0; i < services.size(); i++) {
+			LoadedInstance inst = services.get(i);
+			inst.instance.forceSetParent(rootInstance);
+		}
+	}
+
 	private static void loadObject(HashMap<Long, LoadedInstance> instancesMap, LoadedInstance inst) {
 		if ( inst.loaded )
 			return;
@@ -316,7 +395,7 @@ public class Load {
 		}
 	}
 
-	private static void readObjects(ArrayList<LoadedInstance> instances, HashMap<Long, LoadedInstance> instancesMap, JSONObject obj) {
+	private static void readObjects(ArrayList<LoadedInstance> instances, HashMap<Long, LoadedInstance> instancesMap, JSONObject obj, Instance rootInstance) {
 		LoadedInstance root = new LoadedInstance();
 		root.ClassName = (String) obj.get("ClassName");
 		root.Name = (String) obj.get("Name");
@@ -326,16 +405,18 @@ public class Load {
 		
 		if ( root.ClassName.equals("Game") ) {
 			root.instance = Game.game();
+		} else if ( root.ClassName.equals("project") ) {
+			root.instance = Game.project();
 		} else {
 			// Search directly in game for instance...
-			LuaValue temp = Game.game().get(root.ClassName);
+			LuaValue temp = rootInstance.get(root.ClassName);
 			
 			// Not found
 			if ( temp.isnil() ) {
 				
 				// Check if SID is defined in properties
 				Object SIDRef = ((JSONObject)obj.get("Properties")).get("SID");
-				if ( SIDRef != null ) {
+				if ( SIDRef != null && Long.parseLong(SIDRef.toString()) > -1 ) {
 					
 					// Match instance to server instance
 					Instance inGame = Game.getInstanceFromSID(Long.parseLong(SIDRef.toString()));
@@ -346,8 +427,16 @@ public class Load {
 						root.instance = (Instance) Instance.instance(root.ClassName);
 					}
 				} else {
-					// Create new
-					root.instance = (Instance) Instance.instance(root.ClassName);
+					if ( root.uuid.length() > 0 ) {
+						Instance uuidMatch = Game.getInstanceFromUUID(UUID.fromString(root.uuid));
+						if ( uuidMatch != null ) {
+							root.instance = uuidMatch;
+						} else {
+							root.instance = (Instance) Instance.instance(root.ClassName);
+						}
+					} else {
+						root.instance = (Instance) Instance.instance(root.ClassName);
+					}
 				}
 			} else {
 				// Found... probably a service.
@@ -376,7 +465,7 @@ public class Load {
 		
 		JSONArray children = (JSONArray) obj.get("Children");
 		for (int i = 0; i < children.size(); i++) {
-			readObjects( instances, instancesMap, (JSONObject) children.get(i));
+			readObjects( instances, instancesMap, (JSONObject) children.get(i), rootInstance);
 		}
 	}
 	

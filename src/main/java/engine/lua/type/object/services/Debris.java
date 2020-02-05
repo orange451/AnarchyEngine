@@ -19,9 +19,10 @@ import org.luaj.vm2.lib.ThreeArgFunction;
 
 import engine.Game;
 import engine.lua.type.object.Instance;
+import engine.lua.type.object.SceneStorable;
 import engine.lua.type.object.Service;
 
-public class Debris extends Service {
+public class Debris extends Service implements SceneStorable {
 	private List<DebrisInstance> objects = Collections.synchronizedList(new ArrayList<DebrisInstance>());
 
 	public Debris() {

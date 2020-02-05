@@ -28,6 +28,7 @@ import engine.lua.type.data.Ray;
 import engine.lua.type.data.Vector3;
 import engine.lua.type.object.Instance;
 import engine.lua.type.object.PhysicsBase;
+import engine.lua.type.object.SceneStorable;
 import engine.lua.type.object.ScriptExecutor;
 import engine.lua.type.object.Service;
 import engine.lua.type.object.TreeViewable;
@@ -39,7 +40,7 @@ import engine.physics.PhysicsObjectInternal;
 import engine.physics.PhysicsWorld;
 import ide.layout.windows.icons.Icons;
 
-public class Workspace extends Service implements RenderableWorld,TreeViewable,Tickable,ScriptExecutor  {
+public class Workspace extends Service implements RenderableWorld,TreeViewable,Tickable,ScriptExecutor,SceneStorable  {
 	private static PhysicsWorld physicsWorld;
 	private List<Instance> descendants = Collections.synchronizedList(new ArrayList<Instance>());
 
@@ -181,7 +182,8 @@ public class Workspace extends Service implements RenderableWorld,TreeViewable,T
 	}
 
 	public void tick() {
-		physicsWorld.tick();
+		if ( physicsWorld != null )
+			physicsWorld.tick();
 		
 		synchronized(descendants) {
 			for (int i = 0; i < descendants.size(); i++) {

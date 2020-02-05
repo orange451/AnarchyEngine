@@ -13,11 +13,12 @@ package engine.lua.type.object.services;
 import org.luaj.vm2.LuaValue;
 
 import engine.lua.type.object.Instance;
+import engine.lua.type.object.SceneStorable;
 import engine.lua.type.object.Service;
 import engine.lua.type.object.TreeViewable;
 import ide.layout.windows.icons.Icons;
 
-public class StarterPlayer extends Service implements TreeViewable {
+public class StarterPlayer extends Service implements TreeViewable,SceneStorable {
 
 	private static final LuaValue C_STARTERPLAYERSCRIPTS = LuaValue.valueOf("StarterPlayerScripts");
 	private static final LuaValue C_STARTERPLAYERGUI = LuaValue.valueOf("StarterPlayerGui");

@@ -17,13 +17,15 @@ import engine.lua.type.object.insts.Scene;
 import ide.layout.windows.icons.Icons;
 
 public class Scenes extends Service implements TreeViewable {
-	
+
 	private static final LuaValue C_STARTINGSCENE = LuaValue.valueOf("StartingScene");
+	private static final LuaValue C_CURRENTSCENE = LuaValue.valueOf("CurrentScene");
 	
 	public Scenes() {
 		super("Scenes");
-		
+
 		this.defineField(C_STARTINGSCENE, LuaValue.NIL, false);
+		this.defineField(C_CURRENTSCENE, LuaValue.NIL, true);
 		this.setLocked(true);
 	}
 
@@ -43,13 +45,38 @@ public class Scenes extends Service implements TreeViewable {
 		return value;
 	}
 	
+	/**
+	 * Returns the scene that is loaded when the game initializes.
+	 * @return
+	 */
 	public Scene getStartingScene() {
 		LuaValue t = this.get(C_STARTINGSCENE);
 		return t.isnil()?null:(Scene)t;
 	}
 	
+	/**
+	 * Set which scene is the scene loaded upon game load.
+	 * @param scene
+	 */
 	public void setStartingScene(Scene scene) {
 		this.set(C_STARTINGSCENE, scene==null?LuaValue.NIL:scene);
+	}
+	
+	/**
+	 * Sets the current loaded scene variable. This does not actually handle loading the scene. To load a new scene see: TODO create this method...
+	 * @param scene
+	 */
+	protected void setCurrentScene(Scene scene) {
+		this.rawset(C_CURRENTSCENE, scene==null?LuaValue.NIL:scene);
+	}
+	
+	/**
+	 * Returns which scene is currently loaded into game.
+	 * @return
+	 */
+	public Scene getCurrentScene() {
+		LuaValue t = this.get(C_CURRENTSCENE);
+		return t.isnil()?null:(Scene)t;
 	}
 
 	@Override

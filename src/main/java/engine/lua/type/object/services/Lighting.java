@@ -19,6 +19,7 @@ import engine.lua.type.LuaConnection;
 import engine.lua.type.NumberClampPreferred;
 import engine.lua.type.data.Color3;
 import engine.lua.type.object.Instance;
+import engine.lua.type.object.SceneStorable;
 import engine.lua.type.object.Service;
 import engine.lua.type.object.TreeViewable;
 import engine.lua.type.object.insts.DynamicSkybox;
@@ -26,7 +27,7 @@ import engine.lua.type.object.insts.Skybox;
 import engine.tasks.TaskManager;
 import ide.layout.windows.icons.Icons;
 
-public class Lighting extends Service implements TreeViewable {
+public class Lighting extends Service implements TreeViewable,SceneStorable {
 
 	private static final LuaValue C_AMBIENT = LuaValue.valueOf("Ambient");
 	private static final LuaValue C_EXPOSURE = LuaValue.valueOf("Exposure");

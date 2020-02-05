@@ -38,6 +38,7 @@ import engine.lua.type.object.insts.Folder;
 import engine.lua.type.object.insts.GameObject;
 import engine.lua.type.object.insts.PhysicsObject;
 import engine.lua.type.object.insts.PlayerPhysics;
+import engine.lua.type.object.insts.Scene;
 import engine.lua.type.object.insts.animation.AnimationController;
 import engine.lua.type.object.insts.animation.AnimationData;
 import engine.lua.type.object.insts.light.DirectionalLight;
@@ -380,6 +381,9 @@ public class IdeExplorer extends IdePane {
 						}
 						if ( instance instanceof CSS ) {
 							IDE.openCSS((CSS)instance);
+						}
+						if ( instance instanceof Scene ) {
+							Game.game().loadScene((Scene)instance);
 						}
 					}
 				});

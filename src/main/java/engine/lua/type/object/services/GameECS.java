@@ -11,6 +11,7 @@
 package engine.lua.type.object.services;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -19,9 +20,12 @@ import org.luaj.vm2.lib.OneArgFunction;
 import org.luaj.vm2.lib.TwoArgFunction;
 
 import engine.Game;
+import engine.io.Load;
 import engine.lua.type.LuaEvent;
 import engine.lua.type.object.Instance;
 import engine.lua.type.object.Service;
+import engine.lua.type.object.insts.Scene;
+import engine.lua.type.object.insts.SceneInternal;
 
 public class GameECS extends Instance {
 	
@@ -146,5 +150,51 @@ public class GameECS extends Instance {
 	@Override
 	protected boolean onValueGet(LuaValue key) {
 		return true;
+	}
+
+	public void loadScene(Scene scene) {
+		if ( scene == null )
+			return;
+		
+		if ( scene == Game.project().scenes().getCurrentScene() )
+			return;
+		
+		// Store current scene
+		Scene currentScene = Game.project().scenes().getCurrentScene();
+		if ( currentScene != null )
+			Game.getGame().getUnsavedScene(currentScene).storeGame();
+		
+		// Get the internal scene (data)
+		SceneInternal internal = Game.getGame().getUnsavedScene(scene);
+		if ( internal == null )
+			internal = Load.loadScene(scene);
+		if ( internal == null )
+			internal = new SceneInternal(scene);
+		
+		// Set it as loaded
+		Game.project().scenes().setCurrentScene(scene);
+		Game.getGame().unsavedScenes.add(internal);
+		Game.getGame().currentModifyingScene = scene;
+		
+		// Load it into game
+		List<Instance> services = internal.getChildrenSafe();
+		for (int i = 0; i < services.size(); i++) {
+			Instance service = services.get(i);
+			Instance toParent = Game.getService(service.getName());
+			if ( toParent == null )
+				continue;
+			
+			List<Instance> servChild = service.getChildrenSafe();
+			for (int j = 0; j < servChild.size(); j++) {
+				Instance child = servChild.get(j);
+				child.forceSetParent(toParent);
+				System.out.println("Restoring " + child + " " + child.getUUID() + " to " + toParent.getFullName());
+			}
+		}
+		
+		// Make sure we have all the services...
+		Game.services();
+		
+		
 	}
 }
