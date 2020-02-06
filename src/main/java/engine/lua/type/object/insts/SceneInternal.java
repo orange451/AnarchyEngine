@@ -5,6 +5,8 @@ import java.util.List;
 import org.luaj.vm2.LuaValue;
 
 import engine.Game;
+import engine.lua.type.LuaField;
+import engine.lua.type.LuaFieldFlag;
 import engine.lua.type.object.Instance;
 import engine.lua.type.object.SceneStorable;
 
@@ -64,6 +66,17 @@ public class SceneInternal extends Instance {
 				Instance temp = c.get(j);
 				temp.forceSetParent(newService);
 				System.out.println("Parenting " + temp + " " + temp.getUUID() + " to " + newService.getFullName());
+			}
+			
+			// Copy fields over
+			LuaField[] fields = potentialService.getFields();
+			for (int j = 0; j < fields.length; j++) {
+				LuaField field = fields[j];
+				if ( field.hasFlag(LuaFieldFlag.BASE_FIELD) )
+					continue;
+				
+				System.out.println("SETTING " + field.getName() + " to " + potentialService.get(field.getName()));
+				newService.rawset(field.getName(), potentialService.get(field.getName()));
 			}
 			
 			// Put service in scene
