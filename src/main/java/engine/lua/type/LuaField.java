@@ -89,6 +89,10 @@ public class LuaField {
 		return this;
 	}
 
+	/**
+	 * Returns true if the lua field is an instance-reference pointer.
+	 * @return
+	 */
 	public boolean isInstance() {
 		return isInstance;
 	}

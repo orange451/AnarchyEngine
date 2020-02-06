@@ -25,6 +25,7 @@ import java.util.ListIterator;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import org.luaj.vm2.LuaString;
 import org.luaj.vm2.LuaValue;
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.system.MemoryStack;
@@ -236,40 +237,11 @@ public class Save {
 		Game.changes = false;
 		
 		// Save scenes!
-		String scenePath = Game.saveDirectory + File.separator + "Scenes" + File.separator;
-		File t = new File(scenePath);
-		if ( !t.exists() )
-			t.mkdirs();
-		List<SceneInternal> unsavedScenes = Game.getUnsavedScenes();
-		for (int i = 0; i < unsavedScenes.size(); i++) {
-			SceneInternal internalScene = unsavedScenes.get(i);
-			Scene linkedScene = unsavedScenes.get(i).getScene();
-			if ( linkedScene == null )
-				continue;
-			
-			// Write what's currently in game to the scene
-			if ( linkedScene == Game.project().scenes().getCurrentScene() )
-				internalScene.storeGame();
-			
-			// Write this scene to file
-			String sPath = scenePath + linkedScene.getUUID().toString();
-			JSONObject sceneJSON = getInstanceJSONRecursive(true, true, internalScene);
-			System.out.println("WRITING SCENE TO FILE! " + linkedScene.getFullName());
-			writeJSONToFile(sPath, sceneJSON);
-			
-			// Remove this unsaved scene if it's no longer loaded
-			if ( linkedScene.equals(Game.project().scenes().getCurrentScene()) )
-				unsavedScenes.remove(i--);
-			else {
-				Game.project().scenes().rawset("CurrentScene", LuaValue.NIL);
-				Game.game().extractScene(internalScene);
-			}
-		}
-		unsavedScenes.clear();
+		writeScenes();
 
 		return writeJSONToFile(path, saveJSON);
 	}
-	
+
 	private static boolean writeJSONToFile(String path, JSONObject jsonData) {
 		try {
 			// Get scene as JSON string
@@ -429,7 +401,7 @@ public class Save {
 				}
 				
 				// Special case to NOT write "Source" only when writing a project. Instead put write it externally...
-				if ( field.equals("Source") && savingLocally ) {
+				if ( field.equals("Source") && savingLocally && instance.getField(field).getType() == LuaString.class) {
 					String source = instance.get(field).tojstring();
 					p.put(field, fieldToJSONBlank(instance.get(field)));
 				}
@@ -579,6 +551,40 @@ public class Save {
 			}
             System.out.println("File copied :: " + destinationFolder);
         }
+	}
+	
+	private static void writeScenes() {
+		String scenePath = Game.saveDirectory + File.separator + "Scenes" + File.separator;
+		File t = new File(scenePath);
+		if ( !t.exists() )
+			t.mkdirs();
+		
+		List<SceneInternal> unsavedScenes = Game.getUnsavedScenes();
+		for (int i = 0; i < unsavedScenes.size(); i++) {
+			SceneInternal internalScene = unsavedScenes.get(i);
+			Scene linkedScene = unsavedScenes.get(i).getScene();
+			if ( linkedScene == null )
+				continue;
+			
+			// Write what's currently in game to the scene
+			if ( linkedScene == Game.project().scenes().getCurrentScene() )
+				internalScene.storeGame();
+			
+			// Write this scene to file
+			String sPath = scenePath + linkedScene.getUUID().toString();
+			JSONObject sceneJSON = getInstanceJSONRecursive(false, true, internalScene);
+			System.out.println("WRITING SCENE TO FILE! " + linkedScene.getFullName());
+			writeJSONToFile(sPath, sceneJSON);
+			
+			// Remove this unsaved scene if it's no longer loaded
+			if ( linkedScene.equals(Game.project().scenes().getCurrentScene()) )
+				unsavedScenes.remove(i--);
+			else {
+				Game.project().scenes().rawset("CurrentScene", LuaValue.NIL);
+				Game.game().extractScene(internalScene);
+			}
+		}
+		unsavedScenes.clear();
 	}
 
 	@SuppressWarnings("unchecked")

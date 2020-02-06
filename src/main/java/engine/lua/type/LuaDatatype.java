@@ -100,6 +100,15 @@ public abstract class LuaDatatype extends LuaTable {
 	}
 	
 	/**
+	 * Gets the field object for the specified field name.
+	 * @param key
+	 * @return
+	 */
+	public LuaField getField(String key) {
+		return fields.get(LuaValue.valueOf(key));
+	}
+	
+	/**
 	 * Returns list of fields in the order they are defined.
 	 * @return
 	 */

@@ -144,6 +144,13 @@ public class Load {
 				return;
 		}
 		
+		loadExternalStuff(path);
+		
+		// Tell game we're loaded
+		Game.load();
+	}
+	
+	private static void loadExternalStuff(String path) {
 		// Load external stuff
 		File scripts = new File(new File(path).getParent() + File.separator + "Resources" + File.separator + "Scripts");
 		if ( scripts.exists() ) {
@@ -176,11 +183,8 @@ public class Load {
 				e.printStackTrace();
 			}
 		}
-		
-		// Tell game we're loaded
-		Game.load();
 	}
-	
+
 	/**
 	 * Attempt to load a scene from file (into Game)
 	 * @param scene
@@ -210,6 +214,7 @@ public class Load {
 			JSONObject externalJSON = (JSONObject) parser.parse(new FileReader(t2));
 			SceneInternal internal = new SceneInternal(scene);
 			parseInternalJSON(externalJSON, internal);
+			loadExternalStuff(Game.saveDirectory);
 			return internal;
 		} catch (Exception e) {
 			e.printStackTrace();
