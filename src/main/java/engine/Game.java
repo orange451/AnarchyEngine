@@ -434,6 +434,8 @@ public class Game implements Tickable {
 		ScriptRunner.cleanup();
 		
 		game.unsavedScenes.clear();
+		game().uniqueInstances.clear();
+		game().serverSidedInstances.clear();
 		
 		loaded = false;
 	}
@@ -450,7 +452,7 @@ public class Game implements Tickable {
 			services.get(i).clearAllChildren();
 		}
 		
-		List<Instance> moreServices = Game.project().getChildren();
+		List<Instance> moreServices = Game.project().getChildrenSafe();
 		for (int i = 0; i < moreServices.size(); i++) {
 			List<Instance> desc = moreServices.get(i).getDescendants();
 			for (int j = 0; j < desc.size(); j++) {
@@ -459,6 +461,7 @@ public class Game implements Tickable {
 				inst.cleanup();
 			}
 			moreServices.get(i).clearAllChildren();
+			moreServices.get(i).destroy();
 		}
 	}
 	

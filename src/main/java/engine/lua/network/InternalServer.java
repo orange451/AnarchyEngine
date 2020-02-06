@@ -93,7 +93,7 @@ public class InternalServer extends Server {
 					}
 					
 					// Stream game to client
-					String gameJSON = Save.getGameJSON().toJSONString();
+					String gameJSON = Save.getGameJSON(true).toJSONString();
 					gameJSON = GZIPUtil.compress(gameJSON);
 					String[] strings = gameJSON.split("(?<=\\G.{"+CHUNK_SIZE+"})");
 					connection.sendTCP(new ClientLoadMapTCP()); // Mark client as "loading map" state.

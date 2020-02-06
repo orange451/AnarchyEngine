@@ -228,7 +228,7 @@ public class Save {
 		// Start saving process
 		REFID = 0;		
 		JSONObject projectJSONInternal = getProjectJSON();
-		JSONObject gameJSON = getInstanceJSONRecursive( true, true, Game.game());
+		JSONObject gameJSON = getInstanceJSONRecursive( false, true, Game.game());
 		JSONObject saveJSON = new JSONObject();
 		saveJSON.put("Version", 1.0f);
 		saveJSON.put("ProjectData", projectJSONInternal);
@@ -258,10 +258,9 @@ public class Save {
 			writeJSONToFile(sPath, sceneJSON);
 			
 			// Remove this unsaved scene if it's no longer loaded
-			if ( linkedScene != Game.project().scenes().getCurrentScene() )
+			if ( linkedScene.equals(Game.project().scenes().getCurrentScene()) )
 				unsavedScenes.remove(i--);
 			else {
-				unsavedScenes.remove(i--);
 				Game.project().scenes().rawset("CurrentScene", LuaValue.NIL);
 				Game.game().extractScene(internalScene);
 			}
@@ -295,16 +294,16 @@ public class Save {
 	 * Project JSON contains JSON as it will save to your computer. Game JSON is used for streaming what's currently loaded in Game.
 	 * @return
 	 */
-	public static JSONObject getProjectJSON() {
-		return getInstanceJSONRecursive( true, true, Game.project());
+	private static JSONObject getProjectJSON() {
+		return getInstanceJSONRecursive( false, true, Game.project());
 	}
 
 	/**
 	 * Returns the game represented as a JSON Object.
 	 * @return
 	 */
-	public static JSONObject getGameJSON() {
-		return getInstanceJSONRecursive( true, false, Game.game());
+	public static JSONObject getGameJSON(boolean storeServerId) {
+		return getInstanceJSONRecursive( storeServerId, false, Game.game());
 	}
 	
 	/**
