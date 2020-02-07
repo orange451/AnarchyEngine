@@ -233,6 +233,7 @@ public class IdeLayout {
 		// Test inside IDE (buggy)
 		MenuItem internalTest = new MenuItem("Test Internal (buggy)", Icons.icon_play.getView());
 		internalTest.setOnAction( event -> {
+			JSONObject projectJson = Save.getProjectJSON();
 			JSONObject gameJson = Save.getGameJSON(false);
 			Game.internalTesting = true;
 			Game.setRunning(true);
@@ -255,7 +256,16 @@ public class IdeLayout {
 
 					// Reload from stored JSON
 					InternalGameThread.runLater(()->{
-						Load.parseJSON(true, gameJson);
+						// Reload project
+						Game.unload();
+						
+						//Game.project().clearAllChildren();
+						Load.parseJSONInto(projectJson, Game.project());
+						
+						// Reload game
+						Load.parseJSONInto(gameJson, Game.game());
+						
+						// Load game
 						Game.load();
 					});
 				} catch(Exception e) {

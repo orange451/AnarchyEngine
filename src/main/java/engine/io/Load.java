@@ -130,7 +130,7 @@ public class Load {
 		// Load the json
 		if ( obj.containsKey("Version") ) {
 			System.out.println("USING NEW LOAD SYSTEM");
-			parseInternalJSON((JSONObject)obj.get("ProjectData"), Game.project());
+			parseJSONInto((JSONObject)obj.get("ProjectData"), Game.project());
 			
 			// Force load starting scene...
 			Game.game().rawset(LuaValue.valueOf("CurrentScene"), LuaValue.NIL);
@@ -213,7 +213,7 @@ public class Load {
 		try {
 			JSONObject externalJSON = (JSONObject) parser.parse(new FileReader(t2));
 			SceneInternal internal = new SceneInternal(scene);
-			parseInternalJSON(externalJSON, internal);
+			parseJSONInto(externalJSON, internal);
 			loadExternalStuff(Game.saveDirectory);
 			return internal;
 		} catch (Exception e) {
@@ -314,7 +314,7 @@ public class Load {
 		return null;
 	}
 
-	private static void parseInternalJSON(JSONObject obj, Instance rootInstance) {
+	public static void parseJSONInto(JSONObject obj, Instance rootInstance) {
 		// Read in the objects from JSON
 		ArrayList<LoadedInstance> instances = new ArrayList<LoadedInstance>();
 		HashMap<Long, LoadedInstance> instancesMap = new HashMap<>();
