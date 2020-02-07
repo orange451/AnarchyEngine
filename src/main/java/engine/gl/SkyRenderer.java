@@ -126,11 +126,11 @@ public class SkyRenderer {
 		dynamicSkyCubeShader = new DynamicSkyCubeShader();
 		dynamicSkyCubeShader.init();
 		
-		Game.userInputService().inputBeganEvent().connect((args) -> {
+		/*Game.userInputService().inputBeganEvent().connect((args) -> {
 			if (args[0].get("KeyCode").eq_b(LuaValue.valueOf(GLFW.GLFW_KEY_F6))) {
 				dynamicSkyShader.reload();
 			}
-		});
+		});*/
 
 		cube = VAO.create();
 		cube.bind();

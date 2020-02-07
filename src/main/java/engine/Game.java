@@ -96,6 +96,9 @@ public class Game implements Tickable {
 		if ( Game.workspace() == null )
 			new Workspace().forceSetParent(Game.game());
 		
+		if ( Game.workspace().getCurrentCamera() == null )
+			Game.workspace().setCurrentCamera(new Camera());
+		
 		if ( Game.lighting() == null )
 			new Lighting().forceSetParent(Game.game());
 		
@@ -561,7 +564,7 @@ public class Game implements Tickable {
 		LuaEngine.globals.set(C_WORKSPACE, workspace);
 
 		// Make sure there's a camera
-		if ( workspace.getCurrentCamera() == null ) {
+		/*if ( workspace.getCurrentCamera() == null ) {
 			ticksNoCamera++;
 			if ( ticksNoCamera > 2 ) {
 				Camera c = new Camera();
@@ -572,7 +575,7 @@ public class Game implements Tickable {
 			}
 		} else {
 			ticksNoCamera = 0;
-		}
+		}*/
 
 		// Tick workspace
 		Game.workspace().tick();

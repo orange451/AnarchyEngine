@@ -68,7 +68,7 @@ public class SceneInternal extends Instance {
 				System.out.println("Parenting " + temp + " " + temp.getUUID() + " to " + newService.getFullName());
 			}
 			
-			// Copy fields over
+			// Copy service fields over
 			LuaField[] fields = potentialService.getFields();
 			for (int j = 0; j < fields.length; j++) {
 				LuaField field = fields[j];
@@ -77,6 +77,10 @@ public class SceneInternal extends Instance {
 				
 				System.out.println("SETTING " + field.getName() + " to " + potentialService.get(field.getName()));
 				newService.rawset(field.getName(), potentialService.get(field.getName()));
+				
+				// UNSET ORIGINAL FIELD
+				if ( field.isInstance() )
+					potentialService.rawset(field.getName(), LuaValue.NIL);
 			}
 			
 			// Put service in scene

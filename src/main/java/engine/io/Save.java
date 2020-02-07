@@ -266,7 +266,7 @@ public class Save {
 	 * Project JSON contains JSON as it will save to your computer. Game JSON is used for streaming what's currently loaded in Game.
 	 * @return
 	 */
-	private static JSONObject getProjectJSON() {
+	public static JSONObject getProjectJSON() {
 		return getInstanceJSONRecursive( false, true, Game.project());
 	}
 
