@@ -436,7 +436,6 @@ public class Save {
 		@SuppressWarnings("unchecked")
 		public HashReference(Instance instance) {
 			super(instance.getSID());
-			
 			this.put("Hash", instance.hashFields());
 		}
 	}
@@ -484,11 +483,17 @@ public class Save {
 		// Instances in the game
 		if ( luaValue instanceof Instance ) {
 			SavedInstance svd = instanceMap.get((Instance) luaValue);
+			SavedReference ref = null;
 			if ( svd != null ) {
-				return svd.reference;
+				ref = svd.reference;
 			} else {
-				return new HashReference((Instance) luaValue);
+				ref = new HashReference((Instance) luaValue);
 			}
+			
+			if ( ((Instance) luaValue).getUUID() != null )
+				ref.put("UUID", ((Instance) luaValue).getUUID().toString());
+			
+			return ref;
 		}
 
 		// Vectorx/Colors/etc

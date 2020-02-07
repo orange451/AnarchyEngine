@@ -243,7 +243,7 @@ public class Load {
 		Map<Long, Instance> unmodifiedInstances = null;
 		
 		// Read in the objects from JSON
-		readObjects(instances, instancesMap, obj, Game.game());
+		readObjects(instances, instancesMap, obj, Game.game(), new HighestReference());
 		
 		// Setup instancemap
 		if ( removeUnusedInstances )
@@ -318,7 +318,7 @@ public class Load {
 		// Read in the objects from JSON
 		ArrayList<LoadedInstance> instances = new ArrayList<LoadedInstance>();
 		HashMap<Long, LoadedInstance> instancesMap = new HashMap<>();
-		readObjects(instances, instancesMap, obj, rootInstance);
+		readObjects(instances, instancesMap, obj, rootInstance, new HighestReference());
 		
 		List<LoadedInstance> services = new ArrayList<LoadedInstance>();
 		
@@ -409,7 +409,7 @@ public class Load {
 		}
 	}
 
-	private static void readObjects(ArrayList<LoadedInstance> instances, HashMap<Long, LoadedInstance> instancesMap, JSONObject obj, Instance rootInstance) {
+	private static void readObjects(ArrayList<LoadedInstance> instances, Map<Long, LoadedInstance> instancesMap, JSONObject obj, Instance rootInstance, HighestReference highestReference) {
 		LoadedInstance loadedInstance = new LoadedInstance();
 		loadedInstance.ClassName = (String) obj.get("ClassName");
 		loadedInstance.Name = (String) obj.get("Name");
@@ -462,6 +462,22 @@ public class Load {
 		if ( loadedInstance.uuid != null && loadedInstance.uuid.length() > 0 )
 			loadedInstance.instance.setUUID(UUID.fromString(loadedInstance.uuid));
 		
+		// Store instances to map
+		instances.add(loadedInstance);
+		if ( !instancesMap.containsKey(loadedInstance.Reference)) {
+			instancesMap.put(loadedInstance.Reference, loadedInstance);
+			
+			if ( loadedInstance.Reference > highestReference.reference )
+				highestReference.reference = loadedInstance.Reference;
+		}
+		
+		// Load children
+		JSONArray children = (JSONArray) obj.get("Children");
+		for (int i = 0; i < children.size(); i++) {
+			readObjects( instances, instancesMap, (JSONObject) children.get(i), rootInstance, highestReference);
+		}
+		
+		// Attach properties
 		if ( obj.get("Properties") != null ) {
 			JSONObject properties = (JSONObject) obj.get("Properties");
 			for (Object entry : properties.entrySet()) {
@@ -469,18 +485,9 @@ public class Load {
 				Map.Entry<Object,Object> entry2 = (Entry<Object, Object>) entry;
 				String key = entry2.getKey().toString();
 				Object t = entry2.getValue();
-				PropertyValue<?> v = PropertyValue.parse(t);
+				PropertyValue<?> v = PropertyValue.parse(t, instancesMap, highestReference);
 				loadedInstance.properties.put(key, v);
 			}
-		}
-		
-		instances.add(loadedInstance);
-		if ( !instancesMap.containsKey(loadedInstance.Reference))
-			instancesMap.put(loadedInstance.Reference, loadedInstance);
-		
-		JSONArray children = (JSONArray) obj.get("Children");
-		for (int i = 0; i < children.size(); i++) {
-			readObjects( instances, instancesMap, (JSONObject) children.get(i), rootInstance);
 		}
 	}
 	
@@ -511,9 +518,28 @@ public class Load {
 		private String uuid;
 		
 		public HashMap<String,PropertyValue<?>> properties = new HashMap<String,PropertyValue<?>>();
+		
+		public LoadedInstance() {
+			//
+		}
+		
+		public LoadedInstance(Instance inst) {
+			this.instance = inst;
+			
+			if ( inst.getUUID() != null )
+				this.uuid = inst.getUUID().toString();
+			
+			this.Name = inst.getName();
+			this.ClassName = inst.getClassName().toString();
+			this.loaded = true;
+		}
 	}
 	
 	private static HashMap<String, Method> dataTypeToMethodMap = new HashMap<String, Method>();
+	
+	static class HighestReference {
+		long reference;
+	}
 	
 	static class PropertyValue<T> {
 		private T value;
@@ -532,7 +558,7 @@ public class Load {
 			return value;
 		}
 
-		public static PropertyValue<?> parse(Object fieldKey) {
+		public static PropertyValue<?> parse(Object fieldKey, Map<Long, LoadedInstance> instancesMap, HighestReference highestReference) {
 			if ( fieldKey == null ) {
 				return new PropertyValue<LuaValue>(LuaValue.NIL);
 			}
@@ -554,6 +580,18 @@ public class Load {
 				// Match value to an object reference
 				if ( j.get("Type").equals("Reference") ) {
 					long v = Long.parseLong(j.get("Value").toString());
+					
+					// Special case where we load from UUID
+					if ( v == -1 ) {
+						Object uuidEntry = j.get("UUID");
+						if ( uuidEntry != null ) {
+							Instance temp = Game.getInstanceFromUUID(UUID.fromString(uuidEntry.toString()));
+							if ( temp != null ) {
+								v = highestReference.reference++;
+								instancesMap.put(v, new LoadedInstance(temp));
+							}
+						}
+					}
 					
 					// Make sure the pointed to hash object matches exactly!
 					Object hashEntry = j.get("Hash");
