@@ -78,6 +78,7 @@ public class ErrorWindow {
 					b.setOnAction(event -> {
 						window.close();
 					});
+					window.show();
 				}
 			}.start();
 		});
