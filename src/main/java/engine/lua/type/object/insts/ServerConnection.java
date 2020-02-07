@@ -25,6 +25,8 @@ public class ServerConnection extends Connection implements TreeViewable,NonRepl
 		} else {
 			this.rawset("Address", LuaValue.NIL);
 		}
+		
+		this.setInstanceable(false);
 	}
 	
 	public ServerConnection() {

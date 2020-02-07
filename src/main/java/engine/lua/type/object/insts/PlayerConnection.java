@@ -21,6 +21,8 @@ public class PlayerConnection extends Connection implements TreeViewable,NonRepl
 		this();
 		this.kryoConnection = kryoConnection;
 		this.rawset("Address", LuaValue.valueOf(kryoConnection.getRemoteAddressTCP().getAddress().getHostAddress()));
+		
+		this.setInstanceable(false);
 	}
 	
 	public PlayerConnection() {

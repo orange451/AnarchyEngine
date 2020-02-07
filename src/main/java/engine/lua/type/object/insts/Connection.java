@@ -35,7 +35,7 @@ public abstract class Connection extends Instance {
 		this.defineField(C_PLAYER.toString(), LuaValue.NIL, true);
 		this.defineField(C_PING.toString(), LuaValue.valueOf(0), true);
 		
-		this.forceSetParent(Game.getService("Connections"));
+		//this.forceSetParent(Game.getService("Connections"));
 		
 		this.getmetatable().set("Disconnect", new ZeroArgFunction() {
 			@Override
