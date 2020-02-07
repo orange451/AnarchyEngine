@@ -44,7 +44,10 @@ public final class ClassFinder {
 		        jarEntries = jf.entries();
 		        while(jarEntries.hasMoreElements()){
 		            entryName = jarEntries.nextElement().getName();
-		            if(entryName.startsWith(packageName) && entryName.length()>packageName.length()+5){
+		            if ( !entryName.endsWith(".class") )
+		            	continue;
+		            
+		            if(entryName.startsWith(packageName) && entryName.length()>packageName.length()+5) {
 		                entryName = entryName.substring(packageName.length(),entryName.lastIndexOf('.'));
 		                names.add(entryName);
 		            }
