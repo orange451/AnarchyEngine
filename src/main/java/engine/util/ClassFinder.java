@@ -50,6 +50,7 @@ public final class ClassFinder {
 		            }
 		        }
 	        }catch(Exception e) {
+	        	e.printStackTrace();
 	        	//
 	        }
 
@@ -98,6 +99,7 @@ public final class ClassFinder {
 				Class<?> cl = Class.forName(packageName+"."+name);
 				cls.add(cl);
 			} catch (ClassNotFoundException e) {
+				e.printStackTrace();
 				//
 			}
 		}

@@ -114,9 +114,9 @@ public final class ResourcesManager {
 	public static ByteBuffer ioResourceToByteBuffer(String resource, int bufferSize) throws IOException {
 		ByteBuffer buffer;
 		
-		//resource = FileUtils.fixPath(resource);
+		String resourceFile = FileUtils.fixPath(resource);
 
-		File file = new File(resource);
+		File file = new File(resourceFile);
 		if (file.isFile()) {
 			try (FileInputStream fis = new FileInputStream(file)) {
 				try (FileChannel fc = fis.getChannel()) {
