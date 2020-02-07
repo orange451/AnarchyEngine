@@ -13,10 +13,10 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 #end
 
 #function random
-/*
-	by Spatial
-	05 July 2013
-*/
+//
+//	by Spatial
+//	05 July 2013
+//
 
 // A single iteration of Bob Jenkins' One-At-A-Time hashing algorithm.
 uint hash(uint x) {

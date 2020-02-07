@@ -21,6 +21,7 @@ import engine.gl.shaders.ShaderProgram;
 import engine.gl.shaders.data.Attribute;
 import engine.gl.shaders.data.UniformBoolean;
 import engine.gl.shaders.data.UniformDynamicSky;
+import engine.gl.shaders.data.UniformInteger;
 import engine.gl.shaders.data.UniformMatrix4;
 import engine.gl.shaders.data.UniformVec3;
 import engine.lua.type.object.insts.Camera;
@@ -41,8 +42,10 @@ public class DynamicSkyShader extends ShaderProgram {
 
 	private UniformMatrix4 viewMatrixPrev = new UniformMatrix4("viewMatrixPrev");
 	private UniformMatrix4 projectionMatrixPrev = new UniformMatrix4("projectionMatrixPrev");
+	//private UniformInteger frame = new UniformInteger("frame");
 
 	private Matrix4f temp = new Matrix4f();
+	//private int frameCont;
 
 	@Override
 	protected void setupShader() {
@@ -51,7 +54,7 @@ public class DynamicSkyShader extends ShaderProgram {
 		super.setAttributes(new Attribute(0, "position"), new Attribute(1, "textureCoords"),
 				new Attribute(2, "normal"));
 		super.storeUniforms(projectionMatrix, transformationMatrix, viewMatrix, lightPosition, renderSun,
-				cameraPosition, dynamicSky, ambient, viewMatrixPrev, projectionMatrixPrev);
+				cameraPosition, dynamicSky, ambient, viewMatrixPrev, projectionMatrixPrev/*, frame*/);
 	}
 
 	public void loadCamera(Camera camera, Matrix4f projection) {
@@ -97,6 +100,7 @@ public class DynamicSkyShader extends ShaderProgram {
 
 	public void loadDynamicSky(DynamicSkybox sky) {
 		dynamicSky.loadLight(sky);
+		//frame.loadInteger(frameCont++);
 	}
 
 	public void loadAmbient(Vector3f ambient) {

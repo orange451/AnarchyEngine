@@ -49,10 +49,7 @@ import java.util.List;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
-import org.luaj.vm2.LuaValue;
-import org.lwjgl.glfw.GLFW;
 
-import engine.Game;
 import engine.gl.DeferredPipeline;
 import engine.gl.RenderingSettings;
 import engine.gl.objects.Framebuffer;
@@ -91,11 +88,6 @@ public class AreaLightHandler implements ILightHandler<AreaLightInternal> {
 	public AreaLightHandler(int width, int height) {
 		this.width = width;
 		this.height = height;
-		Game.userInputService().inputBeganEvent().connect((args) -> {
-			if (args[0].get("KeyCode").eq_b(LuaValue.valueOf(GLFW.GLFW_KEY_F6))) {
-				shader.reload();
-			}
-		});
 		init();
 	}
 

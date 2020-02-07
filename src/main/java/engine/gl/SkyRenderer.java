@@ -50,7 +50,10 @@ import static org.lwjgl.opengl.GL30C.glGenerateMipmap;
 
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
+import org.luaj.vm2.LuaValue;
+import org.lwjgl.glfw.GLFW;
 
+import engine.Game;
 import engine.gl.entities.CubeMapCamera;
 import engine.gl.entities.LayeredCubeCamera;
 import engine.gl.objects.Framebuffer;
@@ -122,6 +125,12 @@ public class SkyRenderer {
 		staticSkyCubeShader.init();
 		dynamicSkyCubeShader = new DynamicSkyCubeShader();
 		dynamicSkyCubeShader.init();
+		
+		Game.userInputService().inputBeganEvent().connect((args) -> {
+			if (args[0].get("KeyCode").eq_b(LuaValue.valueOf(GLFW.GLFW_KEY_F6))) {
+				dynamicSkyShader.reload();
+			}
+		});
 
 		cube = VAO.create();
 		cube.bind();

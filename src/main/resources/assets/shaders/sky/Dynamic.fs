@@ -23,6 +23,7 @@ uniform vec3 lightPosition;
 uniform vec3 cameraPosition;
 uniform DynamicSky dynamicSky;
 uniform vec3 ambient;
+uniform int frame;
 
 #include function noise
 
@@ -160,6 +161,56 @@ float RayMarch(vec3 ro, vec3 rd) {
 	}
 	return dO;
 }
+/*
+#include function random
+
+// Simplex 2D noise
+//
+vec3 permute(vec3 x) { return mod(((x*34.0)+1.0)*x, 289.0); }
+
+float snoise(vec2 v){
+  const vec4 C = vec4(0.211324865405187, 0.366025403784439,
+           -0.577350269189626, 0.024390243902439);
+  vec2 i  = floor(v + dot(v, C.yy) );
+  vec2 x0 = v -   i + dot(i, C.xx);
+  vec2 i1;
+  i1 = (x0.x > x0.y) ? vec2(1.0, 0.0) : vec2(0.0, 1.0);
+  vec4 x12 = x0.xyxy + C.xxzz;
+  x12.xy -= i1;
+  i = mod(i, 289.0);
+  vec3 p = permute( permute( i.y + vec3(0.0, i1.y, 1.0 ))
+  + i.x + vec3(0.0, i1.x, 1.0 ));
+  vec3 m = max(0.5 - vec3(dot(x0,x0), dot(x12.xy,x12.xy),
+    dot(x12.zw,x12.zw)), 0.0);
+  m = m*m ;
+  m = m*m ;
+  vec3 x = 2.0 * fract(p * C.www) - 1.0;
+  vec3 h = abs(x) - 0.5;
+  vec3 ox = floor(x + 0.5);
+  vec3 a0 = x - ox;
+  m *= 1.79284291400159 - 0.85373472095314 * ( a0*a0 + h*h );
+  vec3 g;
+  g.x  = a0.x  * x0.x  + h.x  * x0.y;
+  g.yz = a0.yz * x12.xz + h.yz * x12.yw;
+  return 130.0 * dot(m, g);
+}
+
+bool rayHitCloud(vec3 p, out float volume) {
+	float height = max(snoise(p.xy), 0.0);
+	if (height <= 0.0)
+		return false;
+	volume = height;
+
+	float upperHeight = height - 0.5;
+	upperHeight *= 800;
+
+	float lowerHeight = height + 0.5;
+	lowerHeight *= -800;
+
+	lowerHeight += dynamicSky.cloudHeight + 1600;
+	upperHeight += dynamicSky.cloudHeight + 1600;
+	return abs(lowerHeight - p.z) < 100 || abs(upperHeight - p.z) < 100;
+}*/
 
 void main() {
 	vec3 V = normalize(pass_normal);
@@ -193,8 +244,65 @@ void main() {
 			color =/* mix(color,*/ mix(color, vec3(100.0), smoothstep(0.9992, 0.9993, vl))/*, factorSun)*/;
 	}
 
+	/*vec3 rayTrace = cameraPosition;
+	float rayDist, incr = 1.0;
+	vec3 rays;
+	vec3 randSample, finalTrace;
+	bool hit = false;
+	do {
+		rayTrace += V * incr;
+		incr *= 1.025;
+
+		rayDist = length(rayTrace - cameraPosition);
+		//if (rayTrace.z > dynamicSky.cloudHeight + 3200)
+			//break;
+		//if (rayTrace.z < dynamicSky.cloudHeight)
+			//break;
+
+		float noiseMult = 0.00015;
+
+		vec3 randSample = vec3(random(rayTrace.x + dynamicSky.time * frame),
+		random(rayTrace.y * dynamicSky.time + frame), random(rayTrace.z * dynamicSky.time * frame));
+		randSample -= 0.5;
+		randSample *= 0.5;
+		//randSample *= 0.0;
+
+		float fade = smoothstep(dynamicSky.cloudHeight, dynamicSky.cloudHeight + 200, rayTrace.z);
+		float volume;
+		bool hitCloud = rayHitCloud(vec3((rayTrace.xy + randSample.xy * rayDist * 0.125) * noiseMult, rayTrace.z + randSample.z * rayDist * 0.125), volume);
+
+		if(hitCloud) {
+			float shadow = 1.0;
+			{
+				float shadowIncr = 20.0;
+				vec3 shadowTrace = rayTrace;
+				int i = 0;
+				do {
+					shadowTrace += L * shadowIncr;
+					shadowIncr *= 1.05;
+					if (shadowTrace.z < dynamicSky.cloudHeight)
+						break;
+					if (shadowTrace.z > dynamicSky.cloudHeight + 3200)
+						break;
+					float shadowVol;
+					bool hitCloud = rayHitCloud(vec3((shadowTrace.xy + randSample.xy * rayDist * 0.125) * noiseMult, shadowTrace.z + randSample.z), shadowVol);
+					if(hitCloud) {
+						shadow -= 0.15;
+						//shadow = 0.0;
+					}
+					i++;
+				} while(i < 40);
+			}
+			rays = vec3(1.0) * max(shadow, 0.0) * smoothstep(-0.05, 0.2, dot(vec3(0,0,1), L));
+			hit = true;
+			break;
+		}
+	} while (rayDist < 20000);
+	if(hit)
+		color = rays;*/
+
 	vec3 rd = V;
-	vec3 ro = cameraPosition + rd;
+	vec3 ro = cameraPosition;
 
 	float d = RayMarch(ro, rd);
 	if(d > 0) {
