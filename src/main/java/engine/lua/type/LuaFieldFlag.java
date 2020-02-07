@@ -14,6 +14,10 @@ public class LuaFieldFlag {
 	/**
 	 * Flag that represents a field that are common among ALL datamodels.
 	 */
-	public static final int BASE_FIELD = 0x00000004;
-	public static final int VSHRINK					= 0x00000008;
+	public static final int CORE_FIELD = 0x00000004;
+	
+	/**
+	 * Flag that makes a field hidden from properties window.
+	 */
+	public static final int FIELD_HIDDEN = 0x00000008;
 }

@@ -72,7 +72,7 @@ public class SceneInternal extends Instance {
 			LuaField[] fields = potentialService.getFields();
 			for (int j = 0; j < fields.length; j++) {
 				LuaField field = fields[j];
-				if ( field.hasFlag(LuaFieldFlag.BASE_FIELD) )
+				if ( field.hasFlag(LuaFieldFlag.CORE_FIELD) )
 					continue;
 				
 				System.out.println("SETTING " + field.getName() + " to " + potentialService.get(field.getName()));

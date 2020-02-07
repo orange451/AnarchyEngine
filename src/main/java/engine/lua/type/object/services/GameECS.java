@@ -225,7 +225,7 @@ public class GameECS extends Instance {
 			LuaField[] fields = service.getFields();
 			for (int j = 0; j < fields.length; j++) {
 				LuaField field = fields[j];
-				if ( field.hasFlag(LuaFieldFlag.BASE_FIELD) )
+				if ( field.hasFlag(LuaFieldFlag.CORE_FIELD) )
 					continue;
 				
 				System.out.println("SETTING " + field.getName() + " to " + service.get(field.getName()));

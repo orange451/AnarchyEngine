@@ -31,6 +31,7 @@ import engine.lua.LuaEngine;
 import engine.lua.lib.LuaTableReadOnly;
 import engine.lua.type.Clamp;
 import engine.lua.type.LuaField;
+import engine.lua.type.LuaFieldFlag;
 import engine.lua.type.LuaValuetype;
 import engine.lua.type.NumberClamp;
 import engine.lua.type.NumberClampPreferred;
@@ -808,11 +809,18 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 		}
 		
 		private void fill() {
+			
+			int iii = 0;
+			
 			// Fill grid
 			LuaValue[] fields = inst.getFieldNamesOrdered();
 			for (int i = 0; i < fields.length; i++) {
 				LuaValue field = fields[i];
 				LuaValue value = inst.get(field);
+				
+				LuaField lField = inst.getField(field);
+				if ( lField == null || lField.hasFlag(LuaFieldFlag.FIELD_HIDDEN) )
+					continue;
 				
 				String fieldName = field.toString();
 				
@@ -843,9 +851,11 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 					fieldLabel.setTextFill(Color.GRAY);
 				
 				// Add them to grid
-				getInternal().add(t1, 0, i);
-				getInternal().add(t2, 1, i);
+				getInternal().add(t1, 0, iii);
+				getInternal().add(t2, 1, iii);
 				props.put(field, t2);
+				
+				iii++;
 			}
 			
 			this.updateChildren();
