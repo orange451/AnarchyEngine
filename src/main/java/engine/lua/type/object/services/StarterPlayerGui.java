@@ -45,6 +45,18 @@ public class StarterPlayerGui extends Instance implements TreeViewable {
 			}
 		});
 		
+		this.changedEvent().connect((args)->{
+			if ( args[0].eq_b(C_PARENT) ) {
+				if ( !isEnabled() )
+					for (Pane gui : guis )
+						gui.setVisible(false);
+				else
+					if ( !Game.isRunning() )
+						for (Pane gui : guis )
+							gui.setVisible(true);
+			}
+		});
+		
 		this.childAddedEvent().connect((args)->{
 			LuaValue arg = args[0];
 			if ( arg instanceof Gui ) {
@@ -53,6 +65,8 @@ public class StarterPlayerGui extends Instance implements TreeViewable {
 				guis.add(gui);
 				
 				if ( Game.isRunning() )
+					gui.setVisible(false);
+				if ( !isEnabled() )
 					gui.setVisible(false);
 			}
 		});
@@ -67,16 +81,19 @@ public class StarterPlayerGui extends Instance implements TreeViewable {
 		});
 		
 		Game.startEvent().connect((args)->{
-			for (Pane gui : guis ) {
+			for (Pane gui : guis )
 				gui.setVisible(false);
-			}
 		});
 		
 		Game.stoppingEvent().connect((args)->{
-			for (Pane gui : guis ) {
-				gui.setVisible(true);
-			}
+			for (Pane gui : guis )
+				if ( isEnabled() )
+					gui.setVisible(true);
 		});
+	}
+	
+	private boolean isEnabled() {
+		return this.isDescendantOf(Game.game());
 	}
 
 	@Override
