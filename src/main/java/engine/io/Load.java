@@ -133,11 +133,7 @@ public class Load {
 			parseJSONInto((JSONObject)obj.get("ProjectData"), Game.project());
 			
 			// Force load starting scene...
-			Game.game().rawset(LuaValue.valueOf("CurrentScene"), LuaValue.NIL);
 			Game.game().loadScene(Game.project().scenes().getStartingScene());
-			
-			SceneInternal internal = Game.getGame().getUnsavedScene(Game.project().scenes().getStartingScene());
-			System.out.println(internal + " / " + Arrays.toString(internal.getChildren().toArray()));
 		} else {
 			System.out.println("USING OLD LOAD SYSTEM");
 			if ( parseJSON(obj) == null )

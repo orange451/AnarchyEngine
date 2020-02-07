@@ -33,6 +33,7 @@ import org.lwjgl.util.nfd.NativeFileDialog;
 
 import engine.FilePath;
 import engine.Game;
+import engine.InternalGameThread;
 import engine.InternalRenderThread;
 import engine.gl.mesh.BufferedMesh;
 import engine.lua.network.internal.NonReplicatable;
@@ -565,6 +566,7 @@ public class Save {
 			t.mkdirs();
 		
 		List<SceneInternal> unsavedScenes = Game.getUnsavedScenes();
+		SceneInternal currentScene = null;
 		for (int i = 0; i < unsavedScenes.size(); i++) {
 			SceneInternal internalScene = unsavedScenes.get(i);
 			Scene linkedScene = unsavedScenes.get(i).getScene();
@@ -572,8 +574,10 @@ public class Save {
 				continue;
 			
 			// Write what's currently in game to the scene
-			if ( linkedScene == Game.project().scenes().getCurrentScene() )
+			if ( linkedScene == Game.project().scenes().getCurrentScene() ) {
+				currentScene = internalScene;
 				internalScene.storeGame();
+			}
 			
 			// Write this scene to file
 			String sPath = scenePath + linkedScene.getUUID().toString();
@@ -584,12 +588,17 @@ public class Save {
 			// Remove this unsaved scene if it's no longer loaded
 			if ( linkedScene.equals(Game.project().scenes().getCurrentScene()) )
 				unsavedScenes.remove(i--);
-			else {
-				Game.project().scenes().rawset("CurrentScene", LuaValue.NIL);
-				Game.game().extractScene(internalScene);
-			}
 		}
 		unsavedScenes.clear();
+		
+		if ( currentScene != null ) {
+			final SceneInternal temp1 = currentScene;
+			InternalGameThread.runLater(()->{
+				//Game.project().scenes().rawset("CurrentScene", linkedScene);
+				//Game.game().extractScene(internalScene);
+				Game.game().loadScene(temp1.getScene());
+			});
+		}
 	}
 
 	@SuppressWarnings("unchecked")
