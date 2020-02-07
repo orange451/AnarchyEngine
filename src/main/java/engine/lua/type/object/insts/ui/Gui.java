@@ -38,7 +38,7 @@ public class Gui extends GuiBase {
 		
 		this.gui = this;
 
-		this.getField(LuaValue.valueOf("Size")).setLocked(true);
+		this.getField(C_SIZE).setLocked(true);
 		
 		this.root = (Pane) getUINode();
 		uiMap.put(this, this.root);
@@ -145,8 +145,10 @@ public class Gui extends GuiBase {
 
 	@Override
 	protected boolean onValueGet(LuaValue key) {
-		this.rawset(C_SIZE, new Vector2((float)root.getWidth(), (float)root.getHeight()));
-		this.notifyPropertySubscribers(C_SIZE, this.rawget(C_SIZE));
+		if ( root != null ) {
+			this.rawset(C_SIZE, new Vector2((float)root.getWidth(), (float)root.getHeight()));
+			//this.notifyPropertySubscribers(C_SIZE, this.rawget(C_SIZE));
+		}
 		
 		return true;
 	}
