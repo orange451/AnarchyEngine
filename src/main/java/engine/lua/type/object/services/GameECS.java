@@ -50,6 +50,21 @@ public class GameECS extends Instance {
 		this.defineField("IsServer", LuaValue.valueOf(false), true);
 		
 		// GetService convenience method
+		getmetatable().set("LoadScene", new TwoArgFunction() {
+			@Override
+			public LuaValue call(LuaValue myself, LuaValue scene) {
+				if ( scene.isnil() )
+					return LuaValue.NIL;
+				
+				if ( !(scene instanceof Scene) )
+					return LuaValue.NIL;
+				
+				loadScene((Scene)scene);
+				return LuaValue.NIL;
+			}
+		});
+		
+		// GetService convenience method
 		getmetatable().set("GetService", new TwoArgFunction() {
 			@Override
 			public LuaValue call(LuaValue arg, LuaValue arg2) {
@@ -184,6 +199,9 @@ public class GameECS extends Instance {
 		
 		// Make sure we have all the services...
 		Game.services();
+		
+		// Fire load event
+		Game.loadEvent().fire();
 	}
 	
 	public void extractScene(SceneInternal internal) {
