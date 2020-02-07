@@ -371,6 +371,8 @@ public class Load {
 			Entry<String, PropertyValue<?>> set = entrySet.next();
 			String key = set.getKey();
 			PropertyValue<?> val = set.getValue();
+			if ( val == null )
+				continue;
 			
 			// Dont load SID's if game is paused or if non existant
 			if ( key.equals("SID") ) {
