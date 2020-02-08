@@ -71,6 +71,7 @@ public class MeshUtils {
 		}
 		if (sweepAngle == 360.0) {
 		} else {
+			//
 		}
 
 		/* Compute length (needed for normal calculations) */
@@ -117,6 +118,7 @@ public class MeshUtils {
 			ret.setVertex(pointer++, triangle.getVertex(1));
 			ret.setVertex(pointer++, triangle.getVertex(2));
 		}
+		ret.computeTangents();
 		return ret;
 	}
 
@@ -174,6 +176,7 @@ public class MeshUtils {
 				ret.setVertex(pointer++, triangle.getVertex(0));
 			}
 		}
+		ret.computeTangents();
 		return ret;
 	}
 
@@ -279,7 +282,7 @@ public class MeshUtils {
 			// Return final mesh
 			return BufferedMesh.combineMeshes( mesh, bottom, top );
 		}
-		
+		mesh.computeTangents();
 		return mesh;
 	}
 	
@@ -307,7 +310,7 @@ public class MeshUtils {
 			temp.setVertex(a++, t3);
 		}
 		temp.clip();
-		
+		temp.computeTangents();
 		return temp;
 	}
 
@@ -409,6 +412,8 @@ public class MeshUtils {
 			mesh.setVertex( pointer++, tris[1].getVertex(1) );
 			mesh.setVertex( pointer++, tris[1].getVertex(2) );
 		}
+		
+		mesh.computeTangents();
 		return mesh;
 	}
 
@@ -420,6 +425,7 @@ public class MeshUtils {
 		mesh.setVertex(3, new Vertex( x2, y2, 0, 0, 0, 1,  tx2, ty2 ));
 		mesh.setVertex(4, new Vertex( x1, y2, 0, 0, 0, 1,  tx1, ty2 ));
 		mesh.setVertex(5, new Vertex( x1, y1, 0, 0, 0, 1,  tx1, ty1 ));
+		mesh.computeTangents();
 		return mesh;
 	}
 
@@ -443,6 +449,7 @@ public class MeshUtils {
 		OFFSET.z = offsetOriginal;
 
 		BufferedMesh ret = BufferedMesh.combineMeshes( mesh1, mesh2, mesh3 );
+		ret.computeTangents();
 		return ret;
 	}
 
@@ -454,6 +461,7 @@ public class MeshUtils {
 		mesh.setVertex(3, new Vertex( x2, y2, z2, 0, 0, 1,  hrep, vrep ));
 		mesh.setVertex(4, new Vertex( x1, y2, z2, 0, 0, 1,  0,    vrep ));
 		mesh.setVertex(5, new Vertex( x1, y1, z1, 0, 0, 1,  0,    0 ));
+		mesh.computeTangents();
 		return mesh;
 	}
 
@@ -520,7 +528,8 @@ public class MeshUtils {
 		model.setVertex(33, new Vertex( v7.x, v7.y, v7.z, 0, 1, 0, repx, 0 ) );
 		model.setVertex(34, new Vertex( v8.x, v8.y, v8.z, 0, 1, 0, 0, 0 ) );
 		model.setVertex(35, new Vertex( v4.x, v4.y, v4.z, 0, 1, 0, 0, repy ) );
-
+		
+		model.computeTangents();
 		return model;
 	}
 
@@ -637,6 +646,7 @@ public class MeshUtils {
 			}
 		}
 		Assimp.aiReleaseImport(scene);
+		bm.computeTangents();
 		return bm;
 	}
 }

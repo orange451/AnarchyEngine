@@ -122,8 +122,6 @@ public class TeapotData {
 				mesh.setVertex(pointer++, triangle.getVertex(1).add(center));
 				mesh.setVertex(pointer++, triangle.getVertex(2).add(center));
 			}
-			
-			System.out.println(center);
 		}
 		
 		// Return a copy of the teapot mesh.
@@ -133,6 +131,8 @@ public class TeapotData {
 			vertex.setXYZ( vertex.getXYZ()[0] * radius, vertex.getXYZ()[1] * radius, vertex.getXYZ()[2] * radius);
 			ret.setVertex(i, vertex);
 		}
+		
+		ret.computeTangents();
 		return ret;
 	}
 }

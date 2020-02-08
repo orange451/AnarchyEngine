@@ -567,7 +567,7 @@ public class BufferedMesh implements RenderableMesh {
 		return ret;
 	}
 
-	private void computeTangents() {
+	public void computeTangents() {
 		for (int i = 0; i < vertices.length; i+=3) {
 			Vertex v1 = vertices[i+0];
 			Vertex v2 = vertices[i+1];
