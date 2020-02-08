@@ -140,13 +140,13 @@ public class Load {
 				return;
 		}
 		
-		loadExternalStuff(path);
+		loadExternalObjects(path);
 		
 		// Tell game we're loaded
 		Game.load();
 	}
 	
-	private static void loadExternalStuff(String path) {
+	public static void loadExternalObjects(String path) {
 		// Load external stuff
 		File scripts = new File(new File(path).getParent() + File.separator + "Resources" + File.separator + "Scripts");
 		if ( scripts.exists() ) {
@@ -210,7 +210,7 @@ public class Load {
 			JSONObject externalJSON = (JSONObject) parser.parse(new FileReader(t2));
 			SceneInternal internal = new SceneInternal(scene);
 			parseJSONInto(externalJSON, internal);
-			loadExternalStuff(Game.saveDirectory);
+			loadExternalObjects(Game.saveFile);
 			return internal;
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -340,7 +340,6 @@ public class Load {
 
 			if ( parent != -1 && inst.loaded ) {
 				Instance p = getInstanceFromReference(instancesMap, parent);
-				System.out.println("READING OBJECT " + inst.instance + " / " + inst.uuid + " / " + inst.Reference + " / " + inst.Parent + " / " + inst.loaded + "    ::    " + p);
 				if ( !inst.instance.equals(p) ) {
 					inst.instance.forceSetParent(p);
 				}

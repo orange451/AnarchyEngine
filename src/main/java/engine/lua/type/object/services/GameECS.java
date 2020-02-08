@@ -221,11 +221,9 @@ public class GameECS extends Instance {
 			
 			// Move children into service
 			List<Instance> servChild = service.getChildrenSafe();
-			System.out.println("LOOKING AT: " + service + " " + Arrays.toString(servChild.toArray()));
 			for (int j = 0; j < servChild.size(); j++) {
 				Instance child = servChild.get(j);
 				child.forceSetParent(toService);
-				System.out.println("Restoring " + child + " " + child.getUUID() + " to " + toService.getFullName());
 			}
 			
 			// Copy fields over
@@ -235,9 +233,11 @@ public class GameECS extends Instance {
 				if ( field.hasFlag(LuaFieldFlag.CORE_FIELD) )
 					continue;
 				
-				System.out.println("SETTING " + field.getName() + " to " + service.get(field.getName()));
 				toService.rawset(field.getName(), service.get(field.getName()));
 			}
 		}
+		
+		// Make sure external scripts are added
+		Load.loadExternalObjects(Game.saveFile);
 	}
 }

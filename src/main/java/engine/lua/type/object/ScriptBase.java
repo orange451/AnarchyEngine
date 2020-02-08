@@ -147,6 +147,10 @@ public abstract class ScriptBase extends Instance implements GameSubscriber {
 			return;
 		}
 		
+		// Script must be inside either game or project. (So scripts dont run in internally stored scenes)
+		if ( !this.isDescendantOf(Game.game()) && !this.isDescendantOf(Game.project()) )
+			return;
+		
 		// Don't continue if we don't have a script object backing us.
 		if ( scriptInstance != null )
 			return;
