@@ -105,9 +105,9 @@ public class Players extends Service implements TreeViewable {
 	public List<Player> getPlayers() {
 		List<Instance> players = this.getChildrenOfClass(C_PLAYER);
 		List<Player> ret = new ArrayList<Player>();
-		for (int i = 0; i < players.size(); i++) {
+		for (int i = 0; i < players.size(); i++)
 			ret.add((Player) players.get(i));
-		}
+		
 		return ret;
 	}
 

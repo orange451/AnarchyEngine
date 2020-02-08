@@ -27,6 +27,7 @@ import engine.lua.type.LuaField;
 import engine.lua.type.LuaFieldFlag;
 import engine.lua.type.object.Instance;
 import engine.lua.type.object.Service;
+import engine.lua.type.object.insts.Player;
 import engine.lua.type.object.insts.Scene;
 import engine.lua.type.object.insts.SceneInternal;
 
@@ -202,6 +203,12 @@ public class GameECS extends Instance {
 		
 		// Fire load event
 		Game.loadEvent().fire();
+		
+		// Copy in new starter player stuff to existing players...
+		List<Player> players = Game.players().getPlayers();
+		for (int i = 0; i < players.size(); i++) {
+			Game.starterPlayer().startPlayer(players.get(i));
+		}
 	}
 	
 	public void extractScene(SceneInternal internal) {

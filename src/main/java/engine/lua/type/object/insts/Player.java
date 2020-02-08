@@ -94,22 +94,6 @@ public class Player extends Instance implements TreeViewable {
 			this.rawset("Connection", localConnection);
 		}
 		
-		// Copy starter player scripts in to player
-		Instance starterScripts = Game.starterPlayer().starterPlayerScripts();
-		List<Instance> cc = starterScripts.getChildren();
-		for (int j = 0; j < cc.size(); j++) {
-			Instance obj = cc.get(j);
-			Instance clo = obj.clone();
-			clo.forceSetParent(this.playerScripts());
-		}
-		
-		// Copy starter player gui in to player
-		Instance starterGui = Game.starterPlayer().starterPlayerGui();
-		List<Instance> cg = starterGui.getChildren();
-		for (int j = 0; j < cg.size(); j++) {
-			Instance obj = cg.get(j);
-			Instance clo = obj.clone();
-			clo.forceSetParent(this.playerGui());
-		}
+		Game.starterPlayer().startPlayer(this);
 	}
 }

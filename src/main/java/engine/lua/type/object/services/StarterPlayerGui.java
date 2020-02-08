@@ -45,6 +45,7 @@ public class StarterPlayerGui extends Instance implements TreeViewable {
 			}
 		});
 		
+		// This is used to make guis invisible IN IDE when they are packed into a scene.
 		this.changedEvent().connect((args)->{
 			if ( args[0].eq_b(C_PARENT) ) {
 				if ( !isEnabled() )
@@ -57,6 +58,7 @@ public class StarterPlayerGui extends Instance implements TreeViewable {
 			}
 		});
 		
+		// Handle displaying guis when they're added to me
 		this.childAddedEvent().connect((args)->{
 			LuaValue arg = args[0];
 			
@@ -72,6 +74,7 @@ public class StarterPlayerGui extends Instance implements TreeViewable {
 			}
 		});
 		
+		// Handle removing guis when they're removed from me.
 		this.childRemovedEvent().connect((args)->{
 			LuaValue arg = args[0];
 			if ( arg instanceof Gui ) {
@@ -81,11 +84,13 @@ public class StarterPlayerGui extends Instance implements TreeViewable {
 			}
 		});
 		
+		// Make guis invisible when game starts
 		Game.startEvent().connect((args)->{
 			for (Pane gui : guis )
 				gui.setVisible(false);
 		});
 		
+		// Make guis visible when game ends
 		Game.stoppingEvent().connect((args)->{
 			for (Pane gui : guis )
 				if ( isEnabled() )
