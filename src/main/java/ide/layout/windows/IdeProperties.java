@@ -404,9 +404,16 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 			this.getChildren().add(picker);
 			
 			if ( editable ) {
-				this.picker.setOnAction(event -> {
+				// Update color (FOR REAL) when apply is clicked.
+				this.picker.setOnColorApply(event -> {
 					LuaValue output = supportsAlpha?new Color4(this.picker.getColor()):new Color3(this.picker.getColor());
 					setWithHistory(this.instance, LuaValue.valueOf(field), output);
+				});
+				
+				// Update color while its still being modified.
+				this.picker.setOnColorUpdate(event -> {
+					LuaValue output = supportsAlpha?new Color4(this.picker.getColor()):new Color3(this.picker.getColor());
+					this.instance.rawset(LuaValue.valueOf(field), output);
 				});
 			}
 		}

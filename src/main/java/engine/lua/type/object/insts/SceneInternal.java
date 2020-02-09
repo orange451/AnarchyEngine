@@ -65,7 +65,7 @@ public class SceneInternal extends Instance {
 			for (int j = 0; j < c.size(); j++) {
 				Instance temp = c.get(j);
 				temp.forceSetParent(newService);
-				System.out.println("Parenting " + temp + " " + temp.getUUID() + " to " + newService.getFullName());
+				//System.out.println("Parenting " + temp + " " + temp.getUUID() + " to " + newService.getFullName());
 			}
 			
 			// Copy service fields over
@@ -75,7 +75,7 @@ public class SceneInternal extends Instance {
 				if ( field.hasFlag(LuaFieldFlag.CORE_FIELD) )
 					continue;
 				
-				System.out.println("SETTING " + field.getName() + " to " + potentialService.get(field.getName()));
+				//System.out.println("SETTING " + field.getName() + " to " + potentialService.get(field.getName()));
 				newService.rawset(field.getName(), potentialService.get(field.getName()));
 				
 				// UNSET ORIGINAL FIELD
