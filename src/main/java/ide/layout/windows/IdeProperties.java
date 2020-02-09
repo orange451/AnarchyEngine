@@ -12,6 +12,7 @@ package ide.layout.windows;
 
 import java.io.File;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -747,6 +748,7 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 		private Instance inst;
 		
 		private HashMap<LuaValue,PropertyModifier> props = new HashMap<LuaValue,PropertyModifier>();
+		private List<LuaValue> propsInternal = new ArrayList<>();
 		
 		public PropertyGrid() {
 			// Create main underneath pane
@@ -818,12 +820,14 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 		private void fill() {
 			
 			int iii = 0;
+			System.out.println("ATTEMPTING TO FILL");
 			
 			// Fill grid
 			LuaValue[] fields = inst.getFieldNamesOrdered();
 			for (int i = 0; i < fields.length; i++) {
 				LuaValue field = fields[i];
 				LuaValue value = inst.get(field);
+				propsInternal.add(field);
 				
 				LuaField lField = inst.getField(field);
 				if ( lField == null || lField.hasFlag(LuaFieldFlag.FIELD_HIDDEN) )
@@ -882,7 +886,7 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 			if ( inst != null && !instance.equals(inst))
 				return;
 			
-			if ( instance.getFieldNames().length != props.size() ) {
+			if ( instance.getFieldNames().length != propsInternal.size() ) {
 				this.inst = null;
 				setInstance(instance);
 				return;
@@ -902,6 +906,7 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 
 		public void clear() {
 			props.clear();
+			propsInternal.clear();
 			this.inst = null;
 			internal.clear();
 			l.setText("");
