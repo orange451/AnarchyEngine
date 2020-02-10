@@ -229,7 +229,7 @@ public class Save {
 
 		// Start saving process
 		REFID = 0;		
-		JSONObject projectJSONInternal = getProjectJSON();
+		JSONObject projectJSONInternal = getProjectJSON(true);
 		JSONObject gameJSON = getInstanceJSONRecursive( false, true, Game.game());
 		JSONObject saveJSON = new JSONObject();
 		saveJSON.put("Version", 1.0f);
@@ -264,11 +264,11 @@ public class Save {
 
 	/**
 	 * Returns the PROJECT represented as a JSON Object. The project is a little different than the game JSON.
-	 * Project JSON contains JSON as it will save to your computer. Game JSON is used for streaming what's currently loaded in Game.
+	 * The project is global, whereas the game is temporary.
 	 * @return
 	 */
-	public static JSONObject getProjectJSON() {
-		return getInstanceJSONRecursive( false, true, Game.project());
+	public static JSONObject getProjectJSON( boolean savingToFile ) {
+		return getInstanceJSONRecursive( false, savingToFile, Game.project());
 	}
 
 	/**

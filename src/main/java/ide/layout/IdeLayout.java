@@ -233,7 +233,7 @@ public class IdeLayout {
 		// Test inside IDE (buggy)
 		MenuItem internalTest = new MenuItem("Test Internal (buggy)", Icons.icon_play.getView());
 		internalTest.setOnAction( event -> {
-			JSONObject projectJson = Save.getProjectJSON();
+			JSONObject projectJson = Save.getProjectJSON(false);
 			JSONObject gameJson = Save.getGameJSON(false);
 			Game.internalTesting = true;
 			Game.setRunning(true);
