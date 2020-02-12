@@ -38,9 +38,9 @@ public class LoadTextureTask extends Task<Texture> {
 	private int textureWarp;
 	private int format;
 	private boolean textureMipMapAF, flipY, hdr;
+	private RawTexture rawTexture;
 
-	public LoadTextureTask(String file, int filter, int textureWarp, int format, boolean textureMipMapAF,
-			boolean flipY) {
+	public LoadTextureTask(String file, int filter, int textureWarp, int format, boolean textureMipMapAF, boolean flipY) {
 		this.file = file;
 		this.filter = filter;
 		this.textureWarp = textureWarp;
@@ -48,15 +48,26 @@ public class LoadTextureTask extends Task<Texture> {
 		this.textureMipMapAF = textureMipMapAF;
 		this.flipY = flipY;
 	}
+	
+	public LoadTextureTask(RawTexture rawTexture, int filter, int textureWarp, int format, boolean textureMipMapAF, boolean flipY) {
+		this("", filter, textureWarp, format, textureMipMapAF, flipY);
+		this.rawTexture = rawTexture;
+	}
 
 	@Override
 	protected Texture call() {
-		System.out.println("Loading: " + file);
-		RawTexture data = decodeTextureFile(file, flipY);
+		if ( rawTexture == null ) {
+			System.out.println("Loading: " + file);
+			rawTexture = decodeTextureFile(file, flipY);
+		} else {
+			System.out.println("Loading: " + rawTexture);
+		}
+		
 		int id = ResourcesManager.backend.loadTexture(filter, textureWarp, format, hdr ? GL_FLOAT : GL_UNSIGNED_BYTE,
-				textureMipMapAF, data);
-		data.dispose();
-		return new Texture(id, GL_TEXTURE_2D, data.getWidth(), data.getHeight());
+				textureMipMapAF, rawTexture);
+		
+		rawTexture.dispose();
+		return new Texture(id, GL_TEXTURE_2D, rawTexture.getWidth(), rawTexture.getHeight());
 	}
 
 	private RawTexture decodeTextureFile(String file, boolean flipY) {

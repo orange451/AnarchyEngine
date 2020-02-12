@@ -18,10 +18,12 @@ import org.lwjgl.assimp.AIPropertyStore;
 
 import engine.gl.mesh.BufferedMesh;
 import engine.gl.objects.MaterialGL;
+import engine.gl.objects.RawTexture;
 import engine.gl.objects.Texture;
 import engine.resources.ResourcesManager;
 import engine.tasks.TaskManager;
 import engine.util.MeshUtils;
+import lwjgui.paint.Color;
 
 public class Resources {
 	public static BufferedMesh MESH_SPHERE;
@@ -36,12 +38,14 @@ public class Resources {
 	public static Texture diffuse, diffuseMisc, normal, roughness, metallic;
 
 	public static void init() {
-		ResourcesManager.loadTexture("assets/textures/def/d.png", (value) -> diffuse = value.setDisposable(false));
-		ResourcesManager.loadTextureMisc("assets/textures/def/d.png", (value) -> diffuseMisc = value.setDisposable(false));
-		ResourcesManager.loadTextureMisc("assets/textures/def/d_n.png", (value) -> normal = value.setDisposable(false));
-		ResourcesManager.loadTextureMisc("assets/textures/def/d_r.png", (value) -> roughness = value.setDisposable(false));
-		ResourcesManager.loadTextureMisc("assets/textures/def/d_m.png", (value) -> metallic = value.setDisposable(false));
+		ResourcesManager.loadTexture(RawTexture.fromColor(Color.WHITE, 1, 1), (value) -> diffuse = value.setDisposable(false));
+		ResourcesManager.loadTextureMisc(RawTexture.fromColor(Color.WHITE, 1, 1), (value) -> diffuseMisc = value.setDisposable(false));
+		ResourcesManager.loadTextureMisc(RawTexture.fromColor(new Color(127, 127, 255), 1, 1), (value) -> normal = value.setDisposable(false));
+		ResourcesManager.loadTextureMisc(RawTexture.fromColor(Color.WHITE, 1, 1), (value) -> roughness = value.setDisposable(false));
+		ResourcesManager.loadTextureMisc(RawTexture.fromColor(Color.WHITE, 1, 1), (value) -> metallic = value.setDisposable(false));
 		TaskManager.addTaskRenderBackgroundThread(() -> {
+			System.out.println("GENERATING BLANK MATERIAL");
+			System.out.println(diffuse + " / " + normal + " / " + roughness + " / " + metallic);
 			MATERIAL_BLANK = new MaterialGL().setDiffuseTexture(diffuse).setNormalTexture(normal)
 					.setRoughnessTexture(roughness).setMetalnessTexture(metallic);
 		});

@@ -34,6 +34,7 @@ import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.ObjectMap.Entry;
 
 import engine.gl.GLResourcesManagerBackend;
+import engine.gl.objects.RawTexture;
 import engine.gl.objects.Texture;
 import engine.tasks.OnFinished;
 import engine.tasks.Task;
@@ -64,6 +65,17 @@ public final class ResourcesManager {
 				new LoadTextureTask(fileName, filter, GL_REPEAT, GL_RGBA, textureMipMapAF, flipY).setOnFinished(dst));
 	}
 
+	public static Task<Texture> loadTextureMisc(RawTexture rawTexture, OnFinished<Texture> dst) {
+		return loadTextureMisc(rawTexture, GL_LINEAR, true, false, dst);
+	}
+	
+	public static Task<Texture> loadTextureMisc(RawTexture rawTexture, int filter, boolean textureMipMapAF, boolean flipY,
+			OnFinished<Texture> dst) {
+		System.out.println("Texture scheduled to load: " + rawTexture);
+		return TaskManager.submitRenderBackgroundThread(
+				new LoadTextureTask(rawTexture, filter, GL_REPEAT, GL_RGBA, textureMipMapAF, flipY).setOnFinished(dst));
+	}
+
 	public static Task<Texture> loadTexture(String fileName, OnFinished<Texture> dst) {
 		return loadTexture(fileName, GL_LINEAR, true, false, dst);
 	}
@@ -77,6 +89,18 @@ public final class ResourcesManager {
 		System.out.println("Texture scheduled to load: " + fileName);
 		return TaskManager.submitRenderBackgroundThread(
 				new LoadTextureTask(fileName, filter, GL_REPEAT, GL_SRGB_ALPHA, textureMipMapAF, flipY)
+						.setOnFinished(dst));
+	}
+
+	public static Task<Texture> loadTexture(RawTexture rawTexture, OnFinished<Texture> dst) {
+		return loadTexture(rawTexture, GL_LINEAR, true, false, dst);
+	}
+
+	public static Task<Texture> loadTexture(RawTexture rawTexture, int filter, boolean textureMipMapAF, boolean flipY,
+			OnFinished<Texture> dst) {
+		System.out.println("Texture scheduled to load: " + rawTexture);
+		return TaskManager.submitRenderBackgroundThread(
+				new LoadTextureTask(rawTexture, filter, GL_REPEAT, GL_SRGB_ALPHA, textureMipMapAF, flipY)
 						.setOnFinished(dst));
 	}
 

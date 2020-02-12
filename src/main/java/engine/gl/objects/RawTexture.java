@@ -11,8 +11,11 @@
 package engine.gl.objects;
 
 import static org.lwjgl.stb.STBImage.stbi_image_free;
+import static org.lwjgl.system.MemoryUtil.memAlloc;
 
 import java.nio.ByteBuffer;
+
+import lwjgui.paint.Color;
 
 public class RawTexture {
 	private int width;
@@ -45,5 +48,28 @@ public class RawTexture {
 
 	public ByteBuffer getBuffer() {
 		return buffer;
+	}
+	
+	/**
+	 * Generate a Raw Texture from a LWJGUI Color. Will always be a 4 component image (RGBA).
+	 * @param color
+	 * @param width
+	 * @param height
+	 * @return
+	 */
+	public static RawTexture fromColor(Color color, int width, int height) {
+		int comp = 4; // R G B A
+		ByteBuffer buffer = memAlloc(width * height * comp);
+		for (int i = 0; i < width; i++) {
+			for (int j = 0; j < height; j++) {
+				buffer.put((byte)(color.getRed() & 0xff));
+				buffer.put((byte)(color.getGreen() & 0xff));
+				buffer.put((byte)(color.getBlue() & 0xff));
+				buffer.put((byte)(color.getAlpha() & 0xff));
+			}
+		}
+		
+		buffer.flip();
+		return new RawTexture(buffer, width, height, comp);
 	}
 }
