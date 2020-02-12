@@ -26,6 +26,7 @@ import engine.lua.type.object.insts.Material;
 import engine.lua.type.object.insts.Mesh;
 import engine.lua.type.object.insts.Prefab;
 import engine.lua.type.object.insts.Texture;
+import engine.lua.type.object.services.ProjectECS;
 import engine.lua.type.object.services.Workspace;
 import engine.observer.RenderableWorld;
 import ide.layout.IdePane;
@@ -62,11 +63,11 @@ public class IdeMaterialViewer extends IdePane {
 		});
 		
 		// Increase allowence
-		Game.runService().renderSteppedEvent().connect((args)->{
+		/*Game.runService().renderSteppedEvent().connect((args)->{
 			renderAllowence = renderAllowence+1;
 			if ( renderAllowence > 10 )
 				renderAllowence = 10;
-		});
+		});*/
 		
 		// Add user controls
 		StandardUserControls.bind(this);
@@ -85,6 +86,12 @@ public class IdeMaterialViewer extends IdePane {
 	}
 	
 	public void initialize() {
+		if ( Game.core() == null ) {
+			InternalRenderThread.runLater(()->{
+				initialize();
+			});
+			return;
+		}
 		
 		if ( materialBox != null ) {
 			materialBox.getItems().clear();

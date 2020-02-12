@@ -10,7 +10,6 @@
 
 package engine.lua.type.object.services;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -47,8 +46,8 @@ public class GameECS extends Instance {
 		this.rawset("SelectionChanged", new LuaEvent());
 		
 		// Fields
-		this.defineField("Running", LuaValue.valueOf(false), true);
-		this.defineField("IsServer", LuaValue.valueOf(false), true);
+		this.defineField(LuaValue.valueOf("Running"), LuaValue.valueOf(false), true);
+		this.defineField(LuaValue.valueOf("IsServer"), LuaValue.valueOf(false), true);
 		
 		// GetService convenience method
 		getmetatable().set("LoadScene", new TwoArgFunction() {

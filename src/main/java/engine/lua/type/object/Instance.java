@@ -468,7 +468,23 @@ public abstract class Instance extends DataModel {
 	public int getChildrenSize() {
 		return this.children.size();
 	}
+	
+	/**
+	 * Pauses the thread until the child is found.
+	 * @param child
+	 * @param time
+	 * @return
+	 */	
+	public Instance waitForChild(LuaValue child) {
+		return this.waitForChild(child, LuaValue.NIL);
+	}
 
+	/**
+	 * Pauses the thread until the child is found.
+	 * @param child
+	 * @param time
+	 * @return
+	 */
 	public Instance waitForChild(LuaValue child, LuaValue time) {
 		long start = System.currentTimeMillis();
 		int t = (int) (time.isnil()?5000:(time.checkdouble()*1000));

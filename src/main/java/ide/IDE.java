@@ -10,8 +10,6 @@
 
 package ide;
 
-import org.joml.Vector2f;
-
 import engine.ClientEngine;
 import engine.Game;
 import engine.InternalGameThread;
@@ -29,8 +27,6 @@ import lwjgui.scene.Group;
 import lwjgui.scene.Scene;
 import lwjgui.scene.Window;
 import lwjgui.scene.WindowManager;
-import lwjgui.theme.Theme;
-import lwjgui.theme.ThemeDark;
 
 public class IDE extends ClientEngine {
 	public static IdeLayout layout;
