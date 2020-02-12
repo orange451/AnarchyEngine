@@ -51,7 +51,7 @@ public class IDE extends ClientEngine {
 		Group background = new Group();
 		renderThread.getWindow().getScene().setRoot(background);
 
-		Theme.setTheme(new ThemeDark());
+		//Theme.setTheme(new ThemeDark());
 
 		// If someone wants to load a game directly
 		if (args != null && args.length > 0) {

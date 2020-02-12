@@ -26,6 +26,8 @@ import engine.Game;
 import engine.lua.LuaEngine;
 import engine.lua.lib.LuaUtil;
 import engine.lua.type.DataModel;
+import engine.lua.type.LuaField;
+import engine.lua.type.LuaFieldFlag;
 import engine.lua.type.LuaValuetype;
 
 public abstract class Instance extends DataModel {
@@ -355,12 +357,11 @@ public abstract class Instance extends DataModel {
 				if ( !this.containsField(key) )
 					continue;
 				
-				// Parent is special and gets set later
-				if ( key.eq_b(C_PARENT) )
+				LuaField field = this.getField(key);
+				if ( field == null )
 					continue;
 				
-				// SID is special. Do not save
-				if ( key.eq_b(C_SID) )
+				if ( field.hasFlag(LuaFieldFlag.CANT_COPY) )
 					continue;
 				
 				// Set

@@ -20,4 +20,9 @@ public class LuaFieldFlag {
 	 * Flag that makes a field hidden from properties window.
 	 */
 	public static final int FIELD_HIDDEN = 0x00000008;
+	
+	/**
+	 * Flag that makes a field non-copyable when its parent instance of copied.
+	 */
+	public static final int CANT_COPY = 0x00000010;
 }

@@ -14,7 +14,6 @@ import org.luaj.vm2.LuaValue;
 
 import engine.Game;
 import engine.lua.LuaEngine;
-import engine.lua.type.object.services.Assets;
 
 public abstract class Asset extends Instance {
 

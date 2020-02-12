@@ -831,7 +831,7 @@ public class Game implements Tickable {
 		
 		// Generate json for each root object
 		for (int i = 0; i < selected.size(); i++) {
-			JSONObject json = Save.getInstanceJSONRecursive(true, false, selected.get(i));
+			JSONObject json = Save.getInstanceJSONRecursive(false, false, selected.get(i));
 			temp.add(json);
 		}
 		
@@ -842,6 +842,8 @@ public class Game implements Tickable {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        
+        System.out.println("COpied " + temp.size() + " root instance(s)!");
 	}
 
 	/**
