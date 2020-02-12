@@ -8,11 +8,10 @@
  *
  */
 
-package engine.resources;
+package engine.tasks;
 
-import engine.gl.objects.RawTexture;
+public interface ITaskRunnerThread {
+	
+	public void setRunning(boolean running);
 
-public interface IResourcesManagerBackend {
-
-	public int loadTexture(int filter, int textureWarp, int format, int type, boolean textureMipMapAF, RawTexture data);
 }

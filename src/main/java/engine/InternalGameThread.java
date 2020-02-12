@@ -101,7 +101,8 @@ public class InternalGameThread extends Thread implements IEngineThread {
 
 	@Override
 	public void dispose() {
-		TaskManager.runAndStopMainThread();
+		TaskManager.stopMainThread();
+		TaskManager.stopBackgroundThreads();
 		List<Service> services = Game.getServices();
 
 		// Clean up all lua objects

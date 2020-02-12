@@ -125,8 +125,8 @@ public class InternalRenderThread extends Thread implements IEngineThread {
 			ThreadUtils.sleep(1);
 		pipeline.dispose();
 		Resources.dispose();
-		WindowManager.runLater(() -> TaskManager.stopRenderBackgroundThread());
-		TaskManager.runAndStopRenderThread();
+		WindowManager.runLater(() -> TaskManager.stopGLThreads());
+		TaskManager.stopRenderThread();
 		window.dispose();
 		LWJGUI.removeThreadWindow();
 	}

@@ -32,15 +32,6 @@ import engine.tasks.Task;
 
 public class LoadLTCTask extends Task<Texture> {
 
-	private static final int READ_HEADER = 0;
-	private static final int READ_VERSION = 1;
-	private static final int READ_TYPE = 2;
-	private static final int READ_TEXUTRE_SIZE = 3;
-	private static final int READ_TEXUTRE_COMPONENTS = 4;
-	private static final int READ_DATA_SIZE = 5;
-	private static final int READ_DATA = 6;
-	private static final int READ_DONE = 7;
-
 	private static final int VERSION = 2;
 
 	private String file;
@@ -70,7 +61,6 @@ public class LoadLTCTask extends Task<Texture> {
 			glFormat = GL_RGBA32F;
 			break;
 		}
-
 		int id = ResourcesManager.backend.loadTexture(GL_LINEAR, GL_REPEAT, glFormat, GL_FLOAT, false, data);
 		data.dispose();
 		return new Texture(id, GL_TEXTURE_2D, data.getWidth(), data.getHeight());
@@ -85,54 +75,33 @@ public class LoadLTCTask extends Task<Texture> {
 		}
 		int version = -1, type = -1, dataSize = -1, textureSize = -1;
 		ByteBuffer image = null;
-		int status = READ_HEADER;
-		LOOP: while (ltc.hasRemaining()) {
-			switch (status) {
-			case READ_HEADER: // Read Header
-				byte[] formatBytes = new byte[3];
-				ltc.get(formatBytes);
-				String format = new String(formatBytes);
-				if (!format.equals("LTC"))
-					throw new DecodeTextureException("Invalid Format");
-				System.out.println(format);
-				status = READ_VERSION;
-				break;
-			case READ_VERSION:
-				version = ltc.getInt();
-				System.out.println("Version: " + version);
-				if (version != VERSION)
-					throw new DecodeTextureException("Incorrect Version " + version + " != " + VERSION);
-				status = READ_TYPE;
-				break;
-			case READ_TYPE:
-				type = ltc.getInt();
-				System.out.println("Type: " + type);
-				status = READ_TEXUTRE_SIZE;
-				break;
-			case READ_TEXUTRE_SIZE:
-				textureSize = ltc.getInt();
-				System.out.println("Texture Size: " + textureSize);
-				status = READ_TEXUTRE_COMPONENTS;
-				break;
-			case READ_TEXUTRE_COMPONENTS:
-				textureComponents = ltc.getInt();
-				System.out.println("Texture Components: " + textureComponents);
-				status = READ_DATA_SIZE;
-				break;
-			case READ_DATA_SIZE:
-				dataSize = ltc.getInt();
-				System.out.println("Data Size: " + dataSize);
-				status = READ_DATA;
-				break;
-			case READ_DATA:
-				image = memAlloc(dataSize * 4 + 1);
-				memCopy(ltc, image);
-				status = READ_DONE;
-				break;
-			case READ_DONE:
-				break LOOP;
-			}
-		}
+
+		byte[] formatBytes = new byte[3];
+		ltc.get(formatBytes);
+		String format = new String(formatBytes);
+		if (!format.equals("LTC"))
+			throw new DecodeTextureException("Invalid Format");
+		System.out.println(format);
+
+		version = ltc.getInt();
+		System.out.println("Version: " + version);
+		if (version != VERSION)
+			throw new DecodeTextureException("Incorrect Version " + version + " != " + VERSION);
+
+		type = ltc.getInt();
+		System.out.println("Type: " + type);
+
+		textureSize = ltc.getInt();
+		System.out.println("Texture Size: " + textureSize);
+
+		textureComponents = ltc.getInt();
+		System.out.println("Texture Components: " + textureComponents);
+
+		dataSize = ltc.getInt();
+		System.out.println("Data Size: " + dataSize);
+
+		image = memAlloc(dataSize * 4 + 1);
+		memCopy(ltc, image);
 		memFree(ltc);
 
 		return new RawLTC(image, textureSize, textureSize, textureComponents);

@@ -55,6 +55,7 @@ public abstract class ClientEngine {
 					ThreadUtils.sleep(1); // Let's sleep meanwhile
 			}
 		});
+		initThread.setName("Init Thread");
 		initThread.start();
 
 		GLFWErrorCallback.createPrint(System.err).set();

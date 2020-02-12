@@ -10,58 +10,35 @@
 
 package engine.tasks;
 
-import static org.lwjgl.glfw.GLFW.GLFW_CONTEXT_VERSION_MAJOR;
-import static org.lwjgl.glfw.GLFW.GLFW_CONTEXT_VERSION_MINOR;
-import static org.lwjgl.glfw.GLFW.GLFW_OPENGL_CORE_PROFILE;
-import static org.lwjgl.glfw.GLFW.GLFW_OPENGL_FORWARD_COMPAT;
-import static org.lwjgl.glfw.GLFW.GLFW_OPENGL_PROFILE;
-import static org.lwjgl.glfw.GLFW.GLFW_VISIBLE;
-import static org.lwjgl.glfw.GLFW.glfwCreateWindow;
-import static org.lwjgl.glfw.GLFW.glfwDefaultWindowHints;
-import static org.lwjgl.glfw.GLFW.glfwDestroyWindow;
-import static org.lwjgl.glfw.GLFW.glfwMakeContextCurrent;
-import static org.lwjgl.glfw.GLFW.glfwSwapBuffers;
-import static org.lwjgl.glfw.GLFW.glfwWindowHint;
-import static org.lwjgl.opengl.GL11C.GL_FALSE;
-import static org.lwjgl.opengl.GL11C.GL_TRUE;
-import static org.lwjgl.system.MemoryUtil.NULL;
-
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
-
-import org.lwjgl.opengl.GL;
-
-import engine.util.GLCompat;
 
 public class TaskManager {
 
 	private static Queue<Task<?>> tasksMainThread = new ConcurrentLinkedQueue<>(),
 			tasksBackgroundThread = new ConcurrentLinkedQueue<>();
-	private static Thread backgroundThread;
-	private static boolean syncInterruptBackground;
-
-	private static long asyncWindow;
 
 	private static Queue<Task<?>> tasksRenderThread = new ConcurrentLinkedQueue<>(),
-			tasksRenderBackgroundThread = new ConcurrentLinkedQueue<>();
-	private static Thread renderBackgroundThread;
-	private static boolean runBackgroundThread = true, syncInterruptRenderBackground = true;
+			tasksGLBackgroundThread = new ConcurrentLinkedQueue<>();
+
+	private static List<TaskRunnerThread> backgroundThreads;
+	private static List<TaskRunnerGLThread> glThreads;
+
+	private static Object backgroundThreadsLock = new Object(), glThreadsLock = new Object();
+
+	private static final int BACKGROUND_THREADS = 4;
+	private static final int GL_THREADS = 2;
 
 	public static void init() {
-		backgroundThread = new Thread(() -> {
-			while (true) {
-				if (!tasksBackgroundThread.isEmpty()) {
-					while (!tasksBackgroundThread.isEmpty())
-						tasksBackgroundThread.poll().callI();
-				} else {
-					syncInterruptBackground = false;
-					ThreadUtils.sleep(Long.MAX_VALUE);
-				}
-			}
-		});
-		backgroundThread.setDaemon(true);
-		backgroundThread.setName("Main Background");
-		backgroundThread.start();
+		backgroundThreads = new ArrayList<>();
+		for (int i = 0; i < BACKGROUND_THREADS; i++) {
+			TaskRunnerThread t = new TaskRunnerThread(tasksBackgroundThread, backgroundThreadsLock);
+			t.setName("Background Thread " + i);
+			t.start();
+			backgroundThreads.add(t);
+		}
 	}
 
 	public static void addTaskMainThread(Runnable task) {
@@ -102,9 +79,8 @@ public class TaskManager {
 			return null;
 
 		tasksBackgroundThread.add(t);
-		if (!syncInterruptBackground) {
-			syncInterruptBackground = true;
-			backgroundThread.interrupt();
+		synchronized (backgroundThreadsLock) {
+			backgroundThreadsLock.notify();
 		}
 		return t;
 	}
@@ -114,9 +90,17 @@ public class TaskManager {
 			tasksMainThread.poll().callI();
 	}
 
-	public static void runAndStopMainThread() {
+	public static void stopMainThread() {
 		while (!tasksMainThread.isEmpty())
 			tasksMainThread.poll().callI();
+	}
+
+	public static void stopBackgroundThreads() {
+		for (TaskRunnerThread thread : backgroundThreads)
+			thread.setRunning(false);
+		synchronized (backgroundThreadsLock) {
+			backgroundThreadsLock.notifyAll();
+		}
 	}
 
 	public static void addTaskRenderThread(Runnable task) {
@@ -155,10 +139,9 @@ public class TaskManager {
 		if (t == null)
 			return null;
 
-		tasksRenderBackgroundThread.add(t);
-		if (!syncInterruptRenderBackground) {
-			syncInterruptRenderBackground = true;
-			renderBackgroundThread.interrupt();
+		tasksGLBackgroundThread.add(t);
+		synchronized (glThreadsLock) {
+			glThreadsLock.notify();
 		}
 		return t;
 	}
@@ -168,48 +151,35 @@ public class TaskManager {
 			tasksRenderThread.poll().callI();
 	}
 
-	public static void runAndStopRenderThread() {
+	public static void stopRenderThread() {
 		while (!tasksRenderThread.isEmpty())
 			tasksRenderThread.poll().callI();
 	}
 
-	public static void switchToSharedContext(long parent) {
-		glfwDefaultWindowHints();
-		glfwWindowHint(GLFW_VISIBLE, GL_FALSE);
-		glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-		glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, GLCompat.GL_MAJOR);
-		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, GLCompat.GL_MINOR);
-		asyncWindow = glfwCreateWindow(1, 1, "Background Window", NULL, parent);
-		if (asyncWindow == NULL)
-			throw new RuntimeException("Failed to create background window");
-
-		renderBackgroundThread = new Thread(() -> {
-			glfwMakeContextCurrent(asyncWindow);
-			GL.createCapabilities(true);
-			while (runBackgroundThread) {
-				if (!tasksRenderBackgroundThread.isEmpty()) {
-					while (!tasksRenderBackgroundThread.isEmpty())
-						tasksRenderBackgroundThread.poll().callI();
-				} else {
-					syncInterruptRenderBackground = false;
-					ThreadUtils.sleep(Long.MAX_VALUE);
-				}
-				glfwSwapBuffers(asyncWindow);
+	public static void stopGLThreads() {
+		for (TaskRunnerGLThread thread : glThreads)
+			thread.setRunning(false);
+		synchronized (glThreadsLock) {
+			glThreadsLock.notifyAll();
+		}
+		for (TaskRunnerGLThread thread : glThreads) {
+			try {
+				thread.join();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
 			}
-			GL.setCapabilities(null);
-			glfwMakeContextCurrent(NULL);
-		});
-		renderBackgroundThread.setName("Render Background");
-		renderBackgroundThread.start();
+			thread.destroyWindow();
+		}
 	}
 
-	public static void stopRenderBackgroundThread() {
-		runBackgroundThread = false;
-		renderBackgroundThread.interrupt();
-		while (renderBackgroundThread.isAlive())
-			ThreadUtils.sleep(100);
-		glfwDestroyWindow(asyncWindow);
+	public static void switchToSharedContext(long parent) {
+		glThreads = new ArrayList<>();
+		for (int i = 0; i < GL_THREADS; i++) {
+			TaskRunnerGLThread t = new TaskRunnerGLThread(tasksGLBackgroundThread, glThreadsLock, parent);
+			t.setName("GL Background Thread " + i);
+			t.start();
+			glThreads.add(t);
+		}
 	}
 
 }

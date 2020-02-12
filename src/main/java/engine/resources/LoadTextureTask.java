@@ -10,13 +10,14 @@
 
 package engine.resources;
 
+import static org.lwjgl.opengl.GL11C.GL_FLOAT;
 import static org.lwjgl.opengl.GL11C.GL_TEXTURE_2D;
 import static org.lwjgl.opengl.GL11C.GL_UNSIGNED_BYTE;
 import static org.lwjgl.stb.STBImage.stbi_failure_reason;
 import static org.lwjgl.stb.STBImage.stbi_info_from_memory;
 import static org.lwjgl.stb.STBImage.stbi_load_from_memory;
-import static org.lwjgl.stb.STBImage.stbi_set_flip_vertically_on_load;
 import static org.lwjgl.system.MemoryStack.stackPush;
+import static org.lwjgl.system.MemoryUtil.memAlloc;
 import static org.lwjgl.system.MemoryUtil.memFree;
 
 import java.io.IOException;
@@ -36,7 +37,7 @@ public class LoadTextureTask extends Task<Texture> {
 	private int filter;
 	private int textureWarp;
 	private int format;
-	private boolean textureMipMapAF, flipY;
+	private boolean textureMipMapAF, flipY, hdr;
 
 	public LoadTextureTask(String file, int filter, int textureWarp, int format, boolean textureMipMapAF,
 			boolean flipY) {
@@ -52,8 +53,8 @@ public class LoadTextureTask extends Task<Texture> {
 	protected Texture call() {
 		System.out.println("Loading: " + file);
 		RawTexture data = decodeTextureFile(file, flipY);
-		int id = ResourcesManager.backend.loadTexture(filter, textureWarp, format, GL_UNSIGNED_BYTE, textureMipMapAF,
-				data);
+		int id = ResourcesManager.backend.loadTexture(filter, textureWarp, format, hdr ? GL_FLOAT : GL_UNSIGNED_BYTE,
+				textureMipMapAF, data);
 		data.dispose();
 		return new Texture(id, GL_TEXTURE_2D, data.getWidth(), data.getHeight());
 	}
@@ -80,16 +81,33 @@ public class LoadTextureTask extends Task<Texture> {
 			// System.out.println("Image width: " + w.get(0) + "\nImage height: " + h.get(0)
 			// + "\nImage components: "
 			// + comp.get(0) + "\nImage HDR: " + stbi_is_hdr_from_memory(imageBuffer));
-			stbi_set_flip_vertically_on_load(flipY);
+			width = w.get(0);
+			height = h.get(0);
+			component = comp.get(0);
+			// hdr = stbi_is_hdr_from_memory(imageBuffer);
 
 			image = stbi_load_from_memory(imageBuffer, w, h, comp, 0);
 			memFree(imageBuffer);
 
 			if (image == null)
 				throw new DecodeTextureException("Failed to load image: " + stbi_failure_reason());
-			width = w.get(0);
-			height = h.get(0);
-			component = comp.get(0);
+
+			if (flipY) {
+				ByteBuffer flipped = memAlloc(image.capacity());
+
+				for (int row = height - 1; row >= 0; row--) {
+					int offset = row * width * component;
+					for (int x = 0; x < width; x++) {
+						for (int i = 0; i < component; i++) {
+							byte t = image.get(offset + (x * component + i));
+							flipped.put(t);
+						}
+					}
+				}
+				memFree(image);
+				flipped.flip();
+				image = flipped;
+			}
 		}
 		return new RawTexture(image, width, height, component);
 	}
