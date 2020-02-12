@@ -607,13 +607,10 @@ public class Game implements Tickable {
 			return;
 		
 		boolean r = false;
-		
-		//synchronized(selectedInstances) {
-			while( selectedInstances.contains(inst) ) {
-				r = true;
-				selectedInstances.remove(inst);
-			}
-		//}
+		while( isSelected(inst) ) {
+			r = true;
+			selectedInstances.remove(inst);
+		}
 
 		if ( r ) {
 			game.gameUpdate(false);
@@ -622,8 +619,12 @@ public class Game implements Tickable {
 	}
 	
 	public static void deselectAll() {
+		if ( selectedInstances.size() <= 0 )
+			return;
+		
 		selectedInstances.clear();
-		game.gameUpdate(false);
+		game.gameUpdate(true);
+		selectionChanged().fire();
 	}
 	
 	public static boolean isSelected(Instance inst) {

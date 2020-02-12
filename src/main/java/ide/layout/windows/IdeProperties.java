@@ -132,8 +132,13 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 		
 		InternalRenderThread.runLater(()->{
 			LWJGUI.runLater(() -> {
-				if ( selected.size() != 1 )
+				if ( selected.size() > 1 )
 					return;
+				
+				if ( selected.size() == 0 ) {
+					clear();
+					return;
+				}
 				
 				Instance temp = selected.get(0);
 				if ( temp == grid.inst )
@@ -170,7 +175,7 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 
 	@Override
 	public void gameUpdateEvent(boolean important) {
-		update(false);
+		update(important);
 	}
 	
 	@Override
