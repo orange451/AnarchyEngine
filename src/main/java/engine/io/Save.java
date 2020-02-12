@@ -230,7 +230,7 @@ public class Save {
 		// Start saving process
 		REFID = 0;		
 		JSONObject projectJSONInternal = getProjectJSON(true);
-		JSONObject gameJSON = getInstanceJSONRecursive( false, true, Game.game());
+		JSONObject gameJSON = getInstanceJSONRecursive( true, true, Game.game());
 		JSONObject saveJSON = new JSONObject();
 		saveJSON.put("Version", 1.0f);
 		saveJSON.put("ProjectData", projectJSONInternal);
@@ -268,7 +268,7 @@ public class Save {
 	 * @return
 	 */
 	public static JSONObject getProjectJSON( boolean savingToFile ) {
-		return getInstanceJSONRecursive( false, savingToFile, Game.project());
+		return getInstanceJSONRecursive( true, savingToFile, Game.project());
 	}
 
 	/**
@@ -409,7 +409,7 @@ public class Save {
 			}
 
 			JSONObject j = new JSONObject();
-			if ( instance.getUUID() != null )
+			if ( instance.getUUID() != null && saveSID )
 				j.put("UUID", instance.getUUID().toString());
 			j.put("Reference", reference);
 			j.put("ClassName", instance.get("ClassName").toString());
