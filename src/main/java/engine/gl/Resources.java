@@ -18,9 +18,9 @@ import org.lwjgl.assimp.AIPropertyStore;
 
 import engine.gl.mesh.BufferedMesh;
 import engine.gl.objects.MaterialGL;
-import engine.gl.objects.RawTexture;
 import engine.gl.objects.Texture;
 import engine.resources.ResourcesManager;
+import engine.tasks.Task;
 import engine.tasks.TaskManager;
 import engine.util.MeshUtils;
 import lwjgui.paint.Color;
@@ -38,12 +38,18 @@ public class Resources {
 	public static Texture diffuse, diffuseMisc, normal, roughness, metallic;
 
 	public static void init() {
-		ResourcesManager.loadTexture(RawTexture.fromColor(Color.WHITE, 1, 1), (value) -> diffuse = value.setDisposable(false));
-		ResourcesManager.loadTextureMisc(RawTexture.fromColor(Color.WHITE, 1, 1), (value) -> diffuseMisc = value.setDisposable(false));
-		ResourcesManager.loadTextureMisc(RawTexture.fromColor(new Color(127, 127, 255), 1, 1), (value) -> normal = value.setDisposable(false));
-		ResourcesManager.loadTextureMisc(RawTexture.fromColor(Color.WHITE, 1, 1), (value) -> roughness = value.setDisposable(false));
-		ResourcesManager.loadTextureMisc(RawTexture.fromColor(Color.WHITE, 1, 1), (value) -> metallic = value.setDisposable(false));
-		TaskManager.addTaskRenderBackgroundThread(() -> {
+		Task<Texture> diffTask, diffMiscTask, normTask, roughTask, metalTask;
+		diffTask = ResourcesManager.createTexture(Color.WHITE, 2, 2);
+		diffMiscTask = ResourcesManager.createTextureMisc(Color.WHITE, 2, 2);
+		normTask = ResourcesManager.createTextureMisc(new Color(127, 127, 255), 2, 2);
+		roughTask = ResourcesManager.createTextureMisc(Color.WHITE, 2, 2);
+		metalTask = ResourcesManager.createTextureMisc(Color.WHITE, 2, 2);
+		TaskManager.addTaskBackgroundThread(() -> {
+			diffuse = diffTask.get().setDisposable(false);
+			diffuseMisc = diffMiscTask.get().setDisposable(false);
+			normal = normTask.get().setDisposable(false);
+			roughness = roughTask.get().setDisposable(false);
+			metallic = metalTask.get().setDisposable(false);
 			System.out.println("GENERATING BLANK MATERIAL");
 			System.out.println(diffuse + " / " + normal + " / " + roughness + " / " + metallic);
 			MATERIAL_BLANK = new MaterialGL().setDiffuseTexture(diffuse).setNormalTexture(normal)

@@ -34,12 +34,12 @@ import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.ObjectMap.Entry;
 
 import engine.gl.GLResourcesManagerBackend;
-import engine.gl.objects.RawTexture;
 import engine.gl.objects.Texture;
 import engine.tasks.OnFinished;
 import engine.tasks.Task;
 import engine.tasks.TaskManager;
 import engine.util.FileUtils;
+import lwjgui.paint.Color;
 
 public final class ResourcesManager {
 
@@ -48,6 +48,10 @@ public final class ResourcesManager {
 
 	public static void processShaderIncludes(String file) {
 		// TaskManager.submitBackgroundThread(new ShaderIncludeTask(file));
+	}
+
+	public static Task<Texture> loadTextureMisc(String fileName) {
+		return loadTextureMisc(fileName, GL_LINEAR, true, false, null);
 	}
 
 	public static Task<Texture> loadTextureMisc(String fileName, OnFinished<Texture> dst) {
@@ -65,15 +69,24 @@ public final class ResourcesManager {
 				new LoadTextureTask(fileName, filter, GL_REPEAT, GL_RGBA, textureMipMapAF, flipY).setOnFinished(dst));
 	}
 
-	public static Task<Texture> loadTextureMisc(RawTexture rawTexture, OnFinished<Texture> dst) {
-		return loadTextureMisc(rawTexture, GL_LINEAR, true, false, dst);
+	public static Task<Texture> createTextureMisc(Color color, int width, int height) {
+		return createTextureMisc(color, width, height, GL_LINEAR, true, null);
 	}
-	
-	public static Task<Texture> loadTextureMisc(RawTexture rawTexture, int filter, boolean textureMipMapAF, boolean flipY,
-			OnFinished<Texture> dst) {
-		System.out.println("Texture scheduled to load: " + rawTexture);
+
+	public static Task<Texture> createTextureMisc(Color color, int width, int height, OnFinished<Texture> dst) {
+		return createTextureMisc(color, width, height, GL_LINEAR, true, dst);
+	}
+
+	public static Task<Texture> createTextureMisc(Color color, int width, int height, int filter,
+			boolean textureMipMapAF, OnFinished<Texture> dst) {
+		System.out.println("Texture scheduled to load: " + color);
 		return TaskManager.submitRenderBackgroundThread(
-				new LoadTextureTask(rawTexture, filter, GL_REPEAT, GL_RGBA, textureMipMapAF, flipY).setOnFinished(dst));
+				new CreateTextureTask(color, width, height, filter, GL_REPEAT, GL_RGBA, textureMipMapAF)
+						.setOnFinished(dst));
+	}
+
+	public static Task<Texture> loadTexture(String fileName) {
+		return loadTexture(fileName, GL_LINEAR, true, false, null);
 	}
 
 	public static Task<Texture> loadTexture(String fileName, OnFinished<Texture> dst) {
@@ -92,15 +105,19 @@ public final class ResourcesManager {
 						.setOnFinished(dst));
 	}
 
-	public static Task<Texture> loadTexture(RawTexture rawTexture, OnFinished<Texture> dst) {
-		return loadTexture(rawTexture, GL_LINEAR, true, false, dst);
+	public static Task<Texture> createTexture(Color color, int width, int height) {
+		return createTexture(color, width, height, GL_LINEAR, true, null);
 	}
 
-	public static Task<Texture> loadTexture(RawTexture rawTexture, int filter, boolean textureMipMapAF, boolean flipY,
+	public static Task<Texture> createTexture(Color color, int width, int height, OnFinished<Texture> dst) {
+		return createTexture(color, width, height, GL_LINEAR, true, dst);
+	}
+
+	public static Task<Texture> createTexture(Color color, int width, int height, int filter, boolean textureMipMapAF,
 			OnFinished<Texture> dst) {
-		System.out.println("Texture scheduled to load: " + rawTexture);
+		System.out.println("Texture scheduled to load: " + color);
 		return TaskManager.submitRenderBackgroundThread(
-				new LoadTextureTask(rawTexture, filter, GL_REPEAT, GL_SRGB_ALPHA, textureMipMapAF, flipY)
+				new CreateTextureTask(color, width, height, filter, GL_REPEAT, GL_SRGB_ALPHA, textureMipMapAF)
 						.setOnFinished(dst));
 	}
 
@@ -137,7 +154,7 @@ public final class ResourcesManager {
 	 */
 	public static ByteBuffer ioResourceToByteBuffer(String resource, int bufferSize) throws IOException {
 		ByteBuffer buffer;
-		
+
 		String resourceFile = FileUtils.fixPath(resource);
 
 		File file = new File(resourceFile);
