@@ -15,6 +15,7 @@ import java.util.List;
 
 import org.luaj.vm2.LuaValue;
 
+import engine.ClientEngine;
 import engine.Game;
 import engine.InternalRenderThread;
 import engine.lua.type.data.Vector3;
@@ -31,12 +32,16 @@ import ide.layout.IdePane;
 import lwjgui.geometry.Pos;
 import lwjgui.gl.GenericShader;
 import lwjgui.gl.Renderer;
+import lwjgui.paint.Color;
 import lwjgui.scene.Context;
 import lwjgui.scene.control.Label;
 import lwjgui.scene.control.ScrollPane;
 import lwjgui.scene.layout.FlowPane;
 import lwjgui.scene.layout.OpenGLPane;
+import lwjgui.scene.layout.StackPane;
 import lwjgui.scene.layout.VBox;
+import lwjgui.style.BackgroundNVGImage;
+import lwjgui.style.BackgroundSolid;
 
 public class IdeMaterialViewer extends IdePane {
 	
@@ -53,37 +58,42 @@ public class IdeMaterialViewer extends IdePane {
 		super("Material Viewer", true);
 		
 		Game.loadEvent().connect((args)->{
-			//init();
+			initialize();
 		});
 		
 		// Increase allowence
-		/*AnarchyEngineClient.renderThread.attach(()->{
+		Game.runService().renderSteppedEvent().connect((args)->{
 			renderAllowence = renderAllowence+1;
 			if ( renderAllowence > 10 )
 				renderAllowence = 10;
-		});*/
+		});
 		
 		// Add user controls
 		StandardUserControls.bind(this);
+		initialize();
 	}
 	
 	@Override
 	protected void resize() {
 		super.resize();
 
+		if ( materialBox == null )
+			return;
+		
 		materialBox.setPrefWidth(scrollPane.getViewportWidth());
 		materialBox.setPrefHeight(scrollPane.getViewportHeight());
 	}
 	
-	@Override
-	public void init() {
-		super.init();
+	public void initialize() {
+		
 		if ( materialBox != null ) {
 			materialBox.getItems().clear();
 			materialToNodeMap.clear();
 		} else {
 			materialToNodeMap = new HashMap<>();
 			materialBox = new FlowPane();
+			materialBox.setHgap(4);
+			materialBox.setVgap(4);
 			materialBox.setAlignment(Pos.TOP_LEFT);
 			
 			scrollPane = new ScrollPane();
@@ -101,8 +111,10 @@ public class IdeMaterialViewer extends IdePane {
 			attachMaterial((Material) materials.get(i));
 		}
 		
-		// Material added
+		// Handle material creation/deletion
 		if (!createdConnections) {
+			
+			// Material added
 			createdConnections = true;
 			Game.assets().descendantAddedEvent().connect((materialArgs)->{
 				Instance child = (Instance) materialArgs[0];
@@ -113,6 +125,22 @@ public class IdeMaterialViewer extends IdePane {
 			
 			// Material removed
 			Game.assets().descendantRemovedEvent().connect((materialArgs)->{
+				Instance child = (Instance) materialArgs[0];
+				if ( child instanceof Material ) {
+					dettachMaterial((Material) child);
+				}
+			});
+			
+			// Material Added (project)
+			Game.project().assets().descendantAddedEvent().connect((materialArgs)->{
+				Instance child = (Instance) materialArgs[0];
+				if ( child instanceof Material ) {
+					attachMaterial((Material) child);
+				}
+			});
+			
+			// Material removed (project)
+			Game.project().assets().descendantRemovedEvent().connect((materialArgs)->{
 				Instance child = (Instance) materialArgs[0];
 				if ( child instanceof Material ) {
 					dettachMaterial((Material) child);
@@ -147,7 +175,7 @@ public class IdeMaterialViewer extends IdePane {
 			this.setBackground(null);
 			
 			// Create secondary world
-			RenderableWorld renderableWorld = new Workspace();
+			/*RenderableWorld renderableWorld = new Workspace();
 			((Workspace)renderableWorld).forceSetParent(LuaValue.NIL);
 			
 			// Setup pipeline world
@@ -195,10 +223,15 @@ public class IdeMaterialViewer extends IdePane {
 					BG.setPrefab(BGPREFAB);
 					BG.forceSetParent((LuaValue) renderableWorld);
 				}
-			}
+			}*/
+			
+			StackPane backPane = new StackPane();
+			backPane.setPrefSize(NODE_SIZE, NODE_SIZE);
+			backPane.setBackground(new BackgroundSolid(Color.LIGHT_GRAY));
+			this.getChildren().add(backPane);
 			
 			// OpenGL rendering pane
-			this.oglPane = new OpenGLPane();
+			/*this.oglPane = new OpenGLPane();
 			this.oglPane.setPrefSize(NODE_SIZE, NODE_SIZE);
 			this.oglPane.setFlipY(true);
 			this.oglPane.setRendererCallback(new Renderer() {
@@ -207,10 +240,10 @@ public class IdeMaterialViewer extends IdePane {
 				@Override
 				public void render(Context context, int width, int height) {
 					
-					if ( shader == null ) {
-						shader = new GenericShader();
-					}
-					/*
+					//if ( shader == null ) {
+						//shader = new GenericShader();
+					//}
+					
 					if ( materialPipeline == null && renderAllowence > 0 && Game.isLoaded() ) {
 						renderAllowence -= 1;
 						
@@ -268,10 +301,11 @@ public class IdeMaterialViewer extends IdePane {
 					if ( materialPipeline != null ) {
 						Surface surface = materialPipeline.getPipelineBuffer();
 						surface.render(shader);
-					}*/
+					}
 				}
 			});
 			this.getChildren().add(oglPane);
+			*/
 			
 			// Label
 			Label label = new Label(material.getName());
@@ -292,11 +326,11 @@ public class IdeMaterialViewer extends IdePane {
 		}
 
 		private void renderMaterial() {
-			InternalRenderThread.runLater(()->{
+			/*InternalRenderThread.runLater(()->{
 				//if ( materialPipeline == null )
 				//	return;
 				//materialPipeline.render();
-			});
+			});*/
 		}
 	}
 

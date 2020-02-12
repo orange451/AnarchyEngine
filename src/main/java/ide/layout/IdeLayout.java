@@ -24,6 +24,7 @@ import ide.IDE;
 import ide.layout.windows.IdeConsole;
 import ide.layout.windows.IdeExplorer;
 import ide.layout.windows.IdeGameView;
+import ide.layout.windows.IdeMaterialViewer;
 import ide.layout.windows.IdeProperties;
 import ide.layout.windows.icons.Icons;
 import lwjgui.LWJGUI;
@@ -31,6 +32,7 @@ import lwjgui.collections.ObservableList;
 import lwjgui.geometry.Orientation;
 import lwjgui.geometry.Pos;
 import lwjgui.scene.Group;
+import lwjgui.scene.Window;
 import lwjgui.scene.WindowManager;
 import lwjgui.scene.control.Menu;
 import lwjgui.scene.control.MenuBar;
@@ -97,19 +99,18 @@ public class IdeLayout {
 		
 		// Dock south
 		south.dock(new IdeConsole());
-		//south.dock(new IdeMaterialViewer());
+		south.dock(new IdeMaterialViewer());
 		
 		LWJGUI.runLater(() -> {
 			south.select(south.getTabs().get(0));
 			
-			/*SplitPane.setResizableWithParent(split.getItems().get(0), false);
+			split.setDividerPosition(0, 0.2);
+			split.setDividerPosition(1, 0.75);
+			middle.setDividerPosition(0, 0.725);
+			
+			SplitPane.setResizableWithParent(split.getItems().get(0), false);
 			SplitPane.setResizableWithParent(split.getItems().get(2), false);
 			SplitPane.setResizableWithParent(middle.getItems().get(1), false);
-			
-			//split.setDividerPosition(0, (IdeMaterialViewer.NODE_SIZE + 15f)/(float)RenderableApplication.windowWidth);
-			split.setDividerPosition(0, 0);
-			split.setDividerPosition(1, 0.75);
-			middle.setDividerPosition(0, 0.725);*/
 		});	
 	}
 	
