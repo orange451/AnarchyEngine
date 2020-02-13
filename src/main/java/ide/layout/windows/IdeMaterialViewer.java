@@ -15,33 +15,18 @@ import java.util.List;
 
 import org.luaj.vm2.LuaValue;
 
-import engine.ClientEngine;
 import engine.Game;
 import engine.InternalRenderThread;
-import engine.lua.type.data.Vector3;
 import engine.lua.type.object.Instance;
-import engine.lua.type.object.insts.Camera;
-import engine.lua.type.object.insts.GameObject;
 import engine.lua.type.object.insts.Material;
-import engine.lua.type.object.insts.Mesh;
-import engine.lua.type.object.insts.Prefab;
-import engine.lua.type.object.insts.Texture;
-import engine.lua.type.object.services.ProjectECS;
-import engine.lua.type.object.services.Workspace;
-import engine.observer.RenderableWorld;
 import ide.layout.IdePane;
 import lwjgui.geometry.Pos;
-import lwjgui.gl.GenericShader;
-import lwjgui.gl.Renderer;
 import lwjgui.paint.Color;
-import lwjgui.scene.Context;
 import lwjgui.scene.control.Label;
 import lwjgui.scene.control.ScrollPane;
 import lwjgui.scene.layout.FlowPane;
-import lwjgui.scene.layout.OpenGLPane;
 import lwjgui.scene.layout.StackPane;
 import lwjgui.scene.layout.VBox;
-import lwjgui.style.BackgroundNVGImage;
 import lwjgui.style.BackgroundSolid;
 
 public class IdeMaterialViewer extends IdePane {
@@ -51,8 +36,6 @@ public class IdeMaterialViewer extends IdePane {
 	private HashMap<Material, MaterialNode> materialToNodeMap;
 	private boolean createdConnections;
 	
-	private static int renderAllowence;
-	
 	public static final int NODE_SIZE = 120;
 
 	public IdeMaterialViewer() {
@@ -61,13 +44,6 @@ public class IdeMaterialViewer extends IdePane {
 		Game.loadEvent().connect((args)->{
 			initialize();
 		});
-		
-		// Increase allowence
-		/*Game.runService().renderSteppedEvent().connect((args)->{
-			renderAllowence = renderAllowence+1;
-			if ( renderAllowence > 10 )
-				renderAllowence = 10;
-		});*/
 		
 		// Add user controls
 		StandardUserControls.bind(this);
@@ -173,7 +149,6 @@ public class IdeMaterialViewer extends IdePane {
 	}
 	
 	static class MaterialNode extends VBox {
-		private OpenGLPane oglPane;
 		//private LegacyPipeline materialPipeline;
 		
 		public MaterialNode(Material material) {

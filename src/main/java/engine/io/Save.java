@@ -581,7 +581,7 @@ public class Save {
 			
 			// Write this scene to file
 			String sPath = scenePath + linkedScene.getUUID().toString();
-			JSONObject sceneJSON = getInstanceJSONRecursive(false, true, internalScene);
+			JSONObject sceneJSON = getInstanceJSONRecursive(true, true, internalScene);
 			System.out.println("WRITING SCENE TO FILE! " + linkedScene.getFullName());
 			writeJSONToFile(sPath, sceneJSON);
 			
