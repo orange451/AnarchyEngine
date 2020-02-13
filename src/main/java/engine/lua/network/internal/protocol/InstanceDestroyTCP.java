@@ -26,15 +26,11 @@ public class InstanceDestroyTCP implements ClientProcessable {
 	}
 	
 	public InstanceDestroyTCP(Instance instance) {
-		this.instanceId = instance.getSID();
 		this.instanceUUID = new UUIDSerializable(instance.getUUID());
 	}
 
 	@Override
 	public void clientProcess(Connection Connection) {
-		/*Instance instance = Game.getInstanceFromSID(instanceId);
-		if ( instance != null )
-			instance.destroy();*/
 		Instance instance = Game.getInstanceFromUUID(this.instanceUUID.getUUID());
 		if ( instance != null )
 			instance.destroy();

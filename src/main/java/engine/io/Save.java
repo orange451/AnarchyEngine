@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.UUID;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -36,6 +37,7 @@ import engine.Game;
 import engine.InternalGameThread;
 import engine.InternalRenderThread;
 import engine.gl.mesh.BufferedMesh;
+import engine.lua.network.internal.JSONUtil;
 import engine.lua.network.internal.NonReplicatable;
 import engine.lua.type.LuaValuetype;
 import engine.lua.type.object.AssetLoadable;
@@ -59,7 +61,6 @@ import lwjgui.scene.layout.StackPane;
 import lwjgui.theme.Theme;
 
 public class Save {
-	private static long REFID = Integer.MAX_VALUE;
 	private static LinkedList<SavedInstance> inst;
 	private static HashMap<Instance, SavedInstance> instanceMap;
 
@@ -146,6 +147,7 @@ public class Save {
 		return save(false);
 	}
 
+	@SuppressWarnings("unchecked")
 	public static boolean save(boolean saveAs) {
 		if ( !Game.isLoaded() )
 			return false;
@@ -227,12 +229,11 @@ public class Save {
 		// Write scripts
 		writeScripts(resourcesFolder);
 
-		// Start saving process
-		REFID = 0;		
+		// Start saving process	
 		JSONObject projectJSONInternal = getProjectJSON(true);
-		JSONObject gameJSON = getInstanceJSONRecursive( true, true, Game.game());
+		JSONObject gameJSON = getInstanceJSONRecursive( true, Game.game());
 		JSONObject saveJSON = new JSONObject();
-		saveJSON.put("Version", 1.0f);
+		saveJSON.put("Version", 2.0f);
 		saveJSON.put("ProjectData", projectJSONInternal);
 		saveJSON.put("GameData", gameJSON);
 		Game.changes = false;
@@ -268,15 +269,15 @@ public class Save {
 	 * @return
 	 */
 	public static JSONObject getProjectJSON( boolean savingToFile ) {
-		return getInstanceJSONRecursive( true, savingToFile, Game.project());
+		return getInstanceJSONRecursive( savingToFile, Game.project());
 	}
 
 	/**
 	 * Returns the game represented as a JSON Object.
 	 * @return
 	 */
-	public static JSONObject getGameJSON(boolean storeServerId) {
-		return getInstanceJSONRecursive( storeServerId, false, Game.game());
+	public static JSONObject getGameJSON() {
+		return getInstanceJSONRecursive( false, Game.game());
 	}
 	
 	/**
@@ -284,12 +285,12 @@ public class Save {
 	 * @param instance
 	 * @return
 	 */
-	public static JSONObject getInstanceJSONRecursive(boolean saveSID, boolean savingLocally, Instance instance) {
+	public static JSONObject getInstanceJSONRecursive(boolean savingLocally, Instance instance) {
 		JSONObject ret = null;
 		try {
 			instanceMap = new HashMap<>();
-			inst = getSavedInstances( saveSID, savingLocally, instance);
-			ret = inst.getFirst().toJSON(saveSID, savingLocally);
+			inst = getSavedInstances( savingLocally, instance);
+			ret = inst.getFirst().toJSON(savingLocally);
 		} catch(Exception e ) {
 			e.printStackTrace();
 		}
@@ -302,14 +303,14 @@ public class Save {
 	 * @param instance
 	 * @return
 	 */
-	public static JSONObject getInstanceJSON(boolean saveSID, boolean savingLocally, Instance instance) {
+	public static JSONObject getInstanceJSON(boolean savingLocally, Instance instance) {
 		JSONObject ret = null;
 		try {
 			
 			if ( !instance.isArchivable() && savingLocally )
 				return null;
 
-			ret = new SavedInstance(saveSID, instance).toJSON(saveSID, savingLocally);
+			ret = new SavedInstance(instance).toJSON(savingLocally);
 		} catch(Exception e ) {
 			e.printStackTrace();
 		}
@@ -317,20 +318,20 @@ public class Save {
 		return ret;
 	}
 
-	private static LinkedList<SavedInstance> getSavedInstances(boolean saveSID, boolean savingLocally, Instance root) {
+	private static LinkedList<SavedInstance> getSavedInstances(boolean savingLocally, Instance root) {
 		LinkedList<SavedInstance> ret = new LinkedList<SavedInstance>();
 		
 		if ( !root.isArchivable() && savingLocally )
 			return ret;
 
-		SavedInstance savedRoot = new SavedInstance(saveSID, root);
+		SavedInstance savedRoot = new SavedInstance(root);
 		ret.add(savedRoot);
 		instanceMap.put(root, savedRoot);
 
 		List<Instance> children = root.getChildren();
 		for (int i = 0; i < children.size(); i++) {
 			Instance child = children.get(i);
-			List<SavedInstance> t = getSavedInstances(saveSID, savingLocally, child);
+			List<SavedInstance> t = getSavedInstances(savingLocally, child);
 			
 			ListIterator<SavedInstance> listIterator = t.listIterator();
 			while(listIterator.hasNext()) {
@@ -344,27 +345,17 @@ public class Save {
 
 	static class SavedInstance {
 		final Instance instance;
-		final SavedReference reference;
+		final String uuid;
 
-		public SavedInstance(boolean saveSID, Instance child) {
+		public SavedInstance(Instance child) {
 			this.instance = child;
-			long refId = saveSID?child.getSID():-1;
-			while ( refId == -1 || Game.getInstanceFromSID(refId) != null ) {
-				refId = REFID++;
-			}
-			
-			this.reference = new SavedReference(refId);
+			this.uuid = (child.getUUID()!=null?child.getUUID():Game.generateUUID()).toString();
 		}
 
 		@SuppressWarnings("unchecked")
-		public JSONObject toJSON(boolean saveSID, boolean savingLocally) {
+		public JSONObject toJSON(boolean savingLocally) {
 			if ( !instance.isArchivable() && savingLocally )
 				return null;
-			
-			SavedInstance parent = null;
-			if ( !instance.getParent().isnil() ) {
-				parent = instanceMap.get((Instance) instance.getParent());
-			}
 
 			List<Instance> children = instance.getChildren();
 			JSONArray childArray = new JSONArray();
@@ -375,7 +366,7 @@ public class Save {
 
 				SavedInstance sinst = instanceMap.get(child);
 				if ( sinst != null ) {
-					JSONObject json = sinst.toJSON(saveSID, savingLocally);
+					JSONObject json = sinst.toJSON(savingLocally);
 					if ( json != null ) {
 						childArray.add(json);
 					}
@@ -389,13 +380,9 @@ public class Save {
 				// These are default params
 				if ( field.equals("Name") || field.equals("ClassName") || field.equals("Parent") )
 					continue;
-				
-				// Don't write SID if we're told not to!
-				if ( field.equals("SID") && !saveSID )
-					continue;
 
 				// Protect the fields of non replicatable objects being sent when running.
-				if ( !field.equals("SID") && Game.isRunning() && instance instanceof NonReplicatable ) {
+				if ( Game.isRunning() && instance instanceof NonReplicatable ) {
 					p.put(field, fieldToJSONBlank(instance.get(field)));
 				} else {
 					p.put(field, fieldToJSON(instance.get(field)));
@@ -409,35 +396,13 @@ public class Save {
 			}
 
 			JSONObject j = new JSONObject();
-			if ( instance.getUUID() != null && saveSID )
-				j.put("UUID", instance.getUUID().toString());
-			j.put("Reference", reference);
+			j.put("UUID", uuid);
 			j.put("ClassName", instance.get("ClassName").toString());
 			j.put("Name", instance.getName());
-			if ( parent != null )
-				j.put("Parent", parent.reference);
 			j.put("Children", childArray);
 			j.put("Properties", p);
 
 			return j;
-		}
-	}
-
-	@SuppressWarnings("serial")
-	static class SavedReference extends JSONObject {
-		@SuppressWarnings("unchecked")
-		public SavedReference(long ref) {
-			this.put("Type", "Reference");
-			this.put("Value", ref);
-		}
-	}
-
-	@SuppressWarnings("serial")
-	static class HashReference extends SavedReference {
-		@SuppressWarnings("unchecked")
-		public HashReference(Instance instance) {
-			super(instance.getSID());
-			this.put("Hash", instance.hashFields());
 		}
 	}
 
@@ -472,9 +437,9 @@ public class Save {
 		return null;
 	}
 
-	@SuppressWarnings("unchecked")
 	protected static Object fieldToJSON(LuaValue luaValue) {
-		if ( luaValue.isstring() )
+		return JSONUtil.serializeObject(luaValue);
+		/*if ( luaValue.isstring() )
 			return luaValue.toString();
 		if ( luaValue.isboolean() )
 			return luaValue.checkboolean();
@@ -509,7 +474,7 @@ public class Save {
 			return j;
 		}
 
-		return null;
+		return null;*/
 	}
 
 	/*protected static SavedInstance getSavedInstance(Instance instance) {
@@ -581,7 +546,7 @@ public class Save {
 			
 			// Write this scene to file
 			String sPath = scenePath + linkedScene.getUUID().toString();
-			JSONObject sceneJSON = getInstanceJSONRecursive(true, true, internalScene);
+			JSONObject sceneJSON = getInstanceJSONRecursive(true, internalScene);
 			System.out.println("WRITING SCENE TO FILE! " + linkedScene.getFullName());
 			writeJSONToFile(sPath, sceneJSON);
 			

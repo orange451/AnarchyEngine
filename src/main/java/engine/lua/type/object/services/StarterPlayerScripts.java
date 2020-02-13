@@ -32,12 +32,12 @@ public class StarterPlayerScripts extends Instance implements TreeViewable {
 			
 			Instance ss = Game.starterPlayer();
 			
-			if ( !this.getParent().eq_b(ss) ) {
+			if ( this.getParent() != null && !this.getParent().eq_b(ss) ) {
 				this.forceSetParent(ss);
 			}
 		});
 	}
-
+	
 	@Override
 	protected LuaValue onValueSet(LuaValue key, LuaValue value) {
 		return value;

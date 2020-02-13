@@ -35,7 +35,6 @@ public abstract class Instance extends DataModel {
 	protected static final LuaValue C_CLASSNAME = LuaValue.valueOf("ClassName");
 	protected static final LuaValue C_NAME = LuaValue.valueOf("Name");
 	protected static final LuaValue C_ARCHIVABLE = LuaValue.valueOf("Archivable");
-	protected static final LuaValue C_SID = LuaValue.valueOf("SID");
 	
 	static {
 		LuaTable table = new LuaTable();

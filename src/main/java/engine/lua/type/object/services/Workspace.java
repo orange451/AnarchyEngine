@@ -219,7 +219,8 @@ public class Workspace extends Service implements RenderableWorld,TreeViewable,T
 		super.onDestroy();
 		
 		// Destroy physics world
-		physicsWorld.destroy();
+		if ( physicsWorld != null )
+			physicsWorld.destroy();
 		physicsWorld = null;
 		
 		// This no longer has descendants

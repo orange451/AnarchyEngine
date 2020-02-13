@@ -93,7 +93,7 @@ public class InternalServer extends Server {
 					}
 					
 					// Stream game to client
-					String gameJSON = Save.getGameJSON(true).toJSONString();
+					String gameJSON = Save.getGameJSON().toJSONString();
 					gameJSON = GZIPUtil.compress(gameJSON);
 					String[] strings = gameJSON.split("(?<=\\G.{"+CHUNK_SIZE+"})");
 					connection.sendTCP(new ClientLoadMapTCP()); // Mark client as "loading map" state.
@@ -133,7 +133,7 @@ public class InternalServer extends Server {
 						
 						// Tell client where his player is.
 						ClientConnectFinishTCP fn = new ClientConnectFinishTCP();
-						fn.SID = player.getSID();
+						fn.UUID = new UUIDSerializable(player.getUUID());
 						connection.sendTCP(fn);
 					});
 				}
@@ -202,13 +202,12 @@ public class InternalServer extends Server {
 
 	private static final LuaValue C_NAME = LuaValue.valueOf("Name");
 	private static final LuaValue C_PARENT = LuaValue.valueOf("Parent");
-	private static final LuaValue C_SID = LuaValue.valueOf("SID");
 	
 	private void syncInstances(Instance instance) {
 		instance.changedEvent().connect((cargs) -> {
 			LuaValue key = cargs[0];
 			if ( instance instanceof NonReplicatable ) {
-				if ( !key.eq_b(C_NAME) && !key.eq_b(C_PARENT) && !key.eq_b(C_SID) ) {
+				if ( !key.eq_b(C_NAME) && !key.eq_b(C_PARENT) ) {
 					return;
 				}
 			}

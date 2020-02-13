@@ -20,11 +20,6 @@ public class HistoryStack {
 	private HashMap<HistoryObjectReference, Instance> historyToInstanceMap;
 	private boolean busy;
 	
-	public HistoryStack() {
-		this.objectReferences = new HashMap<>();
-		this.historyToInstanceMap = new HashMap<>();
-	}
-	
 	/**
 	 * This indicates where we are in the stack.
 	 * We use this so that we can still keep track of REDO snapshots.
@@ -35,6 +30,16 @@ public class HistoryStack {
 	 * List of snapshots.
 	 */
 	private ArrayList<HistorySnapshot> snapshots = new ArrayList<HistorySnapshot>();
+	
+	public HistoryStack() {
+		this.objectReferences = new HashMap<>();
+		this.historyToInstanceMap = new HashMap<>();
+	}
+	
+	public void clear() {
+		snapshots.clear();
+		latestIndex = 0;
+	}
 	
 	/**
 	 * Push a snapshot to the history stack.

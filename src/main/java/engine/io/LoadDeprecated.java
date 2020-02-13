@@ -33,12 +33,7 @@ import org.json.simple.parser.JSONParser;
 import org.luaj.vm2.LuaString;
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.jse.CoerceJavaToLua;
-import org.lwjgl.PointerBuffer;
-import org.lwjgl.system.MemoryStack;
-import org.lwjgl.util.nfd.NativeFileDialog;
-
 import engine.Game;
-import engine.InternalGameThread;
 import engine.lua.type.LuaValuetype;
 import engine.lua.type.object.Instance;
 import engine.lua.type.object.Service;
@@ -46,52 +41,8 @@ import engine.lua.type.object.insts.Scene;
 import engine.lua.type.object.insts.SceneInternal;
 import engine.util.FileUtils;
 import ide.layout.windows.ErrorWindow;
-import lwjgui.scene.WindowManager;
 
-public class Load {
-	
-	/**
-	 * Load project without losing any changes. POTENTIALLY OPENS FILE WINDOW -- THREAD SAFE!
-	 */
-	public static void loadSafe() {
-		Runnable r = () -> {
-			WindowManager.runLater(() -> {
-				Load.load();
-			});
-		};
-		
-		if ( Game.changes ) {
-			Save.requestSave(r);
-		} else {
-			r.run();
-		}
-	}
-	
-	/**
-	 * Force load project. OPENS FILE WINDOW -- NOT THREAD SAFE.
-	 */
-	public static void load() {
-		String path = "";
-		MemoryStack stack = MemoryStack.stackPush();
-		PointerBuffer outPath = stack.mallocPointer(1);
-		File f1 = new File("");
-		File f2 = new File("Projects");
-		int result = NativeFileDialog.NFD_OpenDialog("json", (f2 == null ? f1 : f2).getAbsolutePath(), outPath);
-		if ( result == NativeFileDialog.NFD_OKAY ) {
-			path = outPath.getStringUTF8(0);
-		} else {
-			return;
-		}
-		stack.pop();
-		
-		final String finalPath = path;
-		
-		// Load the desired path
-		InternalGameThread.runLater(()->{
-			load(finalPath);
-		});
-	}
-	
+public class LoadDeprecated {
 	/**
 	 * Force load a specified path. Will unload currently loaded resources
 	 * @param path
@@ -124,29 +75,30 @@ public class Load {
 		// Load the json
 		if ( obj.containsKey("Version") ) {
 			System.out.println("USING NEW LOAD SYSTEM");
-			if ( (Double)obj.get("Version") < 2 ) {
-				System.out.println("USEING REALLY BAD LOAD FORMAT... Please update!");
-				LoadDeprecated.load(path);
-				return;
-			} else {
-				parseJSONInto((JSONObject)obj.get("ProjectData"), Game.project());
-				
-				// Force load starting scene...
-				Game.game().loadScene(Game.project().scenes().getStartingScene());
-			}
+			parseJSONInto((JSONObject)obj.get("ProjectData"), Game.project());
+			
+			SceneInternal internal = LoadDeprecated.loadScene(Game.project().scenes().getStartingScene());
+			
+			// Set it as loaded
+			//Game.project().scenes().setCurrentScene(Game.project().scenes().getStartingScene());
+			if ( !Game.getGame().unsavedScenes.contains(internal) )
+				Game.getGame().unsavedScenes.add(internal);
+			
+			// Load it into game
+			Game.game().extractScene(internal);
+			
+			// Force load starting scene...
+			//Game.game().loadScene(Game.project().scenes().getStartingScene());
 		} else {
 			System.out.println("USING OLD LOAD SYSTEM");
-			LoadDeprecated.load(path);
-			return;
+			if ( parseJSON(obj) == null )
+				return;
 		}
 		
 		loadExternalObjects(path);
 		
 		// Tell game we're loaded
 		Game.load();
-		
-		// Dont let the user CTRL Z after loading project.
-		Game.historyService().getHistoryStack().clear();
 	}
 	
 	public static void loadExternalObjects(String path) {
@@ -238,15 +190,15 @@ public class Load {
 	 */
 	public static Instance parseJSON(boolean removeUnusedInstances, JSONObject obj) {
 		ArrayList<LoadedInstance> instances = new ArrayList<LoadedInstance>();
-		HashMap<UUID, LoadedInstance> instancesMap = new HashMap<>();
-		Map<UUID, Instance> unmodifiedInstances = null;
+		HashMap<Long, LoadedInstance> instancesMap = new HashMap<>();
+		Map<Long, Instance> unmodifiedInstances = null;
 		
 		// Read in the objects from JSON
-		readObjects(instances, instancesMap, obj, Game.game(), null);
+		readObjects(instances, instancesMap, obj, Game.game(), new HighestReference());
 		
 		// Setup instancemap
-		if ( removeUnusedInstances )
-			unmodifiedInstances = Game.game().getInstanceMap();
+		//if ( removeUnusedInstances )
+			//unmodifiedInstances = Game.game().getInstanceMapOld();
 		
 		try {
 			
@@ -270,14 +222,14 @@ public class Load {
 			// Force set parents (of non services)
 			for (int i = 0; i < instances.size(); i++) {
 				LoadedInstance inst = instances.get(i);
-				//UUID parent = inst.Parent;
-				Instance p = inst.parent.instance;
+				long parent = inst.Parent;
 				
 				// Remove reference to unused
-				if ( removeUnusedInstances )
-					unmodifiedInstances.remove(inst.instance.getUUID());
+				//if ( removeUnusedInstances )
+					//unmodifiedInstances.remove(inst.instance.getSID());
 
-				if ( p != null && inst.loaded ) {
+				if ( parent != -1 && inst.loaded ) {
+					Instance p = getInstanceFromReference(instancesMap, parent);
 					if ( !inst.instance.equals(p) ) {
 						inst.instance.forceSetParent(p);
 						//System.out.println("Setting parent of: " + inst.instance + "\tto\t" + p);
@@ -293,13 +245,14 @@ public class Load {
 			
 			// Delete unused instances
 			if ( removeUnusedInstances ) {
-				Set<Entry<UUID, Instance>> insts = unmodifiedInstances.entrySet();
-				Iterator<Entry<UUID, Instance>> iterator = insts.iterator();
+				Set<Entry<Long, Instance>> insts = unmodifiedInstances.entrySet();
+				Iterator<Entry<Long, Instance>> iterator = insts.iterator();
 				while ( iterator.hasNext() ) {
-					Entry<UUID, Instance> entry = iterator.next();
+					Entry<Long, Instance> entry = iterator.next();
 					Instance t = entry.getValue();
-					if ( !t.isDestroyed() )
+					if ( !t.isDestroyed() ) {
 						t.destroy();
+					}
 				}
 			}
 			
@@ -315,10 +268,8 @@ public class Load {
 	public static void parseJSONInto(JSONObject obj, Instance rootInstance) {
 		// Read in the objects from JSON
 		ArrayList<LoadedInstance> instances = new ArrayList<LoadedInstance>();
-		HashMap<UUID, LoadedInstance> instancesMap = new HashMap<>();
-		LoadedInstance rootloaded = new LoadedInstance(rootInstance);
-		instancesMap.put(rootInstance.getUUID(), rootloaded);
-		readObjects(instances, instancesMap, obj, rootInstance, rootloaded);
+		HashMap<Long, LoadedInstance> instancesMap = new HashMap<>();
+		readObjects(instances, instancesMap, obj, rootInstance, new HighestReference());
 		
 		List<LoadedInstance> services = new ArrayList<LoadedInstance>();
 		
@@ -340,9 +291,12 @@ public class Load {
 		// Force set parents (of non services)
 		for (int i = 0; i < instances.size(); i++) {
 			LoadedInstance inst = instances.get(i);
-			if ( inst.parent != null && inst.loaded ) {
-				if ( !inst.instance.equals(inst.parent.instance) ) {
-					inst.instance.forceSetParent(inst.parent.instance);
+			long parent = inst.Parent;
+
+			if ( parent != -1 && inst.loaded ) {
+				Instance p = getInstanceFromReference(instancesMap, parent);
+				if ( !inst.instance.equals(p) ) {
+					inst.instance.forceSetParent(p);
 				}
 			}
 		}
@@ -354,7 +308,7 @@ public class Load {
 		}
 	}
 
-	private static void loadObject(HashMap<UUID, LoadedInstance> instancesMap, LoadedInstance inst) {
+	private static void loadObject(HashMap<Long, LoadedInstance> instancesMap, LoadedInstance inst) {
 		if ( inst.loaded )
 			return;
 		if ( inst.instance == null )
@@ -374,6 +328,15 @@ public class Load {
 			if ( val == null )
 				continue;
 			
+			// Dont load SID's if game is paused or if non existant
+			if ( key.equals("SID") ) {
+				if (!Game.isRunning())
+					continue;
+				
+				if ( Long.parseLong(val.value.toString()) == -1 )
+					continue;
+			}
+			
 			// Make sure user isn't trying to inject new fields!
 			boolean hasField = inst.instance.containsField(LuaValue.valueOf(key));
 			if ( !hasField )
@@ -382,9 +345,8 @@ public class Load {
 			// Get value for property
 			Object value = val.getValue();
 			if ( val.pointer ) {
-				UUID uuid = (UUID)value;
-				if ( uuid != null ) 
-					value = getInstanceFromReference(instancesMap, uuid);
+				long pointer = ((Long) value).longValue();
+				value = getInstanceFromReference(instancesMap, pointer);
 			}
 			
 			// If value is set, set it in ECS
@@ -399,24 +361,17 @@ public class Load {
 		}
 	}
 
-	private static void readObjects(ArrayList<LoadedInstance> instances, Map<UUID, LoadedInstance> instancesMap, JSONObject obj, Instance rootInstance, LoadedInstance parent) {
+	private static void readObjects(ArrayList<LoadedInstance> instances, Map<Long, LoadedInstance> instancesMap, JSONObject obj, Instance rootInstance, HighestReference highestReference) {
 		LoadedInstance loadedInstance = new LoadedInstance();
 		loadedInstance.ClassName = (String) obj.get("ClassName");
 		loadedInstance.Name = (String) obj.get("Name");
+		loadedInstance.Reference = loadReference("Reference",obj);
+		loadedInstance.Parent = loadReference("Parent",obj);
 		loadedInstance.uuid = (String) obj.get("UUID");
-		loadedInstance.parent = parent;
-		if ( parent == null )
-			loadedInstance.parent = new LoadedInstance(Game.game());
-		loadedInstance.Reference = UUID.fromString(loadedInstance.uuid);
 		
-		
-		// Store instances to map
-		instances.add(loadedInstance);
-		if ( !instancesMap.containsKey(loadedInstance.Reference)) {
-			instancesMap.put(loadedInstance.Reference, loadedInstance);
-		}
-		
-		if ( loadedInstance.ClassName.equals("project") ) {
+		if ( loadedInstance.ClassName.equals("Game") ) {
+			loadedInstance.instance = Game.game();
+		} else if ( loadedInstance.ClassName.equals("project") ) {
 			loadedInstance.instance = Game.project();
 		} else {
 			// Search directly in game for instance...
@@ -425,20 +380,29 @@ public class Load {
 			// Not found
 			if ( temp.isnil() ) {
 				
-				// Check if UUID is defined
-				if ( loadedInstance.uuid != null && loadedInstance.uuid.length() > 0 ) {
-	
-					// Match instance to uuid
-					Instance uuidMatch = Game.getInstanceFromUUID(UUID.fromString(loadedInstance.uuid));
-					if ( uuidMatch != null && !uuidMatch.isDestroyed() && uuidMatch.getClassName().eq_b(LuaValue.valueOf(loadedInstance.ClassName)) ) {
-						loadedInstance.instance = uuidMatch;
+				// Check if SID is defined in properties
+				Object SIDRef = ((JSONObject)obj.get("Properties")).get("SID");
+				if ( SIDRef != null && Long.parseLong(SIDRef.toString()) > -1 ) {
+					
+					// Match instance to server instance
+					Instance inGame = null;//Game.getInstanceFromSID(Long.parseLong(SIDRef.toString()));
+					if ( inGame != null && !inGame.isDestroyed() && inGame.getClassName().eq_b(LuaValue.valueOf(loadedInstance.ClassName)) ) {
+						loadedInstance.instance = inGame;
 					} else {
 						// Create new
 						loadedInstance.instance = (Instance) Instance.instance(loadedInstance.ClassName);
 					}
 				} else {
-					// Create new
-					loadedInstance.instance = (Instance) Instance.instance(loadedInstance.ClassName);
+					if ( loadedInstance.uuid != null && loadedInstance.uuid.length() > 0 ) {
+						Instance uuidMatch = Game.getInstanceFromUUID(UUID.fromString(loadedInstance.uuid));
+						if ( uuidMatch != null && !uuidMatch.isDestroyed() && uuidMatch.getClassName().eq_b(LuaValue.valueOf(loadedInstance.ClassName)) ) {
+							loadedInstance.instance = uuidMatch;
+						} else {
+							loadedInstance.instance = (Instance) Instance.instance(loadedInstance.ClassName);
+						}
+					} else {
+						loadedInstance.instance = (Instance) Instance.instance(loadedInstance.ClassName);
+					}
 				}
 			} else {
 				// Found... probably a service.
@@ -450,10 +414,19 @@ public class Load {
 		if ( loadedInstance.uuid != null && loadedInstance.uuid.length() > 0 )
 			loadedInstance.instance.setUUID(UUID.fromString(loadedInstance.uuid));
 		
+		// Store instances to map
+		instances.add(loadedInstance);
+		if ( !instancesMap.containsKey(loadedInstance.Reference)) {
+			instancesMap.put(loadedInstance.Reference, loadedInstance);
+			
+			if ( loadedInstance.Reference > highestReference.reference )
+				highestReference.reference = loadedInstance.Reference;
+		}
+		
 		// Load children
 		JSONArray children = (JSONArray) obj.get("Children");
 		for (int i = 0; i < children.size(); i++) {
-			readObjects( instances, instancesMap, (JSONObject) children.get(i), rootInstance, loadedInstance);
+			readObjects( instances, instancesMap, (JSONObject) children.get(i), rootInstance, highestReference);
 		}
 		
 		// Attach properties
@@ -464,27 +437,35 @@ public class Load {
 				Map.Entry<Object,Object> entry2 = (Entry<Object, Object>) entry;
 				String key = entry2.getKey().toString();
 				Object t = entry2.getValue();
-				PropertyValue<?> v = PropertyValue.parse(t, instancesMap);
+				PropertyValue<?> v = PropertyValue.parse(t, instancesMap, highestReference);
 				loadedInstance.properties.put(key, v);
 			}
 		}
 	}
 	
-	protected static Instance getInstanceFromReference(HashMap<UUID, LoadedInstance> instancesMap, UUID uuid) {
-		LoadedInstance loaded = instancesMap.get(uuid);
+	private static long loadReference(String field, JSONObject obj) {
+		JSONObject r = (JSONObject) obj.get(field);
+		if ( r != null && r.get("Type").equals("Reference") ) {
+			return Long.parseLong(r.get("Value").toString());
+		}
+		return -1;
+	}
+	
+	protected static Instance getInstanceFromReference(HashMap<Long, LoadedInstance> instancesMap, long ref) {
+		LoadedInstance loaded = instancesMap.get(ref);
 		if ( loaded != null )
 			return loaded.instance;
 		
-		// Now search for instance by UUID if it wasn't found before.
-		return Game.getInstanceFromUUID(uuid);
+		// Now search for instance by SID if it wasn't found before.
+		return null;//Game.getInstanceFromSID(ref);
 	}
 	
 	static class LoadedInstance {
 		public boolean loaded;
 		public String Name;
 		public String ClassName;
-		public UUID Reference;
-		public LoadedInstance parent;
+		public long Reference;
+		public long Parent;
 		public Instance instance;
 		private String uuid;
 		
@@ -508,6 +489,10 @@ public class Load {
 	
 	private static HashMap<String, Method> dataTypeToMethodMap = new HashMap<String, Method>();
 	
+	static class HighestReference {
+		long reference;
+	}
+	
 	static class PropertyValue<T> {
 		private T value;
 		public boolean pointer;
@@ -525,7 +510,7 @@ public class Load {
 			return value;
 		}
 
-		public static PropertyValue<?> parse(Object fieldKey, Map<UUID, LoadedInstance> instancesMap) {
+		public static PropertyValue<?> parse(Object fieldKey, Map<Long, LoadedInstance> instancesMap, HighestReference highestReference) {
 			if ( fieldKey == null ) {
 				return new PropertyValue<LuaValue>(LuaValue.NIL);
 			}
@@ -546,19 +531,31 @@ public class Load {
 				
 				// Match value to an object reference
 				if ( j.get("Type").equals("Reference") ) {
-					String uuidStr = (String)j.get("Value");
-					if ( uuidStr != null && uuidStr.length() > 0 ) {
-						UUID uuid = UUID.fromString(uuidStr);
-						
-						LoadedInstance t1 = instancesMap.get(uuid);
-						if ( t1 == null || t1.instance == null ) {
-							Instance temp = Game.getInstanceFromUUID(uuid);
-							if ( temp != null )
-								instancesMap.put(uuid, new LoadedInstance(Game.getInstanceFromUUID(uuid)));
+					long v = Long.parseLong(j.get("Value").toString());
+					
+					// Special case where we load from UUID
+					if ( v == -1 ) {
+						Object uuidEntry = j.get("UUID");
+						if ( uuidEntry != null ) {
+							Instance temp = Game.getInstanceFromUUID(UUID.fromString(uuidEntry.toString()));
+							if ( temp != null ) {
+								v = highestReference.reference++;
+								instancesMap.put(v, new LoadedInstance(temp));
+							}
 						}
-						
-						return new PropertyValue<UUID>(uuid, true);
 					}
+					
+					// Make sure the pointed to hash object matches exactly!
+					Object hashEntry = j.get("Hash");
+					if ( hashEntry != null ) {
+						Instance temp = null;//Game.getInstanceFromSID(v);
+						if ( temp != null ) {
+							if ( !temp.hashFields().equals(hashEntry) )
+								v = -1;
+						}
+					}
+					
+					return new PropertyValue<Long>(v, true);
 				}
 				
 				// Match value to datatype

@@ -42,7 +42,6 @@ public abstract class DataModel extends LuaDatatype {
 	private static final LuaValue C_DESCENDANTADDED = LuaValue.valueOf("DescendantAdded");
 	private static final LuaValue C_DESCENDANTREMOVED = LuaValue.valueOf("DescendantRemoved");
 	private static final LuaValue C_ARCHIVABLE = LuaValue.valueOf("Archivable");
-	private static final LuaValue C_SID = LuaValue.valueOf("SID");
 
 	private static final LuaValue C_CLASSNAME = LuaValue.valueOf("ClassName");
 	private static final LuaValue C_NAME = LuaValue.valueOf("Name");
@@ -94,7 +93,6 @@ public abstract class DataModel extends LuaDatatype {
 		this.defineField(C_NAME,		LuaValue.valueOf(name), false).addFlag(LuaFieldFlag.CORE_FIELD);
 		this.defineField(C_CLASSNAME,	LuaValue.valueOf(name), true).addFlag(LuaFieldFlag.CORE_FIELD);
 		this.defineField(C_PARENT,		LuaValue.NIL,			false).addFlag(LuaFieldFlag.CORE_FIELD).addFlag(LuaFieldFlag.CANT_COPY);
-		this.defineField(C_SID, 		LuaValue.valueOf(-1),   true).addFlag(LuaFieldFlag.CORE_FIELD).addFlag(LuaFieldFlag.FIELD_HIDDEN).addFlag(LuaFieldFlag.CANT_COPY);
 		this.defineField(C_ARCHIVABLE,	LuaValue.valueOf(true), false).addFlag(LuaFieldFlag.CORE_FIELD);
 
 		this.rawset(C_CHANGED,		new LuaEvent());
@@ -624,14 +622,6 @@ public abstract class DataModel extends LuaDatatype {
 		this.checkSetParent(C_PARENT, oldParent, parent);
 		//this.onValueUpdated(C_PARENT, parent);
 		this.onKeyChange(C_PARENT, parent, oldParent);
-	}
-	
-	/**
-	 * Returns the ServerID of the DataModel. This Identifier is used when sending packets across the network to reference the DataModel. Each DataModel should be given a unique ID.
-	 * @return
-	 */
-	public Long getSID() {
-		return this.get(C_SID).tolong();
 	}
 	
 	/**

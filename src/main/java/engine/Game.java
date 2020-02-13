@@ -402,17 +402,6 @@ public class Game implements Tickable {
 	}
 	
 	/**
-	 * Returns an instance from the server-generated id
-	 * @param sid
-	 * @return
-	 */
-	public static Instance getInstanceFromSID(long sid) {
-		if ( sid == -1 ) 
-			return null;
-		return game().serverSidedInstances.get(sid);
-	}
-	
-	/**
 	 * Returns an instance from the unique id. Every instance has a unique ID.
 	 * The same instance shared between applications will have different UUIDs.
 	 * @param uuid
@@ -438,7 +427,6 @@ public class Game implements Tickable {
 		
 		game.unsavedScenes.clear();
 		game().uniqueInstances.clear();
-		game().serverSidedInstances.clear();
 		
 		loaded = false;
 	}
@@ -515,7 +503,7 @@ public class Game implements Tickable {
 		List<Service> children = Game.getServices();
 		for (int i = 0; i < children.size(); i++) {
 			Instance c = children.get(i);
-			game().serverSidedInstances.put( c.getSID(), c);
+			game().uniqueInstances.put( c.getUUID(), c);
 		}
 		
 		// Fire load event
@@ -730,16 +718,6 @@ public class Game implements Tickable {
 		return game.isServer;
 	}
 
-	public static long generateSID() {
-		if ( !Game.isServer() && Game.running )
-			return -1;
-		long t = instanceCounter.incrementAndGet();
-		while (game().serverSidedInstances.containsKey(t) ) {
-			t = instanceCounter.incrementAndGet();
-		}
-		return t;
-	}
-
 	public void setServer(boolean b) {
 		this.isServer = b;
 	}
@@ -832,7 +810,7 @@ public class Game implements Tickable {
 		
 		// Generate json for each root object
 		for (int i = 0; i < selected.size(); i++) {
-			JSONObject json = Save.getInstanceJSONRecursive(false, false, selected.get(i));
+			JSONObject json = Save.getInstanceJSONRecursive(false, selected.get(i));
 			temp.add(json);
 		}
 		

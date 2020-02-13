@@ -11,6 +11,7 @@
 package engine.lua.network.internal;
 
 import java.lang.reflect.Method;
+import java.util.UUID;
 
 import org.json.simple.JSONObject;
 import org.luaj.vm2.LuaTable;
@@ -46,7 +47,12 @@ public class JSONUtil {
 		
 		// Instances in the game
 		if ( luaValue instanceof Instance || luaValue.isnil() ) {
-			long refId = luaValue.isnil()?-1:((Instance)luaValue).getSID();			
+			String refId = null;
+			if ( !luaValue.isnil() ) {
+				Instance temp = (Instance)luaValue;
+				if ( temp.getUUID() != null )
+					refId = temp.getUUID().toString();
+			}			
 			JSONObject j = new JSONObject();
 			j.put(C_TYPE, C_TYPE_REFERENCE);
 			j.put(C_VALUE, refId);
@@ -106,8 +112,10 @@ public class JSONUtil {
 			}
 			
 			if ( j.get(C_TYPE).equals(C_TYPE_REFERENCE) ) {
-				long v = Long.parseLong(j.get(C_VALUE).toString());
-				return Game.getInstanceFromSID(v);
+				String uuidStr = (String) j.get(C_VALUE);
+				if ( uuidStr == null || uuidStr.length() == 0 )
+					return null;
+				return Game.getInstanceFromUUID(UUID.fromString(uuidStr));
 			}
 			
 			if ( j.get(C_TYPE).equals(C_TYPE_DATATYPE) ) {

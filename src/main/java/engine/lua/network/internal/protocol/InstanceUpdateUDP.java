@@ -30,13 +30,11 @@ import engine.lua.type.object.PhysicsBase;
 import engine.lua.type.object.insts.Player;
 
 public class InstanceUpdateUDP implements ClientProcessable,ServerProcessable {
-	public long instanceId;
 	public UUIDSerializable instanceUUID;
 	public String instanceData;
 	public boolean rawOnly;
 	
 	public InstanceUpdateUDP() {
-		this.instanceId = -1;
 		this.instanceData = "";
 	}
 	
@@ -46,7 +44,6 @@ public class InstanceUpdateUDP implements ClientProcessable,ServerProcessable {
 	
 	@SuppressWarnings("unchecked")
 	public InstanceUpdateUDP(Instance instance, LuaValue field, boolean rawOnly) {
-		this.instanceId = instance.getSID();
 		this.instanceUUID = new UUIDSerializable(instance.getUUID());
 
 		JSONObject j = new JSONObject();
@@ -60,10 +57,6 @@ public class InstanceUpdateUDP implements ClientProcessable,ServerProcessable {
 	
 	@Override
 	public void serverProcess(Connection connection) {
-		/*Instance instance = Game.getInstanceFromSID(instanceId);
-		if ( instance == null ) {
-			return;
-		}*/
 		Instance instance = Game.getInstanceFromUUID(instanceUUID.getUUID());
 		if ( instance == null )
 			return;
@@ -100,7 +93,7 @@ public class InstanceUpdateUDP implements ClientProcessable,ServerProcessable {
 			}
 		}
 		
-		// Prevent client from modifying Name, Parent, Classname, or SID.
+		// Prevent client from modifying Name, Parent, or Classname.
 		try {
 			JSONParser parser = new JSONParser();
 			JSONObject obj = (JSONObject) parser.parse(instanceData);
@@ -122,9 +115,6 @@ public class InstanceUpdateUDP implements ClientProcessable,ServerProcessable {
 
 	@Override
 	public void clientProcess(Connection connection) {
-		/*Instance instance = Game.getInstanceFromSID(instanceId);
-		if ( instance == null )
-			return;*/
 		Instance instance = Game.getInstanceFromUUID(instanceUUID.getUUID());
 		if ( instance == null )
 			return;
@@ -135,7 +125,6 @@ public class InstanceUpdateUDP implements ClientProcessable,ServerProcessable {
 	private static final String C_NAME = "Name";
 	private static final String C_PARENT = "Parent";
 	private static final String C_CLASSNAME = "ClassName";
-	private static final String C_SID = "SID";
 	
 	private void process(Instance instance, Connection connection) {
 		try {

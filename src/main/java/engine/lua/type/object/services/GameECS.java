@@ -31,8 +31,6 @@ import engine.lua.type.object.insts.Scene;
 import engine.lua.type.object.insts.SceneInternal;
 
 public class GameECS extends Instance {
-	
-	public Map<Long,Instance> serverSidedInstances = new HashMap<>();
 	public Map<UUID,Instance> uniqueInstances = new HashMap<>();
 	
 	public GameECS() {
@@ -78,18 +76,15 @@ public class GameECS extends Instance {
 		this.descendantRemovedEvent().connectLua(new OneArgFunction() {
 			@Override
 			public LuaValue call(LuaValue object) {
-				synchronized(serverSidedInstances) {
 					if ( object instanceof Instance ) {
 						Instance inst = (Instance) object;
-						long sid = inst.getSID();
-						
-						// Remove server sided instance
-						serverSidedInstances.remove(sid);
+						UUID UUID = inst.getUUID();
+						if ( UUID == null )
+							return LuaValue.NIL;
 						
 						// Remove unique reference
-						uniqueInstances.remove(inst.getUUID());
+						uniqueInstances.remove(UUID);
 					}
-				}
 				return LuaValue.NIL;
 			}
 		});
@@ -97,34 +92,23 @@ public class GameECS extends Instance {
 		this.descendantAddedEvent().connectLua(new OneArgFunction() {
 			@Override
 			public LuaValue call(LuaValue object) {
-				synchronized(serverSidedInstances) {
-					if ( object instanceof Instance ) {
-						Instance newInst = (Instance)object;
-						
-						// Generate UUID
-						if ( newInst.getUUID() == null ) {
+				if ( object instanceof Instance ) {
+					Instance newInst = (Instance)object;
+					
+					// Generate UUID
+					if ( newInst.getUUID() == null ) {
+						UUID tuid = Game.generateUUID();
+						newInst.setUUID(tuid);
+						uniqueInstances.put(tuid, newInst);
+					} else {
+						Instance oldInst = uniqueInstances.get(newInst.getUUID());
+						if ( oldInst == null ) {
+							uniqueInstances.put(newInst.getUUID(),newInst);
+						} else if ( oldInst != newInst ) {
 							UUID tuid = Game.generateUUID();
 							newInst.setUUID(tuid);
 							uniqueInstances.put(tuid, newInst);
-						} else {
-							Instance oldInst = uniqueInstances.get(newInst.getUUID());
-							if ( oldInst == null ) {
-								uniqueInstances.put(newInst.getUUID(),newInst);
-							} else if ( oldInst != newInst ) {
-								UUID tuid = Game.generateUUID();
-								newInst.setUUID(tuid);
-								uniqueInstances.put(tuid, newInst);
-							}
 						}
-						
-						// Generate server sided id if server instance
-						if ( Game.isServer() )
-							newInst.rawset(C_SID, LuaValue.valueOf(Game.generateSID()));
-						
-						// Get server id and store it
-						long sid = newInst.getSID();
-						if ( sid != -1 )
-							serverSidedInstances.put(sid, newInst);
 					}
 				}
 				return LuaValue.NIL;
@@ -136,12 +120,12 @@ public class GameECS extends Instance {
 		setInstanceable(false);
 	}
 	
-	@Deprecated
+	/*@Deprecated
 	public Map<Long, Instance> getInstanceMapOld() {
 		Map<Long, Instance> map = new HashMap<>();
 		map.putAll(this.serverSidedInstances);
 		return map;
-	}
+	}*/
 	
 	public Map<UUID, Instance> getInstanceMap() {
 		Map<UUID, Instance> map = new HashMap<>();
@@ -171,6 +155,8 @@ public class GameECS extends Instance {
 	public void loadScene(Scene scene) {
 		if ( scene == null )
 			return;
+		
+		System.out.println("Attempting to load scene: " + scene.getFullName() + " / " + scene.getUUID());
 		
 		// Store current scene
 		Scene currentScene = Game.project().scenes().getCurrentScene();
