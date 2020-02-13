@@ -186,10 +186,9 @@ public class InternalServer extends Server {
 		
 		Game.game().descendantRemovedEvent().connect((args) -> {
 			Instance instance = (Instance) args[0];
-			final long instanceId = instance.getSID();
 			
 			InternalGameThread.runLater(()->{
-				InstanceDestroyTCP destObject = new InstanceDestroyTCP(instanceId);
+				InstanceDestroyTCP destObject = new InstanceDestroyTCP(instance);
 				sendAllTCP(destObject);
 			});
 		});

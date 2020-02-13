@@ -24,6 +24,7 @@ import engine.lua.network.internal.protocol.TestProtocol;
 public class InternalRegister {
 	public static void register(Kryo kryo) {
 		kryo.register(String.class);
+		kryo.register(UUIDSerializable.class);
 		
 		kryo.register(ClientConnectTCP.class);
 		kryo.register(ClientConnectFinishTCP.class);

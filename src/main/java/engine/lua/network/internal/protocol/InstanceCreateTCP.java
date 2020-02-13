@@ -19,14 +19,16 @@ import org.luaj.vm2.LuaValue;
 
 import com.esotericsoftware.kryonet.Connection;
 
+import engine.lua.network.UUIDSerializable;
 import engine.lua.network.internal.ClientProcessable;
-import engine.lua.network.internal.NonReplicatable;
 import engine.lua.network.internal.JSONUtil;
+import engine.lua.network.internal.NonReplicatable;
 import engine.lua.type.object.Instance;
 
 public class InstanceCreateTCP implements ClientProcessable {
 	public String instanceType;
 	public String instanceData;
+	public UUIDSerializable instanceUUID;
 
 	private static final String C_PARENTs = "Parent";
 	private static final LuaValue C_CLASSNAME = LuaValue.valueOf("ClassName");
@@ -42,6 +44,7 @@ public class InstanceCreateTCP implements ClientProcessable {
 	@SuppressWarnings("unchecked")
 	public InstanceCreateTCP(Instance instance) {
 		this.instanceType = instance.get(C_CLASSNAME).toString();
+		this.instanceUUID = new UUIDSerializable(instance.getUUID());
 		
 		LuaValue[] fields = instance.getFieldNames();
 		
@@ -52,6 +55,7 @@ public class InstanceCreateTCP implements ClientProcessable {
 			if ( field.eq_b(C_CLASSNAME) )
 				continue;
 			
+			// If instance is Non-Replicatable, DO NOT REPLICATE NAME PARENT OR SID CHANGES!
 			if ( instance instanceof NonReplicatable ) {
 				if ( !field.eq_b(C_NAME) && !field.eq_b(C_PARENT) && !field.eq_b(C_SID) ) {
 					continue;
@@ -98,6 +102,7 @@ public class InstanceCreateTCP implements ClientProcessable {
 		}
 		
 		//System.out.println("PARENT: " + toParent);
+		internalInstance.setUUID(this.instanceUUID.getUUID());
 		internalInstance.forceSetParent(toParent);
 	}
 }

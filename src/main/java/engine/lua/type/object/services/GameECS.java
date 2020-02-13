@@ -99,34 +99,32 @@ public class GameECS extends Instance {
 			public LuaValue call(LuaValue object) {
 				synchronized(serverSidedInstances) {
 					if ( object instanceof Instance ) {
-						Instance inst = (Instance)object;
+						Instance newInst = (Instance)object;
 						
 						// Generate UUID
-						if ( inst.getUUID() == null ) {
+						if ( newInst.getUUID() == null ) {
 							UUID tuid = Game.generateUUID();
-							inst.setUUID(tuid);
-							uniqueInstances.put(tuid, inst);
+							newInst.setUUID(tuid);
+							uniqueInstances.put(tuid, newInst);
 						} else {
-							Instance t = uniqueInstances.get(inst.getUUID());
-							if ( t == null ) {
-								uniqueInstances.put(inst.getUUID(),inst);
-							} else {
-								if ( t != inst ) {
-									UUID tuid = Game.generateUUID();
-									inst.setUUID(tuid);
-									uniqueInstances.put(tuid, inst);
-								}
+							Instance oldInst = uniqueInstances.get(newInst.getUUID());
+							if ( oldInst == null ) {
+								uniqueInstances.put(newInst.getUUID(),newInst);
+							} else if ( oldInst != newInst ) {
+								UUID tuid = Game.generateUUID();
+								newInst.setUUID(tuid);
+								uniqueInstances.put(tuid, newInst);
 							}
 						}
 						
 						// Generate server sided id if server instance
 						if ( Game.isServer() )
-							inst.rawset(C_SID, LuaValue.valueOf(Game.generateSID()));
+							newInst.rawset(C_SID, LuaValue.valueOf(Game.generateSID()));
 						
 						// Get server id and store it
-						long sid = inst.getSID();
+						long sid = newInst.getSID();
 						if ( sid != -1 )
-							serverSidedInstances.put(sid, inst);
+							serverSidedInstances.put(sid, newInst);
 					}
 				}
 				return LuaValue.NIL;

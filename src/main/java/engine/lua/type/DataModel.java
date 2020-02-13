@@ -308,6 +308,7 @@ public abstract class DataModel extends LuaDatatype {
 
 	/**
 	 * Sets the DataModel's UUID. See {@link #getUUID()}.
+	 * Be careful about changing a DataModel's UUID after it is already defined. This may lead to unintended behavior.
 	 * @param uuid
 	 */
 	public void setUUID(UUID uuid) {

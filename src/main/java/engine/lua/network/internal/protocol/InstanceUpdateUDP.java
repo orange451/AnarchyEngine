@@ -18,8 +18,8 @@ import org.luaj.vm2.LuaValue;
 import com.esotericsoftware.kryonet.Connection;
 
 import engine.Game;
-import engine.InternalGameThread;
 import engine.lua.network.InternalServer;
+import engine.lua.network.UUIDSerializable;
 import engine.lua.network.internal.ClientProcessable;
 import engine.lua.network.internal.JSONUtil;
 import engine.lua.network.internal.ServerProcessable;
@@ -31,6 +31,7 @@ import engine.lua.type.object.insts.Player;
 
 public class InstanceUpdateUDP implements ClientProcessable,ServerProcessable {
 	public long instanceId;
+	public UUIDSerializable instanceUUID;
 	public String instanceData;
 	public boolean rawOnly;
 	
@@ -46,6 +47,7 @@ public class InstanceUpdateUDP implements ClientProcessable,ServerProcessable {
 	@SuppressWarnings("unchecked")
 	public InstanceUpdateUDP(Instance instance, LuaValue field, boolean rawOnly) {
 		this.instanceId = instance.getSID();
+		this.instanceUUID = new UUIDSerializable(instance.getUUID());
 
 		JSONObject j = new JSONObject();
 		j.put(field.toString(), JSONUtil.serializeObject(instance.get(field)));
@@ -58,10 +60,13 @@ public class InstanceUpdateUDP implements ClientProcessable,ServerProcessable {
 	
 	@Override
 	public void serverProcess(Connection connection) {
-		Instance instance = Game.getInstanceFromSID(instanceId);
+		/*Instance instance = Game.getInstanceFromSID(instanceId);
 		if ( instance == null ) {
 			return;
-		}
+		}*/
+		Instance instance = Game.getInstanceFromUUID(instanceUUID.getUUID());
+		if ( instance == null )
+			return;
 		
 		// We only let the client control physics objects FOR NOW.
 		if ( !(instance instanceof PhysicsBase) ) {
@@ -101,10 +106,10 @@ public class InstanceUpdateUDP implements ClientProcessable,ServerProcessable {
 			JSONObject obj = (JSONObject) parser.parse(instanceData);
 			String field = (String) obj.keySet().iterator().next();
 			
-			if ( field.equals(C_NAME) || field.equals(C_PARENT) || field.equals(C_CLASSNAME) || field.equals(C_SID) )
+			LuaField lField = instance.getField(LuaValue.valueOf(field));
+			if ( lField.hasFlag(LuaFieldFlag.CORE_FIELD) )
 				return;
 			
-			LuaField lField = instance.getField(LuaValue.valueOf(field));
 			if ( !lField.hasFlag(LuaFieldFlag.CLIENT_SIDE_REPLICATE) && !lField.hasFlag(LuaFieldFlag.CLIENT_SIDE_REPLICATE_MANUAL) )
 				return;
 		} catch (ParseException e) {
@@ -117,7 +122,10 @@ public class InstanceUpdateUDP implements ClientProcessable,ServerProcessable {
 
 	@Override
 	public void clientProcess(Connection connection) {
-		Instance instance = Game.getInstanceFromSID(instanceId);
+		/*Instance instance = Game.getInstanceFromSID(instanceId);
+		if ( instance == null )
+			return;*/
+		Instance instance = Game.getInstanceFromUUID(instanceUUID.getUUID());
 		if ( instance == null )
 			return;
 		
@@ -142,13 +150,7 @@ public class InstanceUpdateUDP implements ClientProcessable,ServerProcessable {
 				else if ( field.equals(C_PARENT) )
 					instance.forceSetParent(value);
 				else {
-					/*if ( Game.isServer() ) {
-						if ( instance instanceof PhysicsBase ) {
-							((PhysicsBase)instance).updatePhysics(LuaValue.valueOf(field), value);
-						}
-					} else {
-						try { instance.set(field, value); } catch(Exception e) {}
-					}*/
+
 					if ( Game.isServer() ) {
 						InternalServer.syncConnectionException = connection;
 						try { instance.set(field, value); } catch(Exception e) {}

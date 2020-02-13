@@ -13,23 +13,29 @@ package engine.lua.network.internal.protocol;
 import com.esotericsoftware.kryonet.Connection;
 
 import engine.Game;
+import engine.lua.network.UUIDSerializable;
 import engine.lua.network.internal.ClientProcessable;
 import engine.lua.type.object.Instance;
 
 public class InstanceDestroyTCP implements ClientProcessable {
 	public long instanceId;
+	public UUIDSerializable instanceUUID;
 
 	public InstanceDestroyTCP() {
 		instanceId = -1;
 	}
 	
-	public InstanceDestroyTCP(long instanceId) {
-		this.instanceId = instanceId;
+	public InstanceDestroyTCP(Instance instance) {
+		this.instanceId = instance.getSID();
+		this.instanceUUID = new UUIDSerializable(instance.getUUID());
 	}
 
 	@Override
 	public void clientProcess(Connection Connection) {
-		Instance instance = Game.getInstanceFromSID(instanceId);
+		/*Instance instance = Game.getInstanceFromSID(instanceId);
+		if ( instance != null )
+			instance.destroy();*/
+		Instance instance = Game.getInstanceFromUUID(this.instanceUUID.getUUID());
 		if ( instance != null )
 			instance.destroy();
 	}
