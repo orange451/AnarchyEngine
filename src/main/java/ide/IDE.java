@@ -117,7 +117,7 @@ public class IDE extends ClientEngine {
 
 	@Override
 	public void update() {
-		if (UserInputService.lockMouse) {
+		if (UserInputService.lockMouse && renderThread.getPipeline().getDisplayPane().isSelectedOrDescendentSelected() && renderThread.getWindow().isFocused()) {
 			if (!grabbed) {
 				grabbed = true;
 				MouseHandler.setGrabbed(renderThread.getWindow().getID(), true);

@@ -40,13 +40,14 @@ public class UserInputService extends Service implements TreeViewable {
 	public static final LuaValue C_INPUTENDED = LuaValue.valueOf("InputEnded");
 	public static final LuaValue C_MOUSEPRESSED = LuaValue.valueOf("MousePressed");
 	public static final LuaValue C_MOUSERELEASED = LuaValue.valueOf("MouseReleased");
+	private static final LuaValue C_LOCKMOUSE = LuaValue.valueOf("LockMouse");
 	
 	public static boolean lockMouse;
 	
 	public UserInputService() {
 		super("UserInputService");
 		
-		this.defineField("LockMouse", LuaValue.valueOf(false), false);
+		this.defineField(C_LOCKMOUSE, LuaValue.valueOf(false), false);
 
 		this.rawset(C_INPUTBEGAN, new LuaEvent());
 		this.rawset(C_INPUTENDED, new LuaEvent());
@@ -175,7 +176,7 @@ public class UserInputService extends Service implements TreeViewable {
 	
 	@Override
 	protected LuaValue onValueSet(LuaValue key, LuaValue value) {
-		if ( key.toString().equals("LockMouse") ) {
+		if ( key.equals(C_LOCKMOUSE) ) {
 			lockMouse = value.toboolean();
 		}
 		return value;

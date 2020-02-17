@@ -62,7 +62,7 @@ public abstract class ClientRunner extends ClientEngine {
 
 	@Override
 	public void update() {
-		if (UserInputService.lockMouse) {
+		if (UserInputService.lockMouse && renderThread.getWindow().isFocused()) {
 			if (!grabbed) {
 				grabbed = true;
 				MouseHandler.setGrabbed(renderThread.getWindow().getID(), true);

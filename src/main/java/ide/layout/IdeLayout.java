@@ -34,8 +34,6 @@ import lwjgui.collections.ObservableList;
 import lwjgui.geometry.Orientation;
 import lwjgui.geometry.Pos;
 import lwjgui.scene.Group;
-import lwjgui.scene.Window;
-import lwjgui.scene.WindowManager;
 import lwjgui.scene.control.Menu;
 import lwjgui.scene.control.MenuBar;
 import lwjgui.scene.control.MenuItem;
