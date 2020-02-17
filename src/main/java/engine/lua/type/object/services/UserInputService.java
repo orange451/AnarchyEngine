@@ -54,6 +54,13 @@ public class UserInputService extends Service implements TreeViewable {
 		this.rawset(C_MOUSEPRESSED, new LuaEvent());
 		this.rawset(C_MOUSERELEASED, new LuaEvent());
 		
+		this.getmetatable().set("IsMouseLocked", new ZeroArgFunction() {
+			@Override
+			public LuaValue call() {
+				return LuaValue.valueOf(ClientEngine.engine.isMouseGrabbed());
+			}
+		});
+		
 		this.getmetatable().set("GetMovementVector", new TwoArgFunction() {
 			@Override
 			public LuaValue call(LuaValue arg1, LuaValue freeCam) {

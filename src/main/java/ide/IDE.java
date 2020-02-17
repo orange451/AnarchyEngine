@@ -130,6 +130,11 @@ public class IDE extends ClientEngine {
 		}
 	}
 
+	@Override
+	public boolean isMouseGrabbed() {
+		return grabbed;
+	}
+
 	public static void main(String[] args) {
 		new IDE(args);
 	}

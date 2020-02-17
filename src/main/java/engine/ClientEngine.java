@@ -29,6 +29,7 @@ public abstract class ClientEngine {
 	public static Game game;
 	public static InternalRenderThread renderThread;
 	public static InternalGameThread gameThread;
+	public static ClientEngine engine;
 
 	private static boolean running = true;
 
@@ -40,6 +41,7 @@ public abstract class ClientEngine {
 		JVMUtil.restartJVM(true, true, null);
 		this.args = args;
 		game = new Game();
+		engine = this;
 		init();
 	}
 
@@ -101,6 +103,8 @@ public abstract class ClientEngine {
 
 	public abstract void update();
 
+	public abstract boolean isMouseGrabbed();
+	
 	public static void stop() {
 		running = false;
 	}
