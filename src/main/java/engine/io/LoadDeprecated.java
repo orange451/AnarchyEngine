@@ -47,7 +47,8 @@ public class LoadDeprecated {
 	 * Force load a specified path. Will unload currently loaded resources
 	 * @param path
 	 */
-	public static void load(String path) {
+	@Deprecated
+	protected static void load(String path) {
 		// Load from JSON file
 		boolean loadedJSON = false;
 		JSONObject obj = null;
@@ -80,15 +81,17 @@ public class LoadDeprecated {
 			SceneInternal internal = LoadDeprecated.loadScene(Game.project().scenes().getStartingScene());
 			
 			// Set it as loaded
-			//Game.project().scenes().setCurrentScene(Game.project().scenes().getStartingScene());
-			if ( !Game.getGame().unsavedScenes.contains(internal) )
-				Game.getGame().unsavedScenes.add(internal);
+			Game.project().scenes().rawset(LuaValue.valueOf("CurrentScene"), internal.getScene());
+			Game.getGame().unsavedScenes.add(internal);
 			
 			// Load it into game
 			Game.game().extractScene(internal);
+
+			// Make sure we have all the services...
+			Game.services();
 			
-			// Force load starting scene...
-			//Game.game().loadScene(Game.project().scenes().getStartingScene());
+			// Fire load event
+			Game.loadEvent().fire();
 		} else {
 			System.out.println("USING OLD LOAD SYSTEM");
 			if ( parseJSON(obj) == null )
@@ -100,8 +103,9 @@ public class LoadDeprecated {
 		// Tell game we're loaded
 		Game.load();
 	}
-	
-	public static void loadExternalObjects(String path) {
+
+	@Deprecated
+	protected static void loadExternalObjects(String path) {
 		// Load external stuff
 		File scripts = new File(new File(path).getParent() + File.separator + "Resources" + File.separator + "Scripts");
 		if ( scripts.exists() ) {
@@ -141,7 +145,8 @@ public class LoadDeprecated {
 	 * @param scene
 	 * @return
 	 */
-	public static SceneInternal loadScene(Scene scene) {
+	@Deprecated
+	protected static SceneInternal loadScene(Scene scene) {
 		if ( scene == null ) 
 			return null;
 		
@@ -178,7 +183,8 @@ public class LoadDeprecated {
 	 * Desearializes a JSONObject(s) into Instances.
 	 * @param obj
 	 */
-	public static Instance parseJSON(JSONObject obj) {
+	@Deprecated
+	protected static Instance parseJSON(JSONObject obj) {
 		return parseJSON( false, obj );
 	}
 	
@@ -188,7 +194,8 @@ public class LoadDeprecated {
 	 * @param obj
 	 * @return
 	 */
-	public static Instance parseJSON(boolean removeUnusedInstances, JSONObject obj) {
+	@Deprecated
+	protected static Instance parseJSON(boolean removeUnusedInstances, JSONObject obj) {
 		ArrayList<LoadedInstance> instances = new ArrayList<LoadedInstance>();
 		HashMap<Long, LoadedInstance> instancesMap = new HashMap<>();
 		Map<Long, Instance> unmodifiedInstances = null;
@@ -265,7 +272,8 @@ public class LoadDeprecated {
 		return null;
 	}
 
-	public static void parseJSONInto(JSONObject obj, Instance rootInstance) {
+	@Deprecated
+	protected static void parseJSONInto(JSONObject obj, Instance rootInstance) {
 		// Read in the objects from JSON
 		ArrayList<LoadedInstance> instances = new ArrayList<LoadedInstance>();
 		HashMap<Long, LoadedInstance> instancesMap = new HashMap<>();

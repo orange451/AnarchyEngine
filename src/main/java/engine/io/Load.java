@@ -416,7 +416,9 @@ public class Load {
 			instancesMap.put(loadedInstance.Reference, loadedInstance);
 		}
 		
-		if ( loadedInstance.ClassName.equals("project") ) {
+		if ( loadedInstance.ClassName.equals("Game") ) {
+			loadedInstance.instance = Game.game();
+		}if ( loadedInstance.ClassName.equals("project") ) {
 			loadedInstance.instance = Game.project();
 		} else {
 			// Search directly in game for instance...
