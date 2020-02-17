@@ -81,7 +81,7 @@ public class IdeExplorer extends IdePane {
 	
 	private static HashMap<Class<? extends Instance>, Integer> priority = new HashMap<>();
 	
-	static {
+	static {		
 		priority.put(Camera.class, 50);
 
 		priority.put(StarterPlayerScripts.class, 41);

@@ -11,6 +11,7 @@
 package ide.layout;
 
 import org.json.simple.JSONObject;
+import org.luaj.vm2.LuaValue;
 
 import engine.ClientEngine;
 import engine.ClientLocalRunner;
@@ -19,6 +20,7 @@ import engine.Game;
 import engine.InternalGameThread;
 import engine.io.Load;
 import engine.io.Save;
+import engine.lua.type.object.services.Core;
 import engine.util.JVMUtil;
 import ide.IDE;
 import ide.layout.windows.IdeConsole;
@@ -260,7 +262,7 @@ public class IdeLayout {
 						// Reload project
 						Game.unload();
 						
-						//Game.project().clearAllChildren();
+						// Reload project
 						Load.parseJSONInto(projectJson, Game.project());
 						
 						// Reload game
@@ -268,6 +270,13 @@ public class IdeLayout {
 						
 						// Load game
 						Game.load();
+						
+						// Reset core
+						Core core = Game.core();
+						if ( core != null ) {
+							core.forceSetParent(LuaValue.NIL);
+							core.forceSetParent(Game.game());
+						}
 					});
 				} catch(Exception e) {
 					e.printStackTrace();

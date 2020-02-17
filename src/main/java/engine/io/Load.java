@@ -418,8 +418,10 @@ public class Load {
 		
 		if ( loadedInstance.ClassName.equals("Game") ) {
 			loadedInstance.instance = Game.game();
+			loadedInstance.parent = null;
 		}if ( loadedInstance.ClassName.equals("project") ) {
 			loadedInstance.instance = Game.project();
+			loadedInstance.parent = null;
 		} else {
 			// Search directly in game for instance...
 			LuaValue temp = rootInstance.get(loadedInstance.ClassName);
