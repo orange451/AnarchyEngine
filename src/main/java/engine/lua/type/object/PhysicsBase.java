@@ -615,6 +615,15 @@ public abstract class PhysicsBase extends Instance implements GameSubscriber {
 		checkAddPhysics();
 	}
 	
+	/**
+	 * Returns the Game Object this physics object is currently linked to.
+	 * @return
+	 */
+	public GameObject getLinked() {
+		LuaValue ret = this.get(C_LINKED);
+		return ret.isnil()?null:(GameObject)ret;
+	}
+	
 	public Vector3 getPosition() {
 		return this.getWorldMatrix().getPosition();
 	}

@@ -28,6 +28,7 @@ import engine.Game;
 import engine.InternalGameThread;
 import engine.gl.mesh.BufferedMesh;
 import engine.lua.type.object.PhysicsBase;
+import engine.lua.type.object.insts.GameObject;
 import engine.lua.type.object.insts.Mesh;
 import engine.lua.type.object.insts.Prefab;
 import engine.lua.type.object.services.Workspace;
@@ -381,15 +382,20 @@ public class PhysicsObjectInternal {
 		
 		float scale = 1.0f;
 		Vector3f offset = ZERO;
-		Prefab prefab = (Prefab) luaFrontEnd.get(C_LINKED).get(C_PREFAB);
-		if ( !prefab.isnil() ) {
+		GameObject linked = luaFrontEnd.getLinked();
+		if ( linked == null )
+			return;
+		
+		Prefab prefab = linked.getPrefab();
+		if ( prefab != null ) {
 			scale = prefab.getScale();
-			offset = prefab.getPrefab().getAABBOffset();
+			if ( prefab.isCenterOrigin() )
+				offset = prefab.getPrefab().getAABBOffset();
 		}
 		
 		
 		BufferedMesh mesh = null;
-		if ( customMesh.isnil() ) {
+		if ( customMesh.isnil() && prefab != null ) {
 			mesh = prefab.getPrefab().getCombinedMesh();
 		} else {
 			mesh = ((Mesh)customMesh).getMesh();
