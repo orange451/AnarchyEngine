@@ -21,7 +21,6 @@ import engine.lua.history.HistoryChange;
 import engine.lua.history.HistorySnapshot;
 import engine.lua.type.object.Instance;
 import engine.lua.type.object.insts.Folder;
-import lwjgui.LWJGUI;
 import lwjgui.scene.Node;
 import lwjgui.scene.control.TextInputControl;
 
@@ -149,7 +148,7 @@ public class StandardUserControls {
 			
 			// Save control
 			if ( event.isCtrlDown && event.getKey() == GLFW.GLFW_KEY_S ) {
-				Save.save();
+				Save.saveSafe();
 			}
 			
 			// New control

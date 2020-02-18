@@ -306,7 +306,7 @@ public class IdeLayout {
 		
 		MenuItem msave = new MenuItem("Save", Icons.icon_save.getView());
 		msave.setOnAction(event -> {
-			Save.save();
+			Save.saveSafe();
 		});
 		menuFile.getItems().add(msave);
 		//msave.setAccelerator(KeyCombination.valueOf("SHORTCUT+S"));

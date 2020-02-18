@@ -143,6 +143,12 @@ public class Save {
 		});
 	}
 	
+	public static void saveSafe() {
+		WindowManager.runLater(()->{
+			save();
+		});
+	}
+	
 	public static boolean save() {
 		return save(false);
 	}

@@ -78,8 +78,6 @@ public class Game implements Tickable {
 	public static boolean internalTesting;
 	private static boolean running;
 	
-	private static AtomicLong instanceCounter = new AtomicLong(0);
-	
 	public static final String VERSION = "0.7a";
 
 	protected boolean isServer = true;
@@ -420,7 +418,6 @@ public class Game implements Tickable {
 		synchronized(selectedInstances) {
 			selectedInstances.clear();
 		}
-		instanceCounter = new AtomicLong(0);
 		
 		clearServices();
 		ScriptRunner.cleanup();
@@ -535,7 +532,6 @@ public class Game implements Tickable {
 	
 	private static final LuaValue C_RUNNING = LuaValue.valueOf("Running");
 	private static final LuaValue C_ISSERVER = LuaValue.valueOf("IsServer");
-	private int ticksNoCamera = 0;
 	
 	@Override
 	public void tick() {
@@ -550,20 +546,6 @@ public class Game implements Tickable {
 			return;
 
 		LuaEngine.globals.set(C_WORKSPACE, workspace);
-
-		// Make sure there's a camera
-		/*if ( workspace.getCurrentCamera() == null ) {
-			ticksNoCamera++;
-			if ( ticksNoCamera > 2 ) {
-				Camera c = new Camera();
-				c.setArchivable(false);
-				c.forceSetParent(workspace);
-				workspace.setCurrentCamera(c);
-				ticksNoCamera = 0;
-			}
-		} else {
-			ticksNoCamera = 0;
-		}*/
 
 		// Tick workspace
 		Game.workspace().tick();
@@ -676,26 +658,27 @@ public class Game implements Tickable {
 		game.gameUpdate(true);
 		
 		if (running) {
-			// Create local player
-			if ( !Game.isServer() && Game.players().getLocalPlayer() == null || internalTesting ) {
-				
-				// Create the player
-				Player p = new Player();
-				p.forceSetParent(Game.players());
-				
-				// Player scripts folder
-				Instance sc = new PlayerScripts();
-				sc.forceSetParent(p);
-				
-				// Player gui folder
-				Instance pg = new PlayerGui();
-				pg.forceSetParent(p);
-				
-				// Simulate a client connection
-				p.start();
-			}
-			
 			Game.runLater(()->{
+				
+				// Create local player
+				if ( !Game.isServer() && Game.players().getLocalPlayer() == null || internalTesting ) {
+					
+					// Create the player
+					Player p = new Player();
+					p.forceSetParent(Game.players());
+					
+					// Player scripts folder
+					Instance sc = new PlayerScripts();
+					sc.forceSetParent(p);
+					
+					// Player gui folder
+					Instance pg = new PlayerGui();
+					pg.forceSetParent(p);
+					
+					// Simulate a client connection
+					p.start();
+				}
+				
 				startEvent().fire();
 				loadEvent().fire();
 			});
