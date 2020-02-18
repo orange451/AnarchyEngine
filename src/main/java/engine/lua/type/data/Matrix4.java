@@ -336,22 +336,22 @@ public class Matrix4 extends LuaValuetype {
 	
 	public static Matrix4 fromJSON(JSONObject json) {
 		Matrix4f internal = new Matrix4f(
-				(float)((Double)json.get("m00")).doubleValue(),
-				(float)((Double)json.get("m01")).doubleValue(),
-				(float)((Double)json.get("m02")).doubleValue(),
-				(float)((Double)json.get("m03")).doubleValue(),
-				(float)((Double)json.get("m10")).doubleValue(),
-				(float)((Double)json.get("m11")).doubleValue(),
-				(float)((Double)json.get("m12")).doubleValue(),
-				(float)((Double)json.get("m13")).doubleValue(),
-				(float)((Double)json.get("m20")).doubleValue(),
-				(float)((Double)json.get("m21")).doubleValue(),
-				(float)((Double)json.get("m22")).doubleValue(),
-				(float)((Double)json.get("m23")).doubleValue(),
-				(float)((Double)json.get("m30")).doubleValue(),
-				(float)((Double)json.get("m31")).doubleValue(),
-				(float)((Double)json.get("m32")).doubleValue(),
-				(float)((Double)json.get("m33")).doubleValue()
+				(float)((Number)json.get("m00")).doubleValue(),
+				(float)((Number)json.get("m01")).doubleValue(),
+				(float)((Number)json.get("m02")).doubleValue(),
+				(float)((Number)json.get("m03")).doubleValue(),
+				(float)((Number)json.get("m10")).doubleValue(),
+				(float)((Number)json.get("m11")).doubleValue(),
+				(float)((Number)json.get("m12")).doubleValue(),
+				(float)((Number)json.get("m13")).doubleValue(),
+				(float)((Number)json.get("m20")).doubleValue(),
+				(float)((Number)json.get("m21")).doubleValue(),
+				(float)((Number)json.get("m22")).doubleValue(),
+				(float)((Number)json.get("m23")).doubleValue(),
+				(float)((Number)json.get("m30")).doubleValue(),
+				(float)((Number)json.get("m31")).doubleValue(),
+				(float)((Number)json.get("m32")).doubleValue(),
+				(float)((Number)json.get("m33")).doubleValue()
 			);
 		return new Matrix4(internal);
 	}

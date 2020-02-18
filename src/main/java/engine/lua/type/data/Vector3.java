@@ -289,9 +289,9 @@ public class Vector3 extends LuaValuetype {
 	
 	public static Vector3 fromJSON(JSONObject json) {
 		return newInstance(
-			((Double)json.get("X")).doubleValue(),
-			((Double)json.get("Y")).doubleValue(),
-			((Double)json.get("Z")).doubleValue()
+			((Number)json.get("X")).doubleValue(),
+			((Number)json.get("Y")).doubleValue(),
+			((Number)json.get("Z")).doubleValue()
 		);
 	}
 	

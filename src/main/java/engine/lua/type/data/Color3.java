@@ -275,9 +275,9 @@ public class Color3 extends ColorBase {
 	
 	public static Color3 fromJSON(JSONObject json) {
 		return newInstance(
-				(int)((Long)json.get("R")).intValue(),
-				(int)((Long)json.get("G")).intValue(),
-				(int)((Long)json.get("B")).intValue()
+				(int)((Number)json.get("R")).intValue(),
+				(int)((Number)json.get("G")).intValue(),
+				(int)((Number)json.get("B")).intValue()
 				);
 	}
 
