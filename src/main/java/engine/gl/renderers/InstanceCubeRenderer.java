@@ -44,6 +44,7 @@ import engine.lua.type.object.PrefabRenderer;
 import engine.lua.type.object.insts.GameObject;
 import engine.lua.type.object.insts.Material;
 import engine.lua.type.object.insts.Model;
+import engine.lua.type.object.insts.Prefab;
 
 public class InstanceCubeRenderer {
 
@@ -86,9 +87,12 @@ public class InstanceCubeRenderer {
 			return;
 		if (go.getPrefab() == null)
 			return;
-		PrefabRenderer pfr = go.getPrefab().getPrefab();
+		Prefab prefab = go.getPrefab();
+		PrefabRenderer pfr = prefab.getPrefab();
 
 		Matrix4f mat = go.getWorldMatrix().toJoml();
+		if ( prefab.isCenterOrigin() )
+			mat.translate(pfr.getAABBOffset());
 		mat.translate(pfr.getAABBOffset());
 		mat.scale(pfr.getParent().getScale());
 		shader.loadTransformationMatrix(mat);

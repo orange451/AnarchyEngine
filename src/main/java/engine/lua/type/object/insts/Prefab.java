@@ -33,14 +33,17 @@ public class Prefab extends Asset implements TreeViewable {
 	
 	private final static LuaValue C_SCALE = LuaValue.valueOf("Scale");
 	private final static LuaValue C_PREFABS = LuaValue.valueOf("Prefabs");
+	private final static LuaValue C_CENTERORIGIN = LuaValue.valueOf("CenterOrigin");
 	
 	private List<Model> models;
 
 	public Prefab() {
 		super("Prefab");
 		
-		this.defineField(C_SCALE.toString(), LuaValue.valueOf(1.0), false);
-		this.getField(C_SCALE).setClamp(new NumberClampPreferred(0, 1024, 0, 4));
+		this.defineField(C_SCALE, LuaValue.valueOf(1.0), false)
+				.setClamp(new NumberClampPreferred(0, 1024, 0, 4));
+		
+		this.defineField(C_CENTERORIGIN, LuaValue.TRUE, false);
 		
 		prefab = new PrefabRenderer(this);
 		models = new ArrayList<Model>();
@@ -111,7 +114,22 @@ public class Prefab extends Asset implements TreeViewable {
 		AssetFolder materials = new AssetFolder();
 		materials.forceSetName("Materials");
 		materials.forceSetParent(this);
-
+	}
+	
+	/**
+	 * Returns whether the Prefab is centered around the origin. See {@link #setCenterOrigin(boolean)}.
+	 * @return
+	 */
+	public boolean isCenterOrigin() {
+		return this.get(C_CENTERORIGIN).toboolean();
+	}
+	
+	/**
+	 * Sets the center origin of this prefab. A Prefab with Center Origin enabled will center the model around origin when drawing.
+	 * @param center
+	 */
+	public void setCenterOrigin(boolean center) {
+		this.set(C_CENTERORIGIN, LuaValue.valueOf(center));
 	}
 	
 	/**

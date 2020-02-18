@@ -47,6 +47,7 @@ import engine.lua.type.object.Instance;
 import engine.lua.type.object.PrefabRenderer;
 import engine.lua.type.object.insts.GameObject;
 import engine.lua.type.object.insts.Material;
+import engine.lua.type.object.insts.Prefab;
 import engine.lua.type.object.insts.animation.AnimationController;
 
 public class AnimInstanceForwardRenderer {
@@ -100,9 +101,12 @@ public class AnimInstanceForwardRenderer {
 		if (go.getPrefab() == null)
 			return;
 		AnimatedModel model = anim.getAnimatedModel();
-		PrefabRenderer pfr = go.getPrefab().getPrefab();
+		Prefab prefab = go.getPrefab();
+		PrefabRenderer pfr = prefab.getPrefab();
 
 		Matrix4f mat = go.getWorldMatrix().toJoml();
+		if ( prefab.isCenterOrigin() )
+			mat.translate(pfr.getAABBOffset());
 		mat.translate(pfr.getAABBOffset());
 		mat.scale(go.getPrefab().getScale());
 		shader.loadTransformationMatrix(mat);
