@@ -10,11 +10,11 @@
 
 package ide.layout.windows;
 
-import lwjgui.ManagedThread;
 import lwjgui.geometry.Pos;
 import lwjgui.scene.Window;
 import lwjgui.scene.WindowHandle;
 import lwjgui.scene.WindowManager;
+import lwjgui.scene.WindowThread;
 import lwjgui.scene.control.Button;
 import lwjgui.scene.control.Label;
 import lwjgui.scene.layout.BorderPane;
@@ -42,7 +42,7 @@ public class ErrorWindow {
 			String prefix = "";
 			if (fatalError)
 				prefix = "Fatal ";
-			new ManagedThread(WIDTH, HEIGHT, prefix + "Error!") {
+			new WindowThread(WIDTH, HEIGHT, prefix + "Error!") {
 				@Override
 				protected void setupHandle(WindowHandle handle) {
 					super.setupHandle(handle);

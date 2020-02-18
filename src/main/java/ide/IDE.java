@@ -21,12 +21,12 @@ import engine.lua.type.object.services.UserInputService;
 import ide.layout.IdeLayout;
 import ide.layout.windows.IdeCSSEditor;
 import ide.layout.windows.IdeLuaEditor;
-import lwjgui.ManagedThread;
 import lwjgui.glfw.input.MouseHandler;
 import lwjgui.scene.Group;
 import lwjgui.scene.Scene;
 import lwjgui.scene.Window;
 import lwjgui.scene.WindowManager;
+import lwjgui.scene.WindowThread;
 
 public class IDE extends ClientEngine {
 	public static IdeLayout layout;
@@ -82,25 +82,21 @@ public class IDE extends ClientEngine {
 
 	public static void openScript(ScriptBase instance) {
 		WindowManager.runLater(() -> {
-			new ManagedThread(300, 100,
-					instance.getName() + ".lua [" + instance.getFullName() + "]") {
+			new WindowThread(instance.getName() + ".lua [" + instance.getFullName() + "]") {
 				@Override
 				protected void init(Window window) {
-					super.init(window);
 					window.setScene(new Scene(new IdeLuaEditor(instance), 500, 400));
 					window.show();
 				}
-			}.start();;
+			}.start();
 		});
 	}
 
 	public static void openCSS(CSS instance) {
 		WindowManager.runLater(() -> {
-			new ManagedThread(300, 100,
-					instance.getName() + ".css [" + instance.getFullName() + "]") {
+			new WindowThread(instance.getName() + ".css [" + instance.getFullName() + "]") {
 				@Override
 				protected void init(Window window) {
-					super.init(window);
 					window.setScene(new Scene(new IdeCSSEditor(instance), 500, 400));
 					window.show();
 				}

@@ -48,11 +48,11 @@ import engine.lua.type.object.insts.Scene;
 import engine.lua.type.object.insts.SceneInternal;
 import engine.util.FileIO;
 import engine.util.FileUtils;
-import lwjgui.ManagedThread;
 import lwjgui.geometry.Pos;
 import lwjgui.scene.Window;
 import lwjgui.scene.WindowHandle;
 import lwjgui.scene.WindowManager;
+import lwjgui.scene.WindowThread;
 import lwjgui.scene.control.Button;
 import lwjgui.scene.control.Label;
 import lwjgui.scene.layout.BorderPane;
@@ -67,7 +67,7 @@ public class Save {
 	public static void requestSave(Runnable after) {
 		//long win = LWJGUIUtil.createOpenGLCoreWindow("Save Dialog", 300, 100, false, true);
 		WindowManager.runLater(() -> {
-			ManagedThread thread = new ManagedThread(300, 100, "Save") {
+			WindowThread thread = new WindowThread(300, 100, "Save") {
 				@Override
 				protected void setupHandle(WindowHandle handle) {
 					super.setupHandle(handle);
