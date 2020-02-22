@@ -23,6 +23,7 @@ public class Scene extends Instance implements TreeViewable {
 		
 		this.setArchivable(true);
 		this.getField(C_ARCHIVABLE).setLocked(true);
+		this.setInstanceable(false);
 	}
 
 	@Override

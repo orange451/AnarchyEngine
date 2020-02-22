@@ -338,6 +338,7 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 		private HBox hbox;
 		private Slider slider;
 		private PropertyModifierInput direct;
+		private boolean ignore;
 		
 		public SliderPropertyModifier(Instance instance, String field, LuaValue value, boolean editable) {
 			super(instance,field,value,editable);
@@ -379,6 +380,9 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 			
 			if ( editable ) {
 				this.slider.setOnValueChangedEvent(event->{
+					if ( ignore )
+						return;
+						
 					double v = Math.floor(slider.getValue()*100)/100f;
 					this.instance.set(field, slider.getValue());
 					this.direct.label.setText(""+v);
@@ -387,8 +391,13 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 		}
 		
 		public void update(LuaValue value) {
-			slider.setValue(value.todouble());
-			this.direct.label.setText(""+slider.getValue());
+			ignore = true;
+			{
+				slider.setValue(value.todouble());
+				double v = Math.floor(slider.getValue()*100)/100f;
+				this.direct.label.setText(""+v);
+			}
+			ignore = false;
 		}
 	}
 	
