@@ -80,21 +80,21 @@ float gold_noise(in vec2 coordinate, in float seed) {
 #end
 
 #function noise
-float random(in vec2 st) {
+float fbm_random(in vec2 st) {
 	return fract(sin(dot(st.xy, vec2(12.9898, 78.233))) * 43758.5453123);
 }
 
 // Based on Morgan McGuire @morgan3d
 // https://www.shadertoy.com/view/4dS3Wd
-float noise(in vec2 st) {
+float fbm_noise(in vec2 st) {
 	vec2 i = floor(st);
 	vec2 f = fract(st);
 
 	// Four corners in 2D of a tile
-	float a = random(i);
-	float b = random(i + vec2(1.0, 0.0));
-	float c = random(i + vec2(0.0, 1.0));
-	float d = random(i + vec2(1.0, 1.0));
+	float a = fbm_random(i);
+	float b = fbm_random(i + vec2(1.0, 0.0));
+	float c = fbm_random(i + vec2(0.0, 1.0));
+	float d = fbm_random(i + vec2(1.0, 1.0));
 
 	vec2 u = f * f * (3.0 - 2.0 * f);
 
@@ -110,7 +110,7 @@ float fbm(in vec2 st) {
 	//
 	// Loop of octaves
 	for (int i = 0; i < OCTAVES; i++) {
-		value += amplitude * noise(st);
+		value += amplitude * fbm_noise(st);
 		st *= 2.;
 		amplitude *= .5;
 	}

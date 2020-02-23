@@ -161,56 +161,108 @@ float RayMarch(vec3 ro, vec3 rd) {
 	}
 	return dO;
 }
-/*
+
 #include function random
 
-// Simplex 2D noise
+//	Simplex 3D Noise
+//	by Ian McEwan, Ashima Arts
 //
-vec3 permute(vec3 x) { return mod(((x*34.0)+1.0)*x, 289.0); }
-
-float snoise(vec2 v){
-  const vec4 C = vec4(0.211324865405187, 0.366025403784439,
-           -0.577350269189626, 0.024390243902439);
-  vec2 i  = floor(v + dot(v, C.yy) );
-  vec2 x0 = v -   i + dot(i, C.xx);
-  vec2 i1;
-  i1 = (x0.x > x0.y) ? vec2(1.0, 0.0) : vec2(0.0, 1.0);
-  vec4 x12 = x0.xyxy + C.xxzz;
-  x12.xy -= i1;
-  i = mod(i, 289.0);
-  vec3 p = permute( permute( i.y + vec3(0.0, i1.y, 1.0 ))
-  + i.x + vec3(0.0, i1.x, 1.0 ));
-  vec3 m = max(0.5 - vec3(dot(x0,x0), dot(x12.xy,x12.xy),
-    dot(x12.zw,x12.zw)), 0.0);
-  m = m*m ;
-  m = m*m ;
-  vec3 x = 2.0 * fract(p * C.www) - 1.0;
-  vec3 h = abs(x) - 0.5;
-  vec3 ox = floor(x + 0.5);
-  vec3 a0 = x - ox;
-  m *= 1.79284291400159 - 0.85373472095314 * ( a0*a0 + h*h );
-  vec3 g;
-  g.x  = a0.x  * x0.x  + h.x  * x0.y;
-  g.yz = a0.yz * x12.xz + h.yz * x12.yw;
-  return 130.0 * dot(m, g);
+vec4 permute(vec4 x) {
+	return mod(((x * 34.0) + 1.0) * x, 289.0);
+}
+vec4 taylorInvSqrt(vec4 r) {
+	return 1.79284291400159 - 0.85373472095314 * r;
 }
 
-bool rayHitCloud(vec3 p, out float volume) {
-	float height = max(snoise(p.xy), 0.0);
-	if (height <= 0.0)
-		return false;
-	volume = height;
+float snoise(vec3 v) {
+	const vec2 C = vec2(1.0 / 6.0, 1.0 / 3.0);
+	const vec4 D = vec4(0.0, 0.5, 1.0, 2.0);
 
-	float upperHeight = height - 0.5;
-	upperHeight *= 800;
+	// First corner
+	vec3 i = floor(v + dot(v, C.yyy));
+	vec3 x0 = v - i + dot(i, C.xxx);
 
-	float lowerHeight = height + 0.5;
-	lowerHeight *= -800;
+	// Other corners
+	vec3 g = step(x0.yzx, x0.xyz);
+	vec3 l = 1.0 - g;
+	vec3 i1 = min(g.xyz, l.zxy);
+	vec3 i2 = max(g.xyz, l.zxy);
 
-	lowerHeight += dynamicSky.cloudHeight + 1600;
-	upperHeight += dynamicSky.cloudHeight + 1600;
-	return abs(lowerHeight - p.z) < 100 || abs(upperHeight - p.z) < 100;
-}*/
+	//  x0 = x0 - 0. + 0.0 * C
+	vec3 x1 = x0 - i1 + 1.0 * C.xxx;
+	vec3 x2 = x0 - i2 + 2.0 * C.xxx;
+	vec3 x3 = x0 - 1. + 3.0 * C.xxx;
+
+	// Permutations
+	i = mod(i, 289.0);
+	vec4 p = permute(
+		permute(permute(i.z + vec4(0.0, i1.z, i2.z, 1.0)) + i.y + vec4(0.0, i1.y, i2.y, 1.0)) +
+		i.x + vec4(0.0, i1.x, i2.x, 1.0));
+
+	// Gradients
+	// ( N*N points uniformly over a square, mapped onto an octahedron.)
+	float n_ = 1.0 / 7.0; // N=7
+	vec3 ns = n_ * D.wyz - D.xzx;
+
+	vec4 j = p - 49.0 * floor(p * ns.z * ns.z); //  mod(p,N*N)
+
+	vec4 x_ = floor(j * ns.z);
+	vec4 y_ = floor(j - 7.0 * x_); // mod(j,N)
+
+	vec4 x = x_ * ns.x + ns.yyyy;
+	vec4 y = y_ * ns.x + ns.yyyy;
+	vec4 h = 1.0 - abs(x) - abs(y);
+
+	vec4 b0 = vec4(x.xy, y.xy);
+	vec4 b1 = vec4(x.zw, y.zw);
+
+	vec4 s0 = floor(b0) * 2.0 + 1.0;
+	vec4 s1 = floor(b1) * 2.0 + 1.0;
+	vec4 sh = -step(h, vec4(0.0));
+
+	vec4 a0 = b0.xzyw + s0.xzyw * sh.xxyy;
+	vec4 a1 = b1.xzyw + s1.xzyw * sh.zzww;
+
+	vec3 p0 = vec3(a0.xy, h.x);
+	vec3 p1 = vec3(a0.zw, h.y);
+	vec3 p2 = vec3(a1.xy, h.z);
+	vec3 p3 = vec3(a1.zw, h.w);
+
+	// Normalise gradients
+	vec4 norm = taylorInvSqrt(vec4(dot(p0, p0), dot(p1, p1), dot(p2, p2), dot(p3, p3)));
+	p0 *= norm.x;
+	p1 *= norm.y;
+	p2 *= norm.z;
+	p3 *= norm.w;
+
+	// Mix final noise value
+	vec4 m = max(0.6 - vec4(dot(x0, x0), dot(x1, x1), dot(x2, x2), dot(x3, x3)), 0.0);
+	m = m * m;
+	return 42.0 * dot(m * m, vec4(dot(p0, x0), dot(p1, x1), dot(p2, x2), dot(p3, x3)));
+}
+
+float rayHitCloud(vec3 p) {
+	float noise = max(snoise(p * 0.004), 0.0);
+	return smoothstep(100, 110, p.z) * smoothstep(250, 240, p.z) * noise;
+}
+
+const float cloudTransmittanceAbsorption = 0.3;
+const float cloudLightAbsorption = 0.05;
+const float cloudLightShadowThreshold = 0.05;
+
+float rayHitCloudLight(vec3 p, vec3 L) {
+	float density;
+	float rayStep = 20.0;
+	vec3 raySample = p;
+	int i = 0;
+	do {
+		raySample += L * rayStep;
+		rayStep *= 1.05;
+		density += max(rayHitCloud(raySample) * rayStep, 0.0);
+		i++;
+	} while (i < 10);
+	return cloudLightShadowThreshold + exp(-density * cloudLightAbsorption) * (1.0 - cloudLightShadowThreshold);
+}
 
 void main() {
 	vec3 V = normalize(pass_normal);
@@ -219,11 +271,11 @@ void main() {
 	vec3 atm = normalize(vec3(pass_normal.x, pass_normal.z, pass_normal.y));
 	vec3 atmL = normalize(vec3(lightPosition.x, lightPosition.z, lightPosition.y));
 
-	vec3 color = atmosphere(atm,								// normalized ray direction
-							vec3(0, 6372e3 + cameraPosition.z, 0),				// ray origin
-							atmL,								// position of the sun
-							22.0,							// intensity of the sun
-							6371e3,							// radius of the planet in meters
+	vec3 color = atmosphere(atm,								   // normalized ray direction
+							vec3(0, 6372e3 + cameraPosition.z, 0), // ray origin
+							atmL,								   // position of the sun
+							22.0,								   // intensity of the sun
+							6371e3,								   // radius of the planet in meters
 							6471e3,							// radius of the atmosphere in meters
 							vec3(5.5e-6, 13.0e-6, 22.4e-6), // Rayleigh scattering coefficient
 							21e-6,							// Mie scattering coefficient
@@ -241,65 +293,9 @@ void main() {
 			clamp((pass_textureCoords.y - SUN_LOWER_LIMIT) / (SUN_UPPER_LIMIT - SUN_LOWER_LIMIT),
 				  0.0, 1.0);
 		if (vl > 0.999)
-			color =/* mix(color,*/ mix(color, vec3(100.0), smoothstep(0.9992, 0.9993, vl))/*, factorSun)*/;
+			color = /* mix(color,*/ mix(color, vec3(100.0),
+										smoothstep(0.9992, 0.9993, vl)) /*, factorSun)*/;
 	}
-
-	/*vec3 rayTrace = cameraPosition;
-	float rayDist, incr = 1.0;
-	vec3 rays;
-	vec3 randSample, finalTrace;
-	bool hit = false;
-	do {
-		rayTrace += V * incr;
-		incr *= 1.025;
-
-		rayDist = length(rayTrace - cameraPosition);
-		//if (rayTrace.z > dynamicSky.cloudHeight + 3200)
-			//break;
-		//if (rayTrace.z < dynamicSky.cloudHeight)
-			//break;
-
-		float noiseMult = 0.00015;
-
-		vec3 randSample = vec3(random(rayTrace.x + dynamicSky.time * frame),
-		random(rayTrace.y * dynamicSky.time + frame), random(rayTrace.z * dynamicSky.time * frame));
-		randSample -= 0.5;
-		randSample *= 0.5;
-		//randSample *= 0.0;
-
-		float fade = smoothstep(dynamicSky.cloudHeight, dynamicSky.cloudHeight + 200, rayTrace.z);
-		float volume;
-		bool hitCloud = rayHitCloud(vec3((rayTrace.xy + randSample.xy * rayDist * 0.125) * noiseMult, rayTrace.z + randSample.z * rayDist * 0.125), volume);
-
-		if(hitCloud) {
-			float shadow = 1.0;
-			{
-				float shadowIncr = 20.0;
-				vec3 shadowTrace = rayTrace;
-				int i = 0;
-				do {
-					shadowTrace += L * shadowIncr;
-					shadowIncr *= 1.05;
-					if (shadowTrace.z < dynamicSky.cloudHeight)
-						break;
-					if (shadowTrace.z > dynamicSky.cloudHeight + 3200)
-						break;
-					float shadowVol;
-					bool hitCloud = rayHitCloud(vec3((shadowTrace.xy + randSample.xy * rayDist * 0.125) * noiseMult, shadowTrace.z + randSample.z), shadowVol);
-					if(hitCloud) {
-						shadow -= 0.15;
-						//shadow = 0.0;
-					}
-					i++;
-				} while(i < 40);
-			}
-			rays = vec3(1.0) * max(shadow, 0.0) * smoothstep(-0.05, 0.2, dot(vec3(0,0,1), L));
-			hit = true;
-			break;
-		}
-	} while (rayDist < 20000);
-	if(hit)
-		color = rays;*/
 
 	vec3 rd = V;
 	vec3 ro = cameraPosition;
@@ -337,8 +333,38 @@ void main() {
 					clamp(length(r.x), 0.0, 1.0));
 	}
 
+	/*vec3 raySample = cameraPosition;
+	float rayDist, rayStep = 0.8;
+	float cloudTransmittance = 1, cloudLight;
+	do {
+		raySample += V * rayStep;
+		rayStep *= 1.025;
+		rayDist = length(raySample - cameraPosition);
+
+		vec3 randSample = vec3(
+			random(raySample.x + dynamicSky.time + frame),
+			random(raySample.y + dynamicSky.time + frame),
+			random(raySample.z + dynamicSky.time + frame)
+			);
+		randSample -= 0.5;
+		randSample *= 0.004;
+		float density = rayHitCloud(raySample + randSample * rayDist);
+		if (density > 0.0) {
+			float lightTransmittance = rayHitCloudLight(raySample, L);
+			cloudLight += density * rayStep * cloudTransmittance * lightTransmittance;
+			cloudTransmittance *= exp(-density * rayStep * cloudTransmittanceAbsorption);
+
+			if	(cloudTransmittance < 0.01) {
+				break;
+			}
+		}
+	} while (rayDist < 1000);
+
+	vec3 cloudColor = cloudLight * vec3(0.8);
+	color = color * cloudTransmittance + cloudColor;*/
+	
 	vec3 ndcPos = (clipSpace / clipSpace.w).xyz;
-    vec3 ndcPosPrev = (clipSpacePrev / clipSpacePrev.w).xyz;
+	vec3 ndcPosPrev = (clipSpacePrev / clipSpacePrev.w).xyz;
 
 	out_Color[0] = vec4(color * ambient, 0.0);
 	out_Color[1] = vec4((ndcPosPrev - ndcPos).xy, 0.0, 0.0);

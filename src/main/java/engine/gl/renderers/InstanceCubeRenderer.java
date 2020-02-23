@@ -93,7 +93,6 @@ public class InstanceCubeRenderer {
 		Matrix4f mat = go.getWorldMatrix().toJoml();
 		if ( prefab.isCenterOrigin() )
 			mat.translate(pfr.getAABBOffset());
-		mat.translate(pfr.getAABBOffset());
 		mat.scale(pfr.getParent().getScale());
 		shader.loadTransformationMatrix(mat);
 

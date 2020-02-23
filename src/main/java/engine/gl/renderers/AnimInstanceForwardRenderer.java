@@ -107,7 +107,6 @@ public class AnimInstanceForwardRenderer {
 		Matrix4f mat = go.getWorldMatrix().toJoml();
 		if ( prefab.isCenterOrigin() )
 			mat.translate(pfr.getAABBOffset());
-		mat.translate(pfr.getAABBOffset());
 		mat.scale(go.getPrefab().getScale());
 		shader.loadTransformationMatrix(mat);
 		shader.loadBoneMat(model.getBoneBuffer());
