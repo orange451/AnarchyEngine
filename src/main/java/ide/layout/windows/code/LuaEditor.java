@@ -2,6 +2,8 @@ package ide.layout.windows.code;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.lwjgl.glfw.GLFW;
 
@@ -46,14 +48,42 @@ public class LuaEditor extends AutoSyntaxCodeEditor {
 					insertText(getCaretPosition(), "\t");
 					setCaretPosition(getCaretPosition() + 1);
 
-					// end
-					if ( amtTabsNext <= amtTabs )
+					int occurencesEnd = occurences("\\b(" + String.join("|", new String[] { "end" }) + ")\\b", true, true);
+					int occurencesStart = occurences("\\b(" + String.join("|", new String[] { "function", "then", "do" }) + ")\\b", true, true);
+					
+					if ( occurencesEnd < occurencesStart )
 						insertText(getCaretPosition(), "\n" + TABS + "end" + CLOSE_PAREN);
 				}
 				
 				event.consume();
 			}
 		});
+	}
+	
+	private int occurences(String match, boolean ignoreComments, boolean replaceSpecialWithSpace) {
+		String currentText = this.getText();
+		
+		// Filter out comments
+		if ( ignoreComments ) {
+			currentText = currentText.replaceAll("--[^\n]*", "");
+			currentText = currentText.replaceAll("--(\\[\\[)(.|\\R)*?(\\]\\])", "");
+		}
+		
+		// Filter out special chars
+		if ( replaceSpecialWithSpace ) {
+			currentText = currentText.replaceAll("[^a-zA-Z0-9]+", " ");
+		}
+		
+		// Create pattern
+        Pattern pattern = Pattern.compile(match);
+        Matcher matcher = pattern.matcher(currentText);
+
+        // Count matches
+        int count = 0;
+        while (matcher.find())
+            count++;
+
+        return count;
 	}
 	
 	@Override
