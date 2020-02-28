@@ -140,7 +140,7 @@ void main() {
 			}
 		}
 		vec3 rayColor = light.color * light.intensity * 0.002;
-		rays += rayColor * intensity * attenuation * (shadow / 25.0);
+		rays += rayColor * intensity * attenuation * (shadow / 25.0) * incr;
 		if (rayDist > rayDistRad)
 			break;
 	} while (rayDist < rayDistRad);*/

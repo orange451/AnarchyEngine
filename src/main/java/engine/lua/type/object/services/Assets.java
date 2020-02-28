@@ -427,6 +427,7 @@ public class Assets extends Service implements TreeViewable,SceneStorable {
 				aData.processBoneTree(scene.mRootNode(), null);
 				aData.forceSetParent(prefab);
 			}
+			Assimp.aiReleaseImport(scene);
 			System.out.println("Loaded");
 			
 			prefab.setName(fileWithoutExtension);

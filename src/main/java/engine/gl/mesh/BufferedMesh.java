@@ -37,8 +37,8 @@ import engine.tasks.TaskManager;
 import engine.util.Pair;
 
 public class BufferedMesh implements RenderableMesh {
-	private int vaoId;
-	private int vboId;
+	private int vaoId = -1;
+	private int vboId = -1;
 	private Vertex[] vertices;
 	private boolean modified;
 	private Pair<Vector3f,Vector3f> AABB;
@@ -248,8 +248,10 @@ public class BufferedMesh implements RenderableMesh {
 		buffer.flip();
 
 		// Generate buffers
-		vboId = glGenBuffers();
-		vaoId = glGenVertexArrays();
+		if (vboId == -1)
+			vboId = glGenBuffers();
+		if (vaoId == -1)
+			vaoId = glGenVertexArrays();
 
 		// Upload Vertex Buffer
 		glBindBuffer(GL_ARRAY_BUFFER, vboId);
