@@ -258,16 +258,16 @@ public class IdeLayout {
 					// Reload from stored JSON
 					InternalGameThread.runLater(()->{
 						// Reload project
-						Game.unload();
+						//Game.unload();
 						
 						// Reload project
-						Load.parseJSONInto(projectJson, Game.project());
+						Load.parseJSONInto(projectJson, Game.project(), true);
 						
 						// Reload game
-						Load.parseJSONInto(gameJson, Game.game());
+						Load.parseJSONInto(gameJson, Game.game(), true);
 						
 						// Load game
-						Game.load();
+						//Game.load();
 						
 						// Reset core
 						Core core = Game.core();

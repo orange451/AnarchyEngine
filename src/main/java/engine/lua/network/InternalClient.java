@@ -89,7 +89,7 @@ public class InternalClient extends Client {
 											Game.unload();
 											
 											// Load new game data
-											if ( Load.parseJSON(true, obj) == null )
+											if ( Load.parseJSONInto(obj, Game.game(), true) == null )
 												return;
 											
 											Game.load();

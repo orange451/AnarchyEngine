@@ -129,7 +129,7 @@ public class Load {
 				LoadDeprecated.load(path);
 				return;
 			} else {
-				parseJSONInto((JSONObject)obj.get("ProjectData"), Game.project());
+				parseJSONInto((JSONObject)obj.get("ProjectData"), Game.project(), false);
 				
 				// Force load starting scene...
 				Game.game().loadScene(Game.project().scenes().getStartingScene());
@@ -212,7 +212,7 @@ public class Load {
 		try {
 			JSONObject externalJSON = (JSONObject) parser.parse(new FileReader(t2));
 			SceneInternal internal = new SceneInternal(scene);
-			parseJSONInto(externalJSON, internal);
+			parseJSONInto(externalJSON, internal, false);
 			loadExternalObjects(Game.saveFile);
 			return internal;
 		} catch (Exception e) {
@@ -227,7 +227,7 @@ public class Load {
 	 * @param obj
 	 */
 	public static Instance parseJSON(JSONObject obj) {
-		return parseJSON( false, obj );
+		return parseJSONInto( obj, Game.game(), false );
 	}
 	
 	/**
@@ -236,7 +236,7 @@ public class Load {
 	 * @param obj
 	 * @return
 	 */
-	public static Instance parseJSON(boolean removeUnusedInstances, JSONObject obj) {
+	/*public static Instance parseJSON(boolean removeUnusedInstances, JSONObject obj) {
 		ArrayList<LoadedInstance> instances = new ArrayList<LoadedInstance>();
 		HashMap<UUID, LoadedInstance> instancesMap = new HashMap<>();
 		Map<UUID, Instance> unmodifiedInstances = null;
@@ -310,10 +310,21 @@ public class Load {
 		}
 		
 		return null;
-	}
+	}*/
 
-	public static void parseJSONInto(JSONObject obj, Instance rootInstance) {
+	public static Instance parseJSONInto(JSONObject obj, Instance rootInstance, boolean removeUnusedInstances) {
 		// Read in the objects from JSON
+		List<Instance> loadedInstances = rootInstance.getDescendants();
+		Map<UUID, Instance> unmodifiedInstances = null;
+		
+		if ( removeUnusedInstances ) {
+			unmodifiedInstances = new HashMap<>();
+			for (int i = 0; i < loadedInstances.size(); i++) {
+				Instance t = loadedInstances.get(i);
+				unmodifiedInstances.put(t.getUUID(), t);
+			}
+		}
+		
 		ArrayList<LoadedInstance> instances = new ArrayList<LoadedInstance>();
 		HashMap<UUID, LoadedInstance> instancesMap = new HashMap<>();
 		LoadedInstance rootloaded = new LoadedInstance(rootInstance);
@@ -345,6 +356,10 @@ public class Load {
 					inst.instance.forceSetParent(inst.parent.instance);
 				}
 			}
+			
+			// Remove reference to unused
+			if ( removeUnusedInstances )
+				unmodifiedInstances.remove(inst.instance.getUUID());
 		}
 		
 		// Parent services
@@ -352,6 +367,21 @@ public class Load {
 			LoadedInstance inst = services.get(i);
 			inst.instance.forceSetParent(rootInstance);
 		}
+
+		
+		// Delete unused instances
+		if ( removeUnusedInstances ) {
+			Set<Entry<UUID, Instance>> insts = unmodifiedInstances.entrySet();
+			Iterator<Entry<UUID, Instance>> iterator = insts.iterator();
+			while ( iterator.hasNext() ) {
+				Entry<UUID, Instance> entry = iterator.next();
+				Instance t = entry.getValue();
+				if ( !t.isDestroyed() )
+					t.destroy();
+			}
+		}
+		
+		return instances.get(0).instance;
 	}
 
 	private static void loadObject(HashMap<UUID, LoadedInstance> instancesMap, LoadedInstance inst) {

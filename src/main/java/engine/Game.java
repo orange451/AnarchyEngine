@@ -821,7 +821,7 @@ public class Game implements Tickable {
         	JSONArray jsonObjects = (JSONArray) parser.parse(reader);
         	for (int i = 0; i < jsonObjects.size(); i++) {
         		JSONObject json = (JSONObject) jsonObjects.get(i);
-        		Instance inst = Load.parseJSON(false, json);
+        		Instance inst = Load.parseJSONInto(json, Game.game(), false);
         		if ( inst == parent ) 
         			continue;
         		
