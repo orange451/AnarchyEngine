@@ -58,9 +58,9 @@ public class DynamicSkyCubeShader extends ShaderProgram {
 	public void loadCamera(LayeredCubeCamera camera) {
 		for (int i = 0; i < 6; i++) {
 			temp.set(camera.getViewMatrix()[i]);
-			temp._m30(0);
-			temp._m31(0);
-			temp._m32(0);
+			temp.m30(0);
+			temp.m31(0);
+			temp.m32(0);
 			this.viewMatrixCube[i].loadMatrix(temp);
 		}
 		this.projectionMatrix.loadMatrix(camera.getProjectionMatrix());

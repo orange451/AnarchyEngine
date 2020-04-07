@@ -63,26 +63,26 @@ public class StaticSkyShader extends ShaderProgram {
 	public void loadCamera(Camera camera, Matrix4f projection) {
 		projectionMatrix.loadMatrix(projection);
 		temp.set(camera.getViewMatrixInternal());
-		temp._m30(0);
-		temp._m31(0);
-		temp._m32(0);
+		temp.m30(0);
+		temp.m31(0);
+		temp.m32(0);
 		viewMatrix.loadMatrix(temp);
 	}
 
 	public void loadCamera(CubeMapCamera camera) {
 		projectionMatrix.loadMatrix(camera.getProjectionMatrix());
 		temp.set(camera.getViewMatrix());
-		temp._m30(0);
-		temp._m31(0);
-		temp._m32(0);
+		temp.m30(0);
+		temp.m31(0);
+		temp.m32(0);
 		viewMatrix.loadMatrix(temp);
 	}
 
 	public void loadCameraPrev(Matrix4f viewMatrixPrev, Matrix4f projectionMatrixPrev) {
 		temp.set(viewMatrixPrev);
-		temp._m30(0);
-		temp._m31(0);
-		temp._m32(0);
+		temp.m30(0);
+		temp.m31(0);
+		temp.m32(0);
 		this.viewMatrixPrev.loadMatrix(temp);
 		this.projectionMatrixPrev.loadMatrix(projectionMatrixPrev);
 	}

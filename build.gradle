@@ -11,7 +11,7 @@ plugins {
 sourceCompatibility = "8"
 mainClassName = "ide.IDE"
 project.ext.lwjglVersion = "3.2.3"
-project.ext.jomlVersion = "1.9.20"
+project.ext.jomlVersion = "1.9.24"
 project.ext.gdxVersion = "1.9.10"
 
 switch (OperatingSystem.current()) {
