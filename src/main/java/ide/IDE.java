@@ -114,7 +114,7 @@ public class IDE extends ClientEngine {
 	@Override
 	public void update() {
 		if (UserInputService.lockMouse && renderThread.getPipeline().getDisplayPane().isSelectedOrDescendentSelected() && renderThread.getWindow().isFocused()) {
-			if (!grabbed) {
+			if (!grabbed) {;
 				grabbed = true;
 				MouseHandler.setGrabbed(renderThread.getWindow().getID(), true);
 			}
@@ -124,11 +124,6 @@ public class IDE extends ClientEngine {
 				grabbed = false;
 			}
 		}
-	}
-
-	@Override
-	public boolean isMouseGrabbed() {
-		return grabbed;
 	}
 
 	public static void main(String[] args) {

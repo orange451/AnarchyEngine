@@ -74,11 +74,6 @@ public abstract class ClientRunner extends ClientEngine {
 			}
 		}
 	}
-	
-	@Override
-	public boolean isMouseGrabbed() {
-		return grabbed;
-	}
 
 	public abstract void loadScene(String[] args);
 

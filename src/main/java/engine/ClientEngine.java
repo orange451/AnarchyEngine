@@ -102,8 +102,6 @@ public abstract class ClientEngine {
 	public abstract void render();
 
 	public abstract void update();
-
-	public abstract boolean isMouseGrabbed();
 	
 	public static void stop() {
 		running = false;

@@ -34,9 +34,4 @@ public class ClientLocalRunner extends ClientRunner {
 	public static void main(String[] args) {
 		new ClientLocalRunner(args);
 	}
-
-	@Override
-	public boolean isMouseGrabbed() {
-		return false;
-	}
 }
