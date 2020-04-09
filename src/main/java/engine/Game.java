@@ -488,7 +488,7 @@ public class Game implements Tickable {
 		if ( !loaded ) {
 			didLoad = true;
 		}
-		loaded = true;
+		setLoaded(true);
 		
 		selectedInstances.clear();
 		game.gameUpdate(true);

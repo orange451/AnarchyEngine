@@ -259,6 +259,7 @@ public class IdeLayout {
 					InternalGameThread.runLater(()->{
 						// Reload project
 						//Game.unload();
+						Game.setLoaded(false);
 						
 						// Reload project
 						Load.parseJSONInto(projectJson, Game.project(), true);
@@ -267,14 +268,14 @@ public class IdeLayout {
 						Load.parseJSONInto(gameJson, Game.game(), true);
 						
 						// Load game
-						//Game.load();
+						Game.load();
 						
 						// Reset core
-						Core core = Game.core();
+						/*Core core = Game.core();
 						if ( core != null ) {
 							core.forceSetParent(LuaValue.NIL);
 							core.forceSetParent(Game.game());
-						}
+						}*/
 					});
 				} catch(Exception e) {
 					e.printStackTrace();
