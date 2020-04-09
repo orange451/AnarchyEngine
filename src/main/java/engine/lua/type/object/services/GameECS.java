@@ -95,6 +95,8 @@ public class GameECS extends Instance {
 				if ( object instanceof Instance ) {
 					Instance newInst = (Instance)object;
 					
+					System.out.println("NEW INSTANCE ADDED TO GAME: " + newInst.getUUID());
+					
 					// Generate UUID
 					if ( newInst.getUUID() == null ) {
 						UUID tuid = Game.generateUUID();

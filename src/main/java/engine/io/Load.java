@@ -314,10 +314,10 @@ public class Load {
 
 	public static Instance parseJSONInto(JSONObject obj, Instance rootInstance, boolean removeUnusedInstances) {
 		// Read in the objects from JSON
-		List<Instance> loadedInstances = rootInstance.getDescendants();
 		Map<UUID, Instance> unmodifiedInstances = null;
 		
-		if ( removeUnusedInstances ) {
+		if ( removeUnusedInstances && rootInstance != null ) {
+			List<Instance> loadedInstances = rootInstance.getDescendants();
 			unmodifiedInstances = new HashMap<>();
 			for (int i = 0; i < loadedInstances.size(); i++) {
 				Instance t = loadedInstances.get(i);
@@ -363,9 +363,11 @@ public class Load {
 		}
 		
 		// Parent services
-		for (int i = 0; i < services.size(); i++) {
-			LoadedInstance inst = services.get(i);
-			inst.instance.forceSetParent(rootInstance);
+		if ( rootInstance != null ) {
+			for (int i = 0; i < services.size(); i++) {
+				LoadedInstance inst = services.get(i);
+				inst.instance.forceSetParent(rootInstance);
+			}
 		}
 
 		
@@ -437,7 +439,8 @@ public class Load {
 		loadedInstance.parent = parent;
 		if ( parent == null )
 			loadedInstance.parent = new LoadedInstance(Game.game());
-		loadedInstance.Reference = UUID.fromString(loadedInstance.uuid);
+		if ( loadedInstance.uuid  != null )
+			loadedInstance.Reference = UUID.fromString(loadedInstance.uuid);
 		
 		
 		// Store instances to map

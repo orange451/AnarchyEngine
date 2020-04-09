@@ -236,7 +236,7 @@ public class Save {
 
 		// Start saving process	
 		JSONObject projectJSONInternal = getProjectJSON(true);
-		JSONObject gameJSON = getInstanceJSONRecursive( true, Game.game());
+		JSONObject gameJSON = getInstanceJSONRecursive( true, true, Game.game());
 		JSONObject saveJSON = new JSONObject();
 		saveJSON.put("Version", 2.0f);
 		saveJSON.put("ProjectData", projectJSONInternal);
@@ -274,7 +274,7 @@ public class Save {
 	 * @return
 	 */
 	public static JSONObject getProjectJSON( boolean savingToFile ) {
-		return getInstanceJSONRecursive( savingToFile, Game.project());
+		return getInstanceJSONRecursive( savingToFile, true, Game.project());
 	}
 
 	/**
@@ -282,7 +282,7 @@ public class Save {
 	 * @return
 	 */
 	public static JSONObject getGameJSON() {
-		return getInstanceJSONRecursive( false, Game.game());
+		return getInstanceJSONRecursive( false, true, Game.game());
 	}
 	
 	/**
@@ -290,12 +290,12 @@ public class Save {
 	 * @param instance
 	 * @return
 	 */
-	public static JSONObject getInstanceJSONRecursive(boolean savingLocally, Instance instance) {
+	public static JSONObject getInstanceJSONRecursive(boolean savingLocally, boolean saveUUID, Instance instance) {
 		JSONObject ret = null;
 		try {
 			instanceMap = new HashMap<>();
 			inst = getSavedInstances( savingLocally, instance);
-			ret = inst.getFirst().toJSON(savingLocally);
+			ret = inst.getFirst().toJSON(savingLocally, saveUUID);
 		} catch(Exception e ) {
 			e.printStackTrace();
 		}
@@ -308,14 +308,14 @@ public class Save {
 	 * @param instance
 	 * @return
 	 */
-	public static JSONObject getInstanceJSON(boolean savingLocally, Instance instance) {
+	public static JSONObject getInstanceJSON(boolean savingLocally, boolean saveUUID, Instance instance) {
 		JSONObject ret = null;
 		try {
 			
 			if ( !instance.isArchivable() && savingLocally )
 				return null;
 
-			ret = new SavedInstance(instance).toJSON(savingLocally);
+			ret = new SavedInstance(instance).toJSON(savingLocally, saveUUID);
 		} catch(Exception e ) {
 			e.printStackTrace();
 		}
@@ -358,7 +358,7 @@ public class Save {
 		}
 
 		@SuppressWarnings("unchecked")
-		public JSONObject toJSON(boolean savingLocally) {
+		public JSONObject toJSON(boolean savingLocally, boolean saveUUID) {
 			if ( !instance.isArchivable() && savingLocally )
 				return null;
 
@@ -371,7 +371,7 @@ public class Save {
 
 				SavedInstance sinst = instanceMap.get(child);
 				if ( sinst != null ) {
-					JSONObject json = sinst.toJSON(savingLocally);
+					JSONObject json = sinst.toJSON(savingLocally, saveUUID);
 					if ( json != null ) {
 						childArray.add(json);
 					}
@@ -401,7 +401,8 @@ public class Save {
 			}
 
 			JSONObject j = new JSONObject();
-			j.put("UUID", uuid);
+			if ( saveUUID )
+				j.put("UUID", uuid);
 			j.put("ClassName", instance.get("ClassName").toString());
 			j.put("Name", instance.getName());
 			j.put("Children", childArray);
@@ -551,7 +552,7 @@ public class Save {
 			
 			// Write this scene to file
 			String sPath = scenePath + linkedScene.getUUID().toString();
-			JSONObject sceneJSON = getInstanceJSONRecursive(true, internalScene);
+			JSONObject sceneJSON = getInstanceJSONRecursive(true, true, internalScene);
 			System.out.println("WRITING SCENE TO FILE! " + linkedScene.getFullName());
 			writeJSONToFile(sPath, sceneJSON);
 			

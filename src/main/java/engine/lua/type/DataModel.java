@@ -379,6 +379,7 @@ public abstract class DataModel extends LuaDatatype {
 			
 			// If the parent hasen't changed, don't run code.
 			if ( oldParent.equals(newParent) ) {
+				System.err.println("Cant change parent to its current parent");
 				return;
 			}
 			

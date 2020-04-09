@@ -36,6 +36,7 @@ import engine.lua.type.ScriptRunner;
 import engine.lua.type.object.Instance;
 import engine.lua.type.object.Service;
 import engine.lua.type.object.insts.Camera;
+import engine.lua.type.object.insts.Folder;
 import engine.lua.type.object.insts.Player;
 import engine.lua.type.object.insts.PlayerGui;
 import engine.lua.type.object.insts.PlayerScripts;
@@ -793,7 +794,7 @@ public class Game implements Tickable {
 		
 		// Generate json for each root object
 		for (int i = 0; i < selected.size(); i++) {
-			JSONObject json = Save.getInstanceJSONRecursive(false, selected.get(i));
+			JSONObject json = Save.getInstanceJSONRecursive(false, false, selected.get(i));
 			temp.add(json);
 		}
 		
@@ -818,23 +819,30 @@ public class Game implements Tickable {
 
         // Parse objects
         try (Reader reader = new FileReader("TEMPCOPY.json")) {
+        	Instance tempRoot = new Folder();
+        	
         	JSONArray jsonObjects = (JSONArray) parser.parse(reader);
         	for (int i = 0; i < jsonObjects.size(); i++) {
         		JSONObject json = (JSONObject) jsonObjects.get(i);
-        		Instance inst = Load.parseJSONInto(json, Game.game(), false);
+        		Instance inst = Load.parseJSONInto(json, tempRoot, false);
         		if ( inst == parent ) 
         			continue;
         		
-        		if ( inst != null ) {
+        		if ( inst != null )
         			instances.add(inst);
+        		
+        		// Force UUIDs to null. This is a new instance!
+        		System.out.println("Resetting instance UUID! " + inst.getFullName() + " / " + inst.getUUID()); 
+        		inst.setUUID(null);
+        		for (Instance tin:inst.getDescendants()) {
+        			tin.setUUID(null);
         		}
+        		
+        		// Move root instance to desired parent
         		inst.forceSetParent(parent);
         	}
-        } catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (ParseException e) {
+        	tempRoot.destroy();
+        } catch (Exception e) {
 			e.printStackTrace();
 		}
         
