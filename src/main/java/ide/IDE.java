@@ -21,7 +21,6 @@ import engine.lua.type.object.services.UserInputService;
 import ide.layout.IdeLayout;
 import ide.layout.windows.IdeCSSEditor;
 import ide.layout.windows.IdeLuaEditor;
-import lwjgui.glfw.input.MouseHandler;
 import lwjgui.scene.Group;
 import lwjgui.scene.Scene;
 import lwjgui.scene.Window;
@@ -116,11 +115,11 @@ public class IDE extends ClientEngine {
 		if (UserInputService.lockMouse && renderThread.getPipeline().getDisplayPane().isSelectedOrDescendentSelected() && renderThread.getWindow().isFocused()) {
 			if (!grabbed) {;
 				grabbed = true;
-				MouseHandler.setGrabbed(renderThread.getWindow().getID(), true);
+				renderThread.getWindow().getMouseHandler().setGrabbed(true);
 			}
 		} else {
 			if (grabbed) {
-				MouseHandler.setGrabbed(renderThread.getWindow().getID(), false);
+				renderThread.getWindow().getMouseHandler().setGrabbed(false);
 				grabbed = false;
 			}
 		}

@@ -57,7 +57,7 @@ public class UserInputService extends Service implements TreeViewable {
 		this.getmetatable().set("IsMouseLocked", new ZeroArgFunction() {
 			@Override
 			public LuaValue call() {
-				return LuaValue.valueOf(MouseHandler.isGrabbed());
+				return LuaValue.valueOf(ClientEngine.renderThread.getWindow().getMouseHandler().isGrabbed());
 			}
 		});
 		

@@ -13,7 +13,6 @@ package engine;
 import engine.lua.type.object.services.UserInputService;
 import lwjgui.geometry.Insets;
 import lwjgui.geometry.Pos;
-import lwjgui.glfw.input.MouseHandler;
 import lwjgui.paint.Color;
 import lwjgui.scene.control.Label;
 import lwjgui.scene.layout.StackPane;
@@ -65,11 +64,11 @@ public abstract class ClientRunner extends ClientEngine {
 		if (UserInputService.lockMouse && renderThread.getWindow().isFocused()) {
 			if (!grabbed) {
 				grabbed = true;
-				MouseHandler.setGrabbed(renderThread.getWindow().getID(), true);
+				renderThread.getWindow().getMouseHandler().setGrabbed(true);
 			}
 		} else {
 			if (grabbed) {
-				MouseHandler.setGrabbed(renderThread.getWindow().getID(), false);
+				renderThread.getWindow().getMouseHandler().setGrabbed(false);
 				grabbed = false;
 			}
 		}
