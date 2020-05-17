@@ -141,4 +141,11 @@ public class LuaEvent extends LuaDatatype {
 			disconnectQueue.clear();
 		}
 	}
+
+	public static void fireEvent(LuaEvent event, LuaValue...values) {
+		if ( event == null )
+			return;
+		
+		event.fire(values);
+	}
 }

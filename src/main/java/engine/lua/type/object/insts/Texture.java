@@ -59,7 +59,8 @@ public class Texture extends AssetLoadable implements TreeViewable, FileResource
 	}
 
 	public LuaEvent textureLoadedEvent() {
-		return (LuaEvent) this.rawget(C_TEXTURELOADED);
+		LuaValue t = this.rawget(C_TEXTURELOADED);
+		return t.isnil()?null:(LuaEvent)t;
 	}
 
 	public void setSRGB(boolean b) {
@@ -90,7 +91,7 @@ public class Texture extends AssetLoadable implements TreeViewable, FileResource
 		this.texture = texture;
 		loaded = true;
 		TaskManager.addTaskRenderThread(() -> {
-			((LuaEvent) this.rawget(C_TEXTURELOADED)).fire();
+			LuaEvent.fireEvent(textureLoadedEvent());
 		});
 	}
 
