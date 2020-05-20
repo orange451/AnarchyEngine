@@ -237,7 +237,7 @@ vec3 computeGI(vec2 texCoords, vec3 position, vec3 normal, sampler2D gDepth,
 
 void main() {
 	vec4 mask = texture(gMask, textureCoords);
-	vec4 image = vec4(1.0);
+	vec4 image = vec4(vec3(0.0), 1.0);
 	if (useAmbientOcclusion) {
 
 		if (MASK_COMPARE(mask.a, PBR_OBJECT)) {

@@ -54,7 +54,7 @@ float rand(vec2 co){
 
 void main() {
 	vec4 mask = texture(gMask, textureCoords);
-	vec4 image = vec4(1.0);
+	vec4 image = vec4(vec3(0.0), 1.0);
 	if (useAmbientOcclusion) {
 
 		if (MASK_COMPARE(mask.a, PBR_OBJECT)) {
@@ -149,8 +149,7 @@ void main() {
             // Power
             total = pow( clamp( total, 0.0, 1.0), CONST_POWER );
             // Output ssao
-            image = vec4(total, total, depth, 1.0);
-
+			image = vec4(vec3(0.0), total);
 		}
 	}
 	out_Color = image;

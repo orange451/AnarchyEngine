@@ -168,13 +168,13 @@ public class GLRenderer implements IPipeline {
 			e.printStackTrace();
 			new ErrorWindow("Error initializing renderer", true);
 		}
-		/*Game.userInputService().inputBeganEvent().connect((args) -> {
+		Game.userInputService().inputBeganEvent().connect((args) -> {
 			if (args[0].get("KeyCode").eq_b(LuaValue.valueOf(GLFW.GLFW_KEY_F5))) {
 				System.out.println("Reloading Shaders...");
 				dp.reloadShaders();
 				pp.reloadShaders();
 			}
-		});*/
+		});
 	}
 
 	private void shadowPass() {
