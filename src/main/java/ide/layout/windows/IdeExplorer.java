@@ -521,13 +521,23 @@ public class IdeExplorer extends IdePane {
 			super(root, node);
 			
 			try {
-				this.icon = new Circle(9);
+				this.icon = new Circle(10);
 				this.icon.setVisible(false);
 				this.icon.setFill(Color.LIGHT_GRAY);
+				this.icon.getClassList().add("icon-button");
 				
 				StackPane p = new StackPane();
 				p.setAlignment(Pos.CENTER);
 				p.getChildren().add(icon);
+				
+				p.setStylesheet(""
+						+ ".icon-button {"
+						+ "		fill-color:lightgray;"
+						+ "}"
+						+ ".icon-button:hover {"
+						+ "		fill-color:gray;"
+						+ "}"
+						+ "");
 				
 				((HBox)this.label).setSpacing(4);
 				((HBox)this.label).getChildren().add(p);
@@ -541,7 +551,7 @@ public class IdeExplorer extends IdePane {
 				l.setFont(Font.SEGOE);
 				l.setMouseTransparent(true);
 				l.setFontStyle(FontStyle.BOLD);
-				l.setFontSize(18);
+				l.setFontSize(20);
 				l.setTextFill(Theme.current().getPane());
 				l.setVisible(false);
 				p.getChildren().add(l);
