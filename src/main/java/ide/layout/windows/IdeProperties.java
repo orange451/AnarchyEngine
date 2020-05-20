@@ -109,6 +109,7 @@ public class IdeProperties extends IdePane implements GameSubscriber,InstancePro
 				}
 			});
 		});
+		
 		// Add user controls
 		StandardUserControls.bind(this);
 	}

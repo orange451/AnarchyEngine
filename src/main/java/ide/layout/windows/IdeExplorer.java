@@ -53,10 +53,16 @@ import engine.tasks.TaskManager;
 import ide.IDE;
 import ide.layout.IdePane;
 import ide.layout.windows.icons.Icons;
+
 import lwjgui.collections.ObservableList;
+import lwjgui.font.Font;
+import lwjgui.font.FontStyle;
 import lwjgui.geometry.Insets;
+import lwjgui.geometry.Pos;
+import lwjgui.paint.Color;
 import lwjgui.scene.Node;
 import lwjgui.scene.control.ContextMenu;
+import lwjgui.scene.control.Label;
 import lwjgui.scene.control.MenuItem;
 import lwjgui.scene.control.ScrollPane;
 import lwjgui.scene.control.SeparatorMenuItem;
@@ -64,6 +70,12 @@ import lwjgui.scene.control.TreeBase;
 import lwjgui.scene.control.TreeItem;
 import lwjgui.scene.control.TreeNode;
 import lwjgui.scene.control.TreeView;
+import lwjgui.scene.layout.HBox;
+import lwjgui.scene.layout.StackPane;
+import lwjgui.scene.shape.Circle;
+import lwjgui.scene.shape.Rectangle;
+import lwjgui.scene.shape.Shape;
+import lwjgui.theme.Theme;
 
 public class IdeExplorer extends IdePane {
 	private ScrollPane scroller;
@@ -499,12 +511,53 @@ public class IdeExplorer extends IdePane {
 	
 	class SortedTreeItem<E> extends TreeItem<E> {
 
+		private Shape icon;
+		
 		public SortedTreeItem(E root) {
-			super(root);
+			this(root, null);
 		}
 		
 		public SortedTreeItem(E root, Node node) {
 			super(root, node);
+			
+			try {
+				this.icon = new Circle(9);
+				this.icon.setVisible(false);
+				this.icon.setFill(Color.LIGHT_GRAY);
+				
+				StackPane p = new StackPane();
+				p.setAlignment(Pos.CENTER);
+				p.getChildren().add(icon);
+				
+				((HBox)this.label).setSpacing(4);
+				((HBox)this.label).getChildren().add(p);
+				
+				this.icon.setOnMouseClicked((event)->{
+					ContextMenu context = new InsertWindowNew((Instance) root);
+					context.show(this.icon.getScene(), tree.getX() + 2, this.icon.getY() + this.icon.getHeight() + 2);
+				});
+				
+				Label l = new Label("+");
+				l.setFont(Font.SEGOE);
+				l.setMouseTransparent(true);
+				l.setFontStyle(FontStyle.BOLD);
+				l.setFontSize(18);
+				l.setTextFill(Theme.current().getPane());
+				l.setVisible(false);
+				p.getChildren().add(l);
+				
+				((HBox)this.label).setOnMouseEntered((event)->{
+					this.icon.setVisible(true);
+					l.setVisible(true);
+				});
+				
+				((HBox)this.label).setOnMouseExited((event)->{
+					this.icon.setVisible(false);
+					l.setVisible(false);
+				});
+			} catch(Exception e) {
+				e.printStackTrace();
+			}
 		}
 		
 		@Override
