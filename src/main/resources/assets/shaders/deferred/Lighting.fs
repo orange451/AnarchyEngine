@@ -8,8 +8,6 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
  */
 
-#include struct DirectionalLight
-
 in vec2 textureCoords;
 
 out vec4[2] out_Color;
@@ -34,6 +32,7 @@ uniform sampler2D directionalLightData;
 uniform sampler2D pointLightData;
 uniform sampler2D spotLightData;
 uniform sampler2D areaLightData;
+uniform sampler2D ambientOcclusion;
 
 uniform bool useAmbientOcclusion;
 
@@ -55,8 +54,6 @@ uniform bool useAmbientOcclusion;
 
 #include function getDepth
 
-#include function computeAmbientOcclusionV2
-
 #include variable MASK
 
 // Linear depth
@@ -66,7 +63,7 @@ uniform bool useAmbientOcclusion;
 // float zeye = B / (A + zndc);
 
 #define MAX_STEPS 100
-#define MAX_DIST 0.5
+#define MAX_DIST 1.0
 #define SURF_DIST 0.01
 
 float computeContactShadows(vec3 pos, vec3 N, vec3 L, float imageDepth) {
@@ -187,17 +184,18 @@ void main() {
 
 		ambient += specular;
 
-		vec3 light = ambient + Lo;
-
-		auxData.rgb = light; // Store light for use in SSR pass
 		auxData.a = 1.0;	 // Initial value 1.0
 
 		if (useAmbientOcclusion) {
-			float ao = computeAmbientOcclusion(textureCoords, position, N, gDepth, projectionMatrix,
-											   inverseProjectionMatrix, inverseViewMatrix);
+			vec4 ssAmbient = texture(ambientOcclusion, textureCoords);
+			float ao = ssAmbient.a;
 			auxData.a = ao; // Store AO for use in SSR pass
-			light *= ao;	// Apply AO, operation will be reversed in SSR pass
+			ambient *= ao;	// Apply AO, operation will be reversed in SSR pass
+			ambient += texture(ambientOcclusion, textureCoords).rgb * image.rgb;
 		}
+		vec3 light = ambient + Lo;
+
+		auxData.rgb = ambient; // Store light for use in SSR pass
 
 		vec3 emissive = texture(gMask, textureCoords).rgb;
 		vec3 color = light + emissive;

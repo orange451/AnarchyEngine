@@ -18,6 +18,7 @@ public class MultiPass extends DeferredPipeline {
 		super(width, height);
 	}
 
+	private AmbientOcclusion ambientOcclusion;
 	private Lighting lighting; // Done
 	private VolumetricLight volumetricLight; // Done
 	private BloomMask bloomMask; // Done
@@ -39,6 +40,8 @@ public class MultiPass extends DeferredPipeline {
 
 		gV1 = new GaussianBlur(true, 0.5f);
 		//super.passes.add(gV1);
+		ambientOcclusion = new AmbientOcclusion();
+		super.passes.add(ambientOcclusion);
 
 		lighting = new Lighting();
 		super.passes.add(lighting);

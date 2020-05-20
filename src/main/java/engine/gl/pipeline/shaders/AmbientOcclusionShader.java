@@ -19,7 +19,7 @@ import engine.gl.shaders.data.UniformSampler;
 import engine.gl.shaders.data.UniformVec3;
 import engine.lua.type.object.insts.Camera;
 
-public class LightingShader extends BasePipelineShader {
+public class AmbientOcclusionShader extends BasePipelineShader {
 
 	private UniformMatrix4 projectionMatrix = new UniformMatrix4("projectionMatrix");
 	private UniformMatrix4 viewMatrix = new UniformMatrix4("viewMatrix");
@@ -33,26 +33,20 @@ public class LightingShader extends BasePipelineShader {
 	private UniformSampler gDepth = new UniformSampler("gDepth");
 	private UniformSampler gPBR = new UniformSampler("gPBR");
 	private UniformSampler gMask = new UniformSampler("gMask");
-	private UniformSampler irradianceCube = new UniformSampler("irradianceCube");
-	private UniformSampler environmentCube = new UniformSampler("environmentCube");
-	private UniformSampler brdfLUT = new UniformSampler("brdfLUT");
+	
 	private UniformSampler directionalLightData = new UniformSampler("directionalLightData");
 	private UniformSampler pointLightData = new UniformSampler("pointLightData");
 	private UniformSampler spotLightData = new UniformSampler("spotLightData");
 	private UniformSampler areaLightData = new UniformSampler("areaLightData");
-	private UniformSampler ambientOcclusion = new UniformSampler("ambientOcclusion");
-
-	private UniformMatrix4 biasMatrix = new UniformMatrix4("biasMatrix");
 
 	private Matrix4f projInv = new Matrix4f();
 
 	@Override
 	protected void setupShader() {
 		super.setupShader();
-		super.addShader(new Shader("assets/shaders/deferred/Lighting.fs", GL_FRAGMENT_SHADER));
+		super.addShader(new Shader("assets/shaders/deferred/AmbientOcclusion.fs", GL_FRAGMENT_SHADER));
 		super.storeUniforms(projectionMatrix, viewMatrix, cameraPosition, gDiffuse, gNormal, gDepth, gPBR, gMask,
-				irradianceCube, environmentCube, brdfLUT, biasMatrix, inverseProjectionMatrix, inverseViewMatrix,
-				directionalLightData, pointLightData, spotLightData, areaLightData, ambientOcclusion);
+				 inverseProjectionMatrix, inverseViewMatrix, directionalLightData, pointLightData, spotLightData, areaLightData);
 	}
 
 	@Override
@@ -63,22 +57,10 @@ public class LightingShader extends BasePipelineShader {
 		gDepth.loadTexUnit(2);
 		gPBR.loadTexUnit(3);
 		gMask.loadTexUnit(4);
-		irradianceCube.loadTexUnit(5);
-		environmentCube.loadTexUnit(6);
-		brdfLUT.loadTexUnit(7);
 		directionalLightData.loadTexUnit(8);
 		pointLightData.loadTexUnit(9);
 		spotLightData.loadTexUnit(10);
 		areaLightData.loadTexUnit(11);
-		ambientOcclusion.loadTexUnit(12);
-		Matrix4f bias = new Matrix4f();
-		bias.m00(0.5f);
-		bias.m11(0.5f);
-		bias.m22(0.5f);
-		bias.m30(0.5f);
-		bias.m31(0.5f);
-		bias.m32(0.5f);
-		biasMatrix.loadMatrix(bias);
 		super.stop();
 	}
 

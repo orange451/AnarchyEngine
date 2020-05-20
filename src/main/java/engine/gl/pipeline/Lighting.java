@@ -23,6 +23,7 @@ import static org.lwjgl.opengl.GL13C.GL_TEXTURE0;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE1;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE10;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE11;
+import static org.lwjgl.opengl.GL13C.GL_TEXTURE12;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE2;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE3;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE4;
@@ -76,6 +77,7 @@ public class Lighting extends DeferredPass<LightingShader> {
 		rnd.plh.getMainTex().active(GL_TEXTURE9);
 		rnd.slh.getMainTex().active(GL_TEXTURE10);
 		rnd.alh.getMainTex().active(GL_TEXTURE11);
+		auxTex[0].active(GL_TEXTURE12);
 	}
 
 	@Override
