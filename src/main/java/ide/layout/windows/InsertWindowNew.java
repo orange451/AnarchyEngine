@@ -74,6 +74,7 @@ public class InsertWindowNew extends ContextMenu {
 			pane.setBackgroundLegacy(Theme.current().getPaneAlt());
 			pane.setFillToParentWidth(true);
 			pane.setPadding(new Insets(8));
+			pane.setBorderRadii(2, 2, 0, 0);
 			mainBox.getChildren().add(pane);
 			
 			pane.getBoxShadowList().add(new BoxShadow(0, 2, 5, -1, Theme.current().getShadow()));
