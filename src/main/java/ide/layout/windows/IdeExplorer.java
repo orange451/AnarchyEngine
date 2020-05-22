@@ -544,7 +544,7 @@ public class IdeExplorer extends IdePane {
 				
 				this.icon.setOnMouseClicked((event)->{
 					ContextMenu context = new InsertWindowNew((Instance) root);
-					context.show(this.icon.getScene(), tree.getX() + 2, this.icon.getY() + this.icon.getHeight() + 2);
+					context.show(this.icon.getScene(), tree.getX() + 2, this.icon.getY() + this.icon.getHeight() + 3);
 				});
 				
 				Label l = new Label("+");
