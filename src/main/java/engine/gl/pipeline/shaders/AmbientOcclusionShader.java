@@ -14,6 +14,8 @@ import static org.lwjgl.opengl.GL20C.GL_FRAGMENT_SHADER;
 
 import org.joml.Matrix4f;
 
+import engine.ClientEngine;
+import engine.gl.shaders.data.UniformFloat;
 import engine.gl.shaders.data.UniformMatrix4;
 import engine.gl.shaders.data.UniformSampler;
 import engine.gl.shaders.data.UniformVec3;
@@ -33,11 +35,17 @@ public class AmbientOcclusionShader extends BasePipelineShader {
 	private UniformSampler gDepth = new UniformSampler("gDepth");
 	private UniformSampler gPBR = new UniformSampler("gPBR");
 	private UniformSampler gMask = new UniformSampler("gMask");
-	
+
 	private UniformSampler directionalLightData = new UniformSampler("directionalLightData");
 	private UniformSampler pointLightData = new UniformSampler("pointLightData");
 	private UniformSampler spotLightData = new UniformSampler("spotLightData");
 	private UniformSampler areaLightData = new UniformSampler("areaLightData");
+
+	private UniformSampler voxelImage = new UniformSampler("voxelImage");
+
+	private UniformFloat time = new UniformFloat("time");
+
+	private float timeL = 0;
 
 	private Matrix4f projInv = new Matrix4f();
 
@@ -46,7 +54,8 @@ public class AmbientOcclusionShader extends BasePipelineShader {
 		super.setupShader();
 		super.addShader(new Shader("assets/shaders/deferred/AmbientOcclusion.fs", GL_FRAGMENT_SHADER));
 		super.storeUniforms(projectionMatrix, viewMatrix, cameraPosition, gDiffuse, gNormal, gDepth, gPBR, gMask,
-				 inverseProjectionMatrix, inverseViewMatrix, directionalLightData, pointLightData, spotLightData, areaLightData);
+				inverseProjectionMatrix, inverseViewMatrix, directionalLightData, pointLightData, spotLightData,
+				areaLightData, voxelImage, time);
 	}
 
 	@Override
@@ -61,6 +70,7 @@ public class AmbientOcclusionShader extends BasePipelineShader {
 		pointLightData.loadTexUnit(9);
 		spotLightData.loadTexUnit(10);
 		areaLightData.loadTexUnit(11);
+		voxelImage.loadTexUnit(12);
 		super.stop();
 	}
 
@@ -70,5 +80,7 @@ public class AmbientOcclusionShader extends BasePipelineShader {
 		this.cameraPosition.loadVec3(camera.getPosition().getInternal());
 		this.inverseProjectionMatrix.loadMatrix(projection.invert(projInv));
 		this.inverseViewMatrix.loadMatrix(camera.getViewMatrixInverseInternal());
+		timeL += ClientEngine.renderThread.getWindow().getDelta();
+		time.loadFloat(timeL);
 	}
 }

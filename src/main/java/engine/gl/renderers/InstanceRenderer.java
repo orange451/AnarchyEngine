@@ -50,6 +50,7 @@ public class InstanceRenderer implements IObjectRenderer {
 	private InstanceShadowRenderer shadowRenderer;
 	private InstanceForwardRenderer forwardRenderer;
 	private InstanceCubeRenderer cubeRenderer;
+	private InstanceVoxelizeRenderer voxelizeRenderer;
 
 	private Matrix4f temp = new Matrix4f();
 
@@ -59,6 +60,7 @@ public class InstanceRenderer implements IObjectRenderer {
 		shadowRenderer = new InstanceShadowRenderer();
 		forwardRenderer = new InstanceForwardRenderer();
 		cubeRenderer = new InstanceCubeRenderer();
+		voxelizeRenderer = new InstanceVoxelizeRenderer();
 	}
 
 	@Override
@@ -104,6 +106,10 @@ public class InstanceRenderer implements IObjectRenderer {
 		shadowRenderer.renderShadow(instances, camera);
 	}
 
+	public void renderVoxelize(IRenderingData rd, RendererData rnd) {
+		voxelizeRenderer.render(instances, rd, rnd);
+	}
+
 	@Override
 	public void end() {
 		instances.clear();
@@ -136,7 +142,7 @@ public class InstanceRenderer implements IObjectRenderer {
 			return;
 
 		Matrix4f mat = go.getWorldMatrix().toJoml();
-		if ( goPrefab.isCenterOrigin() )
+		if (goPrefab.isCenterOrigin())
 			mat.translate(pfr.getAABBOffset());
 		mat.scale(pfr.getParent().getScale());
 		shader.loadTransformationMatrix(mat);

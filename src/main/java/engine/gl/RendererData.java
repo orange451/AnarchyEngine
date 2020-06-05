@@ -34,5 +34,6 @@ public class RendererData {
 	public SpotLightHandler slh;
 	public AreaLightHandler alh;
 	public RenderingSettings rs;
+	public VoxelizedManager vm;
 
 }

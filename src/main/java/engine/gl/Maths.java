@@ -72,26 +72,6 @@ public class Maths {
 
 	}
 
-	public static float clamp(float d, float min, float max) {
-		return Math.max(min, Math.min(max, d));
-	}
-
-	public static float clamp(float d, float min) {
-		return Math.max(min, d);
-	}
-
-	public static int clampInt(int d, int min) {
-		return Math.max(min, d);
-	}
-
-	public static float min(float d, float min) {
-		return Math.min(d, min);
-	}
-
-	public static int minInt(int d, int min) {
-		return Math.min(d, min);
-	}
-
 	public static int randInt(int min, int max) {
 		Random rand = new Random();
 		int randomNum = rand.nextInt((max - min) + 1) + min;

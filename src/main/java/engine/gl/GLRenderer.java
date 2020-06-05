@@ -31,8 +31,10 @@ import static org.lwjgl.opengl.GL11C.glDisable;
 import static org.lwjgl.opengl.GL11C.glEnable;
 import static org.lwjgl.opengl.GL32C.GL_TEXTURE_CUBE_MAP_SEAMLESS;
 
+import org.joml.Math;
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
+import org.joml.Vector3f;
 import org.luaj.vm2.LuaValue;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.ARBClipControl;
@@ -88,6 +90,8 @@ public class GLRenderer implements IPipeline {
 	private RenderingSettings renderingSettings;
 	private RendererData rnd;
 	private IRenderingData rd;
+
+	private VoxelizedManager vm;
 
 	private Matrix4f projMatrix;
 	private Camera currentCamera;
@@ -155,12 +159,13 @@ public class GLRenderer implements IPipeline {
 			directionalLightHandler = new DirectionalLightHandler(width, height);
 			pointLightHandler = new PointLightHandler(width, height);
 			spotLightHandler = new SpotLightHandler(width, height);
-			areaLightHandler =  new AreaLightHandler(width, height);
+			areaLightHandler = new AreaLightHandler(width, height);
 			rnd.plh = pointLightHandler;
 			rnd.dlh = directionalLightHandler;
 			rnd.slh = spotLightHandler;
 			rnd.alh = areaLightHandler;
 			rnd.rs = renderingSettings;
+			rnd.vm = vm = new VoxelizedManager();
 			size.set(width, height);
 			enabled = true;
 			initialized = true;
@@ -244,6 +249,10 @@ public class GLRenderer implements IPipeline {
 
 	private void occlusionPass() {
 		glClear(GL_DEPTH_BUFFER_BIT);
+	}
+
+	private void voxelizePass() {
+		renderingManager.renderVoxelize(rd, rnd);
 	}
 
 	private void gBufferPass() {
@@ -348,7 +357,32 @@ public class GLRenderer implements IPipeline {
 		// Set global time for clouds
 		sun.update(dynamicSkybox);
 
+		//
+		// mat4 mvpX = Ortho * glm::lookAt( vec3( 2, 0, 0 ), vec3( 0, 0, 0 ), vec3( 0,
+		// 1, 0 ) );
+
+		// Create an modelview-orthographic projection matrix see from +Y axis
+		// mat4 mvpY = Ortho * glm::lookAt( vec3( 0, 2, 0 ), vec3( 0, 0, 0 ), vec3( 0,
+		// 0, -1 ) );
+
+		// Create an modelview-orthographic projection matrix see from +Z axis
+		// mat4 mvpZ = Ortho * glm::lookAt( vec3( 0, 0, 2 ), vec3( 0, 0, 0 ), vec3( 0,
+		// 1, 0 ) );
+
 		// currentCamera.getViewMatrix().getInternal().set(spotLightHandler.getLights().get(0).getLightCamera().getViewMatrix());
+		// currentCamera.getViewMatrixInternal().set(new Matrix4f().setLookAt(new
+		// Vector3f(0, 0, 0), new Vector3f(-1,0,0), new Vector3f(0, 1, 0)));
+		// currentCamera.getViewMatrixInternal().set(new Matrix4f().setLookAt(new
+		// Vector3f(0, 0, 0), new Vector3f(0,-0,0), new Vector3f(0, 1, 0)));
+		// currentCamera.getViewMatrixInternal().set(new Matrix4f().setLookAt(new
+		// Vector3f(0, 0, 0), new Vector3f(0,0,-1), new Vector3f(0, 1, 0)));
+
+		// currentCamera.getViewMatrixInternal().set(Maths.createViewMatrixRot(Math.toRadians(-90),
+		// Math.toRadians(90), Math.toRadians(90), null));
+		// currentCamera.getViewMatrixInternal().set(Maths.createViewMatrixRot(Math.toRadians(-90),
+		// Math.toRadians(0), Math.toRadians(0), null));
+		// currentCamera.getViewMatrixInternal().set(Maths.createViewMatrixRot(Math.toRadians(-180),
+		// Math.toRadians(180), Math.toRadians(180), null));
 
 		// Update lighting data
 		Lighting lighting = Game.lighting();
@@ -368,6 +402,7 @@ public class GLRenderer implements IPipeline {
 		shadowPass();
 		environmentPass();
 		// occlusionPass();
+		voxelizePass();
 		gBufferPass();
 		deferredPass();
 		forwardPass();
@@ -415,6 +450,7 @@ public class GLRenderer implements IPipeline {
 		preFilteredEnvironment.dispose();
 		renderingManager.dispose();
 		handlesRenderer.dispose();
+		vm.dispose();
 	}
 
 	@Override

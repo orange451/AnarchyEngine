@@ -191,7 +191,7 @@ void main() {
 			float ao = ssAmbient.a;
 			auxData.a = ao; // Store AO for use in SSR pass
 			ambient *= ao;	// Apply AO, operation will be reversed in SSR pass
-			ambient += texture(ambientOcclusion, textureCoords).rgb * image.rgb;
+			ambient += kD * ssAmbient.rgb * image.rgb;
 		}
 		vec3 light = ambient + Lo;
 
@@ -201,7 +201,7 @@ void main() {
 		vec3 color = light + emissive;
 		image.rgb = color;
 	}
-	out_Color[0].rgb = image;
+	out_Color[0].rgb = image.rgb;
 	out_Color[0].a = 0.0;
 	out_Color[1] = auxData;
 }

@@ -27,6 +27,7 @@ import com.esotericsoftware.kryonet.util.ObjectIntMap;
 import engine.gl.entities.LayeredCubeCamera;
 import engine.gl.lights.DirectionalLightCamera;
 import engine.gl.lights.SpotLightCamera;
+import engine.gl.renderers.InstanceRenderer;
 import engine.lua.type.object.Instance;
 import engine.lua.type.object.insts.animation.AnimationController;
 import engine.observer.RenderableInstance;
@@ -90,6 +91,13 @@ public class RenderingManager {
 	public void renderShadow(LayeredCubeCamera camera) {
 		for (Entry<IObjectRenderer> rendererEntry : objectRenderers)
 			rendererEntry.value.renderShadow(camera);
+	}
+
+	public void renderVoxelize(IRenderingData rd, RendererData rnd) {
+		for (Entry<IObjectRenderer> rendererEntry : objectRenderers) {
+			if (rendererEntry.value instanceof InstanceRenderer)
+				((InstanceRenderer) rendererEntry.value).renderVoxelize(rd, rnd);
+		}
 	}
 
 	public void end() {

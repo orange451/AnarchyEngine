@@ -105,7 +105,7 @@ public class TextureBuilder {
 		check();
 		glBindTexture(target, 0);
 		working = false;
-		return new Texture(texture, target, width, height);
+		return new Texture(texture, target, width, height, depth);
 	}
 
 	private void check() throws IllegalStateException {

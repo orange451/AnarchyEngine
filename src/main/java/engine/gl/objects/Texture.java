@@ -18,23 +18,25 @@ import static org.lwjgl.opengl.GL30C.glGenerateMipmap;
 public class Texture implements IVisualObject {
 
 	private final int texture, target;
-	private final int width, height;
+	private final int width, height, depth;
 
 	private boolean disposable = true;
 
 	@Deprecated
 	public Texture(int texture) {
-		this.texture = texture;
-		this.target = -1;
-		this.width = -1;
-		this.height = -1;
+		this(texture, -1, -1, -1);
 	}
 
 	public Texture(int texture, int target, int width, int height) {
+		this(texture, target, width, height, 0);
+	}
+
+	public Texture(int texture, int target, int width, int height, int depth) {
 		this.texture = texture;
 		this.target = target;
 		this.width = width;
 		this.height = height;
+		this.depth = depth;
 	}
 
 	public void generateMipmaps() {
@@ -74,6 +76,10 @@ public class Texture implements IVisualObject {
 	@Override
 	public int getHeight() {
 		return height;
+	}
+
+	public int getDepth() {
+		return depth;
 	}
 
 	@Deprecated
