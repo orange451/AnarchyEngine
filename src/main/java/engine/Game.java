@@ -62,6 +62,7 @@ import engine.lua.type.object.services.StarterPlayerGui;
 import engine.lua.type.object.services.StarterPlayerScripts;
 import engine.lua.type.object.services.Storage;
 import engine.lua.type.object.services.UserInputService;
+import engine.lua.type.object.services.WeldService;
 import engine.lua.type.object.services.Workspace;
 import engine.observer.Tickable;
 
@@ -173,6 +174,9 @@ public class Game implements Tickable {
 		
 		if ( Game.starterPlayer().starterPlayerGui() == null)
 			new StarterPlayerGui().forceSetParent(Game.starterPlayer());
+		
+		if ( Game.weldService() == null )
+			new WeldService().forceSetParent(Game.game());
 		
 		// SETUP PROJECT BELOW
 		{
@@ -302,6 +306,7 @@ public class Game implements Tickable {
 	private static final LuaValue C_SOUNDSERVICE = LuaValue.valueOf("SoundService");
 	private static final LuaValue C_CORE = LuaValue.valueOf("Core");
 	private static final LuaValue C_HISTORYSERVICE = LuaValue.valueOf("HistoryService");
+	private static final LuaValue C_WELDSERVICE = LuaValue.valueOf("WeldService");
 	private static final LuaValue C_ASSETS = LuaValue.valueOf("Assets");
 
 	public static GameECS game() {
@@ -372,6 +377,10 @@ public class Game implements Tickable {
 	
 	public static HistoryService historyService() {
 		return (HistoryService) Game.getService(C_HISTORYSERVICE);
+	}
+	
+	public static WeldService weldService() {
+		return (WeldService) Game.getService(C_WELDSERVICE);
 	}
 
 	public static Game getGame() {

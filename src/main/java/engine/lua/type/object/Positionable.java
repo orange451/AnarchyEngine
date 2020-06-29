@@ -20,5 +20,6 @@ public interface Positionable {
 	public Vector3 getPosition();
 	public void setPosition(Vector3 position);
 	public Matrix4 getWorldMatrix();
+	public void setWorldMatrix(Matrix4 matrix);
 	public Pair<Vector3f, Vector3f> getAABB();
 }

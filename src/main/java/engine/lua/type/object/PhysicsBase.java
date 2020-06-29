@@ -39,7 +39,7 @@ import engine.lua.type.object.services.Players;
 import engine.physics.PhysicsObjectInternal;
 import engine.util.Pair;
 
-public abstract class PhysicsBase extends Instance implements GameSubscriber {
+public abstract class PhysicsBase extends Instance implements GameSubscriber,Positionable {
 	protected GameObject linked;
 	protected PhysicsObjectInternal physics;
 	private LuaConnection connection;
@@ -638,6 +638,10 @@ public abstract class PhysicsBase extends Instance implements GameSubscriber {
 	
 	public Matrix4 getWorldMatrix() {
 		return (Matrix4) this.get(C_WORLDMATRIX);
+	}
+	
+	public void setWorldMatrix(Matrix4 matrix) {
+		this.set(C_WORLDMATRIX, matrix);
 	}
 	
 	public abstract Pair<Vector3f, Vector3f> getAABB();

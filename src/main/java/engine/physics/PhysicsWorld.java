@@ -69,6 +69,8 @@ public class PhysicsWorld {
 				}
 			}
 		}
+		
+		//com.badlogic.gdx.physics.bullet.dynamics.btFixedConstraint
 
 		synchronized(objects) {
 			for (int i = 0; i < objects.size(); i++) {

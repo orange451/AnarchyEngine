@@ -44,6 +44,7 @@ public class Icons {
 	public static final Icons icon_player_gui = new Icons("PlayerGui.png");
 	public static final Icons icon_starter_player = new Icons("StarterPlayer.png");
 	public static final Icons icon_workspace = new Icons("World.png");
+	public static final Icons icon_weld = new Icons("Weld.png");
 	public static final Icons icon_storage = new Icons("Storage.png");
 	public static final Icons icon_players = new Icons("Players.png");
 	public static final Icons icon_player = new Icons("Player.png");
