@@ -182,7 +182,7 @@ void main() {
 		vec2 envBRDF = texture(brdfLUT, vec2(ndotv, roughness)).rg;
 		vec3 specular = prefilteredColor * (F * envBRDF.x + envBRDF.y);
 
-		//ambient += specular;
+		ambient += specular;
 
 		auxData.a = 1.0;	 // Initial value 1.0
 
