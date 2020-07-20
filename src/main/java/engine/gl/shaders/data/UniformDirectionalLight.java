@@ -37,18 +37,6 @@ public class UniformDirectionalLight extends UniformObject {
 		super.storeUniforms(direction, intensity, visible, color, viewMatrix, shadowMap, shadows);
 	}
 
-	public void loadLight(DirectionalLightInternal light, int i, int offset) {
-		direction.loadVec3(light.direction);
-		color.loadVec3(light.color);
-		intensity.loadFloat(light.intensity);
-		visible.loadBoolean(light.visible);
-		viewMatrix.loadMatrix(light.getLightCamera().getViewMatrix());
-		for (int x = 0; x < 4; x++)
-			projectionMatrix[x].loadMatrix(light.getLightCamera().getProjectionArray()[x]);
-		shadowMap.loadTexUnit(offset + i);
-		shadows.loadBoolean(light.shadows);
-	}
-
 	public void loadLight(DirectionalLightInternal light, int shadowUnit) {
 		direction.loadVec3(light.direction);
 		color.loadVec3(light.color);

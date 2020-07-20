@@ -17,7 +17,7 @@ import static org.lwjgl.opengl.GL13C.GL_TEXTURE1;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE2;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE3;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE4;
-import static org.lwjgl.opengl.GL13C.GL_TEXTURE5;
+import static org.lwjgl.opengl.GL13C.*;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE6;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE8;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE_CUBE_MAP;
@@ -69,9 +69,21 @@ public class InstanceCubeRenderer {
 		glBindTexture(GL_TEXTURE_CUBE_MAP, rnd.environmentMap.getTexture());
 		glActiveTexture(GL_TEXTURE6);
 		glBindTexture(GL_TEXTURE_2D, rnd.brdfLUT.getTexture());
-		for (int x = 0; x < Math.min(8, rnd.dlh.getLights().size()); x++) {
+		for(int x = 0; x < 4; x++) {
+			glActiveTexture(GL_TEXTURE8 + x);
+			glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
+		}
+		for(int x = 0; x < 4; x++) {
+			glActiveTexture(GL_TEXTURE12 + x);
+			glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+		}
+		for (int x = 0; x < Math.min(4, rnd.dlh.getLights().size()); x++) {
 			glActiveTexture(GL_TEXTURE8 + x);
 			glBindTexture(GL_TEXTURE_2D_ARRAY, rnd.dlh.getLights().get(x).getShadowMap().getShadowMaps().getTexture());
+		}
+		for (int x = 0; x < Math.min(4, rnd.plh.getLights().size()); x++) {
+			glActiveTexture(GL_TEXTURE12 + x);
+			glBindTexture(GL_TEXTURE_CUBE_MAP, rnd.plh.getLights().get(x).getShadowMap().getTexture().getTexture());
 		}
 		for (Instance instance : instances) {
 			renderInstance(instance, rnd);
@@ -145,22 +157,10 @@ public class InstanceCubeRenderer {
 	}
 
 	private void prepareMaterial(engine.gl.objects.MaterialGL mat) {
-		if (mat.getDiffuseTexture().getID() != -1) {
-			glActiveTexture(GL_TEXTURE0);
-			glBindTexture(GL_TEXTURE_2D, mat.getDiffuseTexture().getID());
-		}
-		if (mat.getNormalTexture().getID() != -1) {
-			glActiveTexture(GL_TEXTURE1);
-			glBindTexture(GL_TEXTURE_2D, mat.getNormalTexture().getID());
-		}
-		if (mat.getMetalnessTexture().getID() != -1) {
-			glActiveTexture(GL_TEXTURE2);
-			glBindTexture(GL_TEXTURE_2D, mat.getMetalnessTexture().getID());
-		}
-		if (mat.getRoughnessTexture().getID() != -1) {
-			glActiveTexture(GL_TEXTURE3);
-			glBindTexture(GL_TEXTURE_2D, mat.getRoughnessTexture().getID());
-		}
+		mat.getDiffuseTexture().active(GL_TEXTURE0);
+		mat.getNormalTexture().active(GL_TEXTURE1);
+		mat.getMetalnessTexture().active(GL_TEXTURE2);
+		mat.getRoughnessTexture().active(GL_TEXTURE3);
 	}
 
 	public void dispose() {

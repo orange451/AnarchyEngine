@@ -103,6 +103,10 @@ public class Maths {
 		return (float) Math.abs(val - Math.round(val));
 	}
 
+	public static float round(float input, float step) {
+		return ((Math.round(input / step)) * step);
+	}
+
 	public static Matrix4f createProjectionMatrix(int width, int height, float fov, float nearPlane, float farPlane) {
 		return createProjectionMatrix(new Matrix4f(), width, height, fov, nearPlane, farPlane, false);
 	}

@@ -10,20 +10,20 @@
 
 package engine.gl.renderers;
 
-import static org.lwjgl.opengl.GL11C.GL_TEXTURE_2D;
-import static org.lwjgl.opengl.GL11C.glBindTexture;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE0;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE1;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE2;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE3;
-import static org.lwjgl.opengl.GL13C.glActiveTexture;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
+import org.luaj.vm2.LuaValue;
+import org.lwjgl.glfw.GLFW;
 
+import engine.Game;
 import engine.gl.IObjectRenderer;
 import engine.gl.IRenderingData;
 import engine.gl.RendererData;
@@ -61,6 +61,13 @@ public class InstanceRenderer implements IObjectRenderer {
 		forwardRenderer = new InstanceForwardRenderer();
 		cubeRenderer = new InstanceCubeRenderer();
 		voxelizeRenderer = new InstanceVoxelizeRenderer();
+		Game.waitForService(LuaValue.valueOf("UserInputService"));
+		Game.userInputService().inputBeganEvent().connect((args) -> {
+			if (args[0].get("KeyCode").eq_b(LuaValue.valueOf(GLFW.GLFW_KEY_F7))) {
+				System.out.println("Reloading Shaders...");
+				shader.reload();
+			}
+		});
 	}
 
 	@Override
@@ -181,22 +188,10 @@ public class InstanceRenderer implements IObjectRenderer {
 	}
 
 	private void prepareMaterial(engine.gl.objects.MaterialGL mat) {
-		if (mat.getDiffuseTexture().getID() != -1) {
-			glActiveTexture(GL_TEXTURE0);
-			glBindTexture(GL_TEXTURE_2D, mat.getDiffuseTexture().getID());
-		}
-		if (mat.getNormalTexture().getID() != -1) {
-			glActiveTexture(GL_TEXTURE1);
-			glBindTexture(GL_TEXTURE_2D, mat.getNormalTexture().getID());
-		}
-		if (mat.getMetalnessTexture().getID() != -1) {
-			glActiveTexture(GL_TEXTURE2);
-			glBindTexture(GL_TEXTURE_2D, mat.getMetalnessTexture().getID());
-		}
-		if (mat.getRoughnessTexture().getID() != -1) {
-			glActiveTexture(GL_TEXTURE3);
-			glBindTexture(GL_TEXTURE_2D, mat.getRoughnessTexture().getID());
-		}
+		mat.getDiffuseTexture().active(GL_TEXTURE0);
+		mat.getNormalTexture().active(GL_TEXTURE1);
+		mat.getMetalnessTexture().active(GL_TEXTURE2);
+		mat.getRoughnessTexture().active(GL_TEXTURE3);
 	}
 
 	@Override

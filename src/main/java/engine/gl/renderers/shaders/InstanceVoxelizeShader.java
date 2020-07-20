@@ -20,8 +20,8 @@ import org.joml.Math;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
-import engine.ClientEngine;
 import engine.gl.Maths;
+import engine.gl.VoxelizedManager;
 import engine.gl.lights.DirectionalLightInternal;
 import engine.gl.lights.PointLightInternal;
 import engine.gl.objects.MaterialGL;
@@ -29,7 +29,6 @@ import engine.gl.shaders.ShaderProgram;
 import engine.gl.shaders.data.Attribute;
 import engine.gl.shaders.data.UniformBoolean;
 import engine.gl.shaders.data.UniformDirectionalLight;
-import engine.gl.shaders.data.UniformFloat;
 import engine.gl.shaders.data.UniformInteger;
 import engine.gl.shaders.data.UniformMaterial;
 import engine.gl.shaders.data.UniformMatrix4;
@@ -60,8 +59,10 @@ public class InstanceVoxelizeShader extends ShaderProgram {
 	private UniformInteger totalDirectionalLights = new UniformInteger("totalDirectionalLights");
 
 	private UniformSampler voxelImage = new UniformSampler("voxelImage");
+	private UniformInteger resolution = new UniformInteger("resolution");
 
 	private Matrix4f temp = new Matrix4f();
+	private Vector3f tempVec = new Vector3f();
 
 	@Override
 	protected void setupShader() {
@@ -79,7 +80,7 @@ public class InstanceVoxelizeShader extends ShaderProgram {
 		}
 		super.storeUniforms(directionalLights);
 		super.storeUniforms(transformationMatrix, projection, viewX, viewY, viewZ, material, biasMatrix,
-				totalPointLights, totalDirectionalLights, voxelImage, cameraPosition, useShadows);
+				totalPointLights, totalDirectionalLights, voxelImage, cameraPosition, useShadows, resolution);
 	}
 
 	@Override
@@ -94,10 +95,6 @@ public class InstanceVoxelizeShader extends ShaderProgram {
 		bias.m31(0.5f);
 		bias.m32(0.5f);
 		biasMatrix.loadMatrix(bias);
-
-		int cube = 40;
-		projection.loadMatrix(new Matrix4f().setOrtho(-cube, cube, -cube, cube, cube, -cube));
-
 		super.stop();
 	}
 
@@ -109,23 +106,31 @@ public class InstanceVoxelizeShader extends ShaderProgram {
 		this.material.loadMaterial(mat);
 	}
 
-	public void loadCamera(Camera camera) {
-		cameraPosition.loadVec3(camera.getPosition().getInternal());
+	public void loadVoxelizationValues(VoxelizedManager vm, Camera camera) {
+		projection.loadMatrix(vm.getProjectionMatrix());
+
+		Vector3f cameraPos = new Vector3f();
+		cameraPos.setComponent(0, Maths.round(camera.getPosition().getInternal().x(), vm.getCameraOffset()));
+		cameraPos.setComponent(1, Maths.round(camera.getPosition().getInternal().y(), vm.getCameraOffset()));
+		cameraPos.setComponent(2, Maths.round(camera.getPosition().getInternal().z(), vm.getCameraOffset()));
+
+		cameraPosition.loadVec3(cameraPos);
 
 		temp.identity();
 		Maths.createViewMatrixRot(Math.toRadians(-90), Math.toRadians(90), Math.toRadians(90), temp);
-		Maths.createViewMatrixPos(camera.getPosition().getInternal().add(new Vector3f(0.3125f,0,0), new Vector3f()), temp);
+		Maths.createViewMatrixPos(cameraPos.add(tempVec.set(vm.getCameraOffset(), 0, 0), new Vector3f()), temp);
 		viewX.loadMatrix(temp);
 
 		temp.identity();
 		Maths.createViewMatrixRot(Math.toRadians(-90), Math.toRadians(0), Math.toRadians(0), temp);
-		Maths.createViewMatrixPos(camera.getPosition().getInternal().add(new Vector3f(0,0.3125f,0), new Vector3f()), temp);
+		Maths.createViewMatrixPos(cameraPos.add(tempVec.set(0, vm.getCameraOffset(), 0), new Vector3f()), temp);
 		viewY.loadMatrix(temp);
 
 		temp.identity();
 		Maths.createViewMatrixRot(Math.toRadians(-180), Math.toRadians(180), Math.toRadians(180), temp);
-		Maths.createViewMatrixPos(camera.getPosition().getInternal().add(new Vector3f(0,0,0.3125f), new Vector3f()), temp);
+		Maths.createViewMatrixPos(cameraPos.add(tempVec.set(0, 0, 0), new Vector3f()), temp);
 		viewZ.loadMatrix(temp);
+		resolution.loadInteger(vm.getResolution());
 	}
 
 	public void loadPointLights(List<PointLightInternal> lights) {
@@ -136,7 +141,7 @@ public class InstanceVoxelizeShader extends ShaderProgram {
 
 	public void loadDirectionalLights(List<DirectionalLightInternal> lights) {
 		for (int x = 0; x < Math.min(8, lights.size()); x++)
-			this.directionalLights[x].loadLight(lights.get(x), 8, x);
+			this.directionalLights[x].loadLight(lights.get(x), 8 + x);
 		totalDirectionalLights.loadInteger(Math.min(8, lights.size()));
 	}
 

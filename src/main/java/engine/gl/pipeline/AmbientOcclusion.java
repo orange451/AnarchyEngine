@@ -15,7 +15,7 @@ import static org.lwjgl.opengl.GL13C.GL_TEXTURE1;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE10;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE11;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE12;
-import static org.lwjgl.opengl.GL13C.GL_TEXTURE2;
+import static org.lwjgl.opengl.GL13C.*;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE3;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE4;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE8;
@@ -42,6 +42,8 @@ public class AmbientOcclusion extends DeferredPass<AmbientOcclusionShader> {
 	@Override
 	protected void setupShaderData(RendererData rnd, IRenderingData rd, AmbientOcclusionShader shader) {
 		shader.loadCameraData(rd.camera, rd.projectionMatrix);
+		shader.loadVoxelSize(rnd.vm.getSize() * 2.0f);
+		shader.loadVoxelOffset(rnd.vm.getCameraOffset());
 	}
 
 	@Override
@@ -51,6 +53,7 @@ public class AmbientOcclusion extends DeferredPass<AmbientOcclusionShader> {
 		dp.getDepthTex().active(GL_TEXTURE2);
 		dp.getPbrTex().active(GL_TEXTURE3);
 		dp.getMaskTex().active(GL_TEXTURE4);
+		dp.getMotionTex().active(GL_TEXTURE5);
 		rnd.dlh.getMainTex().active(GL_TEXTURE8);
 		rnd.plh.getMainTex().active(GL_TEXTURE9);
 		rnd.slh.getMainTex().active(GL_TEXTURE10);

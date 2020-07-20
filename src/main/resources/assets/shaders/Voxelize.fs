@@ -27,7 +27,7 @@ in vec2 pass_textureCoords_fs;
 in mat3 TBN_fs;
 
 uniform layout(size1x32) image3D voxelImage;
-uniform int size = 256;
+uniform int resolution;
 
 uniform Material material;
 uniform vec3 cameraPosition;
@@ -79,7 +79,7 @@ void main() {
 	vec3 normal = texture(material.normalTex, pass_textureCoords_fs).rgb;
 	normal = normalize(normal * 2.0 - 1.0);
 	normal = normalize(TBN_fs * normal);
-	
+
 	vec3 position = pass_position_fs.xyz;
 
 	vec3 N = normalize(normal);
@@ -95,17 +95,17 @@ void main() {
 								   roughness, metallic);
 	}
 
-	vec4 data = vec4(Lo, 1.0);
+	vec4 data = vec4(Lo + material.emissive, 1.0);
 
-	ivec3 temp = ivec3(gl_FragCoord.x, gl_FragCoord.y, size * gl_FragCoord.z);
+	ivec3 temp = ivec3(gl_FragCoord.x, gl_FragCoord.y, resolution * gl_FragCoord.z);
 	ivec3 texcoord;
 	if (pass_axis == 1) {
-		texcoord.x = size - temp.z;
+		texcoord.x = resolution - temp.z;
 		texcoord.z = temp.x;
 		texcoord.y = temp.y;
 	} else if (pass_axis == 2) {
 		texcoord.z = temp.y;
-		texcoord.y = size - temp.z;
+		texcoord.y = resolution - temp.z;
 		texcoord.x = temp.x;
 	} else
 		texcoord = temp;

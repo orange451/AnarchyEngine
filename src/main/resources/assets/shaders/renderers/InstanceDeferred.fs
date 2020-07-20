@@ -39,12 +39,14 @@ void main() {
 	normal = normalize(normal * 2.0 - 1.0);
 	normal = normalize(TBN * normal);
 
+	vec3 basicNormal = normalize(TBN * vec3(0,0,1));
+
 	vec3 ndcPos = (clipSpace / clipSpace.w).xyz;
     vec3 ndcPosPrev = (clipSpacePrev / clipSpacePrev.w).xyz;
 
 	out_Color[0] = vec4(diffuseF.rgb, 0.0);
-	out_Color[1] = vec4((ndcPosPrev - ndcPos).xy, 0.0, 0.0);
-	out_Color[2] = vec4(normal, 0.0);
+	out_Color[1] = vec4((ndcPosPrev - ndcPos).xy, basicNormal.xy);
+	out_Color[2] = vec4(normal, basicNormal.z);
 	out_Color[3] = vec4(roughnessF, metallicF, 0.0, 0.0);
 	out_Color[4] = vec4(material.emissive.rgb * diffuseF.rgb, PBR_OBJECT);
 }

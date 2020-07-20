@@ -35,6 +35,7 @@ public class AmbientOcclusionShader extends BasePipelineShader {
 	private UniformSampler gDepth = new UniformSampler("gDepth");
 	private UniformSampler gPBR = new UniformSampler("gPBR");
 	private UniformSampler gMask = new UniformSampler("gMask");
+	private UniformSampler gMotion = new UniformSampler("gMotion");
 
 	private UniformSampler directionalLightData = new UniformSampler("directionalLightData");
 	private UniformSampler pointLightData = new UniformSampler("pointLightData");
@@ -42,6 +43,8 @@ public class AmbientOcclusionShader extends BasePipelineShader {
 	private UniformSampler areaLightData = new UniformSampler("areaLightData");
 
 	private UniformSampler voxelImage = new UniformSampler("voxelImage");
+	private UniformFloat voxelSize = new UniformFloat("voxelSize");
+	private UniformFloat voxelOffset = new UniformFloat("voxelOffset");
 
 	private UniformFloat time = new UniformFloat("time");
 
@@ -54,8 +57,8 @@ public class AmbientOcclusionShader extends BasePipelineShader {
 		super.setupShader();
 		super.addShader(new Shader("assets/shaders/deferred/AmbientOcclusion.fs", GL_FRAGMENT_SHADER));
 		super.storeUniforms(projectionMatrix, viewMatrix, cameraPosition, gDiffuse, gNormal, gDepth, gPBR, gMask,
-				inverseProjectionMatrix, inverseViewMatrix, directionalLightData, pointLightData, spotLightData,
-				areaLightData, voxelImage, time);
+				gMotion, inverseProjectionMatrix, inverseViewMatrix, directionalLightData, pointLightData,
+				spotLightData, areaLightData, voxelImage, time, voxelSize, voxelOffset);
 	}
 
 	@Override
@@ -66,6 +69,7 @@ public class AmbientOcclusionShader extends BasePipelineShader {
 		gDepth.loadTexUnit(2);
 		gPBR.loadTexUnit(3);
 		gMask.loadTexUnit(4);
+		gMotion.loadTexUnit(5);
 		directionalLightData.loadTexUnit(8);
 		pointLightData.loadTexUnit(9);
 		spotLightData.loadTexUnit(10);
@@ -82,5 +86,13 @@ public class AmbientOcclusionShader extends BasePipelineShader {
 		this.inverseViewMatrix.loadMatrix(camera.getViewMatrixInverseInternal());
 		timeL += ClientEngine.renderThread.getWindow().getDelta();
 		time.loadFloat(timeL);
+	}
+
+	public void loadVoxelSize(float size) {
+		voxelSize.loadFloat(size);
+	}
+
+	public void loadVoxelOffset(float offset) {
+		voxelOffset.loadFloat(offset);
 	}
 }

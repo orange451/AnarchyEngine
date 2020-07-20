@@ -10,29 +10,44 @@
 
 package engine.gl;
 
-import engine.gl.objects.Texture;
-import engine.gl.objects.TextureBuilder;
-
 import static org.lwjgl.opengl.GL11C.GL_FLOAT;
-import static org.lwjgl.opengl.GL11C.GL_LINEAR;
-import static org.lwjgl.opengl.GL11C.GL_RGB;
+import static org.lwjgl.opengl.GL11C.GL_NEAREST;
+import static org.lwjgl.opengl.GL11C.GL_RGBA;
 import static org.lwjgl.opengl.GL11C.GL_TEXTURE_MAG_FILTER;
 import static org.lwjgl.opengl.GL11C.GL_TEXTURE_MIN_FILTER;
-import static org.lwjgl.opengl.GL30C.GL_RGB16F;
-import static org.lwjgl.opengl.GL43C.*;
+import static org.lwjgl.opengl.GL11C.GL_TEXTURE_WRAP_S;
+import static org.lwjgl.opengl.GL11C.GL_TEXTURE_WRAP_T;
+import static org.lwjgl.opengl.GL12C.GL_TEXTURE_3D;
+import static org.lwjgl.opengl.GL12C.GL_TEXTURE_BASE_LEVEL;
+import static org.lwjgl.opengl.GL12C.GL_TEXTURE_MAX_LEVEL;
+import static org.lwjgl.opengl.GL12C.GL_TEXTURE_WRAP_R;
+import static org.lwjgl.opengl.GL13C.GL_CLAMP_TO_BORDER;
+import static org.lwjgl.opengl.GL30C.GL_RGBA16F;
+
+import org.joml.Matrix4f;
+
+import engine.gl.objects.Texture;
+import engine.gl.objects.TextureBuilder;
 
 public class VoxelizedManager {
 
 	private Texture tex;
 
+	private int resolution = 256;
+	private int size = 40;
+	private float cameraOffset;
+
+	private Matrix4f projectionMatrix = new Matrix4f();
+
 	public VoxelizedManager() {
 		init();
+		updateValues();
 	}
 
 	public void init() {
 		TextureBuilder tb = new TextureBuilder();
 		tb.genTexture(GL_TEXTURE_3D).bindTexture();
-		tb.sizeTexture(256, 256, 256).texImage3D(0, GL_RGBA16F, 0, GL_RGBA, GL_FLOAT, 0);
+		tb.sizeTexture(resolution, resolution, resolution).texImage3D(0, GL_RGBA16F, 0, GL_RGBA, GL_FLOAT, 0);
 		tb.texParameteri(GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		tb.texParameteri(GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		tb.texParameteri(GL_TEXTURE_BASE_LEVEL, 0);
@@ -43,12 +58,43 @@ public class VoxelizedManager {
 		tex = tb.endTexture();
 	}
 
+	private void updateValues() {
+		cameraOffset = size * 2.0f / resolution;
+		projectionMatrix.setOrtho(-size, size, -size, size, size, -size);
+	}
+
+	public void setResolution(int resolution) {
+		this.resolution = resolution;
+		updateValues();
+	}
+
+	public void setSize(int size) {
+		this.size = size;
+		updateValues();
+	}
+
 	public void dispose() {
 		tex.dispose();
 	}
-	
+
 	public Texture getTexture() {
 		return tex;
+	}
+
+	public int getResolution() {
+		return resolution;
+	}
+
+	public int getSize() {
+		return size;
+	}
+
+	public float getCameraOffset() {
+		return cameraOffset;
+	}
+
+	public Matrix4f getProjectionMatrix() {
+		return projectionMatrix;
 	}
 
 }

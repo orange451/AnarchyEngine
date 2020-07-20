@@ -14,7 +14,6 @@ import static org.lwjgl.opengl.GL11C.GL_CULL_FACE;
 import static org.lwjgl.opengl.GL11C.GL_DEPTH_TEST;
 import static org.lwjgl.opengl.GL11C.GL_FLOAT;
 import static org.lwjgl.opengl.GL11C.GL_RGBA;
-import static org.lwjgl.opengl.GL11C.GL_TEXTURE_2D;
 import static org.lwjgl.opengl.GL11C.GL_VIEWPORT;
 import static org.lwjgl.opengl.GL11C.glBindTexture;
 import static org.lwjgl.opengl.GL11C.glColorMask;
@@ -28,7 +27,7 @@ import static org.lwjgl.opengl.GL13C.GL_TEXTURE2;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE3;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE8;
 import static org.lwjgl.opengl.GL13C.glActiveTexture;
-import static org.lwjgl.opengl.GL15C.GL_READ_WRITE;
+import static org.lwjgl.opengl.GL15C.GL_WRITE_ONLY;
 import static org.lwjgl.opengl.GL30C.GL_RGBA16F;
 import static org.lwjgl.opengl.GL30C.GL_TEXTURE_2D_ARRAY;
 import static org.lwjgl.opengl.GL42C.glBindImageTexture;
@@ -79,16 +78,16 @@ public class InstanceVoxelizeRenderer {
 		glClearTexImage(rnd.vm.getTexture().getTexture(), 0, GL_RGBA, GL_FLOAT, (ByteBuffer)null);
 		int[] oldViewport = new int[4];
 		glGetIntegerv(GL_VIEWPORT, oldViewport);
-		glViewport(0, 0, 256, 256);
+		glViewport(0, 0, rnd.vm.getResolution(), rnd.vm.getResolution());
 		glDisable(GL_CULL_FACE);
 		glDisable(GL_DEPTH_TEST);
 		glColorMask(false, false, false, false);
 
 		shader.start();
-		shader.loadCamera(rd.camera);
+		shader.loadVoxelizationValues(rnd.vm, rd.camera);
 		shader.loadSettings(rnd.rs.shadowsEnabled);
 		shader.loadDirectionalLights(rnd.dlh.getLights());
-		glBindImageTexture(4, rnd.vm.getTexture().getTexture(), 0, true, 128, GL_READ_WRITE, GL_RGBA16F);
+		glBindImageTexture(4, rnd.vm.getTexture().getTexture(), 0, true, 128, GL_WRITE_ONLY, GL_RGBA16F);
 		for (int x = 0; x < Math.min(8, rnd.dlh.getLights().size()); x++) {
 			glActiveTexture(GL_TEXTURE8 + x);
 			glBindTexture(GL_TEXTURE_2D_ARRAY, rnd.dlh.getLights().get(x).getShadowMap().getShadowMaps().getTexture());
@@ -170,22 +169,10 @@ public class InstanceVoxelizeRenderer {
 	}
 
 	private void prepareMaterial(engine.gl.objects.MaterialGL mat) {
-		if (mat.getDiffuseTexture().getID() != -1) {
-			glActiveTexture(GL_TEXTURE0);
-			glBindTexture(GL_TEXTURE_2D, mat.getDiffuseTexture().getID());
-		}
-		if (mat.getNormalTexture().getID() != -1) {
-			glActiveTexture(GL_TEXTURE1);
-			glBindTexture(GL_TEXTURE_2D, mat.getNormalTexture().getID());
-		}
-		if (mat.getMetalnessTexture().getID() != -1) {
-			glActiveTexture(GL_TEXTURE2);
-			glBindTexture(GL_TEXTURE_2D, mat.getMetalnessTexture().getID());
-		}
-		if (mat.getRoughnessTexture().getID() != -1) {
-			glActiveTexture(GL_TEXTURE3);
-			glBindTexture(GL_TEXTURE_2D, mat.getRoughnessTexture().getID());
-		}
+		mat.getDiffuseTexture().active(GL_TEXTURE0);
+		mat.getNormalTexture().active(GL_TEXTURE1);
+		mat.getMetalnessTexture().active(GL_TEXTURE2);
+		mat.getRoughnessTexture().active(GL_TEXTURE3);
 	}
 
 	public void dispose() {

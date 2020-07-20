@@ -22,11 +22,6 @@ public class Texture implements IVisualObject {
 
 	private boolean disposable = true;
 
-	@Deprecated
-	public Texture(int texture) {
-		this(texture, -1, -1, -1);
-	}
-
 	public Texture(int texture, int target, int width, int height) {
 		this(texture, target, width, height, 0);
 	}

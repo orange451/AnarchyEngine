@@ -147,22 +147,10 @@ public class InstanceForwardRenderer {
 	}
 
 	private void prepareMaterial(engine.gl.objects.MaterialGL mat) {
-		if (mat.getDiffuseTexture().getID() != -1) {
-			glActiveTexture(GL_TEXTURE0);
-			glBindTexture(GL_TEXTURE_2D, mat.getDiffuseTexture().getID());
-		}
-		if (mat.getNormalTexture().getID() != -1) {
-			glActiveTexture(GL_TEXTURE1);
-			glBindTexture(GL_TEXTURE_2D, mat.getNormalTexture().getID());
-		}
-		if (mat.getMetalnessTexture().getID() != -1) {
-			glActiveTexture(GL_TEXTURE2);
-			glBindTexture(GL_TEXTURE_2D, mat.getMetalnessTexture().getID());
-		}
-		if (mat.getRoughnessTexture().getID() != -1) {
-			glActiveTexture(GL_TEXTURE3);
-			glBindTexture(GL_TEXTURE_2D, mat.getRoughnessTexture().getID());
-		}
+		mat.getDiffuseTexture().active(GL_TEXTURE0);
+		mat.getNormalTexture().active(GL_TEXTURE1);
+		mat.getMetalnessTexture().active(GL_TEXTURE2);
+		mat.getRoughnessTexture().active(GL_TEXTURE3);
 	}
 
 	public void dispose() {

@@ -53,10 +53,10 @@ public class InstanceFowardShader extends ShaderProgram {
 
 	private UniformMatrix4 biasMatrix = new UniformMatrix4("biasMatrix");
 
-	private UniformPointLight pointLights[] = new UniformPointLight[8];
+	private UniformPointLight pointLights[] = new UniformPointLight[4];
 	private UniformInteger totalPointLights = new UniformInteger("totalPointLights");
 
-	private UniformDirectionalLight directionalLights[] = new UniformDirectionalLight[8];
+	private UniformDirectionalLight directionalLights[] = new UniformDirectionalLight[4];
 	private UniformInteger totalDirectionalLights = new UniformInteger("totalDirectionalLights");
 
 	@Override
@@ -65,11 +65,11 @@ public class InstanceFowardShader extends ShaderProgram {
 		super.addShader(new Shader("assets/shaders/renderers/InstanceForward.fs", GL_FRAGMENT_SHADER));
 		super.setAttributes(new Attribute(0, "position"), new Attribute(1, "normals"), new Attribute(2, "tangent"),
 				new Attribute(3, "textureCoords"), new Attribute(4, "inColor"));
-		for (int x = 0; x < 8; x++) {
+		for (int x = 0; x < 4; x++) {
 			pointLights[x] = new UniformPointLight("pointLights[" + x + "]");
 		}
 		super.storeUniforms(pointLights);
-		for (int x = 0; x < 8; x++) {
+		for (int x = 0; x < 4; x++) {
 			directionalLights[x] = new UniformDirectionalLight("directionalLights[" + x + "]");
 		}
 		super.storeUniforms(directionalLights);
@@ -114,16 +114,16 @@ public class InstanceFowardShader extends ShaderProgram {
 	}
 
 	public void loadPointLights(List<PointLightInternal> lights) {
-		for (int x = 0; x < Math.min(8, lights.size()); x++)
-			this.pointLights[x].loadLight(lights.get(x), 10);
-		totalPointLights.loadInteger(Math.min(8, lights.size()));
+		for (int x = 0; x < Math.min(4, lights.size()); x++)
+			this.pointLights[x].loadLight(lights.get(x), 12 + x);
+		totalPointLights.loadInteger(Math.min(4, lights.size()));
 	}
 
 	public void loadDirectionalLights(List<DirectionalLightInternal> lights) {
 		synchronized (lights) {
-			for (int x = 0; x < Math.min(8, lights.size()); x++)
-				this.directionalLights[x].loadLight(lights.get(x), 8, x);
-			totalDirectionalLights.loadInteger(Math.min(8, lights.size()));
+			for (int x = 0; x < Math.min(4, lights.size()); x++)
+				this.directionalLights[x].loadLight(lights.get(x), 8 + x);
+			totalDirectionalLights.loadInteger(Math.min(4, lights.size()));
 		}
 	}
 

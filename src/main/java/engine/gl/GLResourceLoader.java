@@ -13,20 +13,15 @@ package engine.gl;
 import static org.lwjgl.opengl.GL11.GL_FLOAT;
 import static org.lwjgl.opengl.GL11.GL_LINEAR;
 import static org.lwjgl.opengl.GL11.GL_LINEAR_MIPMAP_LINEAR;
-import static org.lwjgl.opengl.GL11.GL_RED;
-import static org.lwjgl.opengl.GL11.GL_REPEAT;
 import static org.lwjgl.opengl.GL11.GL_RGB;
 import static org.lwjgl.opengl.GL11.GL_RGBA;
-import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
 import static org.lwjgl.opengl.GL11.GL_TEXTURE_MAG_FILTER;
 import static org.lwjgl.opengl.GL11.GL_TEXTURE_MIN_FILTER;
 import static org.lwjgl.opengl.GL11.GL_TEXTURE_WRAP_S;
 import static org.lwjgl.opengl.GL11.GL_TEXTURE_WRAP_T;
-import static org.lwjgl.opengl.GL11.GL_UNPACK_ALIGNMENT;
 import static org.lwjgl.opengl.GL11.GL_UNSIGNED_BYTE;
 import static org.lwjgl.opengl.GL11.glBindTexture;
 import static org.lwjgl.opengl.GL11.glGenTextures;
-import static org.lwjgl.opengl.GL11.glPixelStorei;
 import static org.lwjgl.opengl.GL11.glTexImage2D;
 import static org.lwjgl.opengl.GL11.glTexParameterf;
 import static org.lwjgl.opengl.GL11.glTexParameteri;
@@ -45,8 +40,6 @@ import static org.lwjgl.opengl.GL15.glBufferSubData;
 import static org.lwjgl.opengl.GL15.glDeleteBuffers;
 import static org.lwjgl.opengl.GL15.glGenBuffers;
 import static org.lwjgl.opengl.GL20.glVertexAttribPointer;
-import static org.lwjgl.opengl.GL21.GL_SRGB_ALPHA;
-import static org.lwjgl.opengl.GL30.GL_RG;
 import static org.lwjgl.opengl.GL30.GL_RGB16F;
 import static org.lwjgl.opengl.GL30.glBindVertexArray;
 import static org.lwjgl.opengl.GL30.glDeleteVertexArrays;
@@ -79,15 +72,12 @@ import java.util.List;
 
 import org.joml.Vector2f;
 import org.joml.Vector3f;
-import org.lwjgl.opengl.EXTTextureFilterAnisotropic;
 import org.lwjgl.system.MemoryStack;
 
 import engine.gl.exceptions.DecodeTextureException;
-import engine.gl.exceptions.LoadTextureException;
 import engine.gl.objects.CubeMapTexture;
 import engine.gl.objects.RawModel;
 import engine.gl.objects.RawTexture;
-import engine.gl.objects.Texture;
 import engine.gl.objects.VAO;
 import engine.gl.objects.VertexNM;
 
@@ -95,8 +85,6 @@ import engine.gl.objects.VertexNM;
  * This objects handles all loading methods from any type of data, models,
  * textures, fonts, etc.
  * 
- * @author Guerra24 <pablo230699@hotmail.com>
- * @category Assets
  */
 public class GLResourceLoader {
 	/**
@@ -177,77 +165,6 @@ public class GLResourceLoader {
 		glVertexAttribDivisor(attribute, 1);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 		glBindVertexArray(0);
-	}
-
-	public Texture loadTextureMisc(String fileName) {
-		return loadTextureMisc(fileName, GL_LINEAR, true);
-	}
-
-	public Texture loadTextureMisc(String fileName, int filter, boolean textureMipMapAF) {
-		int texture_id = 0;
-		try {
-			System.out.println("Loading Texture: " + fileName);
-			texture_id = loadTexture("assets/" + fileName, filter, GL_REPEAT, GL_RGBA, textureMipMapAF);
-		} catch (Exception e) {
-			throw new LoadTextureException(fileName, e);
-		}
-		return new Texture(texture_id);
-	}
-
-	public Texture loadTexture(String fileName) {
-		return loadTexture(fileName, GL_LINEAR, true);
-	}
-
-	public Texture loadTexture(String fileName, int filter, boolean textureMipMapAF) {
-		int texture = 0;
-		try {
-			System.out.println("Loading Texture: " + fileName);
-			texture = loadTexture("assets/" + fileName, filter, GL_REPEAT, GL_SRGB_ALPHA, textureMipMapAF);
-		} catch (Exception e) {
-			throw new LoadTextureException(fileName, e);
-		}
-		return new Texture(texture);
-	}
-
-	private int loadTexture(String file, int filter, int textureWarp, int format, boolean textureMipMapAF) {
-		RawTexture data = decodeTextureFile(file);
-		int textureID = createTexture(data, filter, textureWarp, format, textureMipMapAF);
-		data.dispose();
-		return textureID;
-	}
-
-	public int createTexture(RawTexture data, int filter, int textureWarp, int format, boolean textureMipMapAF) {
-		int textureID = glGenTextures();
-		glBindTexture(GL_TEXTURE_2D, textureID);
-		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, textureWarp);
-		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, textureWarp);
-		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filter);
-		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter);
-		if (data.getComp() == 3) {
-			if ((data.getWidth() & 3) != 0)
-				glPixelStorei(GL_UNPACK_ALIGNMENT, 2 - (data.getWidth() & 1));
-			glTexImage2D(GL_TEXTURE_2D, 0, format, data.getWidth(), data.getHeight(), 0, GL_RGB, GL_UNSIGNED_BYTE,
-					data.getBuffer());
-		} else if (data.getComp() == 2)
-			glTexImage2D(GL_TEXTURE_2D, 0, format, data.getWidth(), data.getHeight(), 0, GL_RG, GL_UNSIGNED_BYTE,
-					data.getBuffer());
-		else if (data.getComp() == 1)
-			glTexImage2D(GL_TEXTURE_2D, 0, format, data.getWidth(), data.getHeight(), 0, GL_RED, GL_UNSIGNED_BYTE,
-					data.getBuffer());
-		else
-			glTexImage2D(GL_TEXTURE_2D, 0, format, data.getWidth(), data.getHeight(), 0, GL_RGBA, GL_UNSIGNED_BYTE,
-					data.getBuffer());
-
-		if (textureMipMapAF) {
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_LOD_BIAS, 0);
-			glGenerateMipmap(GL_TEXTURE_2D);
-
-			float amount = Math.min(16f, EXTTextureFilterAnisotropic.GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT);
-			glTexParameterf(GL_TEXTURE_2D, EXTTextureFilterAnisotropic.GL_TEXTURE_MAX_ANISOTROPY_EXT, amount);
-		}
-		glBindTexture(GL_TEXTURE_2D, 0);
-		return textureID;
 	}
 
 	public int loadCubeMap(String[] textureFiles) {
