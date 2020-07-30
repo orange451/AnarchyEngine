@@ -141,7 +141,7 @@ public class GLRenderer implements IPipeline {
 			renderingManager = new RenderingManager();
 
 			envRenderer = new EnvironmentRenderer(64, false);
-			envRendererEntities = new EnvironmentRenderer(128, true);
+			//envRendererEntities = new EnvironmentRenderer(128, true);
 			irradianceCapture = new IrradianceCapture();
 			rnd.irradianceCapture = irradianceCapture.getCubeTexture();
 			preFilteredEnvironment = new PreFilteredEnvironment();
@@ -237,11 +237,11 @@ public class GLRenderer implements IPipeline {
 		GPUProfiler.end();
 		GPUProfiler.end();
 		GPUProfiler.start("Reflections");
-		GPUProfiler.start("CubeMap Render");
+		/*GPUProfiler.start("CubeMap Render");
 		envRendererEntities.renderReflections(skyRenderer, sun, rd, rnd, renderingManager);
-		GPUProfiler.end();
+		GPUProfiler.end();*/
 		GPUProfiler.start("PreFilteredEnvironment");
-		preFilteredEnvironment.render(envRendererEntities.getCubeTexture());
+		preFilteredEnvironment.render(envRenderer.getCubeTexture());
 		GPUProfiler.end();
 		GPUProfiler.end();
 		GPUProfiler.end();
@@ -438,7 +438,7 @@ public class GLRenderer implements IPipeline {
 	@Override
 	public void dispose() {
 		envRenderer.dispose();
-		envRendererEntities.dispose();
+		//envRendererEntities.dispose();
 		dp.dispose();
 		pp.dispose();
 		directionalLightHandler.dispose();

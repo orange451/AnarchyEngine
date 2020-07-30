@@ -14,7 +14,6 @@ import static org.lwjgl.opengl.GL20C.GL_FRAGMENT_SHADER;
 
 import org.joml.Matrix4f;
 
-import engine.ClientEngine;
 import engine.gl.shaders.data.UniformFloat;
 import engine.gl.shaders.data.UniformMatrix4;
 import engine.gl.shaders.data.UniformSampler;
@@ -46,10 +45,6 @@ public class AmbientOcclusionShader extends BasePipelineShader {
 	private UniformFloat voxelSize = new UniformFloat("voxelSize");
 	private UniformFloat voxelOffset = new UniformFloat("voxelOffset");
 
-	private UniformFloat time = new UniformFloat("time");
-
-	private float timeL = 0;
-
 	private Matrix4f projInv = new Matrix4f();
 
 	@Override
@@ -58,7 +53,7 @@ public class AmbientOcclusionShader extends BasePipelineShader {
 		super.addShader(new Shader("assets/shaders/deferred/AmbientOcclusion.fs", GL_FRAGMENT_SHADER));
 		super.storeUniforms(projectionMatrix, viewMatrix, cameraPosition, gDiffuse, gNormal, gDepth, gPBR, gMask,
 				gMotion, inverseProjectionMatrix, inverseViewMatrix, directionalLightData, pointLightData,
-				spotLightData, areaLightData, voxelImage, time, voxelSize, voxelOffset);
+				spotLightData, areaLightData, voxelImage, voxelSize, voxelOffset);
 	}
 
 	@Override
@@ -84,8 +79,6 @@ public class AmbientOcclusionShader extends BasePipelineShader {
 		this.cameraPosition.loadVec3(camera.getPosition().getInternal());
 		this.inverseProjectionMatrix.loadMatrix(projection.invert(projInv));
 		this.inverseViewMatrix.loadMatrix(camera.getViewMatrixInverseInternal());
-		timeL += ClientEngine.renderThread.getWindow().getDelta();
-		time.loadFloat(timeL);
 	}
 
 	public void loadVoxelSize(float size) {

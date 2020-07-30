@@ -1,6 +1,6 @@
 -- Declare constants
 local CAMERA_SENSITIVITY = 500
-local CAMERA_SPEED = 10
+local CAMERA_SPEED = 20
 local EPSILON = 1/64
 
 -- Declare varialbes

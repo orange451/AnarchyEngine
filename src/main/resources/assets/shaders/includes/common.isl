@@ -117,3 +117,62 @@ float fbm(in vec2 st) {
 	return value;
 }
 #end
+
+#function randomS
+/*
+  http://amindforeverprogramming.blogspot.de/2013/07/random-floats-in-glsl-330.html?showComment=1507064059398#c5427444543794991219
+*/
+uint hash3(uint x, uint y, uint z) {
+	x += x >> 11;
+	x ^= x << 7;
+	x += y;
+	x ^= x << 3;
+	x += z ^ (x >> 14);
+	x ^= x << 6;
+	x += x >> 15;
+	x ^= x << 5;
+	x += x >> 12;
+	x ^= x << 9;
+	return x;
+}
+
+/*
+  Generate a random value in [-1..+1)
+*/
+float randomS(vec2 pos, float time) {
+	uint mantissaMask = 0x007FFFFFu;
+	uint one = 0x3F800000u;
+	uvec3 u = floatBitsToUint(vec3(pos, time));
+	uint h = hash3(u.x, u.y, u.z);
+	return uintBitsToFloat((h & mantissaMask) | one) - 1.0;
+}
+#end
+
+#function cosWeightedRandomHemisphereDirection
+vec3 cosWeightedRandomHemisphereDirection(vec3 n, float rand1, float rand2) {
+	float Xi1 = rand1;
+	float Xi2 = rand2;
+
+	float theta = acos(sqrt(1.0 - Xi1));
+	float phi = 2.0 * PI * Xi2;
+
+	float xs = sin(theta) * cos(phi);
+	float ys = cos(theta);
+	float zs = sin(theta) * sin(phi);
+
+	vec3 y = n;
+	vec3 h = y;
+	if (abs(h.x) <= abs(h.y) && abs(h.x) <= abs(h.z))
+		h.x = 1.0;
+	else if (abs(h.y) <= abs(h.x) && abs(h.y) <= abs(h.z))
+		h.y = 1.0;
+	else
+		h.z = 1.0;
+
+	vec3 x = normalize(cross(h, y));
+	vec3 z = normalize(cross(x, y));
+
+	vec3 direction = xs * x + ys * y + zs * z;
+	return normalize(direction);
+}
+#end

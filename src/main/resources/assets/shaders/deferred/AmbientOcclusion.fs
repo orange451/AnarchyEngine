@@ -26,7 +26,7 @@ uniform sampler2D pointLightData;
 uniform sampler2D spotLightData;
 uniform sampler2D areaLightData;
 uniform sampler3D voxelImage;
-uniform float time;
+uniform int frame;
 uniform float voxelSize;
 uniform float voxelOffset;
 
@@ -40,66 +40,13 @@ uniform bool useAmbientOcclusion;
 
 #include function getDepth
 
-//#include function computeAmbientOcclusionV2
-
 #include variable MASK
 
-/*
-  http://amindforeverprogramming.blogspot.de/2013/07/random-floats-in-glsl-330.html?showComment=1507064059398#c5427444543794991219
-*/
-uint hash3(uint x, uint y, uint z) {
-	x += x >> 11;
-	x ^= x << 7;
-	x += y;
-	x ^= x << 3;
-	x += z ^ (x >> 14);
-	x ^= x << 6;
-	x += x >> 15;
-	x ^= x << 5;
-	x += x >> 12;
-	x ^= x << 9;
-	return x;
-}
-
-/*
-  Generate a random value in [-1..+1)
-*/
-float randomS(vec2 pos, float time) {
-	uint mantissaMask = 0x007FFFFFu;
-	uint one = 0x3F800000u;
-	uvec3 u = floatBitsToUint(vec3(pos, time));
-	uint h = hash3(u.x, u.y, u.z);
-	return uintBitsToFloat((h & mantissaMask) | one) - 1.0;
-}
+#include function randomS
 
 #include function random
 
-vec3 cosWeightedRandomHemisphereDirection(vec3 n, float rand1, float rand2) {
-	float Xi1 = rand1;
-	float Xi2 = rand2;
-
-	float theta = acos(sqrt(1.0 - Xi1));
-	float phi = 2.0 * PI * Xi2;
-
-	float xs = sin(theta) * cos(phi);
-	float ys = cos(theta);
-	float zs = sin(theta) * sin(phi);
-
-	vec3 y = n;
-	vec3 h = y;
-	if (abs(h.x) <= abs(h.y) && abs(h.x) <= abs(h.z))
-		h.x = 1.0;
-	else if (abs(h.y) <= abs(h.x) && abs(h.y) <= abs(h.z))
-		h.y = 1.0;
-	else
-		h.z = 1.0;
-
-	vec3 x = normalize(cross(h, y));
-	vec3 z = normalize(cross(x, y));
-
-	vec3 direction = xs * x + ys * y + zs * z;
-	return normalize(direction);
-}
+#include function cosWeightedRandomHemisphereDirection
 
 vec3 roundStep(vec3 inp, float step) {
 	return vec3((roundEven(inp.x / step)) * step, (roundEven(inp.y / step)) * step,
@@ -119,6 +66,9 @@ vec3 roundStep(vec3 inp, float step) {
 #define MAX_DIST_AO 1.5
 #define SURF_DIST_AO 0.01
 
+const bool useAO = true;
+const bool useGI = true;
+
 vec4 computeGI(vec2 texCoords, vec3 position, vec3 normal, sampler2D gDepth, mat4 projection,
 			   mat4 invProjection, mat4 invView) {
 	vec4 giCombined = vec4(0.0);
@@ -127,10 +77,8 @@ vec4 computeGI(vec2 texCoords, vec3 position, vec3 normal, sampler2D gDepth, mat
 		vec4 gi = vec4(vec3(0.0), 1.0);
 		float dO = 0.0;
 
-		float rand1 = randomS(textureCoords, time + float(j));
-		float rand2 = randomS(textureCoords + vec2(641.51224, 423.178), time + float(j));
-		float rand3 = randomS(textureCoords - vec2(147.16414, 363.941), time - float(j));
-		vec3 rand = vec3(rand1, rand2, rand3);
+		float rand2 = randomS(textureCoords + vec2(641.51224, 423.178), float(frame) + float(j));
+		float rand3 = randomS(textureCoords - vec2(147.16414, 363.941), float(frame) - float(j));
 
 		vec3 rd = cosWeightedRandomHemisphereDirection(normal, random(rand2), random(rand3));
 		vec3 ro = position + rd * voxelOffset * SURF_DIST_GI;
@@ -190,10 +138,8 @@ float computeAmbientOcclusion(vec2 texCoords, vec3 position, vec3 normal, sample
 		float dO = 0.0;
 		float odS;
 
-		float rand1 = randomS(textureCoords, time + float(j));
-		float rand2 = randomS(textureCoords + vec2(641.51224, 423.178), time + float(j));
-		float rand3 = randomS(textureCoords - vec2(147.16414, 363.941), time - float(j));
-		vec3 rand = vec3(rand1, rand2, rand3);
+		float rand2 = randomS(textureCoords + vec2(641.51224, 423.178), float(frame) + float(j));
+		float rand3 = randomS(textureCoords - vec2(147.16414, 363.941), float(frame) - float(j));
 
 		vec3 rd = cosWeightedRandomHemisphereDirection(normal, random(rand2), random(rand3));
 		vec3 ro = position + rd * SURF_DIST_AO;
@@ -230,7 +176,7 @@ float computeAmbientOcclusion(vec2 texCoords, vec3 position, vec3 normal, sample
 
 			if (diff > 0.001) {
 				// shadow = smoothstep(0.0, 1.0, dO); // Ground truth returns 0.0
-				shadow = smoothstep(1.0, 1.1, diff); // Ground truth returns 0.0
+				shadow = smoothstep(1.0, 1.001, diff); // Ground truth returns 0.0
 				break;
 			}
 
@@ -286,14 +232,18 @@ void main() {
 					}
 				} while (rayDist < 200);*/
 
-				vec4 gi = computeGI(textureCoords, position, GIN, gDepth, projectionMatrix,
-									inverseProjectionMatrix, inverseViewMatrix);
-
-				float ao =
-					computeAmbientOcclusion(textureCoords, position, AON, gDepth, projectionMatrix,
-											inverseProjectionMatrix, inverseViewMatrix);
-				gi.a *= ao;
-				gi.rgb *= ao;
+				vec4 gi = vec4(vec3(0.0), 1.0);
+				if (useGI) {
+					gi = computeGI(textureCoords, position, GIN, gDepth, projectionMatrix,
+								   inverseProjectionMatrix, inverseViewMatrix);
+				}
+				if (useAO) {
+					float ao = computeAmbientOcclusion(textureCoords, position, AON, gDepth,
+													   projectionMatrix, inverseProjectionMatrix,
+													   inverseViewMatrix);
+					gi.a *= ao;
+					//gi.rgb *= ao;
+				}
 				image = vec4(gi);
 			}
 		}

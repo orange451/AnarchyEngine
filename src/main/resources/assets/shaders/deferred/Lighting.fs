@@ -139,10 +139,7 @@ float computeContactShadows(vec3 pos, vec3 N, vec3 L, float imageDepth) {
 void main() {
 	vec4 mask = texture(gMask, textureCoords);
 	vec3 image = texture(gDiffuse, textureCoords).rgb;
-	vec4 lightData = vec4(0.0);
 	vec4 auxData = vec4(0.0);
-
-	lightData += texture(spotLightData, textureCoords);
 
 	if (MASK_COMPARE(mask.a, PBR_OBJECT)) {
 		vec2 pbr = texture(gPBR, textureCoords).rg;
@@ -164,7 +161,7 @@ void main() {
 
 		Lo += texture(directionalLightData, textureCoords).rgb;
 		Lo += texture(pointLightData, textureCoords).rgb;
-		Lo += lightData.rgb;
+		Lo += texture(spotLightData, textureCoords).rgb;
 		Lo += texture(areaLightData, textureCoords).rgb;
 
 		vec3 F = fresnelSchlickRoughness(ndotv, F0, roughness);
@@ -185,6 +182,7 @@ void main() {
 		ambient += specular;
 
 		auxData.a = 1.0;	 // Initial value 1.0
+		auxData.rgb = specular; // Store light for use in SSR pass
 
 		if (useAmbientOcclusion) {
 			vec4 ssAmbient = texture(ambientOcclusion, textureCoords);
@@ -194,8 +192,6 @@ void main() {
 			ambient += kD * ssAmbient.rgb * image.rgb;
 		}
 		vec3 light = ambient + Lo;
-
-		auxData.rgb = ambient; // Store light for use in SSR pass
 
 		vec3 emissive = texture(gMask, textureCoords).rgb;
 		vec3 color = light + emissive;

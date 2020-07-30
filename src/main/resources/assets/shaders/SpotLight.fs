@@ -27,6 +27,7 @@ uniform mat4 projectionMatrix;
 uniform mat4 viewMatrix;
 uniform mat4 inverseProjectionMatrix;
 uniform mat4 inverseViewMatrix;
+uniform float time;
 
 uniform SpotLight light;
 
@@ -94,8 +95,8 @@ void main() {
 
 		result = calcSpotLight(light, position, image.rgb, N, V, F0, roughness, metallic);
 	}
-
-	/*vec3 rd = normalize(pass_position - cameraPosition);
+/*
+	vec3 rd = normalize(pass_position - cameraPosition);
 	vec3 ro = cameraPosition;
 
 	float d = RayMarch(ro, rd);
@@ -109,41 +110,51 @@ void main() {
 		rayTrace = p;
 	else
 		rayTrace = cameraPosition;
-	float rayDist, incr = 0.1;
+	float rayDist, incr = 0.75;
 	float rayDistRad = length(pass_position - cameraPosition);
 	vec3 rays;
-	vec3 randSample, finalTrace;
+	vec3 samplePoint;
+	int itr;
 	do {
 		rayTrace += rd * incr;
-		incr *= 1.05;
+		incr *= 1.025;
+		itr++;
 
 		rayDist = length(rayTrace - cameraPosition);
 		if (rayDist > cameraToWorldDist)
 			break;
 
-		vec3 L = normalize(light.position - rayTrace);
-		float distance = length(light.position - rayTrace);
-		float attenuation = max(1.0 - distance / light.radius, 0.0) / distance;
+		samplePoint = rayTrace;
+
+		float rand1 = randomS(textureCoords, time + float(itr));
+		float rand2 = randomS(textureCoords + vec2(641.51224, 423.178), time + float(itr));
+		float rand3 = randomS(textureCoords - vec2(147.16414, 363.941), time + float(itr));
+		vec3 rand = vec3(random(rand1), random(rand2), random(rand3)) - 0.5;
+		samplePoint += rand;
+
+		vec3 L = normalize(light.position - samplePoint);
+		float dist = length(light.position - samplePoint);
+		float attenuation = max(1.0 - dist / light.radius, 0.0) / dist;
 		float theta = dot(L, normalize(-light.direction));
 		float epsilon = light.innerFOV - light.outerFOV;
 		float intensity = clamp((theta - light.outerFOV) / epsilon, 0.0, 1.0);
 
-		vec4 posLight = light.viewMatrix * vec4(rayTrace, 1.0);
+		vec4 posLight = light.viewMatrix * vec4(samplePoint, 1.0);
 		vec4 shadowCoord = biasMatrix * (light.projectionMatrix * posLight);
 		vec2 multTex = 1.0 / textureSize(light.shadowMap, 0).xy;
 		float shadow = 0.0;
-		for (int x = -2; x <= 2; ++x) {
-			for (int y = -2; y <= 2; ++y) {
+		for (int x = -1; x <= 1; ++x) {
+			for (int y = -1; y <= 1; ++y) {
 				vec2 offset = vec2(x, y) * multTex;
 				vec3 temp = shadowCoord.xyz + vec3(offset * shadowCoord.z, 0);
 				shadow += texture(light.shadowMap, (temp / shadowCoord.w), 0);
 			}
 		}
 		vec3 rayColor = light.color * light.intensity * 0.002;
-		rays += rayColor * intensity * attenuation * (shadow / 25.0) * incr;
+		rays += rayColor * intensity * attenuation * (shadow / 9.0) * incr;
 		if (rayDist > rayDistRad)
 			break;
-	} while (rayDist < rayDistRad);*/
-	out_Color.rgb = result;
-	//out_Color.a = rays.r;
+	} while (rayDist < rayDistRad);
+	*/
+	out_Color.rgb = result;// + rays;
 }

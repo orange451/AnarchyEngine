@@ -26,6 +26,7 @@ uniform samplerCube environmentCube;
 uniform sampler2D brdfLUT;
 uniform sampler2D pass;
 uniform sampler2D aux;
+uniform int frame;
 
 uniform int useReflections;
 
@@ -39,9 +40,18 @@ uniform int useReflections;
 
 #include variable MASK
 
+#include variable pi
+
+#include function randomS
+
+#include function random
+
+#include function cosWeightedRandomHemisphereDirection
+
 #define MAX_STEPS 100
 #define MAX_DIST 100.0
 #define SURF_DIST 0.01
+#define SAMPLES 3
 
 void main(void) {
 	vec2 texcoord = textureCoords;
@@ -68,93 +78,97 @@ void main(void) {
 		F0 = mix(F0, diffuse.rgb, metallic);
 		vec3 F = fresnelSchlickRoughness(ndotv, F0, roughness);
 
-		vec3 prefilteredColor = textureLod(environmentCube, R, roughness * MAX_REFLECTION_LOD).rgb;
 		vec2 envBRDF = texture(brdfLUT, vec2(ndotv, roughness)).rg;
-		vec3 specular = prefilteredColor * (F * envBRDF.x + envBRDF.y);
 
-		vec3 light = auxData.rgb;
+		vec3 specular = auxData.rgb;
 		float ao = auxData.a;
-
-		image -= light * ao;
-		light -= specular;
 
 		if (useReflections == 1) {
 			vec3 camToWorld = position - cameraPosition.xyz;
 			vec3 camToWorldNorm = normalize(camToWorld);
-			vec3 newPos;
-			vec4 newScreen;
-			vec2 newCoords;
+			vec3 combined = vec3(0.0);
 
-			float depth, newDepth;
+			image -= specular * ao;
 
-			float tmpDepth;
+			int j = 0;
+			for (j = 0; j < SAMPLES; j++) {
+				vec3 newPos;
+				vec4 newScreen;
+				vec2 newCoords;
 
-			float dO = 0.0;
-			float odS;
+				float depth, newDepth;
 
-			vec3 rd = normalize(reflect(camToWorldNorm, N));
-			vec3 ro = position + rd * SURF_DIST;
-			int i = 0;
+				float tmpDepth;
 
-			bool hit = false;
-			vec3 newNorm;
+				float dO = 0.0;
+				float odS;
 
-			float oldDist = 0.0;
+				float rand2 = randomS(textureCoords + vec2(641.51224, 423.178), float(frame) + float(j));
+				float rand3 = randomS(textureCoords - vec2(147.16414, 363.941), float(frame) - float(j));
+				// hmmmmm, maybe uses different input data for angle
+				vec3 rd = cosWeightedRandomHemisphereDirection(
+					normalize(reflect(camToWorldNorm, N)), random(rand2) * roughness * 0.10,
+					random(rand3));
+				vec3 ro = position + rd * SURF_DIST;
+				int i = 0;
 
-			for (i = 0; i < MAX_STEPS; i++) {
-				// Move point
-				vec3 p = ro + rd * dO;
+				bool hit = false;
+				vec3 newNorm;
 
-				// Convert world to screen
-				newScreen = viewMatrix * vec4(p, 1);
-				newScreen = projectionMatrix * newScreen;
-				newScreen /= newScreen.w;
-				newCoords = newScreen.xy * 0.5 + 0.5;
+				float oldDist = 0.0;
 
-				if (newCoords.x < 0 || newCoords.x > 1 || newCoords.y < 0 || newCoords.y > 1)
-					break;
+				for (i = 0; i < MAX_STEPS; i++) {
+					// Move point
+					vec3 p = ro + rd * dO;
 
-				// Get new pos
-				tmpDepth = texture(gDepth, newCoords).r;
-				newPos = positionFromDepth(newCoords, tmpDepth, inverseProjectionMatrix,
-										   inverseViewMatrix);
-				newNorm = texture(gNormal, newCoords).rgb;
+					// Convert world to screen
+					newScreen = viewMatrix * vec4(p, 1);
+					newScreen = projectionMatrix * newScreen;
+					newScreen /= newScreen.w;
+					newCoords = newScreen.xy * 0.5 + 0.5;
 
-				// Calculate point and new pos depths
-				depth = length(newPos - cameraPosition);
-				newDepth = length(p - cameraPosition);
+					if (newCoords.x < 0 || newCoords.x > 1 || newCoords.y < 0 || newCoords.y > 1)
+						break;
 
-				// Calculate distance from newPos to point
-				float dS = min(length(newPos - p), 0.5);
+					// Get new pos
+					tmpDepth = texture(gDepth, newCoords).r;
+					newPos = positionFromDepth(newCoords, tmpDepth, inverseProjectionMatrix,
+											   inverseViewMatrix);
+					newNorm = texture(gNormal, newCoords).rgb;
 
-				float diff = newDepth - depth;
+					// Calculate point and new pos depths
+					depth = length(newPos - cameraPosition);
+					newDepth = length(p - cameraPosition);
 
-				if (diff >= 0.1) {
-					float halfD = oldDist / 2.0;
-					dS = -halfD;
-				} else if (diff > -0.001 && diff < 0.1) {
-					if (dot(newNorm, normalize(p - ro)) < 0.0)
-						hit = true;
-					break;
+					// Calculate distance from newPos to point
+					float dS = min(length(newPos - p), 1.0);
+
+					float diff = newDepth - depth;
+
+					if (diff >= 0.1) {
+						float halfD = oldDist / 2.0;
+						dS = -halfD;
+					} else if (diff > -0.001 && diff < 0.1) {
+						if (dot(newNorm, normalize(p - ro)) < 0.0)
+							hit = true;
+						break;
+					}
+
+					dO += dS; // Add distance to distance from origin
+					oldDist = dS;
+
+					if (dO > MAX_DIST)
+						break;
 				}
-
-				dO += dS; // Add distance to distance from origin
-				oldDist = dS;
-
-				if (dO > MAX_DIST)
-					break;
+				if (hit) {
+					vec3 newColor = texture(pass, newCoords).rgb;
+					combined += newColor * (F * envBRDF.x + envBRDF.y);
+				} else {
+					combined += specular * ao;
+				}
 			}
-			if (hit) {
-				vec3 newColor = texture(pass, newCoords).rgb;
-				light += newColor * (F * envBRDF.x + envBRDF.y);
-			} else {
-				light += specular;
-			}
-		} else {
-			light += specular;
+			image += combined / j;
 		}
-		light *= ao; // Re apply AO
-		image += light;
 	}
 	out_Color.rgb = image;
 	out_Color.a = 0.0;

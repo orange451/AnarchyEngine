@@ -362,7 +362,7 @@ vec3 calcSpotLight(SpotLight light, vec3 position, vec3 diffuse, vec3 N, vec3 V,
 		for (int x = -1; x <= 1; ++x) {
 			for (int y = -1; y <= 1; ++y) {
 				vec2 offset = vec2(x, y) * multTex;
-				vec3 temp = shadowCoord.xyz + vec3(offset /* * shadowCoord.z*/, 0);
+				vec3 temp = shadowCoord.xyz + vec3(offset  * shadowCoord.z, 0);
 				shadow += texture(light.shadowMap, (temp / shadowCoord.w), 0);
 			}
 		}
