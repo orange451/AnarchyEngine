@@ -37,7 +37,7 @@ public class ReflectionsShader extends BasePipelineShader {
 	private UniformSampler environmentCube = new UniformSampler("environmentCube");
 	private UniformSampler brdfLUT = new UniformSampler("brdfLUT");
 	private UniformSampler pass = new UniformSampler("pass");
-	private UniformSampler aux = new UniformSampler("aux");
+	private UniformSampler reflectionTex = new UniformSampler("reflectionTex");
 
 	private Matrix4f projInv = new Matrix4f();
 
@@ -46,7 +46,7 @@ public class ReflectionsShader extends BasePipelineShader {
 		super.setupShader();
 		super.addShader(new Shader("assets/shaders/deferred/Reflections.fs", GL_FRAGMENT_SHADER));
 		super.storeUniforms(projectionMatrix, viewMatrix, cameraPosition, gDiffuse, gNormal, gDepth, gPBR, gMask,
-				environmentCube, brdfLUT, inverseProjectionMatrix, inverseViewMatrix, pass, aux);
+				environmentCube, brdfLUT, inverseProjectionMatrix, inverseViewMatrix, pass, reflectionTex);
 	}
 
 	@Override
@@ -60,7 +60,7 @@ public class ReflectionsShader extends BasePipelineShader {
 		environmentCube.loadTexUnit(5);
 		brdfLUT.loadTexUnit(6);
 		pass.loadTexUnit(7);
-		aux.loadTexUnit(8);
+		reflectionTex.loadTexUnit(8);
 		super.stop();
 	}
 

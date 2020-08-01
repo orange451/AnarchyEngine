@@ -25,10 +25,11 @@ uniform sampler2D gDepth;
 uniform samplerCube environmentCube;
 uniform sampler2D brdfLUT;
 uniform sampler2D pass;
-uniform sampler2D aux;
+uniform sampler2D baseTex;		 // No reflection
+uniform sampler2D reflectionTex; // Reflection data
 uniform int frame;
 
-uniform int useReflections;
+uniform bool useReflections;
 
 #include variable GLOBAL
 
@@ -55,7 +56,7 @@ uniform int useReflections;
 
 void main(void) {
 	vec2 texcoord = textureCoords;
-	vec3 image = texture(pass, texcoord).rgb;
+	vec4 image = vec4(0.0);
 	vec4 mask = texture(gMask, texcoord);
 	if (MASK_COMPARE(mask.a, PBR_OBJECT)) {
 		vec4 diffuse = texture(gDiffuse, textureCoords);
@@ -64,7 +65,6 @@ void main(void) {
 		vec3 position = positionFromDepth(textureCoords, frameDepth, inverseProjectionMatrix,
 										  inverseViewMatrix);
 		vec3 normal = texture(gNormal, textureCoords).rgb;
-		vec4 auxData = texture(aux, textureCoords);
 
 		vec3 N = normalize(normal);
 		vec3 V = normalize(cameraPosition - position);
@@ -80,18 +80,15 @@ void main(void) {
 
 		vec2 envBRDF = texture(brdfLUT, vec2(ndotv, roughness)).rg;
 
-		vec3 specular = auxData.rgb;
-		float ao = auxData.a;
+		vec3 reflectionMult = F * envBRDF.x + envBRDF.y;
 
-		if (useReflections == 1) {
+		if (useReflections && roughness < 0.75) {
 			vec3 camToWorld = position - cameraPosition.xyz;
 			vec3 camToWorldNorm = normalize(camToWorld);
 			vec3 combined = vec3(0.0);
 
-			image -= specular * ao;
-
-			int j = 0;
-			for (j = 0; j < SAMPLES; j++) {
+			int samples = 0;
+			for (int j = 0; j < SAMPLES; j++) {
 				vec3 newPos;
 				vec4 newScreen;
 				vec2 newCoords;
@@ -103,8 +100,10 @@ void main(void) {
 				float dO = 0.0;
 				float odS;
 
-				float rand2 = randomS(textureCoords + vec2(641.51224, 423.178), float(frame) + float(j));
-				float rand3 = randomS(textureCoords - vec2(147.16414, 363.941), float(frame) - float(j));
+				float rand2 =
+					randomS(textureCoords + vec2(641.51224, 423.178), float(frame) + float(j));
+				float rand3 =
+					randomS(textureCoords - vec2(147.16414, 363.941), float(frame) - float(j));
 				// hmmmmm, maybe uses different input data for angle
 				vec3 rd = cosWeightedRandomHemisphereDirection(
 					normalize(reflect(camToWorldNorm, N)), random(rand2) * roughness * 0.10,
@@ -145,7 +144,7 @@ void main(void) {
 
 					float diff = newDepth - depth;
 
-					if (diff >= 0.1) {
+					if (diff >= 0.1 && diff <= 1.0) {
 						float halfD = oldDist / 2.0;
 						dS = -halfD;
 					} else if (diff > -0.001 && diff < 0.1) {
@@ -162,14 +161,15 @@ void main(void) {
 				}
 				if (hit) {
 					vec3 newColor = texture(pass, newCoords).rgb;
-					combined += newColor * (F * envBRDF.x + envBRDF.y);
-				} else {
-					combined += specular * ao;
+					combined += newColor * reflectionMult;
+					samples++;
 				}
 			}
-			image += combined / j;
+			if (samples != 0) {
+				image.rgb = combined / samples;
+				image.a = samples / SAMPLES;
+			}
 		}
 	}
-	out_Color.rgb = image;
-	out_Color.a = 0.0;
+	out_Color = image;
 }

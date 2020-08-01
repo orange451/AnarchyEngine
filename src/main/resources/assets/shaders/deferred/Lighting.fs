@@ -10,7 +10,7 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 in vec2 textureCoords;
 
-out vec4[2] out_Color;
+out vec4[3] out_Color;
 
 uniform vec2 resolution;
 uniform vec3 cameraPosition;
@@ -140,6 +140,7 @@ void main() {
 	vec4 mask = texture(gMask, textureCoords);
 	vec3 image = texture(gDiffuse, textureCoords).rgb;
 	vec4 auxData = vec4(0.0);
+	vec3 baseTex = image;
 
 	if (MASK_COMPARE(mask.a, PBR_OBJECT)) {
 		vec2 pbr = texture(gPBR, textureCoords).rg;
@@ -179,7 +180,7 @@ void main() {
 		vec2 envBRDF = texture(brdfLUT, vec2(ndotv, roughness)).rg;
 		vec3 specular = prefilteredColor * (F * envBRDF.x + envBRDF.y);
 
-		ambient += specular;
+		vec3 ambientReflection = ambient + specular;
 
 		auxData.a = 1.0;	 // Initial value 1.0
 		auxData.rgb = specular; // Store light for use in SSR pass
@@ -188,10 +189,13 @@ void main() {
 			vec4 ssAmbient = texture(ambientOcclusion, textureCoords);
 			float ao = ssAmbient.a;
 			auxData.a = ao; // Store AO for use in SSR pass
-			ambient *= ao;	// Apply AO, operation will be reversed in SSR pass
-			ambient += kD * ssAmbient.rgb * image.rgb;
+			ambient *= ao;
+			ambientReflection *= ao;	// Apply AO, operation will be reversed in SSR pass
+			ambientReflection += kD * ssAmbient.rgb * image.rgb;
 		}
-		vec3 light = ambient + Lo;
+		baseTex = ambient + Lo;
+
+		vec3 light = ambientReflection + Lo;
 
 		vec3 emissive = texture(gMask, textureCoords).rgb;
 		vec3 color = light + emissive;
@@ -199,5 +203,6 @@ void main() {
 	}
 	out_Color[0].rgb = image.rgb;
 	out_Color[0].a = 0.0;
-	out_Color[1] = auxData;
+	out_Color[1] = vec4(baseTex, 0.0);
+	out_Color[2] = auxData;
 }

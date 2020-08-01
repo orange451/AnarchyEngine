@@ -34,7 +34,7 @@ import static org.lwjgl.opengl.GL13C.GL_TEXTURE8;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE9;
 import static org.lwjgl.opengl.GL30C.GL_COLOR_ATTACHMENT0;
 import static org.lwjgl.opengl.GL30C.GL_COLOR_ATTACHMENT1;
-import static org.lwjgl.opengl.GL30C.GL_RGBA16F;
+import static org.lwjgl.opengl.GL30C.*;
 
 import engine.gl.DeferredPass;
 import engine.gl.DeferredPipeline;
@@ -47,7 +47,7 @@ import engine.gl.pipeline.shaders.LightingShader;
 
 public class Lighting extends DeferredPass<LightingShader> {
 
-	private Texture auxTex;
+	private Texture baseTex, reflectionTex;
 
 	public Lighting() {
 		super("Lighting");
@@ -83,7 +83,8 @@ public class Lighting extends DeferredPass<LightingShader> {
 	@Override
 	protected void setupAuxTextures(Texture[] auxTextures) {
 		super.setupAuxTextures(auxTextures);
-		auxTextures[1] = auxTex;
+		auxTextures[1] = baseTex;
+		auxTextures[2] = reflectionTex;
 	}
 
 	@Override
@@ -99,26 +100,36 @@ public class Lighting extends DeferredPass<LightingShader> {
 		mainTex = tb.endTexture();
 
 		tb.genTexture(GL_TEXTURE_2D).bindTexture();
+		tb.sizeTexture(width, height).texImage2D(0, GL_RGB16F, 0, GL_RGB, GL_FLOAT, 0);
+		tb.texParameteri(GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		tb.texParameteri(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		tb.texParameteri(GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		tb.texParameteri(GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		baseTex = tb.endTexture();
+
+		tb.genTexture(GL_TEXTURE_2D).bindTexture();
 		tb.sizeTexture(width, height).texImage2D(0, GL_RGBA16F, 0, GL_RGBA, GL_FLOAT, 0);
 		tb.texParameteri(GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		tb.texParameteri(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		tb.texParameteri(GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 		tb.texParameteri(GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-		auxTex = tb.endTexture();
+		reflectionTex = tb.endTexture();
 
 		FramebufferBuilder fb = new FramebufferBuilder();
 
 		fb.genFramebuffer().bindFramebuffer().sizeFramebuffer(width, height);
 		fb.framebufferTexture(GL_COLOR_ATTACHMENT0, mainTex, 0);
-		fb.framebufferTexture(GL_COLOR_ATTACHMENT1, auxTex, 0);
-		fb.drawBuffers(GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1);
+		fb.framebufferTexture(GL_COLOR_ATTACHMENT1, baseTex, 0);
+		fb.framebufferTexture(GL_COLOR_ATTACHMENT2, reflectionTex, 0);
+		fb.drawBuffers(GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2);
 		mainBuf = fb.endFramebuffer();
 	}
 
 	@Override
 	protected void disposeFramebuffer() {
 		super.disposeFramebuffer();
-		auxTex.dispose();
+		baseTex.dispose();
+		reflectionTex.dispose();
 	}
 
 }

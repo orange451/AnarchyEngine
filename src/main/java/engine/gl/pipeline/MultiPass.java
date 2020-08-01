@@ -30,6 +30,7 @@ public class MultiPass extends DeferredPipeline {
 	private Bloom bloom; // Done
 	private TAA taa; // Done
 	private MotionBlur mblur;
+	private MergeReflection mergeReflection;
 
 	public void setupPasses() {
 		//volumetricLight = new VolumetricLight(0.5f);
@@ -48,6 +49,9 @@ public class MultiPass extends DeferredPipeline {
 
 		reflections = new Reflections();
 		super.passes.add(reflections);
+
+		mergeReflection = new MergeReflection();
+		super.passes.add(mergeReflection);
 
 		bloomMask = new BloomMask();
 		super.passes.add(bloomMask);

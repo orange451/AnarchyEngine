@@ -30,7 +30,7 @@ import engine.gl.pipeline.shaders.ReflectionsShader;
 public class Reflections extends DeferredPass<ReflectionsShader> {
 
 	public Reflections() {
-		super("Reflections");
+		super("Reflections", 0.5f);
 	}
 
 	@Override
@@ -53,7 +53,7 @@ public class Reflections extends DeferredPass<ReflectionsShader> {
 		rnd.environmentMap.active(GL_TEXTURE5);
 		rnd.brdfLUT.active(GL_TEXTURE6);
 		auxTex[0].active(GL_TEXTURE7);
-		auxTex[1].active(GL_TEXTURE8);
+		auxTex[2].active(GL_TEXTURE8);
 	}
 
 }
