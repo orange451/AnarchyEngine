@@ -16,6 +16,10 @@ For support, see: http://manta.games/
 - [JSON-Simple](https://code.google.com/archive/p/json-simple/downloads)
 - [luaj (JSE)](https://github.com/luaj/luaj/releases)
 
+# Gradle setup
+After importing, run this command
+```git submodules update --init```
+
 # Screenshots
 ![bouncy](https://i.imgur.com/q3RHHt1.gif)
 ![pong](https://i.imgur.com/EBIDL8M.gif)
