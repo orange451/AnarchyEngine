@@ -17,8 +17,9 @@ For support, see: http://manta.games/
 - [luaj (JSE)](https://github.com/luaj/luaj/releases)
 
 # Gradle setup
-After importing, run this command
-```git submodules update --init```
+After clone, run
+```git submodule update --init```
+to initialize submodules.
 
 # Screenshots
 ![bouncy](https://i.imgur.com/q3RHHt1.gif)
