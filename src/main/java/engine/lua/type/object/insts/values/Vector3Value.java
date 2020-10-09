@@ -80,4 +80,9 @@ public class Vector3Value extends ValueBase implements TreeViewable,Positionable
 	public Matrix4 getWorldMatrix() {
 		return new Matrix4(getPosition());
 	}
+
+	@Override
+	public void setWorldMatrix(Matrix4 matrix) {
+		this.setPosition(matrix.getPosition());
+	}
 }
