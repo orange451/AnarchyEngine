@@ -14,6 +14,7 @@ import static org.lwjgl.opengl.GL11C.glBindTexture;
 import static org.lwjgl.opengl.GL11C.glDeleteTextures;
 import static org.lwjgl.opengl.GL13C.glActiveTexture;
 import static org.lwjgl.opengl.GL30C.glGenerateMipmap;
+import static org.lwjgl.opengl.GL42C.glBindImageTexture;
 
 public class Texture implements IVisualObject {
 
@@ -41,6 +42,10 @@ public class Texture implements IVisualObject {
 	public void active(int textureNum) {
 		glActiveTexture(textureNum);
 		glBindTexture(target, texture);
+	}
+
+	public void image(int unit, int level, boolean layered, int layer, int access, int format) {
+		glBindImageTexture(unit, texture, level, layered, layer, access, format);
 	}
 
 	@Override

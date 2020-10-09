@@ -10,12 +10,11 @@
 
 package engine.gl.lights;
 
-import static org.lwjgl.opengl.GL11C.GL_FRONT;
-import static org.lwjgl.opengl.GL11C.glCullFace;
 import static org.lwjgl.opengl.GL11C.GL_BACK;
 import static org.lwjgl.opengl.GL11C.GL_BLEND;
 import static org.lwjgl.opengl.GL11C.GL_COLOR_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11C.GL_FLOAT;
+import static org.lwjgl.opengl.GL11C.GL_FRONT;
 import static org.lwjgl.opengl.GL11C.GL_LINEAR;
 import static org.lwjgl.opengl.GL11C.GL_ONE;
 import static org.lwjgl.opengl.GL11C.GL_ONE_MINUS_SRC_ALPHA;
@@ -28,6 +27,7 @@ import static org.lwjgl.opengl.GL11C.GL_TEXTURE_WRAP_S;
 import static org.lwjgl.opengl.GL11C.GL_TEXTURE_WRAP_T;
 import static org.lwjgl.opengl.GL11C.glBlendFunc;
 import static org.lwjgl.opengl.GL11C.glClear;
+import static org.lwjgl.opengl.GL11C.glCullFace;
 import static org.lwjgl.opengl.GL11C.glDisable;
 import static org.lwjgl.opengl.GL11C.glEnable;
 import static org.lwjgl.opengl.GL12C.GL_CLAMP_TO_EDGE;
@@ -46,7 +46,7 @@ import java.util.List;
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
 
-import engine.gl.DeferredPipeline;
+import engine.gl.IDeferredPipeline;
 import engine.gl.RenderingSettings;
 import engine.gl.mesh.BufferedMesh;
 import engine.gl.objects.Framebuffer;
@@ -87,7 +87,7 @@ public class PointLightHandler implements ILightHandler<PointLightInternal> {
 		generateFramebuffer();
 	}
 
-	public void render(Camera camera, Matrix4f projectionMatrix, DeferredPipeline dp, RenderingSettings rs) {
+	public void render(Camera camera, Matrix4f projectionMatrix, IDeferredPipeline dp, RenderingSettings rs) {
 		main.bind();
 		glCullFace(GL_FRONT);
 		glClear(GL_COLOR_BUFFER_BIT);

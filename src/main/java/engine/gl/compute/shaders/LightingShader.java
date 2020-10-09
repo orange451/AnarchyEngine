@@ -8,19 +8,19 @@
  *
  */
 
-package engine.gl.pipeline.shaders;
+package engine.gl.compute.shaders;
 
-import static org.lwjgl.opengl.GL20C.GL_FRAGMENT_SHADER;
+import static org.lwjgl.opengl.GL43C.GL_COMPUTE_SHADER;
 
 import org.joml.Matrix4f;
 
-import engine.gl.shaders.data.UniformFloat;
+import engine.gl.compute.BaseComputeShader;
 import engine.gl.shaders.data.UniformMatrix4;
 import engine.gl.shaders.data.UniformSampler;
 import engine.gl.shaders.data.UniformVec3;
 import engine.lua.type.object.insts.Camera;
 
-public class ReflectionsShader extends BasePipelineShader {
+public class LightingShader extends BaseComputeShader {
 
 	private UniformMatrix4 projectionMatrix = new UniformMatrix4("projectionMatrix");
 	private UniformMatrix4 viewMatrix = new UniformMatrix4("viewMatrix");
@@ -34,25 +34,26 @@ public class ReflectionsShader extends BasePipelineShader {
 	private UniformSampler gDepth = new UniformSampler("gDepth");
 	private UniformSampler gPBR = new UniformSampler("gPBR");
 	private UniformSampler gMask = new UniformSampler("gMask");
-
+	private UniformSampler irradianceCube = new UniformSampler("irradianceCube");
 	private UniformSampler environmentCube = new UniformSampler("environmentCube");
 	private UniformSampler brdfLUT = new UniformSampler("brdfLUT");
-	private UniformSampler pass = new UniformSampler("pass");
-	private UniformSampler reflectionTex = new UniformSampler("reflectionTex");
+	private UniformSampler directionalLightData = new UniformSampler("directionalLightData");
+	private UniformSampler pointLightData = new UniformSampler("pointLightData");
+	private UniformSampler spotLightData = new UniformSampler("spotLightData");
+	private UniformSampler areaLightData = new UniformSampler("areaLightData");
+	private UniformSampler ambientOcclusion = new UniformSampler("ambientOcclusion");
 
-	private UniformSampler voxelImage = new UniformSampler("voxelImage");
-	private UniformFloat voxelSize = new UniformFloat("voxelSize");
-	private UniformFloat voxelOffset = new UniformFloat("voxelOffset");
+	private UniformMatrix4 biasMatrix = new UniformMatrix4("biasMatrix");
 
 	private Matrix4f projInv = new Matrix4f();
 
 	@Override
 	protected void setupShader() {
 		super.setupShader();
-		super.addShader(new Shader("assets/shaders/deferred/Reflections.fs", GL_FRAGMENT_SHADER));
+		super.addShader(new Shader("assets/shaders/deferred_compute/Lighting.comp", GL_COMPUTE_SHADER));
 		super.storeUniforms(projectionMatrix, viewMatrix, cameraPosition, gDiffuse, gNormal, gDepth, gPBR, gMask,
-				environmentCube, brdfLUT, inverseProjectionMatrix, inverseViewMatrix, pass, reflectionTex, voxelImage,
-				voxelSize, voxelOffset);
+				irradianceCube, environmentCube, brdfLUT, biasMatrix, inverseProjectionMatrix, inverseViewMatrix,
+				directionalLightData, pointLightData, spotLightData, areaLightData, ambientOcclusion);
 	}
 
 	@Override
@@ -63,11 +64,22 @@ public class ReflectionsShader extends BasePipelineShader {
 		gDepth.loadTexUnit(2);
 		gPBR.loadTexUnit(3);
 		gMask.loadTexUnit(4);
-		environmentCube.loadTexUnit(5);
-		brdfLUT.loadTexUnit(6);
-		pass.loadTexUnit(7);
-		reflectionTex.loadTexUnit(8);
-		voxelImage.loadTexUnit(9);
+		irradianceCube.loadTexUnit(5);
+		environmentCube.loadTexUnit(6);
+		brdfLUT.loadTexUnit(7);
+		directionalLightData.loadTexUnit(8);
+		pointLightData.loadTexUnit(9);
+		spotLightData.loadTexUnit(10);
+		areaLightData.loadTexUnit(11);
+		ambientOcclusion.loadTexUnit(12);
+		Matrix4f bias = new Matrix4f();
+		bias.m00(0.5f);
+		bias.m11(0.5f);
+		bias.m22(0.5f);
+		bias.m30(0.5f);
+		bias.m31(0.5f);
+		bias.m32(0.5f);
+		biasMatrix.loadMatrix(bias);
 		super.stop();
 	}
 
@@ -78,13 +90,4 @@ public class ReflectionsShader extends BasePipelineShader {
 		this.inverseProjectionMatrix.loadMatrix(projection.invert(projInv));
 		this.inverseViewMatrix.loadMatrix(camera.getViewMatrixInverseInternal());
 	}
-	
-	public void loadVoxelSize(float size) {
-		voxelSize.loadFloat(size);
-	}
-
-	public void loadVoxelOffset(float offset) {
-		voxelOffset.loadFloat(offset);
-	}
-
 }

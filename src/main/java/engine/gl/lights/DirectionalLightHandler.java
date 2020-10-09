@@ -45,7 +45,7 @@ import java.util.List;
 
 import org.joml.Matrix4f;
 
-import engine.gl.DeferredPipeline;
+import engine.gl.IDeferredPipeline;
 import engine.gl.RenderingSettings;
 import engine.gl.objects.Framebuffer;
 import engine.gl.objects.FramebufferBuilder;
@@ -87,7 +87,7 @@ public class DirectionalLightHandler implements ILightHandler<DirectionalLightIn
 		generateFramebuffer();
 	}
 
-	public void render(Camera camera, Matrix4f projectionMatrix, DeferredPipeline dp, RenderingSettings rs) {
+	public void render(Camera camera, Matrix4f projectionMatrix, IDeferredPipeline dp, RenderingSettings rs) {
 		main.bind();
 		glClear(GL_COLOR_BUFFER_BIT);
 		glEnable(GL_BLEND);

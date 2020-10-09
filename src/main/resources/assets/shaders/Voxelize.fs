@@ -26,7 +26,7 @@ in vec3 pass_position_fs;
 in vec2 pass_textureCoords_fs;
 in mat3 TBN_fs;
 
-uniform layout(size1x32) image3D voxelImage;
+layout(rgba16f, binding = 0) restrict writeonly uniform image3D voxelImage;
 uniform int resolution;
 
 uniform Material material;

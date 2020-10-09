@@ -31,7 +31,6 @@ import static org.lwjgl.opengl.GL15C.GL_WRITE_ONLY;
 import static org.lwjgl.opengl.GL30C.GL_RGBA16F;
 import static org.lwjgl.opengl.GL30C.GL_TEXTURE_2D_ARRAY;
 import static org.lwjgl.opengl.GL42C.glBindImageTexture;
-import static org.lwjgl.opengl.GL44C.glClearTexImage;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -75,7 +74,6 @@ public class InstanceVoxelizeRenderer {
 	}
 
 	public void render(List<Instance> instances, IRenderingData rd, RendererData rnd) {
-		glClearTexImage(rnd.vm.getTexture().getTexture(), 0, GL_RGBA, GL_FLOAT, (ByteBuffer)null);
 		int[] oldViewport = new int[4];
 		glGetIntegerv(GL_VIEWPORT, oldViewport);
 		glViewport(0, 0, rnd.vm.getResolution(), rnd.vm.getResolution());
@@ -87,11 +85,11 @@ public class InstanceVoxelizeRenderer {
 		shader.loadVoxelizationValues(rnd.vm, rd.camera);
 		shader.loadSettings(rnd.rs.shadowsEnabled);
 		shader.loadDirectionalLights(rnd.dlh.getLights());
-		glBindImageTexture(4, rnd.vm.getTexture().getTexture(), 0, true, 128, GL_WRITE_ONLY, GL_RGBA16F);
-		for (int x = 0; x < Math.min(8, rnd.dlh.getLights().size()); x++) {
-			glActiveTexture(GL_TEXTURE8 + x);
-			glBindTexture(GL_TEXTURE_2D_ARRAY, rnd.dlh.getLights().get(x).getShadowMap().getShadowMaps().getTexture());
-		}
+		glBindImageTexture(0, rnd.vm.getColor().getTexture(), 0, true, 0, GL_WRITE_ONLY, GL_RGBA16F);
+		//for (int x = 0; x < Math.min(8, rnd.dlh.getLights().size()); x++) {
+			//glActiveTexture(GL_TEXTURE8 + x);
+			//glBindTexture(GL_TEXTURE_2D_ARRAY, rnd.dlh.getLights().get(x).getShadowMap().getShadowMaps().getTexture());
+		//}
 		for (Instance instance : instances) {
 			renderInstance(instance, rnd);
 		}

@@ -33,7 +33,6 @@ import engine.gl.shaders.data.UniformInteger;
 import engine.gl.shaders.data.UniformMaterial;
 import engine.gl.shaders.data.UniformMatrix4;
 import engine.gl.shaders.data.UniformPointLight;
-import engine.gl.shaders.data.UniformSampler;
 import engine.gl.shaders.data.UniformVec3;
 import engine.lua.type.object.insts.Camera;
 
@@ -58,7 +57,6 @@ public class InstanceVoxelizeShader extends ShaderProgram {
 	private UniformDirectionalLight directionalLights[] = new UniformDirectionalLight[8];
 	private UniformInteger totalDirectionalLights = new UniformInteger("totalDirectionalLights");
 
-	private UniformSampler voxelImage = new UniformSampler("voxelImage");
 	private UniformInteger resolution = new UniformInteger("resolution");
 
 	private Matrix4f temp = new Matrix4f();
@@ -80,13 +78,12 @@ public class InstanceVoxelizeShader extends ShaderProgram {
 		}
 		super.storeUniforms(directionalLights);
 		super.storeUniforms(transformationMatrix, projection, viewX, viewY, viewZ, material, biasMatrix,
-				totalPointLights, totalDirectionalLights, voxelImage, cameraPosition, useShadows, resolution);
+				totalPointLights, totalDirectionalLights, cameraPosition, useShadows, resolution);
 	}
 
 	@Override
 	protected void loadInitialData() {
 		super.start();
-		voxelImage.loadTexUnit(4);
 		Matrix4f bias = new Matrix4f();
 		bias.m00(0.5f);
 		bias.m11(0.5f);

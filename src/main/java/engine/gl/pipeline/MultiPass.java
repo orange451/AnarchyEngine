@@ -33,14 +33,14 @@ public class MultiPass extends DeferredPipeline {
 	private MergeReflection mergeReflection;
 
 	public void setupPasses() {
-		//volumetricLight = new VolumetricLight(0.5f);
-		//super.passes.add(volumetricLight);
+		// volumetricLight = new VolumetricLight(0.5f);
+		// super.passes.add(volumetricLight);
 
 		gH1 = new GaussianBlur(false, 0.5f);
-		//super.passes.add(gH1);
+		// super.passes.add(gH1);
 
 		gV1 = new GaussianBlur(true, 0.5f);
-		//super.passes.add(gV1);
+		// super.passes.add(gV1);
 		ambientOcclusion = new AmbientOcclusion();
 		super.passes.add(ambientOcclusion);
 
@@ -68,11 +68,11 @@ public class MultiPass extends DeferredPipeline {
 		lensFlareMod = new LensFlareMod();
 		super.passes.add(lensFlareMod);
 
-		colorCorrection = new ColorCorrection();
-		super.passes.add(colorCorrection);
-
 		mblur = new MotionBlur();
 		super.passes.add(mblur);
+
+		colorCorrection = new ColorCorrection();
+		super.passes.add(colorCorrection);
 
 		taa = new TAA();
 		super.passes.add(taa);

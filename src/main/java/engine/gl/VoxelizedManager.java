@@ -31,10 +31,10 @@ import engine.gl.objects.TextureBuilder;
 
 public class VoxelizedManager {
 
-	private Texture tex;
+	private Texture color;
 
 	private int resolution = 256;
-	private int size = 40;
+	private int size = 50;
 	private float cameraOffset;
 
 	private Matrix4f projectionMatrix = new Matrix4f();
@@ -55,7 +55,7 @@ public class VoxelizedManager {
 		tb.texParameteri(GL_TEXTURE_WRAP_R, GL_CLAMP_TO_BORDER);
 		tb.texParameteri(GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
 		tb.texParameteri(GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-		tex = tb.endTexture();
+		color = tb.endTexture();
 	}
 
 	private void updateValues() {
@@ -74,11 +74,11 @@ public class VoxelizedManager {
 	}
 
 	public void dispose() {
-		tex.dispose();
+		color.dispose();
 	}
 
-	public Texture getTexture() {
-		return tex;
+	public Texture getColor() {
+		return color;
 	}
 
 	public int getResolution() {

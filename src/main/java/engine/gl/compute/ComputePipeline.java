@@ -8,12 +8,11 @@
  *
  */
 
-package engine.gl;
+package engine.gl.compute;
 
 import static org.lwjgl.opengl.GL11C.GL_COLOR_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11C.GL_DEPTH_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11C.GL_DEPTH_COMPONENT;
-import static org.lwjgl.opengl.GL11C.GL_DEPTH_TEST;
 import static org.lwjgl.opengl.GL11C.GL_FLOAT;
 import static org.lwjgl.opengl.GL11C.GL_LINEAR;
 import static org.lwjgl.opengl.GL11C.GL_NEAREST;
@@ -27,9 +26,7 @@ import static org.lwjgl.opengl.GL11C.GL_TEXTURE_WRAP_T;
 import static org.lwjgl.opengl.GL11C.GL_TRIANGLE_STRIP;
 import static org.lwjgl.opengl.GL11C.GL_UNSIGNED_BYTE;
 import static org.lwjgl.opengl.GL11C.glBindTexture;
-import static org.lwjgl.opengl.GL11C.glDisable;
 import static org.lwjgl.opengl.GL11C.glDrawArrays;
-import static org.lwjgl.opengl.GL11C.glEnable;
 import static org.lwjgl.opengl.GL12C.GL_CLAMP_TO_EDGE;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE0;
 import static org.lwjgl.opengl.GL13C.glActiveTexture;
@@ -48,10 +45,16 @@ import static org.lwjgl.opengl.GL30C.GL_RGB16F;
 import static org.lwjgl.opengl.GL30C.GL_RGBA16F;
 import static org.lwjgl.opengl.GL30C.glBindFramebuffer;
 import static org.lwjgl.opengl.GL30C.glBlitFramebuffer;
+import static org.lwjgl.opengl.GL42C.GL_SHADER_IMAGE_ACCESS_BARRIER_BIT;
+import static org.lwjgl.opengl.GL42C.glMemoryBarrier;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import engine.gl.GPUProfiler;
+import engine.gl.IDeferredPipeline;
+import engine.gl.IRenderingData;
+import engine.gl.RendererData;
 import engine.gl.objects.Framebuffer;
 import engine.gl.objects.FramebufferBuilder;
 import engine.gl.objects.Texture;
@@ -59,24 +62,24 @@ import engine.gl.objects.TextureBuilder;
 import engine.gl.objects.VAO;
 import engine.gl.shaders.FinalShader;
 
-public abstract class DeferredPipeline implements IDeferredPipeline {
+public abstract class ComputePipeline implements IDeferredPipeline {
 
 	protected int width, height;
 	private Texture[] auxTex;
 
-	protected List<DeferredPass<?>> passes;
+	protected List<ComputePass<?>> passes;
 
 	private Framebuffer main;
 	private Texture diffuseTex, motionTex, normalTex, pbrTex, maskTex, depthTex;
 
-	private VAO quad;
-
 	private Framebuffer previousFrame;
 	private Texture previousFrameTex;
 
+	// Temporary
+	private VAO quad;
 	private FinalShader finalShader;
 
-	public DeferredPipeline(int width, int height) {
+	public ComputePipeline(int width, int height) {
 		this.width = width;
 		this.height = height;
 		passes = new ArrayList<>();
@@ -85,18 +88,20 @@ public abstract class DeferredPipeline implements IDeferredPipeline {
 	}
 
 	public void init() {
+		generatePipeline();
+		setupPasses();
+		for (ComputePass<?> pass : passes)
+			pass.init(width, height);
+
+		// Remove this
+		finalShader = new FinalShader("deferred/Final");
+		finalShader.init();
 		float[] positions = { -1, 1, -1, -1, 1, 1, 1, -1 };
 		quad = VAO.create();
 		quad.bind();
 		quad.createAttribute(0, positions, 2, GL_STATIC_DRAW);
 		quad.unbind();
 		quad.setVertexCount(4);
-		generatePipeline();
-		setupPasses();
-		for (DeferredPass<?> pass : passes)
-			pass.init(width, height);
-		finalShader = new FinalShader("deferred/Final");
-		finalShader.init();
 	}
 
 	public abstract void setupPasses();
@@ -113,16 +118,16 @@ public abstract class DeferredPipeline implements IDeferredPipeline {
 
 	@Override
 	public void process(RendererData rnd, IRenderingData rd) {
-		glDisable(GL_DEPTH_TEST);
-		quad.bind();
-		for (DeferredPass<?> pass : passes)
-			pass.process(rnd, rd, this, auxTex, quad);
-		quad.unbind();
-		glEnable(GL_DEPTH_TEST);
+		for (ComputePass<?> pass : passes) {
+			pass.process(rnd, rd, this, auxTex);
+		}
 	}
 
 	@Override
 	public void render(Framebuffer fb) {
+		// Wait for compute shaders
+		glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
+
 		previousFrame.bind();
 		finalShader.start();
 		quad.bind();
@@ -148,21 +153,21 @@ public abstract class DeferredPipeline implements IDeferredPipeline {
 		this.height = height;
 		disposePipeline();
 		generatePipeline();
-		for (DeferredPass<?> pass : passes)
+		for (ComputePass<?> pass : passes)
 			pass.resize(width, height);
 	}
 
 	@Override
 	public void dispose() {
 		disposePipeline();
-		for (DeferredPass<?> pass : passes)
+		for (ComputePass<?> pass : passes)
 			pass.dispose();
 		quad.dispose();
 		finalShader.dispose();
 	}
 
 	public void reloadShaders() {
-		for (DeferredPass<?> deferredPass : passes)
+		for (ComputePass<?> deferredPass : passes)
 			deferredPass.reloadShader();
 		finalShader.reload();
 	}

@@ -16,10 +16,12 @@ import static org.lwjgl.opengl.GL11C.GL_COLOR_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11C.GL_CULL_FACE;
 import static org.lwjgl.opengl.GL11C.GL_DEPTH_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11C.GL_DEPTH_TEST;
+import static org.lwjgl.opengl.GL11C.GL_FLOAT;
 import static org.lwjgl.opengl.GL11C.GL_FRONT;
 import static org.lwjgl.opengl.GL11C.GL_GREATER;
 import static org.lwjgl.opengl.GL11C.GL_LESS;
 import static org.lwjgl.opengl.GL11C.GL_ONE_MINUS_SRC_ALPHA;
+import static org.lwjgl.opengl.GL11C.GL_RGBA;
 import static org.lwjgl.opengl.GL11C.GL_SRC_ALPHA;
 import static org.lwjgl.opengl.GL11C.glBlendFunc;
 import static org.lwjgl.opengl.GL11C.glClear;
@@ -30,6 +32,9 @@ import static org.lwjgl.opengl.GL11C.glDepthFunc;
 import static org.lwjgl.opengl.GL11C.glDisable;
 import static org.lwjgl.opengl.GL11C.glEnable;
 import static org.lwjgl.opengl.GL32C.GL_TEXTURE_CUBE_MAP_SEAMLESS;
+import static org.lwjgl.opengl.GL44C.glClearTexImage;
+
+import java.nio.ByteBuffer;
 
 import org.joml.Math;
 import org.joml.Matrix4f;
@@ -41,6 +46,8 @@ import org.lwjgl.opengl.ARBClipControl;
 import org.lwjgl.opengl.GL;
 
 import engine.Game;
+import engine.gl.compute.ComputeMultiPass;
+import engine.gl.compute.ComputePipeline;
 import engine.gl.lights.AreaLightHandler;
 import engine.gl.lights.AreaLightInternal;
 import engine.gl.lights.DirectionalLightHandler;
@@ -85,6 +92,7 @@ public class GLRenderer implements IPipeline {
 
 	private HandlesRenderer handlesRenderer;
 
+	private ComputePipeline cp;
 	private DeferredPipeline dp;
 	private PostProcessPipeline pp;
 	private RenderingSettings renderingSettings;
@@ -109,7 +117,7 @@ public class GLRenderer implements IPipeline {
 	private boolean initialized;
 
 	private Window window;
-
+	
 	public GLRenderer(Window window) {
 		this.window = window;
 		useARBClipControl = GL.getCapabilities().GL_ARB_clip_control;
@@ -166,6 +174,9 @@ public class GLRenderer implements IPipeline {
 			rnd.alh = areaLightHandler;
 			rnd.rs = renderingSettings;
 			rnd.vm = vm = new VoxelizedManager();
+			
+			cp = new ComputeMultiPass(width, height);
+			
 			size.set(width, height);
 			enabled = true;
 			initialized = true;
@@ -176,6 +187,7 @@ public class GLRenderer implements IPipeline {
 		Game.userInputService().inputBeganEvent().connect((args) -> {
 			if (args[0].get("KeyCode").eq_b(LuaValue.valueOf(GLFW.GLFW_KEY_F5))) {
 				System.out.println("Reloading Shaders...");
+				cp.reloadShaders();
 				dp.reloadShaders();
 				pp.reloadShaders();
 			}
@@ -255,7 +267,7 @@ public class GLRenderer implements IPipeline {
 		renderingManager.renderVoxelize(rd, rnd);
 	}
 
-	private void gBufferPass() {
+	private void gBufferPass(IDeferredPipeline dp) {
 		GPUProfiler.start("G-Buffer pass");
 		if (useARBClipControl) {
 			ARBClipControl.glClipControl(ARBClipControl.GL_LOWER_LEFT, ARBClipControl.GL_ZERO_TO_ONE);
@@ -279,7 +291,7 @@ public class GLRenderer implements IPipeline {
 		GPUProfiler.end();
 	}
 
-	private void deferredPass() {
+	private void deferredPass(IDeferredPipeline dp) {
 		GPUProfiler.start("Lighting");
 		GPUProfiler.start("Directional");
 		directionalLightHandler.render(currentCamera, projMatrix, dp, renderingSettings);
@@ -299,7 +311,7 @@ public class GLRenderer implements IPipeline {
 		GPUProfiler.end();
 	}
 
-	private void forwardPass() {
+	private void forwardPass(IDeferredPipeline dp) {
 		GPUProfiler.start("Forward Pass");
 		if (useARBClipControl) {
 			ARBClipControl.glClipControl(ARBClipControl.GL_LOWER_LEFT, ARBClipControl.GL_ZERO_TO_ONE);
@@ -397,15 +409,18 @@ public class GLRenderer implements IPipeline {
 		rd.projectionMatrix = projMatrix;
 
 		GPUProfiler.startFrame();
+		
+		glClearTexImage(rnd.vm.getColor().getTexture(), 0, GL_RGBA, GL_FLOAT, (ByteBuffer)null);
+		//glClearTexImage(ao.getTexture().getTexture(), 0, GL_RGBA, GL_FLOAT, new float[] { 0, 0, 0, 1 });
 
 		renderingManager.preProcess(renderableWorld.getInstance());
 		shadowPass();
 		environmentPass();
 		// occlusionPass();
 		voxelizePass();
-		gBufferPass();
-		deferredPass();
-		forwardPass();
+		gBufferPass(dp);
+		deferredPass(dp);
+		forwardPass(dp);
 		postFXPass();
 		renderingManager.end();
 
@@ -427,6 +442,7 @@ public class GLRenderer implements IPipeline {
 		this.width = width;
 		this.height = height;
 		this.size.set(width, height);
+		cp.resize(width, height);
 		dp.resize(width, height);
 		pp.resize(width, height);
 		directionalLightHandler.resize(width, height);
@@ -439,6 +455,7 @@ public class GLRenderer implements IPipeline {
 	public void dispose() {
 		envRenderer.dispose();
 		//envRendererEntities.dispose();
+		cp.dispose();
 		dp.dispose();
 		pp.dispose();
 		directionalLightHandler.dispose();

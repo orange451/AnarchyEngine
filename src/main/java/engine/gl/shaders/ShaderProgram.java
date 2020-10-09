@@ -25,7 +25,7 @@ import static org.lwjgl.opengl.GL20C.glGetShaderi;
 import static org.lwjgl.opengl.GL20C.glLinkProgram;
 import static org.lwjgl.opengl.GL20C.glShaderSource;
 import static org.lwjgl.opengl.GL20C.glUseProgram;
-import static org.lwjgl.opengl.GL20C.glValidateProgram;
+import static org.lwjgl.opengl.GL43C.glDispatchCompute;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -76,6 +76,11 @@ public abstract class ShaderProgram {
 		this.loadShaderProgram();
 	}
 
+	public void initCompute() {
+		this.setupShader();
+		this.loadComputeShader();
+	}
+
 	protected abstract void setupShader();
 
 	protected void loadInitialData() {
@@ -89,9 +94,18 @@ public abstract class ShaderProgram {
 		glUseProgram(0);
 	}
 
+	public void dispatch(int x, int y, int z) {
+		glDispatchCompute(x, y, z);
+	}
+
 	public void reload() {
 		glDeleteProgram(program);
 		this.loadShaderProgram();
+	}
+
+	public void reloadCompute() {
+		glDeleteProgram(program);
+		this.loadComputeShader();
 	}
 
 	public void dispose() {
@@ -120,7 +134,22 @@ public abstract class ShaderProgram {
 			glDetachShader(program, shader.id);
 			glDeleteShader(shader.id);
 		}
-		glValidateProgram(program); // TODO: Check validation
+		// glValidateProgram(program); // TODO: Check validation
+		for (IUniform uniform : uniforms)
+			uniform.storeUniformLocation(program);
+		this.loadInitialData();
+		loaded = true;
+	}
+
+	private void loadComputeShader() {
+		program = glCreateProgram();
+		for (Shader shader : shaders.values())
+			glAttachShader(program, loadShader(shader));
+		glLinkProgram(program);
+		for (Shader shader : shaders.values()) {
+			glDetachShader(program, shader.id);
+			glDeleteShader(shader.id);
+		}
 		for (IUniform uniform : uniforms)
 			uniform.storeUniformLocation(program);
 		this.loadInitialData();

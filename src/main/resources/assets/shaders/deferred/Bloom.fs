@@ -17,7 +17,7 @@ uniform sampler2D bloom;
 
 void main() {
 	vec3 baseColor = texture(base, textureCoords).rgb;
-	//baseColor += texture(bloom, textureCoords).rgb;
+	baseColor += texture(bloom, textureCoords).rgb;
 	out_Color.rgb = baseColor;
 	out_Color.a = 0.0;
 }

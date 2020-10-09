@@ -50,7 +50,7 @@ import org.joml.Matrix4f;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 
-import engine.gl.DeferredPipeline;
+import engine.gl.IDeferredPipeline;
 import engine.gl.RenderingSettings;
 import engine.gl.lights.mesh.ConeGenerator;
 import engine.gl.objects.Framebuffer;
@@ -94,7 +94,7 @@ public class SpotLightHandler implements ILightHandler<SpotLightInternal> {
 		generateFramebuffer();
 	}
 
-	public void render(Camera camera, Matrix4f projectionMatrix, DeferredPipeline dp, RenderingSettings rs) {
+	public void render(Camera camera, Matrix4f projectionMatrix, IDeferredPipeline dp, RenderingSettings rs) {
 		main.bind();
 		glCullFace(GL_FRONT);
 		glClear(GL_COLOR_BUFFER_BIT);

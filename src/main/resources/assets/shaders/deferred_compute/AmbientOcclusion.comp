@@ -8,9 +8,12 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
  */
 
-in vec2 textureCoords;
+layout(local_size_x = 16, local_size_y = 16) in;
+layout(rgba16f, binding = 0) restrict writeonly uniform image2D out_color;
 
-out vec4 out_Color;
+uniform vec2 resolution;
+uniform vec2 pixelOffset;
+uniform int frame;
 
 uniform vec3 cameraPosition;
 uniform sampler2D gNormal;
@@ -26,11 +29,8 @@ uniform sampler2D pointLightData;
 uniform sampler2D spotLightData;
 uniform sampler2D areaLightData;
 uniform sampler3D voxelImage;
-uniform int frame;
 uniform float voxelSize;
 uniform float voxelOffset;
-
-uniform sampler2D aoCompute;
 
 uniform bool useAmbientOcclusion;
 
@@ -159,8 +159,7 @@ float computeAmbientOcclusion(vec2 textureCoords, vec3 position, vec3 normal, sa
 
 			// Get new pos
 			tmpDepth = texture(gDepth, newCoords).r;
-			newPos =
-				positionFromDepth(newCoords, tmpDepth, invProjection, invView);
+			newPos = positionFromDepth(newCoords, tmpDepth, invProjection, invView);
 
 			// Calculate point and new pos depths
 			depth = length(newPos - cameraPosition);
@@ -192,58 +191,43 @@ float computeAmbientOcclusion(vec2 textureCoords, vec3 position, vec3 normal, sa
 }
 
 void main() {
+	if (!useAmbientOcclusion)
+		return;
+
+	ivec2 pixelcoords = ivec2(gl_GlobalInvocationID.xy);
+	vec2 textureCoords = pixelcoords.xy / resolution + pixelOffset;
+
 	vec4 mask = texture(gMask, textureCoords);
-	vec4 image = vec4(vec3(0.0), 1.0);
-	if (useAmbientOcclusion) {
-		if (MASK_COMPARE(mask.a, PBR_OBJECT)) {
-			float depth = texture(gDepth, textureCoords).r;
-			vec3 position =
-				positionFromDepth(textureCoords, depth, inverseProjectionMatrix, inverseViewMatrix);
+	if (MASK_COMPARE(mask.a, PBR_OBJECT)) {
+		float depth = texture(gDepth, textureCoords).r;
+		vec3 position =
+			positionFromDepth(textureCoords, depth, inverseProjectionMatrix, inverseViewMatrix);
 
-			vec2 xy = texture(gMotion, textureCoords).ba;
-			vec4 normal = texture(gNormal, textureCoords);
+		vec2 xy = texture(gMotion, textureCoords).ba;
+		vec4 normal = texture(gNormal, textureCoords);
 
-			vec3 GIN = normalize(vec3(xy, normal.a));
-			vec3 AON = normal.xyz;
+		vec3 GIN = normalize(vec3(xy, normal.a));
+		vec3 AON = normal.xyz;
 
-			vec3 samplePos = (position - cameraPosition) / voxelSize + 0.5;
+		vec3 samplePos = (position - cameraPosition) / voxelSize + 0.5;
 
-			if (!(samplePos.x < 0.0 || samplePos.x > 1.0 || samplePos.y < 0.0 ||
-				  samplePos.y > 1.0 || samplePos.z < 0.0 || samplePos.z > 1.0)) {
+		if (!(samplePos.x < 0.0 || samplePos.x > 1.0 || samplePos.y < 0.0 || samplePos.y > 1.0 ||
+			  samplePos.z < 0.0 || samplePos.z > 1.0)) {
 
-				/*vec3 rd = normalize(position - cameraPosition);
+			vec3 rd = normalize(position - cameraPosition);
 
-				vec3 cameraToWorld = position - cameraPosition;
-				float cameraToWorldDist = length(cameraToWorld);
-
-				vec3 rayTrace = cameraPosition;
-				float rayDist, incr = 0.025;
-				float rayDistRad = length(position - cameraPosition);
-				do {
-					rayTrace += rd * incr;
-					incr *= 1.010;
-
-					rayDist = length(rayTrace - cameraPosition);
-					vec4 pointSample =
-						texture(voxelImage, vec3((rayTrace.xyz - cameraPosition) / voxelSize +
-				0.5)); if (pointSample.a > 0.0) { image.rgb = pointSample.rgb; break;
-					}
-				} while (rayDist < 200);*/
-
-				vec4 gi = vec4(vec3(0.0), 1.0);
-				if (useGI) {
-					gi = computeGI(textureCoords, position, GIN, gDepth);
-				}
-				if (useAO) {
-					float ao = computeAmbientOcclusion(textureCoords, position, AON, gDepth,
-													   projectionMatrix, viewMatrix, inverseProjectionMatrix,
-													   inverseViewMatrix);
-					gi.a *= ao;
-					gi.rgb *= ao;
-				}
-				image = vec4(gi);
+			vec4 gi = vec4(vec3(0.0), 1.0);
+			if (useGI) {
+				gi = computeGI(textureCoords, position, GIN, gDepth);
 			}
+			if (useAO) {
+				float ao =
+					computeAmbientOcclusion(textureCoords, position, AON, gDepth, projectionMatrix,
+											viewMatrix, inverseProjectionMatrix, inverseViewMatrix);
+				gi.a *= ao;
+				gi.rgb *= ao;
+			}
+			imageStore(out_color, pixelcoords, gi);
 		}
 	}
-	out_Color = image;
 }

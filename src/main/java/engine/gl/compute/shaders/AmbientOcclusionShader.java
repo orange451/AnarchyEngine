@@ -8,37 +8,36 @@
  *
  */
 
-package engine.gl.pipeline.shaders;
+package engine.gl.compute.shaders;
 
-import static org.lwjgl.opengl.GL20C.GL_FRAGMENT_SHADER;
+import static org.lwjgl.opengl.GL43C.GL_COMPUTE_SHADER;
 
 import org.joml.Matrix4f;
 
+import engine.gl.compute.BaseComputeShader;
 import engine.gl.shaders.data.UniformFloat;
 import engine.gl.shaders.data.UniformMatrix4;
 import engine.gl.shaders.data.UniformSampler;
 import engine.gl.shaders.data.UniformVec3;
 import engine.lua.type.object.insts.Camera;
 
-public class ReflectionsShader extends BasePipelineShader {
+public class AmbientOcclusionShader extends BaseComputeShader {
 
+	private UniformVec3 cameraPosition = new UniformVec3("cameraPosition");
 	private UniformMatrix4 projectionMatrix = new UniformMatrix4("projectionMatrix");
 	private UniformMatrix4 viewMatrix = new UniformMatrix4("viewMatrix");
 	private UniformMatrix4 inverseProjectionMatrix = new UniformMatrix4("inverseProjectionMatrix");
 	private UniformMatrix4 inverseViewMatrix = new UniformMatrix4("inverseViewMatrix");
 
-	private UniformVec3 cameraPosition = new UniformVec3("cameraPosition");
-
-	private UniformSampler gDiffuse = new UniformSampler("gDiffuse");
 	private UniformSampler gNormal = new UniformSampler("gNormal");
 	private UniformSampler gDepth = new UniformSampler("gDepth");
-	private UniformSampler gPBR = new UniformSampler("gPBR");
 	private UniformSampler gMask = new UniformSampler("gMask");
+	private UniformSampler gMotion = new UniformSampler("gMotion");
 
-	private UniformSampler environmentCube = new UniformSampler("environmentCube");
-	private UniformSampler brdfLUT = new UniformSampler("brdfLUT");
-	private UniformSampler pass = new UniformSampler("pass");
-	private UniformSampler reflectionTex = new UniformSampler("reflectionTex");
+	private UniformSampler directionalLightData = new UniformSampler("directionalLightData");
+	private UniformSampler pointLightData = new UniformSampler("pointLightData");
+	private UniformSampler spotLightData = new UniformSampler("spotLightData");
+	private UniformSampler areaLightData = new UniformSampler("areaLightData");
 
 	private UniformSampler voxelImage = new UniformSampler("voxelImage");
 	private UniformFloat voxelSize = new UniformFloat("voxelSize");
@@ -49,25 +48,24 @@ public class ReflectionsShader extends BasePipelineShader {
 	@Override
 	protected void setupShader() {
 		super.setupShader();
-		super.addShader(new Shader("assets/shaders/deferred/Reflections.fs", GL_FRAGMENT_SHADER));
-		super.storeUniforms(projectionMatrix, viewMatrix, cameraPosition, gDiffuse, gNormal, gDepth, gPBR, gMask,
-				environmentCube, brdfLUT, inverseProjectionMatrix, inverseViewMatrix, pass, reflectionTex, voxelImage,
-				voxelSize, voxelOffset);
+		super.addShader(new Shader("assets/shaders/deferred_compute/AmbientOcclusion.comp", GL_COMPUTE_SHADER));
+		super.storeUniforms(projectionMatrix, viewMatrix, cameraPosition, gNormal, gDepth, gMask, gMotion,
+				directionalLightData, pointLightData, spotLightData, areaLightData, voxelImage, voxelSize, voxelOffset,
+				inverseProjectionMatrix, inverseViewMatrix);
 	}
 
 	@Override
 	protected void loadInitialData() {
 		super.start();
-		gDiffuse.loadTexUnit(0);
-		gNormal.loadTexUnit(1);
-		gDepth.loadTexUnit(2);
-		gPBR.loadTexUnit(3);
-		gMask.loadTexUnit(4);
-		environmentCube.loadTexUnit(5);
-		brdfLUT.loadTexUnit(6);
-		pass.loadTexUnit(7);
-		reflectionTex.loadTexUnit(8);
-		voxelImage.loadTexUnit(9);
+		gNormal.loadTexUnit(0);
+		gDepth.loadTexUnit(1);
+		gMask.loadTexUnit(2);
+		gMotion.loadTexUnit(3);
+		directionalLightData.loadTexUnit(4);
+		pointLightData.loadTexUnit(5);
+		spotLightData.loadTexUnit(6);
+		areaLightData.loadTexUnit(7);
+		voxelImage.loadTexUnit(8);
 		super.stop();
 	}
 
@@ -78,7 +76,7 @@ public class ReflectionsShader extends BasePipelineShader {
 		this.inverseProjectionMatrix.loadMatrix(projection.invert(projInv));
 		this.inverseViewMatrix.loadMatrix(camera.getViewMatrixInverseInternal());
 	}
-	
+
 	public void loadVoxelSize(float size) {
 		voxelSize.loadFloat(size);
 	}
