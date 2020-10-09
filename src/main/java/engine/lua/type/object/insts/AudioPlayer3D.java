@@ -87,4 +87,9 @@ public class AudioPlayer3D extends AudioPlayerBase implements Positionable {
 		
 		Game.soundService().playSound3D(source, getPosition(), getVolume(), getPitch(), getRange(), getEmitterSize());
 	}
+
+	@Override
+	public void setWorldMatrix(Matrix4 matrix) {
+		this.setPosition(matrix.getPosition());
+	}
 }

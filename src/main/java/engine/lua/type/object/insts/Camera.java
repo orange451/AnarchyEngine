@@ -326,4 +326,9 @@ public class Camera extends Instance implements TreeViewable,Positionable {
 	public Matrix4 getWorldMatrix() {
 		return new Matrix4(getPosition());
 	}
+
+	@Override
+	public void setWorldMatrix(Matrix4 matrix) {
+		this.setViewMatrix(matrix);
+	}
 }
