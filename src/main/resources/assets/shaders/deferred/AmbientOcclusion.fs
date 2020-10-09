@@ -231,15 +231,22 @@ void main() {
 				} while (rayDist < 200);*/
 
 				vec4 gi = vec4(vec3(0.0), 1.0);
+#ifndef MACOS
 				if (useGI) {
 					gi = computeGI(textureCoords, position, GIN, gDepth);
 				}
+#endif
 				if (useAO) {
 					float ao = computeAmbientOcclusion(textureCoords, position, AON, gDepth,
 													   projectionMatrix, viewMatrix, inverseProjectionMatrix,
 													   inverseViewMatrix);
+#ifndef MACOS
 					gi.a *= ao;
 					gi.rgb *= ao;
+#else
+					gi.a *= ao;
+					gi.rgb *= ao;
+#endif
 				}
 				image = vec4(gi);
 			}

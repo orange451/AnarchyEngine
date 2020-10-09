@@ -36,6 +36,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.lwjgl.opengl.GL;
+import org.lwjgl.system.Platform;
 
 import com.esotericsoftware.kryo.util.IntMap;
 
@@ -162,23 +163,27 @@ public abstract class ShaderProgram {
 		System.out.println("Loading Shader: " + shader.file);
 		try (BufferedReader reader = new BufferedReader(new InputStreamReader(filet))) {
 
-			shaderSource.append(GLCompat.GLSL_VERSION).append("//\n");
+			shaderSource.append(GLCompat.GLSL_VERSION).append("\n");
+			
+			// TODO: Fix Shaders Caps
 			if (!GL.getCapabilities().GL_ARB_clip_control)
-				shaderSource.append("#define OneToOneDepth").append("//\n");
+				shaderSource.append("#define OneToOneDepth").append("\n");
+			if (Platform.get() == Platform.MACOSX)
+				shaderSource.append("#define MACOS").append("\n");
 			String line;
 			while ((line = reader.readLine()) != null) {
 				if (line.startsWith("#include")) {
 					String[] split = line.split(" ");
 					String name = split[2];
 					if (split[1].equalsIgnoreCase("variable"))
-						shaderSource.append(ShaderIncludes.getVariable(name)).append("//\n");
+						shaderSource.append(ShaderIncludes.getVariable(name)).append("\n");
 					else if (split[1].equalsIgnoreCase("struct"))
-						shaderSource.append(ShaderIncludes.getStruct(name)).append("//\n");
+						shaderSource.append(ShaderIncludes.getStruct(name)).append("\n");
 					else if (split[1].equalsIgnoreCase("function"))
-						shaderSource.append(ShaderIncludes.getFunction(name)).append("//\n");
+						shaderSource.append(ShaderIncludes.getFunction(name)).append("\n");
 					continue;
 				}
-				shaderSource.append(line).append("//\n");
+				shaderSource.append(line).append("\n");
 			}
 		} catch (IOException e) {
 			throw new LoadShaderException(e);

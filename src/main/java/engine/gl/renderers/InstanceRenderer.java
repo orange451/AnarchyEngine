@@ -22,6 +22,7 @@ import org.joml.Matrix4f;
 import org.joml.Vector2f;
 import org.luaj.vm2.LuaValue;
 import org.lwjgl.glfw.GLFW;
+import org.lwjgl.opengl.GL;
 
 import engine.Game;
 import engine.gl.IObjectRenderer;
@@ -52,6 +53,8 @@ public class InstanceRenderer implements IObjectRenderer {
 	private InstanceCubeRenderer cubeRenderer;
 	private InstanceVoxelizeRenderer voxelizeRenderer;
 
+	private boolean voxelize = false;
+
 	private Matrix4f temp = new Matrix4f();
 
 	public InstanceRenderer() {
@@ -60,7 +63,10 @@ public class InstanceRenderer implements IObjectRenderer {
 		shadowRenderer = new InstanceShadowRenderer();
 		forwardRenderer = new InstanceForwardRenderer();
 		cubeRenderer = new InstanceCubeRenderer();
-		voxelizeRenderer = new InstanceVoxelizeRenderer();
+		voxelize = GL.getCapabilities().GL_ARB_clear_texture;
+
+		if (voxelize)
+			voxelizeRenderer = new InstanceVoxelizeRenderer();
 		Game.waitForService(LuaValue.valueOf("UserInputService"));
 		Game.userInputService().inputBeganEvent().connect((args) -> {
 			if (args[0].get("KeyCode").eq_b(LuaValue.valueOf(GLFW.GLFW_KEY_F7))) {
@@ -114,7 +120,8 @@ public class InstanceRenderer implements IObjectRenderer {
 	}
 
 	public void renderVoxelize(IRenderingData rd, RendererData rnd) {
-		voxelizeRenderer.render(instances, rd, rnd);
+		if (voxelize)
+			voxelizeRenderer.render(instances, rd, rnd);
 	}
 
 	@Override
@@ -200,6 +207,8 @@ public class InstanceRenderer implements IObjectRenderer {
 		shadowRenderer.dispose();
 		forwardRenderer.dispose();
 		cubeRenderer.dispose();
+		if (voxelize)
+			voxelizeRenderer.dispose();
 	}
 
 	@Override

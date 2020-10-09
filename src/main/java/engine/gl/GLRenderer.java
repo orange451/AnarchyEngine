@@ -112,15 +112,17 @@ public class GLRenderer implements IPipeline {
 	private int width, height;
 	private Vector2f size = new Vector2f();
 
-	private boolean useARBClipControl = false;
+	private boolean useARBClipControl = false, useComputeShaders = false, voxelize = false;
 
 	private boolean initialized;
 
 	private Window window;
-	
+
 	public GLRenderer(Window window) {
 		this.window = window;
 		useARBClipControl = GL.getCapabilities().GL_ARB_clip_control;
+		voxelize = GL.getCapabilities().GL_ARB_clear_texture;
+		useComputeShaders = GL.getCapabilities().GL_ARB_compute_shader;
 
 		rnd = new RendererData();
 		loader = new GLResourceLoader();
@@ -149,7 +151,7 @@ public class GLRenderer implements IPipeline {
 			renderingManager = new RenderingManager();
 
 			envRenderer = new EnvironmentRenderer(64, false);
-			//envRendererEntities = new EnvironmentRenderer(128, true);
+			// envRendererEntities = new EnvironmentRenderer(128, true);
 			irradianceCapture = new IrradianceCapture();
 			rnd.irradianceCapture = irradianceCapture.getCubeTexture();
 			preFilteredEnvironment = new PreFilteredEnvironment();
@@ -174,9 +176,10 @@ public class GLRenderer implements IPipeline {
 			rnd.alh = areaLightHandler;
 			rnd.rs = renderingSettings;
 			rnd.vm = vm = new VoxelizedManager();
-			
-			cp = new ComputeMultiPass(width, height);
-			
+
+			if (useComputeShaders)
+				cp = new ComputeMultiPass(width, height);
+
 			size.set(width, height);
 			enabled = true;
 			initialized = true;
@@ -187,7 +190,8 @@ public class GLRenderer implements IPipeline {
 		Game.userInputService().inputBeganEvent().connect((args) -> {
 			if (args[0].get("KeyCode").eq_b(LuaValue.valueOf(GLFW.GLFW_KEY_F5))) {
 				System.out.println("Reloading Shaders...");
-				cp.reloadShaders();
+				if (useComputeShaders)
+					cp.reloadShaders();
 				dp.reloadShaders();
 				pp.reloadShaders();
 			}
@@ -249,9 +253,11 @@ public class GLRenderer implements IPipeline {
 		GPUProfiler.end();
 		GPUProfiler.end();
 		GPUProfiler.start("Reflections");
-		/*GPUProfiler.start("CubeMap Render");
-		envRendererEntities.renderReflections(skyRenderer, sun, rd, rnd, renderingManager);
-		GPUProfiler.end();*/
+		/*
+		 * GPUProfiler.start("CubeMap Render");
+		 * envRendererEntities.renderReflections(skyRenderer, sun, rd, rnd,
+		 * renderingManager); GPUProfiler.end();
+		 */
 		GPUProfiler.start("PreFilteredEnvironment");
 		preFilteredEnvironment.render(envRenderer.getCubeTexture());
 		GPUProfiler.end();
@@ -409,9 +415,11 @@ public class GLRenderer implements IPipeline {
 		rd.projectionMatrix = projMatrix;
 
 		GPUProfiler.startFrame();
-		
-		glClearTexImage(rnd.vm.getColor().getTexture(), 0, GL_RGBA, GL_FLOAT, (ByteBuffer)null);
-		//glClearTexImage(ao.getTexture().getTexture(), 0, GL_RGBA, GL_FLOAT, new float[] { 0, 0, 0, 1 });
+
+		if (voxelize)
+			glClearTexImage(rnd.vm.getColor().getTexture(), 0, GL_RGBA, GL_FLOAT, (ByteBuffer) null);
+		// glClearTexImage(ao.getTexture().getTexture(), 0, GL_RGBA, GL_FLOAT, new
+		// float[] { 0, 0, 0, 1 });
 
 		renderingManager.preProcess(renderableWorld.getInstance());
 		shadowPass();
@@ -442,7 +450,8 @@ public class GLRenderer implements IPipeline {
 		this.width = width;
 		this.height = height;
 		this.size.set(width, height);
-		cp.resize(width, height);
+		if (useComputeShaders)
+			cp.resize(width, height);
 		dp.resize(width, height);
 		pp.resize(width, height);
 		directionalLightHandler.resize(width, height);
@@ -454,8 +463,9 @@ public class GLRenderer implements IPipeline {
 	@Override
 	public void dispose() {
 		envRenderer.dispose();
-		//envRendererEntities.dispose();
-		cp.dispose();
+		// envRendererEntities.dispose();
+		if (useComputeShaders)
+			cp.dispose();
 		dp.dispose();
 		pp.dispose();
 		directionalLightHandler.dispose();
