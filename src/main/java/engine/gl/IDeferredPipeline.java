@@ -32,4 +32,8 @@ public interface IDeferredPipeline extends IObject {
 
 	public Texture getDepthTex();
 
+	public void reloadShaders();
+
+	public void resize(int width, int height);
+
 }

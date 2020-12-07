@@ -143,6 +143,7 @@ public abstract class DeferredPipeline implements IDeferredPipeline {
 		GPUProfiler.end();
 	}
 
+	@Override
 	public void resize(int width, int height) {
 		this.width = width;
 		this.height = height;
@@ -161,6 +162,7 @@ public abstract class DeferredPipeline implements IDeferredPipeline {
 		finalShader.dispose();
 	}
 
+	@Override
 	public void reloadShaders() {
 		for (DeferredPass<?> deferredPass : passes)
 			deferredPass.reloadShader();

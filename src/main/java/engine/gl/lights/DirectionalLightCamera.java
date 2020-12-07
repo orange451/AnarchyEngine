@@ -29,11 +29,11 @@ public class DirectionalLightCamera {
 		int shadowDrawDistance = distance;
 		shadowDrawDistance *= 2;
 		projectionArray = new Matrix4f[4];
-		projectionArray[0] = Maths.orthoSymmetric(-shadowDrawDistance * 0.25f, shadowDrawDistance * 0.25f,
+		projectionArray[0] = Maths.orthoSymmetric(-shadowDrawDistance * 0.1f, shadowDrawDistance * 0.1f,
 				-shadowDrawDistance, shadowDrawDistance, false);
-		projectionArray[1] = Maths.orthoSymmetric(-shadowDrawDistance * 0.5f, shadowDrawDistance * 0.5f,
+		projectionArray[1] = Maths.orthoSymmetric(-shadowDrawDistance * 0.3f, shadowDrawDistance * 0.3f,
 				-shadowDrawDistance, shadowDrawDistance, false);
-		projectionArray[2] = Maths.orthoSymmetric(-shadowDrawDistance * 0.75f, shadowDrawDistance * 0.75f,
+		projectionArray[2] = Maths.orthoSymmetric(-shadowDrawDistance * 0.5f, shadowDrawDistance * 0.5f,
 				-shadowDrawDistance, shadowDrawDistance, false);
 		projectionArray[3] = Maths.orthoSymmetric(-shadowDrawDistance, shadowDrawDistance, -shadowDrawDistance,
 				shadowDrawDistance, false);
@@ -48,11 +48,11 @@ public class DirectionalLightCamera {
 	public void setShadowDistance(int distance) {
 		int shadowDrawDistance = distance;
 		shadowDrawDistance *= 2;
-		projectionArray[0] = Maths.orthoSymmetric(-shadowDrawDistance * 0.25f, shadowDrawDistance * 0.25f,
+		projectionArray[0] = Maths.orthoSymmetric(-shadowDrawDistance * 0.1f, shadowDrawDistance * 0.1f,
 				-shadowDrawDistance, shadowDrawDistance, false);
-		projectionArray[1] = Maths.orthoSymmetric(-shadowDrawDistance * 0.5f, shadowDrawDistance * 0.5f,
+		projectionArray[1] = Maths.orthoSymmetric(-shadowDrawDistance * 0.3f, shadowDrawDistance * 0.3f,
 				-shadowDrawDistance, shadowDrawDistance, false);
-		projectionArray[2] = Maths.orthoSymmetric(-shadowDrawDistance * 0.75f, shadowDrawDistance * 0.75f,
+		projectionArray[2] = Maths.orthoSymmetric(-shadowDrawDistance * 0.5f, shadowDrawDistance * 0.5f,
 				-shadowDrawDistance, shadowDrawDistance, false);
 		projectionArray[3] = Maths.orthoSymmetric(-shadowDrawDistance, shadowDrawDistance, -shadowDrawDistance,
 				shadowDrawDistance, false);

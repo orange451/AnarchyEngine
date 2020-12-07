@@ -59,6 +59,7 @@ public abstract class ComputePass<T extends BaseComputeShader> {
 		shader.initCompute();
 		shader.start();
 		shader.loadResolution(new Vector2f(width, height));
+		shaderResizeSetup(width, height, shader);
 		shader.stop();
 	}
 
@@ -72,7 +73,7 @@ public abstract class ComputePass<T extends BaseComputeShader> {
 		shader.loadFrame(frameCont);
 		setupShaderData(rnd, rd, shader);
 		setupTextures(rnd, pl, auxTextures);
-		shader.dispatch(width / 16, height / 16, 1);
+		dispatch(width, height, shader);
 		shader.stop();
 		GPUProfiler.end();
 		this.setupAuxTextures(auxTextures);
@@ -97,6 +98,13 @@ public abstract class ComputePass<T extends BaseComputeShader> {
 	protected void setupShaderData(RendererData rnd, IRenderingData rd, T shader) {
 	}
 
+	protected void shaderResizeSetup(int width, int height, T shader) {
+	}
+
+	protected void dispatch(int width, int height, T shader) {
+		shader.dispatch(width / 16, height / 16, 1);
+	}
+
 	protected abstract void setupTextures(RendererData rnd, ComputePipeline dp, Texture[] auxTex);
 
 	public void resize(int iWidth, int iHeight) {
@@ -106,6 +114,7 @@ public abstract class ComputePass<T extends BaseComputeShader> {
 		generateFramebuffer(width, height);
 		shader.start();
 		shader.loadResolution(new Vector2f(width, height));
+		shaderResizeSetup(width, height, shader);
 		shader.stop();
 	}
 
@@ -118,6 +127,7 @@ public abstract class ComputePass<T extends BaseComputeShader> {
 		shader.reloadCompute();
 		shader.start();
 		shader.loadResolution(new Vector2f(width, height));
+		shaderResizeSetup(width, height, shader);
 		shader.stop();
 	}
 

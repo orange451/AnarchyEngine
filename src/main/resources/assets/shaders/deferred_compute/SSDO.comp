@@ -55,12 +55,10 @@ vec3 roundStep(vec3 inp, float step) {
 				(roundEven(inp.z / step)) * step);
 }
 
-// Random dir generator has issues
-
 #define SAMPLES_GI 8
 #define MAX_STEPS_GI 100
 #define MAX_DIST_GI 20.0
-#define SURF_DIST_GI 2.0
+#define SURF_DIST_GI voxelOffset
 #define SAMPLE_STEP voxelOffset * 0.5
 
 #define SAMPLES_AO 4
@@ -79,10 +77,11 @@ vec4 computeGI(vec2 textureCoords, vec3 position, vec3 normal, sampler2D gDepth)
 		float dO = 0.0;
 
 		float rand2 = randomS(textureCoords + vec2(641.51224, 423.178), float(frame) + float(j));
-		float rand3 = randomS(textureCoords - vec2(147.16414, 363.941), float(frame) - float(j));
+		float rand3 =
+			randomS(textureCoords - vec2(147.16414, 363.941), float(j + 1) * float(frame));
 
 		vec3 rd = cosWeightedRandomHemisphereDirection(normal, random(rand2), random(rand3));
-		vec3 ro = position + rd * voxelOffset * SURF_DIST_GI;
+		vec3 ro = position + rd * SURF_DIST_GI;
 		int i = 0;
 		bool canHit = false;
 		for (i = 0; i < MAX_STEPS_GI; i++) {
@@ -103,6 +102,8 @@ vec4 computeGI(vec2 textureCoords, vec3 position, vec3 normal, sampler2D gDepth)
 			}
 
 			if (canHit && samplePoint.a > 0.0) {
+
+				// vec3 norm = normalize(unpackColor(samplePoint.a));
 				gi.rgb = samplePoint.rgb;
 				gi.a = 0.0;
 				break;
@@ -128,20 +129,20 @@ float computeAmbientOcclusion(vec2 textureCoords, vec3 position, vec3 normal, sa
 		vec3 newPos;
 		vec4 newScreen;
 		vec2 newCoords;
+		vec3 newNorm;
 
-		float depth, newDepth;
+		float depth, newDepth, diff, oldDist, tmpDepth;
 
-		float tmpDepth;
-
-		float dO = 0.0;
-		float odS;
+		float dO = SURF_DIST_AO, odS, step = 0.5;
 
 		float rand2 = randomS(textureCoords + vec2(641.51224, 423.178), float(frame) + float(j));
-		float rand3 = randomS(textureCoords - vec2(147.16414, 363.941), float(frame) - float(j));
+		float rand3 =
+			randomS(textureCoords - vec2(147.16414, 363.941), float(j + 1) * float(frame));
 
 		vec3 rd = cosWeightedRandomHemisphereDirection(normal, random(rand2), random(rand3));
-		vec3 ro = position + rd * SURF_DIST_AO;
+		vec3 ro = position;
 		int i = 0;
+		bool hit = false;
 		for (i = 0; i < MAX_STEPS_AO; i++) {
 			// Move point
 			vec3 p = ro + rd * dO;
@@ -152,38 +153,41 @@ float computeAmbientOcclusion(vec2 textureCoords, vec3 position, vec3 normal, sa
 			newScreen /= newScreen.w;
 			newCoords = newScreen.xy * 0.5 + 0.5;
 
-			if (newCoords.x < 0 || newCoords.x > 1 || newCoords.y < 0 || newCoords.y > 1) {
-				shadow = 1.0;
+			if (newCoords.x < 0 || newCoords.x > 1 || newCoords.y < 0 || newCoords.y > 1)
 				break;
-			}
 
 			// Get new pos
 			tmpDepth = texture(gDepth, newCoords).r;
 			newPos = positionFromDepth(newCoords, tmpDepth, invProjection, invView);
+			newNorm = texture(gNormal, newCoords).rgb;
 
 			// Calculate point and new pos depths
 			depth = length(newPos - cameraPosition);
 			newDepth = length(p - cameraPosition);
 
 			// Calculate distance from newPos to point
-			float dS = min(length(newPos - p), 0.1);
+			float dS = min(length(newPos - p), step);
+
+			diff = newDepth - depth;
+
+			if (diff >= 1.0 && diff <= 2.0) {
+				float halfD = oldDist / 2.0;
+				step = max(step / 2.0, 0.1);
+				dS = -halfD;
+			} else if (diff > 0.001 && diff < 1.0) {
+				if (dot(newNorm, normalize(p - ro)) < 1.0)
+					hit = true;
+				break;
+			}
+
 			dO += dS; // Add distance to distance from origin
+			oldDist = dS;
 
-			float diff = newDepth - depth;
-
-			if (diff > 0.001) {
-				// shadow = smoothstep(0.0, 1.0, dO); // Ground truth returns 0.0
-				shadow = smoothstep(1.0, 1.001, diff); // Ground truth returns 0.0
+			if (dO > MAX_DIST_AO)
 				break;
-			}
-
-			if (dO > MAX_DIST_AO) {
-				shadow = 1.0;
-				break;
-			}
 		}
-		if (i == MAX_STEPS_AO) {
-			shadow = 1.0;
+		if (hit) {
+			shadow = smoothstep(1.0, 1.001, diff); // Ground truth returns 0.0
 		}
 		aoCombined += shadow;
 	}
@@ -194,8 +198,14 @@ void main() {
 	if (!useAmbientOcclusion)
 		return;
 
-	ivec2 pixelcoords = ivec2(gl_GlobalInvocationID.xy);
-	vec2 textureCoords = pixelcoords.xy / resolution + pixelOffset;
+	ivec2 pixelCoords = ivec2(gl_GlobalInvocationID.xy);
+
+	if ((pixelCoords.x + pixelCoords.y + frame) % 2 == 0) {
+		// imageStore(mainTex, pixelCoords, vec4(0.0));
+		return;
+	}
+
+	vec2 textureCoords = pixelCoords.xy / resolution + pixelOffset;
 
 	vec4 mask = texture(gMask, textureCoords);
 	if (MASK_COMPARE(mask.a, PBR_OBJECT)) {
@@ -211,23 +221,42 @@ void main() {
 
 		vec3 samplePos = (position - cameraPosition) / voxelSize + 0.5;
 
+		vec4 gi = vec4(vec3(0.0), 1.0);
 		if (!(samplePos.x < 0.0 || samplePos.x > 1.0 || samplePos.y < 0.0 || samplePos.y > 1.0 ||
 			  samplePos.z < 0.0 || samplePos.z > 1.0)) {
 
-			vec3 rd = normalize(position - cameraPosition);
-
-			vec4 gi = vec4(vec3(0.0), 1.0);
 			if (useGI) {
 				gi = computeGI(textureCoords, position, GIN, gDepth);
 			}
-			if (useAO) {
-				float ao =
-					computeAmbientOcclusion(textureCoords, position, AON, gDepth, projectionMatrix,
-											viewMatrix, inverseProjectionMatrix, inverseViewMatrix);
-				gi.a *= ao;
-				gi.rgb *= ao;
-			}
-			imageStore(out_color, pixelcoords, gi);
+
+			/*vec3 rd = normalize(position - cameraPosition);
+
+			vec3 cameraToWorld = position - cameraPosition;
+			float cameraToWorldDist = length(cameraToWorld);
+
+			vec3 rayTrace = cameraPosition;
+			float rayDist, incr = 0.025;
+			float rayDistRad = length(position - cameraPosition);
+			do {
+				rayTrace += rd * incr;
+				incr *= 1.010;
+
+				rayDist = length(rayTrace - cameraPosition);
+				vec4 pointSample =
+					texture(voxelImage, vec3((rayTrace.xyz - cameraPosition) / voxelSize + 0.5));
+				if (pointSample.a != 0.0) {
+					gi.rgb = pointSample.rgb;
+					break;
+				}
+			} while (rayDist < 200);*/
 		}
+		if (useAO) {
+			float ao =
+				computeAmbientOcclusion(textureCoords, position, AON, gDepth, projectionMatrix,
+										viewMatrix, inverseProjectionMatrix, inverseViewMatrix);
+			gi.a *= ao;
+			gi.rgb *= ao;
+		}
+		imageStore(out_color, pixelCoords, gi);
 	}
 }

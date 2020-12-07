@@ -48,8 +48,9 @@ import static org.lwjgl.opengl.GL30C.glBlitFramebuffer;
 import static org.lwjgl.opengl.GL42C.GL_SHADER_IMAGE_ACCESS_BARRIER_BIT;
 import static org.lwjgl.opengl.GL42C.glMemoryBarrier;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.EnumMap;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import engine.gl.GPUProfiler;
 import engine.gl.IDeferredPipeline;
@@ -67,7 +68,11 @@ public abstract class ComputePipeline implements IDeferredPipeline {
 	protected int width, height;
 	private Texture[] auxTex;
 
-	protected List<ComputePass<?>> passes;
+	public enum PipelineSteps {
+		AMBIENT_OCCLUSION, AO_BLUR, LIGHTING, MOTION_BLUR, COLOR_CORRECTION, ANTI_ALIASING
+	}
+
+	private Map<PipelineSteps, ComputePass<?>> steps;
 
 	private Framebuffer main;
 	private Texture diffuseTex, motionTex, normalTex, pbrTex, maskTex, depthTex;
@@ -82,7 +87,7 @@ public abstract class ComputePipeline implements IDeferredPipeline {
 	public ComputePipeline(int width, int height) {
 		this.width = width;
 		this.height = height;
-		passes = new ArrayList<>();
+		steps = new EnumMap<>(PipelineSteps.class);
 		auxTex = new Texture[3];
 		init();
 	}
@@ -90,8 +95,8 @@ public abstract class ComputePipeline implements IDeferredPipeline {
 	public void init() {
 		generatePipeline();
 		setupPasses();
-		for (ComputePass<?> pass : passes)
-			pass.init(width, height);
+		for (Entry<PipelineSteps, ComputePass<?>> pass : steps.entrySet())
+			pass.getValue().init(width, height);
 
 		// Remove this
 		finalShader = new FinalShader("deferred/Final");
@@ -118,9 +123,8 @@ public abstract class ComputePipeline implements IDeferredPipeline {
 
 	@Override
 	public void process(RendererData rnd, IRenderingData rd) {
-		for (ComputePass<?> pass : passes) {
-			pass.process(rnd, rd, this, auxTex);
-		}
+		for (Entry<PipelineSteps, ComputePass<?>> pass : steps.entrySet())
+			pass.getValue().process(rnd, rd, this, auxTex);
 	}
 
 	@Override
@@ -148,28 +152,37 @@ public abstract class ComputePipeline implements IDeferredPipeline {
 		GPUProfiler.end();
 	}
 
+	@Override
 	public void resize(int width, int height) {
 		this.width = width;
 		this.height = height;
 		disposePipeline();
 		generatePipeline();
-		for (ComputePass<?> pass : passes)
-			pass.resize(width, height);
+		for (Entry<PipelineSteps, ComputePass<?>> pass : steps.entrySet())
+			pass.getValue().resize(width, height);
 	}
 
 	@Override
 	public void dispose() {
 		disposePipeline();
-		for (ComputePass<?> pass : passes)
-			pass.dispose();
+		for (Entry<PipelineSteps, ComputePass<?>> pass : steps.entrySet())
+			pass.getValue().dispose();
 		quad.dispose();
 		finalShader.dispose();
 	}
 
+	@Override
 	public void reloadShaders() {
-		for (ComputePass<?> deferredPass : passes)
-			deferredPass.reloadShader();
+		for (Entry<PipelineSteps, ComputePass<?>> pass : steps.entrySet())
+			pass.getValue().reloadShader();
 		finalShader.reload();
+	}
+
+	public void addStep(PipelineSteps step, ComputePass<?> pass) {
+		ComputePass<?> old = steps.put(step, pass);
+		if (old != null) {
+			old.dispose();
+		}
 	}
 
 	private void generatePipeline() {

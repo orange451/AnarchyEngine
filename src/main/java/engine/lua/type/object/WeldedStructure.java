@@ -38,7 +38,7 @@ public class WeldedStructure {
 	}
 	
 	private boolean checkCanWeldInstance(Instance instance) {
-		
+		return false;
 	}
 	
 	private void testAddWeldInstance_internal(Weld weld, Instance newWeld, Instance oldWeld) {

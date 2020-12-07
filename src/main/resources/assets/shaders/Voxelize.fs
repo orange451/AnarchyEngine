@@ -55,8 +55,33 @@ uniform int totalDirectionalLights;
 #include function computeShadowV2
 /*
 #include function calcPointLight
-*/
 #include function calcDirectionalLight
+*/
+
+vec3 calcDirectionalLight(DirectionalLight light, vec3 position, vec3 diffuse, vec3 N, vec3 V,
+						  vec3 F0, float roughness, float metallic) {
+	if (!light.visible)
+		return vec3(0.0);
+	vec3 L = normalize(light.direction);
+	vec3 H = normalize(V + L);
+	float NdotL = max(dot(N, L), 0.0);
+
+	vec3 radiance = light.color * light.intensity;
+
+	vec3 F = fresnelSchlick(1.0, F0);
+
+	vec3 nominator = F;
+	float denominator = NdotL + 0.001;
+	vec3 brdf = nominator / denominator;
+
+	vec3 kS = F;
+	vec3 kD = vec3(1.0) - kS;
+	kD *= 1.0 - metallic;
+
+	if (light.shadows)
+		NdotL *= computeShadowV2(position, light);
+	return (kD * diffuse / PI) * radiance * NdotL;
+}
 
 #include function toneMap
 
@@ -95,6 +120,7 @@ void main() {
 								   roughness, metallic);
 	}
 
+	//vec3 basicNormal = normalize(TBN_fs * vec3(0,0,1));
 	vec4 data = vec4(Lo + material.emissive, 1.0);
 
 	ivec3 temp = ivec3(gl_FragCoord.x, gl_FragCoord.y, resolution * gl_FragCoord.z);

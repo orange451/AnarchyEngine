@@ -1,0 +1,74 @@
+/*
+
+Copyright (C) 2015-2020 Anarchy Engine Open Source Contributors (see CONTRIBUTORS.md)
+
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+ */
+
+layout(local_size_x = 16, local_size_y = 16) in;
+layout(rgba16f, binding = 0) restrict writeonly uniform image2D out_color;
+
+uniform vec2 resolution;
+uniform vec2 pixelOffset;
+uniform int frame;
+
+uniform sampler2D gMask;
+uniform sampler2D gDepth;
+uniform sampler2D image;
+uniform mat4 projectionMatrix;
+uniform vec2 direction;
+uniform bool useAmbientOcclusion;
+
+#include variable GLOBAL
+
+#include variable pi
+
+#include function getDepth
+
+#include variable MASK
+
+#define SAMPLES 5
+#define DEPTH_SENSITIVITY 10.0
+
+float weights[SAMPLES] = float[SAMPLES](
+	74.0, 58.0, 32.0, 14.0, 6.0
+);
+
+void main() {
+	if (!useAmbientOcclusion)
+		return;
+	ivec2 pixelCoords = ivec2(gl_GlobalInvocationID.xy);
+	vec2 textureCoords = pixelCoords.xy / resolution + pixelOffset;
+
+	vec4 mask = texture(gMask, textureCoords);
+	if (MASK_COMPARE(mask.a, PBR_OBJECT)) {
+		float ssao = texture(image, textureCoords).a * weights[0];
+		float totalWeight = weights[0];
+
+		float centerDepth = getDepth(projectionMatrix, gDepth, textureCoords);
+
+		for (int i = 1; i < SAMPLES; i++) {
+			vec2 sampleOffset = direction * float(i);
+
+			vec2 sampleCoords = textureCoords + sampleOffset;
+
+			float depth = getDepth(projectionMatrix, gDepth, sampleCoords);
+
+			float weight = max(0.0, 1.0 - abs(depth - centerDepth) * DEPTH_SENSITIVITY) * weights[i];
+			ssao += texture(image, sampleCoords).a * weight;
+			totalWeight += weight;
+
+			sampleCoords = textureCoords - sampleOffset;
+
+			depth = getDepth(projectionMatrix, gDepth, sampleCoords);
+
+			weight = max(0.0, 1.0 - abs(depth - centerDepth) * DEPTH_SENSITIVITY) * weights[i];
+			ssao += texture(image, sampleCoords).a * weight;
+			totalWeight += weight;
+		}
+		imageStore(out_color, pixelCoords, vec4(vec3(0.0), ssao / totalWeight));
+	}
+}

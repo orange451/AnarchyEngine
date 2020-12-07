@@ -10,8 +10,6 @@
 
 package engine.gl.compute;
 
-import static org.lwjgl.opengl.GL11C.GL_FLOAT;
-import static org.lwjgl.opengl.GL11C.GL_RGBA;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE0;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE1;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE2;
@@ -23,31 +21,25 @@ import static org.lwjgl.opengl.GL13C.GL_TEXTURE7;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE8;
 import static org.lwjgl.opengl.GL15C.GL_WRITE_ONLY;
 import static org.lwjgl.opengl.GL30C.GL_RGBA16F;
-import static org.lwjgl.opengl.GL44C.glClearTexImage;
 
 import engine.gl.IRenderingData;
 import engine.gl.RendererData;
-import engine.gl.compute.shaders.AmbientOcclusionShader;
+import engine.gl.compute.shaders.SSDOShader;
 import engine.gl.objects.Texture;
 
-public class AmbientOcclusion extends ComputePass<AmbientOcclusionShader> {
+public class SSDO extends ComputePass<SSDOShader> {
 
-	public AmbientOcclusion() {
-		super("AmbientOcclusion", 0.5f);
+	public SSDO() {
+		super("SSDO", 0.5f);
 	}
 
 	@Override
-	protected AmbientOcclusionShader setupShader() {
-		return new AmbientOcclusionShader();
+	protected SSDOShader setupShader() {
+		return new SSDOShader();
 	}
 
 	@Override
-	protected void setupImage() {
-		glClearTexImage(super.mainTex.getTexture(), 0, GL_RGBA, GL_FLOAT, new float[] { 0, 0, 0, 1 });
-	}
-
-	@Override
-	protected void setupShaderData(RendererData rnd, IRenderingData rd, AmbientOcclusionShader shader) {
+	protected void setupShaderData(RendererData rnd, IRenderingData rd, SSDOShader shader) {
 		shader.loadCameraData(rd.camera, rd.projectionMatrix);
 		shader.loadVoxelSize(rnd.vm.getSize() * 2.0f);
 		shader.loadVoxelOffset(rnd.vm.getCameraOffset());

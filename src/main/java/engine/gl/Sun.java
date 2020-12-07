@@ -25,6 +25,7 @@ public class Sun {
 
 	public Sun() {
 		light = new DirectionalLightInternal(rotation, 1.0f);
+		light.shadowResolution = 4096;
 	}
 
 	public void update(DynamicSkybox skybox) {

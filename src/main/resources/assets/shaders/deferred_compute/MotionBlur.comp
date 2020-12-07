@@ -20,12 +20,12 @@ uniform sampler2D gMotion;
 uniform bool useMotionBlur;
 
 void main() {
-	ivec2 pixelcoords = ivec2(gl_GlobalInvocationID.xy);
-	vec2 textureCoords = pixelcoords.xy / resolution + pixelOffset;
+	ivec2 pixelCoords = ivec2(gl_GlobalInvocationID.xy);
+	vec2 textureCoords = pixelCoords.xy / resolution + pixelOffset;
 
-	vec3 textureColor = texture(image, textureCoords).rgb;
+	vec3 textureColor = texelFetch(image, pixelCoords, 0).rgb;
 	if (useMotionBlur) {
-		vec2 vel = texture(gMotion, textureCoords).rg * 0.5;
+		vec2 vel = texelFetch(gMotion, pixelCoords, 0).rg * 0.5;
 		vec2 motionCoords = textureCoords;
 		vec3 sum = textureColor;
 
@@ -39,5 +39,5 @@ void main() {
 		sum = sum / samples;
 		textureColor = sum;
 	}
-	imageStore(out_color, pixelcoords, vec4(textureColor, 0.0));
+	imageStore(out_color, pixelCoords, vec4(textureColor, 0.0));
 }

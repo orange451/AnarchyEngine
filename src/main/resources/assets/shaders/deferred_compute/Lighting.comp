@@ -36,6 +36,7 @@ uniform sampler2D spotLightData;
 uniform sampler2D areaLightData;
 uniform sampler2D ambientOcclusion;
 
+uniform int frame;
 uniform bool useAmbientOcclusion;
 
 #include variable GLOBAL
@@ -139,20 +140,31 @@ float computeContactShadows(vec3 pos, vec3 N, vec3 L, float imageDepth) {
 }
 
 void main() {
-	ivec2 pixelcoords = ivec2(gl_GlobalInvocationID.xy);
-	vec2 textureCoords = pixelcoords.xy / resolution + pixelOffset;
+	ivec2 pixelCoords = ivec2(gl_GlobalInvocationID.xy);
 
-	vec4 mask = texture(gMask, textureCoords);
-	vec3 image = texture(gDiffuse, textureCoords).rgb;
+	//if (frame % 2 == 0) {
+		if ((pixelCoords.x + pixelCoords.y + frame) % 2 == 0) {
+			//imageStore(mainTex, pixelCoords, vec4(0.0));
+			//return;
+		}
+	//} else {
+	//	if (pixelCoords.x % 2 == 1)
+			//return;
+	//}
+
+	vec2 textureCoords = pixelCoords.xy / resolution + pixelOffset;
+
+	vec4 mask = texelFetch(gMask, pixelCoords, 0);
+	vec3 image = texelFetch(gDiffuse, pixelCoords, 0).rgb;
 	vec3 baseTex = image;
 
 	if (MASK_COMPARE(mask.a, PBR_OBJECT)) {
 		vec4 auxData = vec4(0.0);
-		vec2 pbr = texture(gPBR, textureCoords).rg;
-		float depth = texture(gDepth, textureCoords).r;
+		vec2 pbr = texelFetch(gPBR, pixelCoords, 0).rg;
+		float depth = texelFetch(gDepth, pixelCoords, 0).r;
 		vec3 position =
 			positionFromDepth(textureCoords, depth, inverseProjectionMatrix, inverseViewMatrix);
-		vec3 normal = texture(gNormal, textureCoords).rgb;
+		vec3 normal = texelFetch(gNormal, pixelCoords, 0).rgb;
 		float roughness = pbr.r;
 		float metallic = pbr.g;
 
@@ -165,10 +177,10 @@ void main() {
 		F0 = mix(F0, image.rgb, metallic);
 		vec3 Lo = vec3(0.0);
 
-		Lo += texture(directionalLightData, textureCoords).rgb;
-		Lo += texture(pointLightData, textureCoords).rgb;
-		Lo += texture(spotLightData, textureCoords).rgb;
-		Lo += texture(areaLightData, textureCoords).rgb;
+		Lo += texelFetch(directionalLightData, pixelCoords, 0).rgb;
+		Lo += texelFetch(pointLightData, pixelCoords, 0).rgb;
+		Lo += texelFetch(spotLightData, pixelCoords, 0).rgb;
+		Lo += texelFetch(areaLightData, pixelCoords, 0).rgb;
 
 		vec3 F = fresnelSchlickRoughness(ndotv, F0, roughness);
 
@@ -191,7 +203,7 @@ void main() {
 		auxData.rgb = specular; // Store light for use in SSR pass
 
 		if (useAmbientOcclusion) {
-			vec4 ssAmbient = texture(ambientOcclusion, textureCoords);
+			vec4 ssAmbient = texelFetch(ambientOcclusion, pixelCoords, 0);
 			float ao = ssAmbient.a;
 			auxData.a = ao; // Store AO for use in SSR pass
 			ambient *= ao;
@@ -203,11 +215,11 @@ void main() {
 
 		vec3 light = ambientReflection + Lo;
 
-		vec3 emissive = texture(gMask, textureCoords).rgb;
+		vec3 emissive = texelFetch(gMask, pixelCoords, 0).rgb;
 		vec3 color = light + emissive;
 		image.rgb = color;
-		imageStore(reflection, pixelcoords, auxData);
+		imageStore(reflection, pixelCoords, auxData);
 	}
-	imageStore(mainTex, pixelcoords, vec4(image, 0.0));
-	imageStore(base, pixelcoords, vec4(baseTex, 0.0));
+	imageStore(mainTex, pixelCoords, vec4(image, 0.0));
+	imageStore(base, pixelCoords, vec4(baseTex, 0.0));
 }

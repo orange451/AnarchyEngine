@@ -61,7 +61,7 @@ uniform bool useReflections;
 #define MAX_STEPS_GI 800
 #define MAX_DIST_GI 800.0
 #define SURF_DIST_GI 2.0
-#define SAMPLE_STEP 0.5
+#define SAMPLE_STEP voxelOffset * 0.5
 
 vec4 computeGI(vec2 texCoords, vec3 position, vec3 normal, sampler2D gDepth, mat4 projection,
 			   mat4 invProjection, mat4 invView, float roughness) {
@@ -72,7 +72,7 @@ vec4 computeGI(vec2 texCoords, vec3 position, vec3 normal, sampler2D gDepth, mat
 		float dO = 0.0;
 
 		float rand2 = randomS(textureCoords + vec2(641.51224, 423.178), float(frame) + float(j));
-		float rand3 = randomS(textureCoords - vec2(147.16414, 363.941), float(frame) - float(j));
+		float rand3 = randomS(textureCoords - vec2(147.16414, 363.941), float(j + 1) * float(frame));
 		
 		vec3 rd = cosWeightedRandomHemisphereDirection(normal, random(rand2) * roughness * 0.10,
 					random(rand3));
@@ -150,30 +150,24 @@ void main(void) {
 				vec3 newPos;
 				vec4 newScreen;
 				vec2 newCoords;
+				vec3 newNorm;
 
-				float depth, newDepth;
+				float depth, newDepth, oldDist, tmpDepth;
 
-				float tmpDepth;
-
-				float dO = 0.0;
-				float odS;
+				float dO = SURF_DIST, odS, step = 1.0;
 
 				float rand2 =
 					randomS(textureCoords + vec2(641.51224, 423.178), float(frame) + float(j));
 				float rand3 =
-					randomS(textureCoords - vec2(147.16414, 363.941), float(frame) - float(j));
+					randomS(textureCoords - vec2(147.16414, 363.941), float(j + 1) * float(frame));
 				// hmmmmm, maybe uses different input data for angle
 				vec3 rd = cosWeightedRandomHemisphereDirection(
 					normalize(reflect(camToWorldNorm, N)), random(rand2) * roughness * 0.10,
 					random(rand3));
-				vec3 ro = position + rd * SURF_DIST;
+				//rd = normalize(reflect(camToWorldNorm, N));
+				vec3 ro = position;
 				int i = 0;
-
 				bool hit = false;
-				vec3 newNorm;
-
-				float oldDist = 0.0;
-
 				for (i = 0; i < MAX_STEPS; i++) {
 					// Move point
 					vec3 p = ro + rd * dO;
@@ -198,12 +192,13 @@ void main(void) {
 					newDepth = length(p - cameraPosition);
 
 					// Calculate distance from newPos to point
-					float dS = min(length(newPos - p), 1.0);
+					float dS = min(length(newPos - p), step);
 
 					float diff = newDepth - depth;
 
 					if (diff >= 0.2 && diff <= 2.0) {
 						float halfD = oldDist / 2.0;
+						step = max(step / 4.0, 0.05);
 						dS = -halfD;
 					} else if (diff > -0.001 && diff < 0.2) {
 						if (dot(newNorm, normalize(p - ro)) < 0.0)

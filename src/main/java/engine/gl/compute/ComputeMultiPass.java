@@ -16,29 +16,14 @@ public class ComputeMultiPass extends ComputePipeline {
 		super(width, height);
 	}
 
-	private AmbientOcclusion ao;
-	private Lighting lighting;
-
-	private MotionBlur mblur;
-	private ColorCorrection colorCorrection;
-	private TAA taa;
-
 	@Override
 	public void setupPasses() {
-		ao = new AmbientOcclusion();
-		super.passes.add(ao);
-
-		lighting = new Lighting();
-		super.passes.add(lighting);
-
-		mblur = new MotionBlur();
-		super.passes.add(mblur);
-
-		colorCorrection = new ColorCorrection();
-		super.passes.add(colorCorrection);
-		
-		taa = new TAA();
-		super.passes.add(taa);
+		super.addStep(PipelineSteps.AMBIENT_OCCLUSION, new HBAO());
+		super.addStep(PipelineSteps.AO_BLUR, new AOBlur());
+		super.addStep(PipelineSteps.LIGHTING, new Lighting());
+		super.addStep(PipelineSteps.MOTION_BLUR, new MotionBlur());
+		super.addStep(PipelineSteps.COLOR_CORRECTION, new ColorCorrection());
+		super.addStep(PipelineSteps.ANTI_ALIASING, new TAA());
 	}
 
 }

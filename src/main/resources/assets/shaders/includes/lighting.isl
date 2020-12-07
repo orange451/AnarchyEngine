@@ -230,6 +230,16 @@ float getDepth(mat4 proj, sampler2D depth, vec2 texcoord) {
 	float B = proj[3][2];
 	return B / (A + zndc);
 }
+
+float getDepth(mat4 proj, sampler2D depth, ivec2 texcoord) {
+	float zndc = texelFetch(depth, texcoord, 0).r;
+#ifdef OneToOneDepth
+	zndc = zndc * 2.0 - 1.0;
+#endif
+	float A = proj[2][2];
+	float B = proj[3][2];
+	return B / (A + zndc);
+}
 #end
 
 #function positionFromDepth

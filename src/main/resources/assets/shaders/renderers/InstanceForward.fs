@@ -62,15 +62,16 @@ uniform int totalDirectionalLights;
 
 void main() {
 
-	vec3 diffuseF = texture(material.diffuseTex, pass_textureCoords).rgb;
+	vec4 diffuseF = texture(material.diffuseTex, pass_textureCoords);
 	float roughness = texture(material.roughnessTex, pass_textureCoords).r;
 	float metallic = texture(material.metallicTex, pass_textureCoords).r;
 
-	diffuseF *= material.diffuse;
+	diffuseF.rgb *= material.diffuse;
 	roughness *= material.roughness;
 	metallic *= material.metallic;
+	diffuseF.a *= transparency;
 
-	if (transparency == 0.0)
+	if (diffuseF.a == 0.0)
 		discard;
 
 	vec3 normal = texture(material.normalTex, pass_textureCoords).rgb;
@@ -125,5 +126,5 @@ void main() {
 		color = final;
 	}
 
-	out_Color = vec4(color, transparency);
+	out_Color = vec4(color, diffuseF.a);
 }

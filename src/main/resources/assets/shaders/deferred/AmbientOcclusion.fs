@@ -60,7 +60,7 @@ vec3 roundStep(vec3 inp, float step) {
 #define SAMPLES_GI 8
 #define MAX_STEPS_GI 100
 #define MAX_DIST_GI 20.0
-#define SURF_DIST_GI 2.0
+#define SURF_DIST_GI voxelOffset
 #define SAMPLE_STEP voxelOffset * 0.5
 
 #define SAMPLES_AO 4
@@ -79,10 +79,11 @@ vec4 computeGI(vec2 textureCoords, vec3 position, vec3 normal, sampler2D gDepth)
 		float dO = 0.0;
 
 		float rand2 = randomS(textureCoords + vec2(641.51224, 423.178), float(frame) + float(j));
-		float rand3 = randomS(textureCoords - vec2(147.16414, 363.941), float(frame) - float(j));
+		float rand3 =
+			randomS(textureCoords - vec2(147.16414, 363.941), float(j + 1) * float(frame));
 
 		vec3 rd = cosWeightedRandomHemisphereDirection(normal, random(rand2), random(rand3));
-		vec3 ro = position + rd * voxelOffset * SURF_DIST_GI;
+		vec3 ro = position + rd * SURF_DIST_GI;
 		int i = 0;
 		bool canHit = false;
 		for (i = 0; i < MAX_STEPS_GI; i++) {
@@ -128,20 +129,20 @@ float computeAmbientOcclusion(vec2 textureCoords, vec3 position, vec3 normal, sa
 		vec3 newPos;
 		vec4 newScreen;
 		vec2 newCoords;
+		vec3 newNorm;
 
-		float depth, newDepth;
+		float depth, newDepth, diff, oldDist, tmpDepth;
 
-		float tmpDepth;
-
-		float dO = 0.0;
-		float odS;
+		float dO = SURF_DIST_AO, odS, step = 0.5;
 
 		float rand2 = randomS(textureCoords + vec2(641.51224, 423.178), float(frame) + float(j));
-		float rand3 = randomS(textureCoords - vec2(147.16414, 363.941), float(frame) - float(j));
+		float rand3 =
+			randomS(textureCoords - vec2(147.16414, 363.941), float(j + 1) * float(frame));
 
 		vec3 rd = cosWeightedRandomHemisphereDirection(normal, random(rand2), random(rand3));
-		vec3 ro = position + rd * SURF_DIST_AO;
+		vec3 ro = position;
 		int i = 0;
+		bool hit = false;
 		for (i = 0; i < MAX_STEPS_AO; i++) {
 			// Move point
 			vec3 p = ro + rd * dO;
@@ -152,39 +153,41 @@ float computeAmbientOcclusion(vec2 textureCoords, vec3 position, vec3 normal, sa
 			newScreen /= newScreen.w;
 			newCoords = newScreen.xy * 0.5 + 0.5;
 
-			if (newCoords.x < 0 || newCoords.x > 1 || newCoords.y < 0 || newCoords.y > 1) {
-				shadow = 1.0;
+			if (newCoords.x < 0 || newCoords.x > 1 || newCoords.y < 0 || newCoords.y > 1)
 				break;
-			}
 
 			// Get new pos
 			tmpDepth = texture(gDepth, newCoords).r;
-			newPos =
-				positionFromDepth(newCoords, tmpDepth, invProjection, invView);
+			newPos = positionFromDepth(newCoords, tmpDepth, invProjection, invView);
+			newNorm = texture(gNormal, newCoords).rgb;
 
 			// Calculate point and new pos depths
 			depth = length(newPos - cameraPosition);
 			newDepth = length(p - cameraPosition);
 
 			// Calculate distance from newPos to point
-			float dS = min(length(newPos - p), 0.1);
+			float dS = min(length(newPos - p), step);
+
+			diff = newDepth - depth;
+
+			if (diff >= 1.0 && diff <= 2.0) {
+				float halfD = oldDist / 2.0;
+				step = max(step / 2.0, 0.1);
+				dS = -halfD;
+			} else if (diff > 0.001 && diff < 1.0) {
+				if (dot(newNorm, normalize(p - ro)) < 1.0)
+					hit = true;
+				break;
+			}
+
 			dO += dS; // Add distance to distance from origin
+			oldDist = dS;
 
-			float diff = newDepth - depth;
-
-			if (diff > 0.001) {
-				// shadow = smoothstep(0.0, 1.0, dO); // Ground truth returns 0.0
-				shadow = smoothstep(1.0, 1.001, diff); // Ground truth returns 0.0
+			if (dO > MAX_DIST_AO)
 				break;
-			}
-
-			if (dO > MAX_DIST_AO) {
-				shadow = 1.0;
-				break;
-			}
 		}
-		if (i == MAX_STEPS_AO) {
-			shadow = 1.0;
+		if (hit) {
+			shadow = smoothstep(1.0, 1.001, diff); // Ground truth returns 0.0
 		}
 		aoCombined += shadow;
 	}
@@ -238,14 +241,13 @@ void main() {
 #endif
 				if (useAO) {
 					float ao = computeAmbientOcclusion(textureCoords, position, AON, gDepth,
-													   projectionMatrix, viewMatrix, inverseProjectionMatrix,
-													   inverseViewMatrix);
+													   projectionMatrix, viewMatrix,
+													   inverseProjectionMatrix, inverseViewMatrix);
 #ifndef MACOS
 					gi.a *= ao;
 					gi.rgb *= ao;
 #else
-					gi.a *= ao;
-					gi.rgb *= ao;
+					gi.a = ao;
 #endif
 				}
 				image = vec4(gi);

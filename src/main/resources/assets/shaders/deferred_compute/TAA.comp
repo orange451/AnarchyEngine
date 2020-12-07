@@ -23,24 +23,24 @@ uniform sampler2D gMotion;
 uniform bool useTAA;
 
 void main() {
-	ivec2 pixelcoords = ivec2(gl_GlobalInvocationID.xy);
-	vec2 textureCoords = pixelcoords.xy / resolution + pixelOffset;
+	ivec2 pixelCoords = ivec2(gl_GlobalInvocationID.xy);
+	vec2 textureCoords = pixelCoords.xy / resolution + pixelOffset;
 
 	if (!useTAA) {
-		imageStore(out_color, pixelcoords, vec4(texture(image, textureCoords).rgb, 0.0));
+		imageStore(out_color, pixelCoords, vec4(texelFetch(image, pixelCoords, 0).rgb, 0.0));
 		return;
 	}
 	vec3 neighbourhood[9];
 
-	neighbourhood[0] = texture(image, textureCoords + vec2(-1, -1) * pixelSize).rgb;
-	neighbourhood[1] = texture(image, textureCoords + vec2(+0, -1) * pixelSize).rgb;
-	neighbourhood[2] = texture(image, textureCoords + vec2(+1, -1) * pixelSize).rgb;
-	neighbourhood[3] = texture(image, textureCoords + vec2(-1, +0) * pixelSize).rgb;
-	neighbourhood[4] = texture(image, textureCoords + vec2(+0, +0) * pixelSize).rgb;
-	neighbourhood[5] = texture(image, textureCoords + vec2(+1, +0) * pixelSize).rgb;
-	neighbourhood[6] = texture(image, textureCoords + vec2(-1, +1) * pixelSize).rgb;
-	neighbourhood[7] = texture(image, textureCoords + vec2(+0, +1) * pixelSize).rgb;
-	neighbourhood[8] = texture(image, textureCoords + vec2(+1, +1) * pixelSize).rgb;
+	neighbourhood[0] = texelFetch(image, pixelCoords + ivec2(-1, -1), 0).rgb;
+	neighbourhood[1] = texelFetch(image, pixelCoords + ivec2(+0, -1), 0).rgb;
+	neighbourhood[2] = texelFetch(image, pixelCoords + ivec2(+1, -1), 0).rgb;
+	neighbourhood[3] = texelFetch(image, pixelCoords + ivec2(-1, +0), 0).rgb;
+	neighbourhood[4] = texelFetch(image, pixelCoords + ivec2(+0, +0), 0).rgb;
+	neighbourhood[5] = texelFetch(image, pixelCoords + ivec2(+1, +0), 0).rgb;
+	neighbourhood[6] = texelFetch(image, pixelCoords + ivec2(-1, +1), 0).rgb;
+	neighbourhood[7] = texelFetch(image, pixelCoords + ivec2(+0, +1), 0).rgb;
+	neighbourhood[8] = texelFetch(image, pixelCoords + ivec2(+1, +1), 0).rgb;
 
 	vec3 nmin = neighbourhood[0];
 	vec3 nmax = neighbourhood[0];
@@ -49,7 +49,7 @@ void main() {
 		nmax = max(nmax, neighbourhood[i]);
 	}
 
-	vec2 vel = texture(gMotion, textureCoords).rg * 0.5;
+	vec2 vel = texelFetch(gMotion, pixelCoords, 0).rg * 0.5;
 
 	vec2 histUv = textureCoords + vel;
 
@@ -67,8 +67,8 @@ void main() {
 
 	vec3 curSample = neighbourhood[4];
 	vec3 color = mix(histSample, curSample, vec3(blend));
-	imageStore(out_color, pixelcoords, vec4(color, 0.0));
 
+	imageStore(out_color, pixelCoords, vec4(color, 0.0));
 	//	out_Color.rgb = vec3(vel.x, 0, vel.y);
 	// out_Color.rgb = vec3(texture(gMotion, textureCoords).rg + 0.5, 0.0);
 }

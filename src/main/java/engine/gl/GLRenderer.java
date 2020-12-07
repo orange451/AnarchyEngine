@@ -92,8 +92,7 @@ public class GLRenderer implements IPipeline {
 
 	private HandlesRenderer handlesRenderer;
 
-	private ComputePipeline cp;
-	private DeferredPipeline dp;
+	private IDeferredPipeline dp;
 	private PostProcessPipeline pp;
 	private RenderingSettings renderingSettings;
 	private RendererData rnd;
@@ -161,7 +160,14 @@ public class GLRenderer implements IPipeline {
 			renderingManager.addRenderer(new InstanceRenderer());
 			renderingManager.addRenderer(new AnimInstanceRenderer());
 			handlesRenderer = new HandlesRenderer();
-			dp = new MultiPass(width, height);
+			if (useComputeShaders) {
+				System.out.println("Using Compute Shaders");
+				dp = new ComputeMultiPass(width, height);
+			}
+			else {
+				System.out.println("Using Pixel Shaders");
+				dp = new MultiPass(width, height);
+			}
 			pp = new PostProcess(width, height, window.getContext().getNVG());
 			projMatrix = Maths.createProjectionMatrix(width, height, 90, 0.1f, Float.POSITIVE_INFINITY, true);
 
@@ -177,9 +183,6 @@ public class GLRenderer implements IPipeline {
 			rnd.rs = renderingSettings;
 			rnd.vm = vm = new VoxelizedManager();
 
-			if (useComputeShaders)
-				cp = new ComputeMultiPass(width, height);
-
 			size.set(width, height);
 			enabled = true;
 			initialized = true;
@@ -190,8 +193,6 @@ public class GLRenderer implements IPipeline {
 		Game.userInputService().inputBeganEvent().connect((args) -> {
 			if (args[0].get("KeyCode").eq_b(LuaValue.valueOf(GLFW.GLFW_KEY_F5))) {
 				System.out.println("Reloading Shaders...");
-				if (useComputeShaders)
-					cp.reloadShaders();
 				dp.reloadShaders();
 				pp.reloadShaders();
 			}
@@ -425,7 +426,8 @@ public class GLRenderer implements IPipeline {
 		shadowPass();
 		environmentPass();
 		// occlusionPass();
-		voxelizePass();
+		// voxelizePass();
+
 		gBufferPass(dp);
 		deferredPass(dp);
 		forwardPass(dp);
@@ -450,8 +452,6 @@ public class GLRenderer implements IPipeline {
 		this.width = width;
 		this.height = height;
 		this.size.set(width, height);
-		if (useComputeShaders)
-			cp.resize(width, height);
 		dp.resize(width, height);
 		pp.resize(width, height);
 		directionalLightHandler.resize(width, height);
@@ -464,8 +464,6 @@ public class GLRenderer implements IPipeline {
 	public void dispose() {
 		envRenderer.dispose();
 		// envRendererEntities.dispose();
-		if (useComputeShaders)
-			cp.dispose();
 		dp.dispose();
 		pp.dispose();
 		directionalLightHandler.dispose();
