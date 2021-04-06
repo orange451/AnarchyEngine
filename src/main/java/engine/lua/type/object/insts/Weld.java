@@ -13,10 +13,13 @@ package engine.lua.type.object.insts;
 import org.luaj.vm2.LuaValue;
 
 import engine.lua.type.object.Instance;
+import engine.lua.type.object.WeldedStructure;
 
 public class Weld extends Instance {
 	protected final static LuaValue C_INSTANCE_0 = LuaValue.valueOf("Instance0");
 	protected final static LuaValue C_INSTANCE_1 = LuaValue.valueOf("Instance1");
+	
+	private WeldedStructure structure;
 	
 	public Weld() {
 		super("Weld");
@@ -41,7 +44,10 @@ public class Weld extends Instance {
 
 	@Override
 	public void onDestroy() {
-		//
+		if ( structure != null ) {
+			structure = null;
+			structure.removeWeld(this);
+		}
 	}
 
 	public Instance getInstance0() {
