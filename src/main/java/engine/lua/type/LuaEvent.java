@@ -15,11 +15,14 @@ import java.util.Collections;
 import java.util.List;
 
 import org.luaj.vm2.LuaFunction;
+import org.luaj.vm2.LuaThread;
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.Varargs;
+import org.luaj.vm2.lib.OneArgFunction;
 import org.luaj.vm2.lib.TwoArgFunction;
 import org.luaj.vm2.lib.VarArgFunction;
 
+import engine.lua.LuaEngine;
 import engine.lua.RunnableArgs;
 import engine.lua.type.object.ScriptBase;
 
@@ -27,6 +30,7 @@ public class LuaEvent extends LuaDatatype {
 
 	protected List<LuaConnection> connections = Collections.synchronizedList(new ArrayList<LuaConnection>());
 	protected List<LuaConnection> disconnectQueue = Collections.synchronizedList(new ArrayList<LuaConnection>());
+	protected List<LuaThread> waitingThreads = Collections.synchronizedList(new ArrayList<LuaThread>());
 
 	public LuaEvent() {
 		this.rawset("Connect", new TwoArgFunction() {
@@ -35,7 +39,21 @@ public class LuaEvent extends LuaDatatype {
 				return connectLua(arg);
 			}
 		});
+		this.rawset("Wait", new TwoArgFunction() {
+			@Override
+			public LuaValue call(LuaValue myself, LuaValue dead) {
+				LuaEvent.this.wait(myself.checkthread());
+				return LuaValue.NIL;
+			}
+		});
 		this.setLocked(true);
+	}
+	
+	public void wait(LuaThread thread) {
+		synchronized(waitingThreads) {
+			thread.state.lua_yield(LuaValue.NIL);
+			waitingThreads.add(thread);
+		}
 	}
 	
 	/**
@@ -106,18 +124,26 @@ public class LuaEvent extends LuaDatatype {
 				if ( temp == null )
 					continue;
 
-				//LuaThread lt = (LuaThread) LuaEngine.globals.get("coroutine").get("create").call(temp.getFunction());
-				//LuaEngine.globals.get("coroutine").get("resume").invoke(LuaValue.varargsOf( lt, vargs ));
+				LuaThread lt = (LuaThread) LuaEngine.globals.get("coroutine").get("create").call(temp.getFunction());
+				LuaEngine.globals.get("coroutine").get("resume").invoke(LuaValue.varargsOf( lt, vargs ));
+				
 				//LuaEngine.globals.get("spawn").call(temp.getFunction());
 				//LuaEngine.spawn(temp.getFunction(), null, vargs);
 				
-				try {
+				/*try {
 					ScriptRunner t = ScriptRunner.create(temp.getFunction(), null, vargs);
 					t.run();
 				}catch(Exception e) {
 					//
-				}
+				}*/
 			}
+		}
+		
+		synchronized(waitingThreads) {
+			for (LuaThread thread : waitingThreads) {
+				thread.state.lua_resume(thread, LuaValue.NIL);
+			}
+			waitingThreads.clear();
 		}
 	}
 
